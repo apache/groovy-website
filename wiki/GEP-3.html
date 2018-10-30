@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]--><head>
+    <meta charset='utf-8'/><meta http-equiv='X-UA-Compatible' content='IE=edge'/><meta name='viewport' content='width=device-width, initial-scale=1'/><title>The Apache Groovy programming language - Developer docs - GEP-3</title><link href='..\img/favicon.ico' type='image/x-ico' rel='icon'/><link rel='stylesheet' type='text/css' href='..\css/bootstrap.css'/><link rel='stylesheet' type='text/css' href='..\css/font-awesome.min.css'/><link rel='stylesheet' type='text/css' href='..\css/style.css'/><link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css'/>
+</head><body>
+    <div id='fork-me'>
+        <a href='https://github.com/apache/groovy'>
+            <img style='position: fixed; top: -14px; right: -14px; border: 0; z-index: 100' src='https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67' alt='Fork me on GitHub' data-canonical-src='https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png'/>
+        </a>
+    </div><div id='st-container' class='st-container st-effect-9'>
+        <nav class='st-menu st-effect-9' id='menu-12'>
+            <h2 class='icon icon-lab'>Socialize</h2><ul>
+                <li>
+                    <a href='http://groovy-lang.org/mailing-lists.html' class='icon'><span class='fa fa-envelope'></span> Discuss on the mailing-list</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/groovy-weekly.html' class='icon'><span class='fa fa-envelope-o'></span> Groovy newsletter</a>
+                </li><li>
+                    <a href='https://twitter.com/ApacheGroovy' class='icon'><span class='fa fa-twitter'></span> Groovy on Twitter</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/events.html' class='icon'><span class='fa fa-calendar'></span> Events and conferences</a>
+                </li><li>
+                    <a href='https://github.com/apache/groovy' class='icon'><span class='fa fa-github'></span> Source code on GitHub</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/reporting-issues.html' class='icon'><span class='fa fa-bug'></span> Report issues in Jira</a>
+                </li><li>
+                    <a href='https://google.com/+groovy' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Page</a>
+                </li><li>
+                    <a href='http://bit.ly/g-community' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Community</a>
+                </li><li>
+                    <a href='http://stackoverflow.com/questions/tagged/groovy' class='icon'><span class='fa fa-stack-overflow'></span> Stack Overflow questions</a>
+                </li><li>
+                    <a href='http://groovycommunity.com/' class='icon'><span class='fa fa-slack'></span> Slack Community</a>
+                </li>
+            </ul>
+        </nav><div class='st-pusher'>
+            <div class='st-content'>
+                <div class='st-content-inner'>
+                    <!--[if lt IE 7]>
+                    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+                <![endif]--><div><div class='navbar navbar-default navbar-static-top' role='navigation'>
+                            <div class='container'>
+                                <div class='navbar-header'>
+                                    <button type='button' class='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
+                                        <span class='sr-only'></span><span class='icon-bar'></span><span class='icon-bar'></span><span class='icon-bar'></span>
+                                    </button><a class='navbar-brand' href='..\index.html'>
+                                        <i class='fa fa-star'></i> Apache Groovy
+                                    </a>
+                                </div><div class='navbar-collapse collapse'>
+                                    <ul class='nav navbar-nav navbar-right'>
+                                        <li class=''><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li class=''><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li class=''><a href='http://groovy-lang.org/download.html'>Download</a></li><li class=''><a href='http://groovy-lang.org/support.html'>Support</a></li><li class=''><a href='..\/'>Contribute</a></li><li class=''><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li><li>
+                                            <a data-effect='st-effect-9' class='st-trigger' href='#'>Socialize</a>
+                                        </li><li class=''>
+                                            <a href='..\search.html'>
+                                                <i class='fa fa-search'></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><div id='content' class='page-1'><div class='row'><div class='row-fluid'><div class='col-lg-3'><ul class='nav-sidebar'><li class='active'><a href='#doc'>GEP-3</a></li><li><a href='#_abstract' class='anchor-link'>Abstract</a></li><li><a href='#_rationale' class='anchor-link'>Rationale</a></li><li><a href='#_references_and_useful_links' class='anchor-link'>References and useful links</a></li><li><a href='#_update_history' class='anchor-link'>Update history</a></li></ul></div><div class='col-lg-8 col-lg-pull-0'><a name='doc'></a><h1>GEP-3</h1><p>Author: <i/></p><hr/><div id="preamble">
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Metadata</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<strong>Number</strong>
+</td>
+<td class="hdlist2">
+<p>GEP-3</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Title</strong>
+</td>
+<td class="hdlist2">
+<p>Command Expression based DSL</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Version</strong>
+</td>
+<td class="hdlist2">
+<p>2</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Type</strong>
+</td>
+<td class="hdlist2">
+<p>Feature</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Target</strong>
+</td>
+<td class="hdlist2">
+<p>Groovy 1.8 or 2.0</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Status</strong>
+</td>
+<td class="hdlist2">
+<p>Final</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Comment</strong>
+</td>
+<td class="hdlist2">
+<p>Included in Groovy and has been further enhanced</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Leader</strong>
+</td>
+<td class="hdlist2">
+<p>Jochen "blackdrag" Theodorou</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Created</strong>
+</td>
+<td class="hdlist2">
+<p>2009-06-30</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Last modification</strong>&#160;
+</td>
+<td class="hdlist2">
+<p>2018-10-12</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_abstract">Abstract</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Since Groovy 1.0 Groovy supports command expressions. These are method calls without parenthesizing the arguments.
+This would be in theory a nice base for DSLs, but our command expressions are too limited,
+because we were not able to find easy rules on how to handle multiple arguments.
+This proposal now tries to close the gap by defining the evaluation order and meaning of those arguments.
+The concept is very near to what Scala allows, but is not equal for historic reasons.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_rationale">Rationale</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_current_command_expression">Current Command Expression</h3>
+<div class="paragraph">
+<p>Examples of current command expressions are:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Command expression</th>
+<th class="tableblock halign-left valign-top">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo (a1)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo {c}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo ({c})</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo m {c}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo (m({c})</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1, a2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo (a1, a2)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo k1:v1, a2, k2:v2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo ([k1:v1, k2:v2], a2)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo k1:m{c}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo ([k1:m({c})])</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Examples of current command expressions, that are not allowed:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Command expression</th>
+<th class="tableblock halign-left valign-top">Possible meanings</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 a2</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre>foo(a1,a2)
+foo(a1(a2))
+foo(a1).a2</pre>
+</div>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 a2 a3</code></p></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="listingblock">
+<div class="content">
+<pre>foo(a1,a2,a3)
+foo(a1(a2(a3)))
+foo(a1).a2(a3)
+foo(a1,a2(a3))</pre>
+</div>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>This list is not intended to be complete.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_constraints">Constraints</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>existing valid usages must be kept as much as possible (for obvious backwards compatibility reasons)</p>
+</li>
+<li>
+<p>the evaluation must be easily explainable</p>
+</li>
+<li>
+<p>the grammar should support it</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_details">Details</h3>
+<div class="paragraph">
+<p>What I want to allow are expressions such as:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Expression</th>
+<th class="tableblock halign-left valign-top">Possible meanings</th>
+<th class="tableblock halign-left valign-top">Allowed in old syntax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo {c}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo({c})</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs up]</span> (same meaning)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo(a1)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs up]</span> (same meaning)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo(a1())</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs up]</span> (same meaning)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 {c}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo(a1({c}))</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs up]</span> (same meaning)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 a2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1() a2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 a2()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 a2 {c}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 {c} a2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 {c} a2 {c}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 a2 a3</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo(a1).a2(a3)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1() a2 a3()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo(a1()).a2(a3())</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 a2() a3</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 a2 a3 {c}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo(a1).a2(a3({c}))</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 a2 a3 a4</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 a2 a3 a4 {c}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 a2 a3 a4 a5</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo(a1).a2(a3).a4(a5)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1() a2 a3() a4 a5()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo(a1()).a2(a3()).a4(a5())</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo a1 a2 a3 a4 a5 {c}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>foo(a1).a2(a3).a4(a5({c})</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="icon">[thumbs down]</span></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The table shows enough to recognize the pattern. The attached block has a special role as it does not count as argument
+on its own directly. Instead the block is always bound to the identifier before and makes a method call.
+That itself is no command expression, but a normal method call expression. As can be seen too,
+this syntax nicely extends the existing Groovy syntax. Of course this also means, it will not be possible to omit
+commas if multiple arguments are used. A case that is not supported today anyway. For a DSL that is not really a problem though.</p>
+</div>
+<div class="sect3">
+<h4 id="_summary_of_the_pattern">Summary of the pattern</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>A command-expression is composed of an even number of elements</p>
+</li>
+<li>
+<p>The elements are alternating a method name, and its parameters (can be named and non-named parameters)</p>
+</li>
+<li>
+<p>A parameter element can be any kind of expression (ie. a method call foo(), foo{}, or some expression like x+y)</p>
+</li>
+<li>
+<p>All those pairs of method name and parameters are actually chained method calls (ie. send "hello" to "Guillaume"
+is two methods chained one after the other as send("hello").to("Guillaume"))</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_interesting_benefit_of_the_enhanced_command_expressions">Interesting benefit of the enhanced command expressions</h4>
+<div class="paragraph">
+<p>More and more do we see Java Fluent APIs that chain method calls, returning this, so as to "build" a new object.
+For instance, you can imagine a fluent API for building an Email message, that would look something like this in Java:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>Email.from("foo@example.com").to("bar@example.com").subject("hello").body("how are you?")</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In Groovy, with the extended command expressions, this could become:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>Email.from "foo@example.com" to "bar@example.com" subject "hello" body "how are you?"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice the absence of parentheses and dots.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_example_a_dsl_for_sql">Example: A DSL for SQL</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>SELECT "column_name"
+FROM "table_name"
+WHERE "column_name" IN ('value1', 'value2', ...)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In current Groovy this could maybe expressed by</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>sql.select(
+  "column_name",
+  from:"table_name",
+  where:"column_name",
+  in:['value1','value2',...])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With this new command dsl you could also do</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>sql.
+  select "column_name" \\
+  from "table_name" \\
+  where "column_name" \\
+  in ['value1','value2',...]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It should be noticed, that both cases have quite different semantics. In the second case the writer saves a lot of commas, but of course not all of them. Also the lack of any kind of operator like the comma makes it diifivult to span the DSL across multiple lines. A more extended example would be</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>SELECT COUNT("column_name")
+FROM "table_name"
+sql.select count("column_name") from "table_name"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To express this in map style is a bit difficult, because of where to place count&#8230;&#8203; a possible version is mabye</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>sql.select(sql.count("column_name"), from:"table_name"</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_more_example_ideas">More example ideas</h4>
+<div class="paragraph">
+<p>Here are some additional examples which relate to various domains, which may make the idea more visual in our minds.
+These examples also mix named and non-named arguments, the use closures or not.
+In comments, alongside the example, you&#8217;ll see the equivalent non-command expression interpretation.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>sell 100.shares of MSFT // sell(100.shares).of(MSFT)
+every 10.minutes, execute {} // already possible with current command expressions
+schedule executionOf { ... } every 10.minutes // scheduler(executionOf({})).every(10.minutes)
+blend red, green of acrylic // blend(red, gree).of(acrylic)
+
+// named parameters into the mix
+select from: users where age &gt; 32 and sex == 'male'
+// equivalent to select(from: users).where(age &gt; 32).and(sex == 'male')
+// not that however for this example, it would be intersting
+// to transparently convert the boolean conditions into closure expressions!
+
+// a recipe DSL
+take mediumBowl
+combine soySauce, vinegar, chiliPowder, garlic
+place chicken in sauce
+turn once to coat
+marinate 30.minutes at roomTemperature</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_extension_to_command_expressions_in_the_case_of_assignments">Extension to command expressions in the case of assignments</h4>
+<div class="paragraph">
+<p>Currently, command expressions are allowed as standalone top-leval statements or expressions, but you can&#8217;t assign such an expression to a variable with keeping that nice DSL syntax. For instance, while you can do:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>move left</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you wanted to assign that command (which could return a Position instance), you would like to do</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>def newPosition = move left</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>But you still have to do</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>def newPosition = move(left)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So the GEP-3 proposal also suggests we extend command expressions to be allowed on the RHS of assignments.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_differences_to_scala">Differences to Scala</h4>
+<div class="paragraph">
+<p>For historic reasons</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>println foo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>has to be supported. This seems to not to be a valid version in Scala, since that would be interpreted as</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>println.foo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and not as</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>this.println foo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On the other hand</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>foo bar a1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>is interpreted as</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>foo.bar(a1)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>in Scala and is invalid in current Groovy as well as after this proposal. So it could be stated, that this proposal is less object oriented then Scala, because the DSL usually starts with the method, not the object. On the other hand it is possible to write</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>foo.bar a1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So the Groovy notation would be a bit more verbose, but not much.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_to_be_evaluated_mixed_case_with_explicit_parentheses">To be evaluated: Mixed case with explicit parentheses</h4>
+<div class="paragraph">
+<p>A possible supported case is also when mixing method calls with explicit parentheses within that extended command expression.
+The benefit would be to allow the ability to also be able to call methods not taking parameters, as well as allowing an odd number of "elements" (ie. a method name or a parameter).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>m1 a m2 b m3()
+m1 a m2() m3 b
+m1() m2 a m3 b</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>would be respectively equivalent to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>m1(a).m2(b).m3()
+m1(a).m2().m3(b)
+m1().m2(a).m3(b)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that the method calls with explicit parentheses could also take a number of arguments.
+For instance, this is also a valid mixed command expression:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>m1 a m2(1, 2, 3) m3 b</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_references_and_useful_links">References and useful links</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_jira_issues">JIRA issues:</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Implement GEP-3: extended command expressions <a href="https://issues.apache.org/jira/browse/GROOVY-4384">GROOVY-4384</a></p>
+</li>
+<li>
+<p>Ability to use (extended) command expression on the RHS <a href="https://issues.apache.org/jira/browse/GROOVY-4401">GROOVY-4401</a></p>
+</li>
+<li>
+<p>Allow zero-args methods in the chain of calls <a href="https://issues.apache.org/jira/browse/GROOVY-4402">GROOVY-4402</a></p>
+</li>
+<li>
+<p>Disambiguate cases where minus something or [] or {} are used as the argument of extended command expressions <a href="https://issues.apache.org/jira/browse/GROOVY-4403">GROOVY-4403</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_update_history">Update history</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">1 (2009-06-17)</dt>
+<dd>
+<p>Version as extracted from Codehaus wiki</p>
+</dd>
+<dt class="hdlist1">2 (2018-10-11)</dt>
+<dd>
+<p>Numerous minor tweaks</p>
+</dd>
+</dl>
+</div>
+</div>
+</div></div></div></div></div><footer id='footer'>
+                            <div class='row'>
+                                <div class='colset-3-footer'>
+                                    <div class='col-1'>
+                                        <h1>Groovy</h1><ul>
+                                            <li><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li><a href='http://groovy-lang.org/download.html'>Download</a></li><li><a href='http://groovy-lang.org/support.html'>Support</a></li><li><a href='..\/'>Contribute</a></li><li><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li>
+                                        </ul>
+                                    </div><div class='col-2'>
+                                        <h1>About</h1><ul>
+                                            <li><a href='https://github.com/apache/groovy'>Source code</a></li><li><a href='http://groovy-lang.org/security.html'>Security</a></li><li><a href='http://groovy-lang.org/learn.html#books'>Books</a></li><li><a href='http://groovy-lang.org/thanks.html'>Thanks</a></li><li><a href='http://www.apache.org/foundation/sponsorship.html'>Sponsorship</a></li><li><a href='http://groovy-lang.org/faq.html'>FAQ</a></li><li><a href='http://groovy-lang.org/search.html'>Search</a></li>
+                                        </ul>
+                                    </div><div class='col-3'>
+                                        <h1>Socialize</h1><ul>
+                                            <li><a href='http://groovy-lang.org/mailing-lists.html'>Discuss on the mailing-list</a></li><li><a href='http://groovy-lang.org/groovy-weekly.html'>Groovy newsletter</a></li><li><a href='https://twitter.com/ApacheGroovy'>Groovy on Twitter</a></li><li><a href='http://groovy-lang.org/events.html'>Events and conferences</a></li><li><a href='https://github.com/apache/groovy'>Source code on GitHub</a></li><li><a href='http://groovy-lang.org/reporting-issues.html'>Report issues in Jira</a></li><li><a href='https://google.com/+groovy'>Google+ Groovy Page</a></li><li><a href='http://bit.ly/g-community'>Google+ Groovy Community</a></li><li><a href='http://stackoverflow.com/questions/tagged/groovy'>Stack Overflow questions</a></li><li><a href='http://groovycommunity.com/'>Slack Community</a></li>
+                                        </ul>
+                                    </div><div class='col-right'>
+                                        <p>
+                                            The Groovy programming language is supported by the <a href='http://www.apache.org'>Apache Software Foundation</a> and the Groovy community
+                                        </p><img src='..\img/asf_logo.png' title='The Apache Software Foundation' alt='The Apache Software Foundation' class='img-responsive'/>
+                                    </div>
+                                </div><div class='clearfix'>&copy; 2003-2018 the Apache Groovy project &mdash; Groovy is Open Source, <a href='http://www.apache.org/licenses/LICENSE-2.0.html'>Apache 2 License</a></div>
+                            </div>
+                        </footer></div>
+                </div>
+            </div>
+        </div>
+    </div><script src='..\js/vendor/jquery-1.10.2.min.js' defer></script><script src='..\js/vendor/classie.js' defer></script><script src='..\js/vendor/bootstrap.js' defer></script><script src='..\js/vendor/sidebarEffects.js' defer></script><script src='..\js/vendor/modernizr-2.6.2.min.js' defer></script><script src='..\js/plugins.js' defer></script><script src='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js'></script><script>document.addEventListener('DOMContentLoaded',prettyPrint)</script><script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-257558-10', 'auto');
+          ga('send', 'pageview');
+    </script>
+</body></html>

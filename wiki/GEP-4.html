@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]--><head>
+    <meta charset='utf-8'/><meta http-equiv='X-UA-Compatible' content='IE=edge'/><meta name='viewport' content='width=device-width, initial-scale=1'/><title>The Apache Groovy programming language - Developer docs - GEP-4</title><link href='..\img/favicon.ico' type='image/x-ico' rel='icon'/><link rel='stylesheet' type='text/css' href='..\css/bootstrap.css'/><link rel='stylesheet' type='text/css' href='..\css/font-awesome.min.css'/><link rel='stylesheet' type='text/css' href='..\css/style.css'/><link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css'/>
+</head><body>
+    <div id='fork-me'>
+        <a href='https://github.com/apache/groovy'>
+            <img style='position: fixed; top: -14px; right: -14px; border: 0; z-index: 100' src='https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67' alt='Fork me on GitHub' data-canonical-src='https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png'/>
+        </a>
+    </div><div id='st-container' class='st-container st-effect-9'>
+        <nav class='st-menu st-effect-9' id='menu-12'>
+            <h2 class='icon icon-lab'>Socialize</h2><ul>
+                <li>
+                    <a href='http://groovy-lang.org/mailing-lists.html' class='icon'><span class='fa fa-envelope'></span> Discuss on the mailing-list</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/groovy-weekly.html' class='icon'><span class='fa fa-envelope-o'></span> Groovy newsletter</a>
+                </li><li>
+                    <a href='https://twitter.com/ApacheGroovy' class='icon'><span class='fa fa-twitter'></span> Groovy on Twitter</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/events.html' class='icon'><span class='fa fa-calendar'></span> Events and conferences</a>
+                </li><li>
+                    <a href='https://github.com/apache/groovy' class='icon'><span class='fa fa-github'></span> Source code on GitHub</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/reporting-issues.html' class='icon'><span class='fa fa-bug'></span> Report issues in Jira</a>
+                </li><li>
+                    <a href='https://google.com/+groovy' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Page</a>
+                </li><li>
+                    <a href='http://bit.ly/g-community' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Community</a>
+                </li><li>
+                    <a href='http://stackoverflow.com/questions/tagged/groovy' class='icon'><span class='fa fa-stack-overflow'></span> Stack Overflow questions</a>
+                </li><li>
+                    <a href='http://groovycommunity.com/' class='icon'><span class='fa fa-slack'></span> Slack Community</a>
+                </li>
+            </ul>
+        </nav><div class='st-pusher'>
+            <div class='st-content'>
+                <div class='st-content-inner'>
+                    <!--[if lt IE 7]>
+                    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+                <![endif]--><div><div class='navbar navbar-default navbar-static-top' role='navigation'>
+                            <div class='container'>
+                                <div class='navbar-header'>
+                                    <button type='button' class='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
+                                        <span class='sr-only'></span><span class='icon-bar'></span><span class='icon-bar'></span><span class='icon-bar'></span>
+                                    </button><a class='navbar-brand' href='..\index.html'>
+                                        <i class='fa fa-star'></i> Apache Groovy
+                                    </a>
+                                </div><div class='navbar-collapse collapse'>
+                                    <ul class='nav navbar-nav navbar-right'>
+                                        <li class=''><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li class=''><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li class=''><a href='http://groovy-lang.org/download.html'>Download</a></li><li class=''><a href='http://groovy-lang.org/support.html'>Support</a></li><li class=''><a href='..\/'>Contribute</a></li><li class=''><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li><li>
+                                            <a data-effect='st-effect-9' class='st-trigger' href='#'>Socialize</a>
+                                        </li><li class=''>
+                                            <a href='..\search.html'>
+                                                <i class='fa fa-search'></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><div id='content' class='page-1'><div class='row'><div class='row-fluid'><div class='col-lg-3'><ul class='nav-sidebar'><li class='active'><a href='#doc'>GEP-4</a></li><li><a href='#_abstract' class='anchor-link'>Abstract</a></li><li><a href='#_approach' class='anchor-link'>Approach</a></li><li><a href='#_references_and_useful_links' class='anchor-link'>References and useful links</a></li><li><a href='#_update_history' class='anchor-link'>Update history</a></li></ul></div><div class='col-lg-8 col-lg-pull-0'><a name='doc'></a><h1>GEP-4</h1><p>Author: <i/></p><hr/><div id="preamble">
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Metadata</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<strong>Number</strong>
+</td>
+<td class="hdlist2">
+<p>GEP-4</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Title</strong>
+</td>
+<td class="hdlist2">
+<p>AstBuilder AST Templates</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Version</strong>
+</td>
+<td class="hdlist2">
+<p>2</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Type</strong>
+</td>
+<td class="hdlist2">
+<p>Feature</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Status</strong>
+</td>
+<td class="hdlist2">
+<p>Rejected</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Comment</strong>
+</td>
+<td class="hdlist2">
+<p>The approach used in Groovy macros was pursued instead</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Leader</strong>
+</td>
+<td class="hdlist2">
+<p>Hamlet D&#8217;Arcy</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Created</strong>
+</td>
+<td class="hdlist2">
+<p>2010-02-16</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Last modification</strong>&#160;
+</td>
+<td class="hdlist2">
+<p>2018-10-12</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_abstract">Abstract</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The AstBuilder was introduced in Groovy 1.7 as a way to ease the task of writing AST transformations.
+The "fromCode" approach allows you generate the AST from a piece of code. Currently, the AstBuilder fromCode API
+accepts a closure as a parameter, and the code within the closure it transformed to AST.
+A limitation of the AstBuilder is that the closure parameter does not allow variables in the surrounding
+context to be referenced: there is no way to pass a parameter into the code block.
+It was initially discussed but the idea was deemed too much effort to fit into 1.7.</p>
+</div>
+<div class="paragraph">
+<p>This AST Template feature allows you to pass parameters into the AstBuilder.
+Similar to how a $ works in GString interpolation, there needs to be a way to bind a variable from the
+enclosing scope into an AstBuilder closure. The syntax proposed is to use oxford brackets (see below).
+An AstBuilder closure containing GEP 4 - AstBuilder AST Templates will have the variable within the brackets bound in.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_approach">Approach</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The oxford brackets are used to bind, or quasi-quote, variables from the enclosing scope into an AstBuilder parameter.</p>
+</div>
+<div class="paragraph">
+<p>Example 1: String concatenation</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>def constant = new ConstantExpression("World")
+List&lt;ASTNode&gt; greeting = AstBuilder.buildFromCode { "Hello" + [ | constant | ]  }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Produces the AST</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>BlockStatement
+-&gt; ExpressionStatement
+   -&gt; BinaryExpression +
+      -&gt; ConstantExpresssion - Hello
+      -&gt; ConstantExpression - World</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Example 2: Producing a println</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>new AstBuilder().buildFromCode { println([ | message | ]) }[0]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>is equivalent to invoking this method:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>private Statement createPrintlnAst(String message) {
+   return new ExpressionStatement(
+       new MethodCallExpression(
+           new VariableExpression("this"),
+           new ConstantExpression("println"),
+           new ArgumentListExpression(
+               new ConstantExpression(message)
+           )
+       )
+   )
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Example 3: Memoization of a method</p>
+</div>
+<div class="paragraph">
+<p>Presumably, you would have the existing method AST in a variable called "methodNode":</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>def methodNode = ...
+def parameters = methodNode.parameters
+
+def newMethod = new AstBuilder().buildFromCode {
+ if (cache.contains([ | parameters | ])) {
+   return cache.get([ | parameters | ])
+ }
+ def result = [ | methodNode.code | ]
+ cache.put([ | parameters | ])
+ return result
+}
+
+methodNode.code = newMethod[0]</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_alternatives">Alternatives</h3>
+<div class="paragraph">
+<p>There are many syntax alternatives:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Lisp uses ´ and ,</p>
+</li>
+<li>
+<p>Template Haskell uses something similar to oxford brackets but with slightly different semantics</p>
+</li>
+<li>
+<p>Boo uses uses GEP 4 - AstBuilder AST Templates and $ but with slightly different semantics</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>A $ was considered but cannot be used as it is already a meaningful identifier.
+Boo Meta Method Comparison
+The Boo Metamethod feature overlaps with the Groovy AST Transformation features. Instead of an @AstTransformation interface with a seperately defined AstTransformation subclass, Boo offers Meta methods, where the AST Transformation is called and generated at compile time.</p>
+</div>
+<div class="paragraph">
+<p>While Groovy offers AstBuilder to turn code into AST, Boo uses the oxford brackets. And while GEP-4 proposed oxford brackets to signify an AST variable templating, Boo uses the $. Consider a simple println AST in Groovy</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>new AstBuilder().buildFromCode {
+    println([ | message | ])
+}[0]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Compared to a similar construct in Boo:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>[Meta]
+static def methodname(expr as Expression):
+    [| println($expr) |]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>GEP-4 proposes the opposite syntax from Boo: oxford brackets for AST Templating instead of the $. The $ is already a character in Java, and can be part of a variable name.</p>
+</div>
+<div class="paragraph">
+<p>There are no real drawbacks to having an opposite syntax. The number of Boo AST Transformation writers migrating to Groovy is most likely quite low.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_references_and_useful_links">References and useful links</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Mailing List Discussions</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>groovy-dev: <a href="https://groovy.markmail.org/thread/mgo3ze3uvn2jalz4">Groovy AstBuilder AST Templates</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_update_history">Update history</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">1 (2010-02-16)</dt>
+<dd>
+<p>Version as extracted from Codehaus wiki</p>
+</dd>
+<dt class="hdlist1">2 (2018-10-14)</dt>
+<dd>
+<p>Numerous minor tweaks</p>
+</dd>
+</dl>
+</div>
+</div>
+</div></div></div></div></div><footer id='footer'>
+                            <div class='row'>
+                                <div class='colset-3-footer'>
+                                    <div class='col-1'>
+                                        <h1>Groovy</h1><ul>
+                                            <li><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li><a href='http://groovy-lang.org/download.html'>Download</a></li><li><a href='http://groovy-lang.org/support.html'>Support</a></li><li><a href='..\/'>Contribute</a></li><li><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li>
+                                        </ul>
+                                    </div><div class='col-2'>
+                                        <h1>About</h1><ul>
+                                            <li><a href='https://github.com/apache/groovy'>Source code</a></li><li><a href='http://groovy-lang.org/security.html'>Security</a></li><li><a href='http://groovy-lang.org/learn.html#books'>Books</a></li><li><a href='http://groovy-lang.org/thanks.html'>Thanks</a></li><li><a href='http://www.apache.org/foundation/sponsorship.html'>Sponsorship</a></li><li><a href='http://groovy-lang.org/faq.html'>FAQ</a></li><li><a href='http://groovy-lang.org/search.html'>Search</a></li>
+                                        </ul>
+                                    </div><div class='col-3'>
+                                        <h1>Socialize</h1><ul>
+                                            <li><a href='http://groovy-lang.org/mailing-lists.html'>Discuss on the mailing-list</a></li><li><a href='http://groovy-lang.org/groovy-weekly.html'>Groovy newsletter</a></li><li><a href='https://twitter.com/ApacheGroovy'>Groovy on Twitter</a></li><li><a href='http://groovy-lang.org/events.html'>Events and conferences</a></li><li><a href='https://github.com/apache/groovy'>Source code on GitHub</a></li><li><a href='http://groovy-lang.org/reporting-issues.html'>Report issues in Jira</a></li><li><a href='https://google.com/+groovy'>Google+ Groovy Page</a></li><li><a href='http://bit.ly/g-community'>Google+ Groovy Community</a></li><li><a href='http://stackoverflow.com/questions/tagged/groovy'>Stack Overflow questions</a></li><li><a href='http://groovycommunity.com/'>Slack Community</a></li>
+                                        </ul>
+                                    </div><div class='col-right'>
+                                        <p>
+                                            The Groovy programming language is supported by the <a href='http://www.apache.org'>Apache Software Foundation</a> and the Groovy community
+                                        </p><img src='..\img/asf_logo.png' title='The Apache Software Foundation' alt='The Apache Software Foundation' class='img-responsive'/>
+                                    </div>
+                                </div><div class='clearfix'>&copy; 2003-2018 the Apache Groovy project &mdash; Groovy is Open Source, <a href='http://www.apache.org/licenses/LICENSE-2.0.html'>Apache 2 License</a></div>
+                            </div>
+                        </footer></div>
+                </div>
+            </div>
+        </div>
+    </div><script src='..\js/vendor/jquery-1.10.2.min.js' defer></script><script src='..\js/vendor/classie.js' defer></script><script src='..\js/vendor/bootstrap.js' defer></script><script src='..\js/vendor/sidebarEffects.js' defer></script><script src='..\js/vendor/modernizr-2.6.2.min.js' defer></script><script src='..\js/plugins.js' defer></script><script src='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js'></script><script>document.addEventListener('DOMContentLoaded',prettyPrint)</script><script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-257558-10', 'auto');
+          ga('send', 'pageview');
+    </script>
+</body></html>

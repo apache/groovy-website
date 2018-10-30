@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]--><head>
+    <meta charset='utf-8'/><meta http-equiv='X-UA-Compatible' content='IE=edge'/><meta name='viewport' content='width=device-width, initial-scale=1'/><title>The Apache Groovy programming language - Developer docs - GEP-9</title><link href='..\img/favicon.ico' type='image/x-ico' rel='icon'/><link rel='stylesheet' type='text/css' href='..\css/bootstrap.css'/><link rel='stylesheet' type='text/css' href='..\css/font-awesome.min.css'/><link rel='stylesheet' type='text/css' href='..\css/style.css'/><link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css'/>
+</head><body>
+    <div id='fork-me'>
+        <a href='https://github.com/apache/groovy'>
+            <img style='position: fixed; top: -14px; right: -14px; border: 0; z-index: 100' src='https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67' alt='Fork me on GitHub' data-canonical-src='https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png'/>
+        </a>
+    </div><div id='st-container' class='st-container st-effect-9'>
+        <nav class='st-menu st-effect-9' id='menu-12'>
+            <h2 class='icon icon-lab'>Socialize</h2><ul>
+                <li>
+                    <a href='http://groovy-lang.org/mailing-lists.html' class='icon'><span class='fa fa-envelope'></span> Discuss on the mailing-list</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/groovy-weekly.html' class='icon'><span class='fa fa-envelope-o'></span> Groovy newsletter</a>
+                </li><li>
+                    <a href='https://twitter.com/ApacheGroovy' class='icon'><span class='fa fa-twitter'></span> Groovy on Twitter</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/events.html' class='icon'><span class='fa fa-calendar'></span> Events and conferences</a>
+                </li><li>
+                    <a href='https://github.com/apache/groovy' class='icon'><span class='fa fa-github'></span> Source code on GitHub</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/reporting-issues.html' class='icon'><span class='fa fa-bug'></span> Report issues in Jira</a>
+                </li><li>
+                    <a href='https://google.com/+groovy' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Page</a>
+                </li><li>
+                    <a href='http://bit.ly/g-community' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Community</a>
+                </li><li>
+                    <a href='http://stackoverflow.com/questions/tagged/groovy' class='icon'><span class='fa fa-stack-overflow'></span> Stack Overflow questions</a>
+                </li><li>
+                    <a href='http://groovycommunity.com/' class='icon'><span class='fa fa-slack'></span> Slack Community</a>
+                </li>
+            </ul>
+        </nav><div class='st-pusher'>
+            <div class='st-content'>
+                <div class='st-content-inner'>
+                    <!--[if lt IE 7]>
+                    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+                <![endif]--><div><div class='navbar navbar-default navbar-static-top' role='navigation'>
+                            <div class='container'>
+                                <div class='navbar-header'>
+                                    <button type='button' class='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
+                                        <span class='sr-only'></span><span class='icon-bar'></span><span class='icon-bar'></span><span class='icon-bar'></span>
+                                    </button><a class='navbar-brand' href='..\index.html'>
+                                        <i class='fa fa-star'></i> Apache Groovy
+                                    </a>
+                                </div><div class='navbar-collapse collapse'>
+                                    <ul class='nav navbar-nav navbar-right'>
+                                        <li class=''><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li class=''><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li class=''><a href='http://groovy-lang.org/download.html'>Download</a></li><li class=''><a href='http://groovy-lang.org/support.html'>Support</a></li><li class=''><a href='..\/'>Contribute</a></li><li class=''><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li><li>
+                                            <a data-effect='st-effect-9' class='st-trigger' href='#'>Socialize</a>
+                                        </li><li class=''>
+                                            <a href='..\search.html'>
+                                                <i class='fa fa-search'></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><div id='content' class='page-1'><div class='row'><div class='row-fluid'><div class='col-lg-3'><ul class='nav-sidebar'><li class='active'><a href='#doc'>GEP-9</a></li><li><a href='#_abstract_modularization' class='anchor-link'>Abstract: Modularization</a></li><li><a href='#_references_and_useful_links' class='anchor-link'>References and useful links</a></li><li><a href='#_update_history' class='anchor-link'>Update history</a></li></ul></div><div class='col-lg-8 col-lg-pull-0'><a name='doc'></a><h1>GEP-9</h1><p>Author: <i/></p><hr/><div id="preamble">
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Metadata</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<strong>Number</strong>
+</td>
+<td class="hdlist2">
+<p>GEP-9</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Title</strong>
+</td>
+<td class="hdlist2">
+<p>Modularization</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Version</strong>
+</td>
+<td class="hdlist2">
+<p>5</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Type</strong>
+</td>
+<td class="hdlist2">
+<p>Feature</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Status</strong>
+</td>
+<td class="hdlist2">
+<p>Final</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Comment</strong>
+</td>
+<td class="hdlist2">
+<p>Parts incorporated in Groovy 2.0</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Leader</strong>
+</td>
+<td class="hdlist2">
+<p>Paul King</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Created</strong>
+</td>
+<td class="hdlist2">
+<p>2011-10-26</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Last modification</strong>&#160;
+</td>
+<td class="hdlist2">
+<p>2018-10-24</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_abstract_modularization">Abstract: Modularization</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This GEP introduces the goals and proposed details behind a modularization effort that will:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>provide a more streamlined jar for core Groovy with other jars comprising what might be considered optional parts of Groovy</p>
+</li>
+<li>
+<p>provide Groovy library writers with hooks into the groovy runtime to allow them to extend Groovy in various ways - allowing "grapes" to be more like plugins than just traditional libraries</p>
+</li>
+<li>
+<p>auxiliary details about how the modularization might affect other artifacts, e.g. the Groovy build, wiki, jira components, etc.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This activity builds upon the work discussed previously: Groovy 2.0 modularization and the somewhat older profiles discussion Packaging and Modularity.</p>
+</div>
+<div class="sect2">
+<h3 id="_out_of_scope">Out of scope</h3>
+<div class="paragraph">
+<p>While we should keep a watching brief on other modularization efforts, at this stage we are anticipating structural
+changes to the Groovy classes which are orthogonal to eventually using something like OSGi or Java 8&#8217;s Jigsaw modularization.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_jar_groupings">Jar groupings</h3>
+<div class="paragraph">
+<p>At the moment, Groovy provides two main jar artifacts:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>groovy.jar contains the core classes for Groovy and has a dependency on a small handful of critical dependent jars (i.e. asm, antlr, etc.)</p>
+</li>
+<li>
+<p>groovy-all.jar contains the core classes for Groovy and bundled versions of the critical dependent jars</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>After modularization, the main Groovy codebase will be packaged into additional jar artifacts:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>groovy.jar or groovy-core.jar (name to be finalized) will contain a smaller set of core classes for Groovy and will retain its dependency on a small handful of critical dependent jars (i.e. asm, antlr, etc.)</p>
+</li>
+<li>
+<p>numerous smaller "module/component" jars (exact names/numbers/contents to be finalized) but possibly things like groovy-bsf.jar, groovy-sql.jar, groovy-swing.jar, groovy-jmx.jar, groovy-xml, groovy-tools etc.</p>
+</li>
+<li>
+<p>groovy-all.jar contains the core classes for Groovy, bundled versions of the critical dependent jars and all of the classes from the module jars</p>
+</li>
+<li>
+<p>optionally we may support other "profiles" - profiles being other "fat" jars we bundle together for other environments, e.g. groovy-android.jar might exclude the JMX or Swing modules for instance.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Recommendations/suggestions for jar groupings are welcome. See some more details in the accompanying discussion: Groovy 2.0 modularization.</p>
+</div>
+<div class="paragraph">
+<p>One of the goals of this bundling effort is to facilitate Groovy&#8217;s evolution as a language by enabling:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>less relevant modules to become deprecated and removed from the main project but still available as external libraries, e.g. groovy-bsf might be deemed inessential now that most users will have jsr-223 (but it can be moved into a separate module and still available for anyone who needs it)</p>
+</li>
+<li>
+<p>the controlled migration from legacy to new versions of some functionality, e.g. we could produce a groovy-xml-v2 library which might have breaking changes - the v2 library might be an optional module at first but later become the main supported option - legacy users would be able to "point back to the old version" so that their scripts don&#8217;t break if they wished (further details later)</p>
+</li>
+<li>
+<p>external modules could more easily be incorporated into the core distribution (with users able to customize certain aspects of what gets bundled)</p>
+</li>
+<li>
+<p>we can provide "legacy" jars which contain deprecated features or unforeseen breaking changes - library writers can incorporate the legacy jar into their libraries to more easily support using their libraries across multiple versions of Groovy</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_configuring_a_groovy_installation">Configuring a Groovy installation</h3>
+<div class="paragraph">
+<p>Groovy bootstraps its configuration using a file in the conf/groovy-starter.conf file. It has entries like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code># load required libraries
+load !{groovy.home}/lib/*.jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>with required jars being in a lib directory which is part of a Groovy install.</p>
+</div>
+<div class="paragraph">
+<p>The groovy install will now likely have a "modules" (or components or repository) directory.
+The groovy-starter.conf file will have additional entries such as:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code># load SQL component
+grab org.codehaus.groovy groovy-sql 1.9.0
+# load XML component
+grab org.codehaus.groovy groovy-xml 1.9.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Grapes are loaded via Ivy and configured from a settings file. This file might have an additional entry:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>&lt;ibiblio name="modules" root="file:${groovy.home}/modules/" m2compatible="true"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The Ivy library (or perhaps the wharf or aether libraries) will likely become a required jar - though it may be
+that only a very limited form of grab is supported in which case no additional library might be necessary.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_runtime_hooksregistration">Runtime hooks/registration</h3>
+<div class="paragraph">
+<p>When downloading a grape, the classes from its jar are added (currently appended) to the classpath.
+In addition, we are planning on supporting additional integration points:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">potential hook</th>
+<th class="tableblock halign-left valign-top">purpose</th>
+<th class="tableblock halign-left valign-top">status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>META-INF/services/<br>
+org.codehaus.groovy.runtime.CategoryMethods</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">allow the module to define additional category methods</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">now in <code>META-INF/groovy/<br>
+                                                                                                       org.codehaus.groovy.runtime.ExtensionModuleSpec</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>META-INF/services/<br>
+org.codehaus.groovy.runtime.StaticCategoryMethods</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">allow the module to define additional static category methods</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">now in <code>META-INF/groovy/<br>
+                                                                                                                    org.codehaus.groovy.runtime.ExtensionModuleSpec</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>META-INF/services/<br>
+org.codehaus.groovy.runtime.SerializedCategoryMethods</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">allow the module to define additional category methods which have been serialized</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">deferred</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>META-INF/services/<br>
+org.codehaus.groovy.runtime.ExpandoMethods</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">allow the module to define additional ExpandoMetaClass methods</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">deferred</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>META-INF/services/<br>
+org.codehaus.groovy.runtime.DefaultMetaClasses</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">allow the module to define additional metaclasses similar to the current magic package mechanism <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">deferred</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>META-INF/services/groovy/defaultImports</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">allow the module to define additional normal, star, static imports, aliases</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">moved to compiler configuration</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>META-INF/services/groovy/defaultExtensions</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">allow the module to define supported file extensions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">moved to compiler configuration</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>META-INF/services/groovy/defaultAstTransforms</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">allow the module to define AST transforms</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">now in <code>META-INF/services/<br>
+                                                                                               org.codehaus.groovy.transform.ASTTransformation</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">provide a way to register builder metadata</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">deferred</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">should there by a way to 'publish' new commandline level startup scripts e.g. java2groovy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">deferred</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">provide a way to register a runner class, e.g. EasyB - there might also be a need to detect runner types</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">now in <code>META-INF/groovy/<br>
+                                                                                                                 org.apache.groovy.plugin.GroovyRunner</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">provide a way to register special compiler flags, e.g. '--indy'</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">deferred</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">?</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">provide a way to inject special AST customizations</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">deferred</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>This is also where we could specify additional requirements, e.g. require 'invoke dynamic' - but see later also. Could we declaratively specify our security policy requirements. Or can we disable specific aspects of functionality, e.g. disable some standard global AST transform because we want to provide a better one. (There are obviously security implications for this!)</p>
+</div>
+<div class="paragraph">
+<p>Another question is whether all these features will be available also via an API. Would such an API allow modules to be "unregistered"?</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_groovydocsource_pointers">Groovydoc/source pointers</h3>
+<div class="paragraph">
+<p>Some modularization systems support the "installation" of documentation (and/or sources) along with the module.
+Should a module have a pointer to (or be bundled with) its GroovyDoc and/or source.</p>
+</div>
+<div class="paragraph">
+<p>In the Java ecosystem, many libraries are published with their javadoc/sources according to common conventions or have javadoc available online. Do we rely on these established conventions or provide additional support? For users without access to sophisticated IDEs it could be convenient to have all the documentation available in "merged" form in one place.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_runtime_introspection">Runtime Introspection</h3>
+<div class="paragraph">
+<p>In Groovy you can currently determine the Groovy version using:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>println GroovySystem.version</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>which returns a String.</p>
+</div>
+<div class="paragraph">
+<p>In GROOVY-2422 it talks about the desire for additional version checks.</p>
+</div>
+<div class="paragraph">
+<p>It also talks about listing capabilities. This could be "is invokeDynamic" available or could really just be about available loaded modules. In general, we would expect our dependencies to be specified as part of our pom and loaded for us automatically but it can sometimes be useful to do special things.</p>
+</div>
+<div class="paragraph">
+<p>In general, should we be able to find out the list of loaded modules and versions? Or ask about which module/version a particular class belongs to?</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_build_impacts">Build Impacts</h3>
+<div class="paragraph">
+<p>Mostly discussed here: Groovy 2.0 modularization</p>
+</div>
+<div class="paragraph">
+<p>Should each "submodule" be able to be built on its own? Will it have its own javadoc, own coding style rules, own coverage metrics etc.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_module_robustness">Module robustness</h3>
+<div class="paragraph">
+<p>Should we provide a standard hook/mechanism to try to combat the following scenarios:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>you are loading a jar that depends on classes managed by the root classloader?</p>
+</li>
+<li>
+<p>a class with the same name is already on the classpath before yours?</p>
+</li>
+<li>
+<p>a class with the same name as one of your dependencies but from an incompatible version is on the classpath already</p>
+</li>
+<li>
+<p>an ability to register a "ping"/health check method to quickly test the component</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_assisting_ide_support">Assisting IDE support</h3>
+<div class="paragraph">
+<p>We may define a standard place or convention, e.g. META-INF/services/groovy/dsld or META-INF/services/groovy/gdsl where IDEs can find DSL descriptors relevant for that module.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_logging">Logging</h3>
+<div class="paragraph">
+<p>Should modules themselves have a standard way to do logging? Is that j.u.l.Logger? Perhaps bridged with slf4j?</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_references_and_useful_links">References and useful links</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_wiki_pages_web_archive">Wiki pages (web archive)</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://web.archive.org/web/20150508040614/http://docs.codehaus.org/display/GROOVY/Groovy+2.0+modularization">Groovy 2.0 modularization</a></p>
+</li>
+<li>
+<p><a href="https://web.archive.org/web/20150512231712/http://docs.codehaus.org/display/GroovyJSR/Packaging+and+Modularity">Packaging and Modularity</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_jira_issues">JIRA issues</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://issues.apache.org/jira/browse/GROOVY-2422">GROOVY-2422: API for checking version and capabilities of Groovy runtime</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_update_history">Update history</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">4 (2011-10-26)</dt>
+<dd>
+<p>Version as extracted from Codehaus wiki</p>
+</dd>
+<dt class="hdlist1">5 (2018-10-24)</dt>
+<dd>
+<p>Numerous minor tweaks</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. This needs to mesh in with the existing magic package mechanism for defining custom metaclasses.
+</div>
+</div></div></div></div></div><footer id='footer'>
+                            <div class='row'>
+                                <div class='colset-3-footer'>
+                                    <div class='col-1'>
+                                        <h1>Groovy</h1><ul>
+                                            <li><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li><a href='http://groovy-lang.org/download.html'>Download</a></li><li><a href='http://groovy-lang.org/support.html'>Support</a></li><li><a href='..\/'>Contribute</a></li><li><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li>
+                                        </ul>
+                                    </div><div class='col-2'>
+                                        <h1>About</h1><ul>
+                                            <li><a href='https://github.com/apache/groovy'>Source code</a></li><li><a href='http://groovy-lang.org/security.html'>Security</a></li><li><a href='http://groovy-lang.org/learn.html#books'>Books</a></li><li><a href='http://groovy-lang.org/thanks.html'>Thanks</a></li><li><a href='http://www.apache.org/foundation/sponsorship.html'>Sponsorship</a></li><li><a href='http://groovy-lang.org/faq.html'>FAQ</a></li><li><a href='http://groovy-lang.org/search.html'>Search</a></li>
+                                        </ul>
+                                    </div><div class='col-3'>
+                                        <h1>Socialize</h1><ul>
+                                            <li><a href='http://groovy-lang.org/mailing-lists.html'>Discuss on the mailing-list</a></li><li><a href='http://groovy-lang.org/groovy-weekly.html'>Groovy newsletter</a></li><li><a href='https://twitter.com/ApacheGroovy'>Groovy on Twitter</a></li><li><a href='http://groovy-lang.org/events.html'>Events and conferences</a></li><li><a href='https://github.com/apache/groovy'>Source code on GitHub</a></li><li><a href='http://groovy-lang.org/reporting-issues.html'>Report issues in Jira</a></li><li><a href='https://google.com/+groovy'>Google+ Groovy Page</a></li><li><a href='http://bit.ly/g-community'>Google+ Groovy Community</a></li><li><a href='http://stackoverflow.com/questions/tagged/groovy'>Stack Overflow questions</a></li><li><a href='http://groovycommunity.com/'>Slack Community</a></li>
+                                        </ul>
+                                    </div><div class='col-right'>
+                                        <p>
+                                            The Groovy programming language is supported by the <a href='http://www.apache.org'>Apache Software Foundation</a> and the Groovy community
+                                        </p><img src='..\img/asf_logo.png' title='The Apache Software Foundation' alt='The Apache Software Foundation' class='img-responsive'/>
+                                    </div>
+                                </div><div class='clearfix'>&copy; 2003-2018 the Apache Groovy project &mdash; Groovy is Open Source, <a href='http://www.apache.org/licenses/LICENSE-2.0.html'>Apache 2 License</a></div>
+                            </div>
+                        </footer></div>
+                </div>
+            </div>
+        </div>
+    </div><script src='..\js/vendor/jquery-1.10.2.min.js' defer></script><script src='..\js/vendor/classie.js' defer></script><script src='..\js/vendor/bootstrap.js' defer></script><script src='..\js/vendor/sidebarEffects.js' defer></script><script src='..\js/vendor/modernizr-2.6.2.min.js' defer></script><script src='..\js/plugins.js' defer></script><script src='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js'></script><script>document.addEventListener('DOMContentLoaded',prettyPrint)</script><script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-257558-10', 'auto');
+          ga('send', 'pageview');
+    </script>
+</body></html>

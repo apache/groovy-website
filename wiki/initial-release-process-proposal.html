@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]--><head>
+    <meta charset='utf-8'/><meta http-equiv='X-UA-Compatible' content='IE=edge'/><meta name='viewport' content='width=device-width, initial-scale=1'/><title>The Apache Groovy programming language - Developer docs - Initial release process proposal</title><link href='..\img/favicon.ico' type='image/x-ico' rel='icon'/><link rel='stylesheet' type='text/css' href='..\css/bootstrap.css'/><link rel='stylesheet' type='text/css' href='..\css/font-awesome.min.css'/><link rel='stylesheet' type='text/css' href='..\css/style.css'/><link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css'/>
+</head><body>
+    <div id='fork-me'>
+        <a href='https://github.com/apache/groovy'>
+            <img style='position: fixed; top: -14px; right: -14px; border: 0; z-index: 100' src='https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67' alt='Fork me on GitHub' data-canonical-src='https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png'/>
+        </a>
+    </div><div id='st-container' class='st-container st-effect-9'>
+        <nav class='st-menu st-effect-9' id='menu-12'>
+            <h2 class='icon icon-lab'>Socialize</h2><ul>
+                <li>
+                    <a href='http://groovy-lang.org/mailing-lists.html' class='icon'><span class='fa fa-envelope'></span> Discuss on the mailing-list</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/groovy-weekly.html' class='icon'><span class='fa fa-envelope-o'></span> Groovy newsletter</a>
+                </li><li>
+                    <a href='https://twitter.com/ApacheGroovy' class='icon'><span class='fa fa-twitter'></span> Groovy on Twitter</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/events.html' class='icon'><span class='fa fa-calendar'></span> Events and conferences</a>
+                </li><li>
+                    <a href='https://github.com/apache/groovy' class='icon'><span class='fa fa-github'></span> Source code on GitHub</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/reporting-issues.html' class='icon'><span class='fa fa-bug'></span> Report issues in Jira</a>
+                </li><li>
+                    <a href='https://google.com/+groovy' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Page</a>
+                </li><li>
+                    <a href='http://bit.ly/g-community' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Community</a>
+                </li><li>
+                    <a href='http://stackoverflow.com/questions/tagged/groovy' class='icon'><span class='fa fa-stack-overflow'></span> Stack Overflow questions</a>
+                </li><li>
+                    <a href='http://groovycommunity.com/' class='icon'><span class='fa fa-slack'></span> Slack Community</a>
+                </li>
+            </ul>
+        </nav><div class='st-pusher'>
+            <div class='st-content'>
+                <div class='st-content-inner'>
+                    <!--[if lt IE 7]>
+                    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+                <![endif]--><div><div class='navbar navbar-default navbar-static-top' role='navigation'>
+                            <div class='container'>
+                                <div class='navbar-header'>
+                                    <button type='button' class='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
+                                        <span class='sr-only'></span><span class='icon-bar'></span><span class='icon-bar'></span><span class='icon-bar'></span>
+                                    </button><a class='navbar-brand' href='..\index.html'>
+                                        <i class='fa fa-star'></i> Apache Groovy
+                                    </a>
+                                </div><div class='navbar-collapse collapse'>
+                                    <ul class='nav navbar-nav navbar-right'>
+                                        <li class=''><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li class=''><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li class=''><a href='http://groovy-lang.org/download.html'>Download</a></li><li class=''><a href='http://groovy-lang.org/support.html'>Support</a></li><li class=''><a href='..\/'>Contribute</a></li><li class=''><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li><li>
+                                            <a data-effect='st-effect-9' class='st-trigger' href='#'>Socialize</a>
+                                        </li><li class=''>
+                                            <a href='..\search.html'>
+                                                <i class='fa fa-search'></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><div id='content' class='page-1'><div class='row'><div class='row-fluid'><div class='col-lg-3'><ul class='nav-sidebar'><li class='active'><a href='#doc'>Initial release process proposal</a></li><li><a href='#_background' class='anchor-link'>Background</a></li><li><a href='#_initiating_a_release' class='anchor-link'>Initiating a release</a></li><li><a href='#_preparing_a_release' class='anchor-link'>Preparing a release</a></li><li><a href='#_setup_the_teamcity_release_configuration' class='anchor-link'>Setup the TeamCity release configuration</a></li><li><a href='#_trigger_the_release' class='anchor-link'>Trigger the release</a></li><li><a href='#_upload_to_apache_servers' class='anchor-link'>Upload to Apache servers</a></li><li><a href='#_push_the_tag_and_new_head' class='anchor-link'>Push the tag and new HEAD</a></li><li><a href='#_send_a_vote_thread' class='anchor-link'>Send a [VOTE] thread</a></li><li><a href='#_publish_the_release' class='anchor-link'>Publish the release</a></li><li><a href='#_update_the_web_site' class='anchor-link'>Update the web site</a></li><li><a href='#_send_an_announcement_email' class='anchor-link'>Send an announcement email</a></li></ul></div><div class='col-lg-8 col-lg-pull-0'><a name='doc'></a><h1>Initial release process proposal</h1><p>Author: <i/></p><hr/><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>v1.2, March 28, 2018</p>
+</div>
+<div class="paragraph">
+<p><em>NOTE</em></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>This document captures some historical information and discussion about Groovy&#8217;s release process that occurred soon after the Groovy project joined Apache.
+Many of the ideas went into Groovy&#8217;s current release process which involves use of a gradle build at the following repo: <a href="https://github.com/apache/groovy-release/" class="bare">https://github.com/apache/groovy-release/</a>
+If any of the steps in the automated process fail, this documentation might prove useful to understand what manual rectification steps that might be needed.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_background">Background</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The goal of this document is to guide the release manager in order to perform a release under the Apache Incubator. This document, reflecting the status of incubation, is work in progress and will be adapted with regards to comments from the community, mentors and IPMC.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_initiating_a_release">Initiating a release</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Releases can be initiated by a committer, as long as:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>an email has been sent to the dev mailing list, where a committer volunteers for a release</p>
+</li>
+<li>
+<p>there&#8217;s a general agreement that a release can be done. There&#8217;s still no explicit rule telling when a new Groovy version can be released, but the history of the project shows that releases are usually done when a significant amount of bugfixes have been done justifying a release, or that new major features are ready.</p>
+</li>
+<li>
+<p>release manager has his personal setup ready. In particular:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>release manager can log into his people.apache.org account using SSH</p>
+</li>
+<li>
+<p>release manager has administration privileges on <a href="http://ci.groovy-lang.org">the CI server</a></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Releases are launched from the CI server. A release should never be done from a personal computer.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_preparing_a_release">Preparing a release</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Releases are done from the CI server, but since it will involve creating tags, branches and several commits, and that the CI server doesn&#8217;t have privileges to do it, we cannot work on the Apache Git origin. Instead, it is required that the release manager forks the repository and pushes changes to his personal fork. Given that <code>GROOVY_2_4_X</code> is the branch to release, <code>upstream</code> references Apache Git, and <code>origin</code> the release manager fork on GitHub, preparing for a release usually starts with:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>git checkout GROOVY_2_4_X
+git pull --rebase upstream GROOVY_2_4_X
+git push origin GROOVY_2_4_X</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you haven&#8217;t done it already, create a token on <a href="https://github.com/settings/tokens">your GitHub profile</a> so that the CI server can have write access on your fork. Keep the token safe!</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_setup_the_teamcity_release_configuration">Setup the TeamCity release configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Go to the <a href="http://ci.groovy-lang.org/admin/editBuild.html?id=buildType:Groovy_BintrayIntegration_ReleasePlan">TeamCity release plan</a> configuration and open the VCS settings. If the VCS root attached to the configuration is not your GitHub fork, attach your VCS root, or create a new VCS root if you haven&#8217;t done it already. The VCS root MUST have write access using the token authentication.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_trigger_the_release">Trigger the release</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Go to the <a href="http://ci.groovy-lang.org/viewType.html?buildTypeId=Groovy_BintrayIntegration_ReleasePlan&amp;tab=artifactory">Artifactory Release Management tab</a> and fill the form appropriately:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>groovyVersion</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p><em>release version</em> must be set to the version number of Groovy you are releasing. For example <code>2.4.6</code>.</p>
+</li>
+<li>
+<p><em>next integration version</em> <strong>must</strong> be set to the subsequent version number of Groovy you are releasing and as it will be a development version, <strong>must</strong> end with <code>-SNAPSHOT</code>. For example <code>2.4.5-SNAPSHOT</code>.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>groovyBundleVersion</em></p>
+<div class="ulist">
+<ul>
+<li>
+<p><em>release version</em> must be set to the OSGi bundle version number of Groovy you are releasing. For example <code>2.4.6</code>.</p>
+</li>
+<li>
+<p><em>next integration version</em> <strong>must</strong> be set to the subsequent OSGi bundle version number of Groovy you are releasing and as it will be a development version, <strong>must</strong> end with <code>.SNAPSHOT</code>. For example <code>2.4.5.SNAPSHOT</code>.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><em>Checkout branch:</em> must be set to the branch your are releasing. For example, if you are releasing a 2.4.x version of Groovy, <code>GROOVY_2_4_X</code>.</p>
+</li>
+<li>
+<p><em>Use release branch</em> must be checked, and it will automate the creation of a release branch. Use a branch name in the form of <code>REL_BRANCH_2_4_3</code></p>
+</li>
+<li>
+<p><em>Create VCS tag</em> must be checked, and it will automate the creation of a release tag. Use a tag name in the form of <code>GROOVY_2_4_4</code></p>
+</li>
+<li>
+<p><em>Tag comment</em> must be set to something useful describing the release version</p>
+</li>
+<li>
+<p><em>Repository to stage the release to (Artifactory Pro):</em> must be set to <code>oss-release-local</code></p>
+</li>
+<li>
+<p><em>Staging comment</em> should be set with something useful like <code>release of Groovy 2.4.6</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Hit the release button.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_upload_to_apache_servers">Upload to Apache servers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>At this point, if the release build was successful, artifacts are staging on Bintray. You must log into Bintray and download the distribution artifacts. The URL for
+the staging distribution should be in the form of <a href="https://bintray.com/groovy/maven/groovy/2.4.6">https://bintray.com/groovy/maven/groovy/2.4.6</a>.</p>
+</div>
+<div class="paragraph">
+<p>Downloads of the following files are only possible if you use the (groovy-operator,&lt;api key&gt;) credentials. If you don&#8217;t have them please ask one of the PPMC members:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>apache-groovy-src-<em>version</em>.zip</p>
+</li>
+<li>
+<p>apache-groovy-binary-<em>version</em>.zip</p>
+</li>
+<li>
+<p>apache-groovy-docs-<em>version</em>.zip</p>
+</li>
+<li>
+<p>apache-groovy-sdk-<em>version</em>.zip</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>as well as the corresponding <em>asc</em> and <em>md5</em> files. There should therefore be a total of <em>12</em> files.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+at this point it is possible that the MD5 files are missing, in which cases you would have to create them locally before uploading to Apache.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>for f in `ls *.zip`; do md5sum $f &gt; $f.md5; done</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It is in general not accepted that the release is signed using the CI server key, so you <strong>must</strong> replace the signatures with your own. If you didn&#8217;t yet,
+add your public key to the <code>KEYS</code> file, then sign each zip individually. This can be done, for each file, with a command line like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>gpg --armor --output apache-groovy-src-2.4.6.zip.asc --detach-sign apache-groovy-src-2.4.6.zip</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now you are ready to upload to the dev space on <em>dist.apache.org</em>. First of all, please make sure your local layout
+looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>|-- KEYS
+|-- 2.4.6
+|     |
+|     -- distribution
+|     |  |-- apache-groovy-binary-2.4.6.zip
+|     |  |-- apache-groovy-binary-2.4.6.zip.asc
+|     |  |-- apache-groovy-binary-2.4.6.zip.md5
+|     |  |-- apache-groovy-docs-2.4.6.zip
+|     |  |-- apache-groovy-docs-2.4.6.zip.asc
+|     |  |-- apache-groovy-docs-2.4.6.zip.md5
+|     |  |-- apache-groovy-sdk-2.4.6.zip
+|     |  |-- apache-groovy-sdk-2.4.6.zip.asc
+|     |  `-- apache-groovy-sdk-2.4.6.zip.md5
+|     |-- sources
+         |-- apache-groovy-src-2.4.6.zip
+         |-- apache-groovy-src-2.4.6.zip.asc
+         `-- apache-groovy-src-2.4.6.zip.md5</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then you need to perform the upload:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>svn https://dist.apache.org/repos/dist/dev/incubator/groovy groovy-release
+cd groovy-release
+cp -r ../path/to/local/groovy/&lt;version&gt; .
+svn add &lt;version&gt;
+svn ci &lt;version&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_push_the_tag_and_new_head">Push the tag and new HEAD</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>git fetch origin --tags
+git push upstream GROOVY_2_4_4
+git push upstream GROOVY_2_4_X</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_send_a_vote_thread">Send a [VOTE] thread</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can use the following template to send a VOTE thread on the dev@ list:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>Dear community,
+
+I am happy to start the VOTE thread for a Groovy x.y.z!
+This release includes bugfixes for ...
+
+The changelog for this release can be found here: https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12318123&amp;version=12331941
+
+Tag: https://git1-us-west.apache.org/repos/asf?p=groovy.git;a=tag;h=19f70958f39f0cc5c6b4d3e9471fd297400647d2
+
+The artifacts to be voted on are located here: https://dist.apache.org/repos/dist/dev/incubator/groovy/
+
+Release artifacts are signed with the following key: https://dist.apache.org/repos/dist/dev/incubator/groovy/KEYS
+
+Please vote on releasing this package as Apache Groovy 2.4.6.
+
+The vote is open for the next 72 hours and passes if a majority of at least three +1 PMC votes are cast.
+
+[ ] +1 Release Apache Groovy 2.4.6
+[ ]  0 I don't have a strong opinion about this, but I assume it's ok
+[ ] -1 Do not release Apache Groovy 2.4.6 because...
+
+Here is my vote:
+
++1 (binding)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After 72h, send another email summarizing the result of the vote. If it passed, you <strong>must</strong> send another vote to
+<code>general@incubator.apache.org</code> to ask the IPMC to vote:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>Hi all!
+
+The Apache Groovy PMC has successfully voted the release of Apache Groovy 2.4.6 [1], with 6 "+1" binding votes, one "+1" non binding, no "0" votes and one "-1" vote (see the explanation below). We are now asking the IPMC to vote it too. Since it is our first release under the Apache Software Foundation umbrella, let me give a few more details:
+
+&lt;description of the release&gt;
+
+Vote on dev list: http://mail-archives.apache.org/mod_mbox/groovy-dev/201507.mbox/%3CCADQzvm%3DzDNCxpOua3LQ1ZNo62Aq40QZM7SJwgER5MfkArWrTeA%40mail.gmail.com%3E
+Result of vote on dev list: http://mail-archives.apache.org/mod_mbox/groovy-dev/201507.mbox/%3CCADQzvmn1yEMMz_ZaCL5QqqUtQJdgd0NNcy8v7BVY8Lt4Uog0Zg%40mail.gmail.com%3E
+Relicensing of the documentation tracking: https://issues.apache.org/jira/browse/GROOVY-7470
+Vote for relicensing the docs: http://mail-archives.apache.org/mod_mbox/groovy-dev/201506.mbox/%3CCADQzvm%3DMfajQuMxoZJmpLe%2B4W22a_MDY_dC4W%2BNMWiakEEOyNg%40mail.gmail.com%3E
+Result of vote for relicensing the docs: http://mail-archives.apache.org/mod_mbox/groovy-dev/201506.mbox/%3CCADQzvmkQyOEk3ofOrnTHfnvTKO5xECY87hKAGf5pD%2BuePyA8UA%40mail.gmail.com%3E
+
+The changelog for this release can be found here: https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12318123&amp;version=12331941
+
+Tag for the release: https://git1-us-west.apache.org/repos/asf?p=groovy.git;a=commit;h=716b0b1bd56eeab04e4441eecc91c2cd8bfda8b6
+&lt;https://git1-us-west.apache.org/repos/asf?p=groovy.git;a=tag;h=19f70958f39f0cc5c6b4d3e9471fd297400647d2&gt;
+
+The artifacts to be voted on are located here: https://dist.apache.org/repos/dist/dev/incubator/groovy/
+
+Release artifacts are signed with the following keys: https://dist.apache.org/repos/dist/dev/incubator/groovy/KEYS
+
+Vote is open for at least 72 hours. Artifacts will be moved to dist as soon as the vote passes.
+
+[ ] +1, release Apache Groovy 2.4.6
+[ ] 0, I don't care
+[ ] -1, because...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the vote passes:</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_publish_the_release">Publish the release</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Open <code><a href="https://bintray.com/groovy/maven/groovy/2.4.6" class="bare">https://bintray.com/groovy/maven/groovy/2.4.6</a></code> and click <code>Publish</code> on the notice message (something like <code>ou have 532 unpublished item(s) for this version (expiring in 21 hours)</code>)</p>
+</li>
+<li>
+<p>Perform Maven Central synchronization: on <a href="https://bintray.com/groovy/maven/groovy/2.4.6/view?sort=&amp;order=#central">this page (update the link to the appropriate version)</a>, click 'sync'. This step may take several minutes to complete.</p>
+</li>
+<li>
+<p>Update the documentation symlinks on the website. You need credentials on the server:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>cd /var/www/docs/docs
+rm -f latest
+ln -s groovy-2.4.6 latest</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Publish to GVM. Open <a href="http://ci.groovy-lang.org/viewType.html?buildTypeId=Groovy_BintrayIntegration_GvmPublish">the publish configuration</a>, click on the 3 dots near <code>run</code> then on the <em>parameters</em> tab, fill
+in the <code>groovyVersion</code> parameter. Click on <code>run build</code>.</p>
+</li>
+<li>
+<p>if the release is NOT a beta or a release candidate, make it the default version on GVM. Open <a href="http://ci.groovy-lang.org/viewType.html?buildTypeId=Groovy_BintrayIntegration_GvmMakeDefault">the GVM make default configuration</a>, click on the 3 dots near <code>run</code> then on the <em>parameters</em> tab, fill
+in the <code>groovyVersion</code> parameter. Click on <code>run build</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_update_the_web_site">Update the web site</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you don&#8217;t have it locally, checkout <code><a href="https://github.com/groovy/groovy-website" class="bare">https://github.com/groovy/groovy-website</a></code>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Update the <a href="https://github.com/melix/groovy-website/blob/master/site/src/site/sitemap.groovy">site map</a> to include the newly released version.</p>
+</li>
+<li>
+<p>Push the changes</p>
+</li>
+<li>
+<p>Wait for the <a href="http://ci.groovy-lang.org/viewType.html?buildTypeId=Groovy_Website">CI website deployment build</a> to complete.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_send_an_announcement_email">Send an announcement email</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You should wait 24h before doing this (in order for <code>dist.apache.org</code> to be properly mirrored).
+Send an email to <code>dev@</code>, <code>user@</code> and <code>announce@apache.org</code>.</p>
+</div>
+<div class="paragraph">
+<p>You can use this template. Please make sure that the email at least contains the DISCLAIMER:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>Dear community,
+
+We are pleased to announce the first release of Apache Groovy done under the Apache Software Foundation
+Incubator sponsorship! Apache Groovy is a multi-facet programming language for the JVM. Details can be
+found at http://groovy-lang.org
+
+This release is a maintenance release of the 2.4.x branch, but contains critical fixes, in particular a fix
+for a 0-day vulnerability. Details can be found on http://groovy-lang.org/security.html
+
+It is strongly encouraged that all users upgrade to this version. There is no plan to provide patches for
+older versions of Groovy which were not developped under the Foundation umbrella.
+
+Changelog for this version can be found at: http://groovy-lang.org/changelogs/changelog-2.4.6.html
+Sources can be downloaded from: http://www.groovy-lang.org/download.html
+Convenience binaries, SDK and documentation can be found at: http://www.groovy-lang.org/download.html
+
+We would like to thank all people who contributed to this release. In particular, thanks to our mentors who are
+having hard days at explaining the Apache Way :) Despite comments we received about this release, we felt that
+the security issue is so important that we deserved this to our community.
+
+Best regards,</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Broadcast the release on GVM. Open <a href="http://ci.groovy-lang.org/viewType.html?buildTypeId=Groovy_BintrayIntegration_GvmBroadcast">the GVM broadcast configuration</a>, click on the 3 dots near <code>run</code> then on the <em>parameters</em> tab, fill
+in the <code>groovyVersion</code> parameter. Click on <code>run build</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div></div></div></div></div><footer id='footer'>
+                            <div class='row'>
+                                <div class='colset-3-footer'>
+                                    <div class='col-1'>
+                                        <h1>Groovy</h1><ul>
+                                            <li><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li><a href='http://groovy-lang.org/download.html'>Download</a></li><li><a href='http://groovy-lang.org/support.html'>Support</a></li><li><a href='..\/'>Contribute</a></li><li><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li>
+                                        </ul>
+                                    </div><div class='col-2'>
+                                        <h1>About</h1><ul>
+                                            <li><a href='https://github.com/apache/groovy'>Source code</a></li><li><a href='http://groovy-lang.org/security.html'>Security</a></li><li><a href='http://groovy-lang.org/learn.html#books'>Books</a></li><li><a href='http://groovy-lang.org/thanks.html'>Thanks</a></li><li><a href='http://www.apache.org/foundation/sponsorship.html'>Sponsorship</a></li><li><a href='http://groovy-lang.org/faq.html'>FAQ</a></li><li><a href='http://groovy-lang.org/search.html'>Search</a></li>
+                                        </ul>
+                                    </div><div class='col-3'>
+                                        <h1>Socialize</h1><ul>
+                                            <li><a href='http://groovy-lang.org/mailing-lists.html'>Discuss on the mailing-list</a></li><li><a href='http://groovy-lang.org/groovy-weekly.html'>Groovy newsletter</a></li><li><a href='https://twitter.com/ApacheGroovy'>Groovy on Twitter</a></li><li><a href='http://groovy-lang.org/events.html'>Events and conferences</a></li><li><a href='https://github.com/apache/groovy'>Source code on GitHub</a></li><li><a href='http://groovy-lang.org/reporting-issues.html'>Report issues in Jira</a></li><li><a href='https://google.com/+groovy'>Google+ Groovy Page</a></li><li><a href='http://bit.ly/g-community'>Google+ Groovy Community</a></li><li><a href='http://stackoverflow.com/questions/tagged/groovy'>Stack Overflow questions</a></li><li><a href='http://groovycommunity.com/'>Slack Community</a></li>
+                                        </ul>
+                                    </div><div class='col-right'>
+                                        <p>
+                                            The Groovy programming language is supported by the <a href='http://www.apache.org'>Apache Software Foundation</a> and the Groovy community
+                                        </p><img src='..\img/asf_logo.png' title='The Apache Software Foundation' alt='The Apache Software Foundation' class='img-responsive'/>
+                                    </div>
+                                </div><div class='clearfix'>&copy; 2003-2018 the Apache Groovy project &mdash; Groovy is Open Source, <a href='http://www.apache.org/licenses/LICENSE-2.0.html'>Apache 2 License</a></div>
+                            </div>
+                        </footer></div>
+                </div>
+            </div>
+        </div>
+    </div><script src='..\js/vendor/jquery-1.10.2.min.js' defer></script><script src='..\js/vendor/classie.js' defer></script><script src='..\js/vendor/bootstrap.js' defer></script><script src='..\js/vendor/sidebarEffects.js' defer></script><script src='..\js/vendor/modernizr-2.6.2.min.js' defer></script><script src='..\js/plugins.js' defer></script><script src='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js'></script><script>document.addEventListener('DOMContentLoaded',prettyPrint)</script><script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-257558-10', 'auto');
+          ga('send', 'pageview');
+    </script>
+</body></html>

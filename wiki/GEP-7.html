@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]--><head>
+    <meta charset='utf-8'/><meta http-equiv='X-UA-Compatible' content='IE=edge'/><meta name='viewport' content='width=device-width, initial-scale=1'/><title>The Apache Groovy programming language - Developer docs - GEP-7</title><link href='..\img/favicon.ico' type='image/x-ico' rel='icon'/><link rel='stylesheet' type='text/css' href='..\css/bootstrap.css'/><link rel='stylesheet' type='text/css' href='..\css/font-awesome.min.css'/><link rel='stylesheet' type='text/css' href='..\css/style.css'/><link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css'/>
+</head><body>
+    <div id='fork-me'>
+        <a href='https://github.com/apache/groovy'>
+            <img style='position: fixed; top: -14px; right: -14px; border: 0; z-index: 100' src='https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67' alt='Fork me on GitHub' data-canonical-src='https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png'/>
+        </a>
+    </div><div id='st-container' class='st-container st-effect-9'>
+        <nav class='st-menu st-effect-9' id='menu-12'>
+            <h2 class='icon icon-lab'>Socialize</h2><ul>
+                <li>
+                    <a href='http://groovy-lang.org/mailing-lists.html' class='icon'><span class='fa fa-envelope'></span> Discuss on the mailing-list</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/groovy-weekly.html' class='icon'><span class='fa fa-envelope-o'></span> Groovy newsletter</a>
+                </li><li>
+                    <a href='https://twitter.com/ApacheGroovy' class='icon'><span class='fa fa-twitter'></span> Groovy on Twitter</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/events.html' class='icon'><span class='fa fa-calendar'></span> Events and conferences</a>
+                </li><li>
+                    <a href='https://github.com/apache/groovy' class='icon'><span class='fa fa-github'></span> Source code on GitHub</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/reporting-issues.html' class='icon'><span class='fa fa-bug'></span> Report issues in Jira</a>
+                </li><li>
+                    <a href='https://google.com/+groovy' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Page</a>
+                </li><li>
+                    <a href='http://bit.ly/g-community' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Community</a>
+                </li><li>
+                    <a href='http://stackoverflow.com/questions/tagged/groovy' class='icon'><span class='fa fa-stack-overflow'></span> Stack Overflow questions</a>
+                </li><li>
+                    <a href='http://groovycommunity.com/' class='icon'><span class='fa fa-slack'></span> Slack Community</a>
+                </li>
+            </ul>
+        </nav><div class='st-pusher'>
+            <div class='st-content'>
+                <div class='st-content-inner'>
+                    <!--[if lt IE 7]>
+                    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+                <![endif]--><div><div class='navbar navbar-default navbar-static-top' role='navigation'>
+                            <div class='container'>
+                                <div class='navbar-header'>
+                                    <button type='button' class='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
+                                        <span class='sr-only'></span><span class='icon-bar'></span><span class='icon-bar'></span><span class='icon-bar'></span>
+                                    </button><a class='navbar-brand' href='..\index.html'>
+                                        <i class='fa fa-star'></i> Apache Groovy
+                                    </a>
+                                </div><div class='navbar-collapse collapse'>
+                                    <ul class='nav navbar-nav navbar-right'>
+                                        <li class=''><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li class=''><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li class=''><a href='http://groovy-lang.org/download.html'>Download</a></li><li class=''><a href='http://groovy-lang.org/support.html'>Support</a></li><li class=''><a href='..\/'>Contribute</a></li><li class=''><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li><li>
+                                            <a data-effect='st-effect-9' class='st-trigger' href='#'>Socialize</a>
+                                        </li><li class=''>
+                                            <a href='..\search.html'>
+                                                <i class='fa fa-search'></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><div id='content' class='page-1'><div class='row'><div class='row-fluid'><div class='col-lg-3'><ul class='nav-sidebar'><li class='active'><a href='#doc'>GEP-7</a></li><li><a href='#_abstract' class='anchor-link'>Abstract</a></li><li><a href='#_rationale' class='anchor-link'>Rationale</a></li><li><a href='#_references_and_useful_links' class='anchor-link'>References and useful links</a></li><li><a href='#_update_history' class='anchor-link'>Update history</a></li></ul></div><div class='col-lg-8 col-lg-pull-0'><a name='doc'></a><h1>GEP-7</h1><p>Author: <i/></p><hr/><div id="preamble">
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Metadata</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<strong>Number</strong>
+</td>
+<td class="hdlist2">
+<p>GEP-7</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Title</strong>
+</td>
+<td class="hdlist2">
+<p>JSON Support</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Version</strong>
+</td>
+<td class="hdlist2">
+<p>4</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Type</strong>
+</td>
+<td class="hdlist2">
+<p>Feature</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Status</strong>
+</td>
+<td class="hdlist2">
+<p>Final</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Comment</strong>
+</td>
+<td class="hdlist2">
+<p>Delivered in Groovy 1.8</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Leader</strong>
+</td>
+<td class="hdlist2">
+<p>Guillaume Laforge</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Contributors</strong>
+</td>
+<td class="hdlist2">
+<p>Andres Almiray</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Created</strong>
+</td>
+<td class="hdlist2">
+<p>2010-10-25</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Last modification</strong>&#160;
+</td>
+<td class="hdlist2">
+<p>2018-10-12</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_abstract">Abstract</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Provide a builder/slurper combination for handling data in JSON format in a similar fashion as it&#8217;s already done for XML.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_rationale">Rationale</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>JSON has become ubiquitous to the web. RESTful services exchange data in both POX (Plain Old XML) and JSON formats.
+Groovy has excellent support for producing/consuming XML with MarkupBuilder, XmlSlurper and XmlParser but lacks this
+kind support for JSON. This GEP strives to remedy the situation, by providing a compatible builder approach.</p>
+</div>
+<div class="sect2">
+<h3 id="_producing_json">Producing JSON</h3>
+<div class="paragraph">
+<p>The following builder syntax is proposed</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>def builder = new groovy.json.JsonBuilder()
+def root = builder.people {
+    person {
+        firstName 'Guillame'
+        lastName 'Laforge'
+        // Maps are valid values for objects too
+        address(
+            city: 'Paris',
+            country: 'France',
+            zip: 12345,
+        )
+        married true
+        conferences 'JavaOne', 'Gr8conf'
+    }
+}
+
+// creates a data structure made of maps (Json object) and lists (Json array)
+assert root instanceof Map
+
+println builder.toString()
+
+// prints (without formatting)
+{"people": {
+    "person": {
+        "firstName": "Guillaume",
+        "lastName": "Laforge",
+        "address": {
+           "city": "Paris",
+           "country": "France",
+           "zip": 12345
+        },
+        "married": true,
+        "conferences": [
+            "JavaOne",
+            "Gr8conf"
+        ]
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Valid node values are: <code>Number</code>, <code>String</code>, <code>GString</code>, <code>Boolean</code>, <code>Map</code>, <code>List</code>. <code>null</code> is reserved for object references.
+Arrays can not be null but they can be empty. Anything else results in an IAE (or a more specialized exception) being thrown.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_special_cases">Special cases</h3>
+<div class="paragraph">
+<p>There is a special case to be considered: when the top node results in an anonymous object or array.
+or objects a call() method on the builder is needed which takes a map as argument, for arrays call() takes a vararg of values. Here are some examples:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>builder.foo "foo"
+// produces
+{foo: "foo"}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>builder([{
+  foo 'foo'
+}])
+// produces
+[{"foo": "foo"}]</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>builder([[
+  foo: 'foo'
+]])
+// produces, same as above
+[{"foo": "foo"}]</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>builder {
+    elem 1, 2, 3
+}
+// produces
+{ "elem": [1, 2, 3] }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When a method is called on the builder without arguments, and empty JSON object is associated with the key:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>builder.element()
+// produces
+{ "element": {} }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can also pass a map and a closure argument:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>builder.person(name: "Guillaume", age: 33) { town "Paris" }
+
+// produces
+{"name": "Guillaume", "age": 33, "town": "Paris}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Calls like the following, with a map and a value, don&#8217;t have any meaningful representation in JSON (unlike in XML), and triggers a JsonException:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>shouldFail(JsonException) {
+    builder.elem(a: 1, b: 2, "some text value")
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In case of overlapping keys in the map and the closure, the closure wins – a visual clue for this rule is that the closure appears "after" the map key/value pairs.</p>
+</div>
+<div class="paragraph">
+<p>Consuming JSON
+The proposal is for the creation of a JsonSlurper class that can read JSON from a string (in a non-streaming fashion) and produce a hierarchy of maps and lists representing the JSON objects and arrays respectively.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>String json = '{"person": {"firstName": "Guillaume", "lastName": "Laforge", "conferences": ["JavaOne", "Gr8conf"]}}'
+def root = new JsonSlurper().parseText(json)
+assert root instanceof Map
+assert root.person.conferences instanceof List
+assert root.person.firstName == 'Guillaume'
+assert root.person.conferences[1] == 'Gr8conf'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>JsonSlurper&#8217;s API should mirror closely what XmlParser/XmlSlurper offers in terms of its parse* method variants.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_references_and_useful_links">References and useful links</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>JSON Spec and Java implementations</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://json.org/">json.org</a></p>
+</li>
+<li>
+<p><a href="http://tools.ietf.org/html/rfc4627">RFC-4627</a></p>
+</li>
+<li>
+<p><a href="http://json-lib.sourceforge.net/">json-lib</a></p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_mailing_list_discussions">Mailing-list discussions</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://markmail.org/thread/5ofqwr6t33okyh6g">groovy-dev: Built-in JSON support in 1.8</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_jira_issues">JIRA issues</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://issues.apache.org/jira/browse/GROOVY-4644">GROOVY-4644: JSON support: provide a parser and a builder for JSON content</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_update_history">Update history</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">3 (2011-02-02)</dt>
+<dd>
+<p>Version as extracted from Codehaus wiki</p>
+</dd>
+<dt class="hdlist1">4 (2018-10-16)</dt>
+<dd>
+<p>Numerous minor tweaks</p>
+</dd>
+</dl>
+</div>
+</div>
+</div></div></div></div></div><footer id='footer'>
+                            <div class='row'>
+                                <div class='colset-3-footer'>
+                                    <div class='col-1'>
+                                        <h1>Groovy</h1><ul>
+                                            <li><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li><a href='http://groovy-lang.org/download.html'>Download</a></li><li><a href='http://groovy-lang.org/support.html'>Support</a></li><li><a href='..\/'>Contribute</a></li><li><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li>
+                                        </ul>
+                                    </div><div class='col-2'>
+                                        <h1>About</h1><ul>
+                                            <li><a href='https://github.com/apache/groovy'>Source code</a></li><li><a href='http://groovy-lang.org/security.html'>Security</a></li><li><a href='http://groovy-lang.org/learn.html#books'>Books</a></li><li><a href='http://groovy-lang.org/thanks.html'>Thanks</a></li><li><a href='http://www.apache.org/foundation/sponsorship.html'>Sponsorship</a></li><li><a href='http://groovy-lang.org/faq.html'>FAQ</a></li><li><a href='http://groovy-lang.org/search.html'>Search</a></li>
+                                        </ul>
+                                    </div><div class='col-3'>
+                                        <h1>Socialize</h1><ul>
+                                            <li><a href='http://groovy-lang.org/mailing-lists.html'>Discuss on the mailing-list</a></li><li><a href='http://groovy-lang.org/groovy-weekly.html'>Groovy newsletter</a></li><li><a href='https://twitter.com/ApacheGroovy'>Groovy on Twitter</a></li><li><a href='http://groovy-lang.org/events.html'>Events and conferences</a></li><li><a href='https://github.com/apache/groovy'>Source code on GitHub</a></li><li><a href='http://groovy-lang.org/reporting-issues.html'>Report issues in Jira</a></li><li><a href='https://google.com/+groovy'>Google+ Groovy Page</a></li><li><a href='http://bit.ly/g-community'>Google+ Groovy Community</a></li><li><a href='http://stackoverflow.com/questions/tagged/groovy'>Stack Overflow questions</a></li><li><a href='http://groovycommunity.com/'>Slack Community</a></li>
+                                        </ul>
+                                    </div><div class='col-right'>
+                                        <p>
+                                            The Groovy programming language is supported by the <a href='http://www.apache.org'>Apache Software Foundation</a> and the Groovy community
+                                        </p><img src='..\img/asf_logo.png' title='The Apache Software Foundation' alt='The Apache Software Foundation' class='img-responsive'/>
+                                    </div>
+                                </div><div class='clearfix'>&copy; 2003-2018 the Apache Groovy project &mdash; Groovy is Open Source, <a href='http://www.apache.org/licenses/LICENSE-2.0.html'>Apache 2 License</a></div>
+                            </div>
+                        </footer></div>
+                </div>
+            </div>
+        </div>
+    </div><script src='..\js/vendor/jquery-1.10.2.min.js' defer></script><script src='..\js/vendor/classie.js' defer></script><script src='..\js/vendor/bootstrap.js' defer></script><script src='..\js/vendor/sidebarEffects.js' defer></script><script src='..\js/vendor/modernizr-2.6.2.min.js' defer></script><script src='..\js/plugins.js' defer></script><script src='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js'></script><script>document.addEventListener('DOMContentLoaded',prettyPrint)</script><script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-257558-10', 'auto');
+          ga('send', 'pageview');
+    </script>
+</body></html>

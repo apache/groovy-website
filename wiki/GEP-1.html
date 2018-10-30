@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]--><head>
+    <meta charset='utf-8'/><meta http-equiv='X-UA-Compatible' content='IE=edge'/><meta name='viewport' content='width=device-width, initial-scale=1'/><title>The Apache Groovy programming language - Developer docs - GEP-1</title><link href='..\img/favicon.ico' type='image/x-ico' rel='icon'/><link rel='stylesheet' type='text/css' href='..\css/bootstrap.css'/><link rel='stylesheet' type='text/css' href='..\css/font-awesome.min.css'/><link rel='stylesheet' type='text/css' href='..\css/style.css'/><link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css'/>
+</head><body>
+    <div id='fork-me'>
+        <a href='https://github.com/apache/groovy'>
+            <img style='position: fixed; top: -14px; right: -14px; border: 0; z-index: 100' src='https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67' alt='Fork me on GitHub' data-canonical-src='https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png'/>
+        </a>
+    </div><div id='st-container' class='st-container st-effect-9'>
+        <nav class='st-menu st-effect-9' id='menu-12'>
+            <h2 class='icon icon-lab'>Socialize</h2><ul>
+                <li>
+                    <a href='http://groovy-lang.org/mailing-lists.html' class='icon'><span class='fa fa-envelope'></span> Discuss on the mailing-list</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/groovy-weekly.html' class='icon'><span class='fa fa-envelope-o'></span> Groovy newsletter</a>
+                </li><li>
+                    <a href='https://twitter.com/ApacheGroovy' class='icon'><span class='fa fa-twitter'></span> Groovy on Twitter</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/events.html' class='icon'><span class='fa fa-calendar'></span> Events and conferences</a>
+                </li><li>
+                    <a href='https://github.com/apache/groovy' class='icon'><span class='fa fa-github'></span> Source code on GitHub</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/reporting-issues.html' class='icon'><span class='fa fa-bug'></span> Report issues in Jira</a>
+                </li><li>
+                    <a href='https://google.com/+groovy' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Page</a>
+                </li><li>
+                    <a href='http://bit.ly/g-community' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Community</a>
+                </li><li>
+                    <a href='http://stackoverflow.com/questions/tagged/groovy' class='icon'><span class='fa fa-stack-overflow'></span> Stack Overflow questions</a>
+                </li><li>
+                    <a href='http://groovycommunity.com/' class='icon'><span class='fa fa-slack'></span> Slack Community</a>
+                </li>
+            </ul>
+        </nav><div class='st-pusher'>
+            <div class='st-content'>
+                <div class='st-content-inner'>
+                    <!--[if lt IE 7]>
+                    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+                <![endif]--><div><div class='navbar navbar-default navbar-static-top' role='navigation'>
+                            <div class='container'>
+                                <div class='navbar-header'>
+                                    <button type='button' class='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
+                                        <span class='sr-only'></span><span class='icon-bar'></span><span class='icon-bar'></span><span class='icon-bar'></span>
+                                    </button><a class='navbar-brand' href='..\index.html'>
+                                        <i class='fa fa-star'></i> Apache Groovy
+                                    </a>
+                                </div><div class='navbar-collapse collapse'>
+                                    <ul class='nav navbar-nav navbar-right'>
+                                        <li class=''><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li class=''><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li class=''><a href='http://groovy-lang.org/download.html'>Download</a></li><li class=''><a href='http://groovy-lang.org/support.html'>Support</a></li><li class=''><a href='..\/'>Contribute</a></li><li class=''><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li><li>
+                                            <a data-effect='st-effect-9' class='st-trigger' href='#'>Socialize</a>
+                                        </li><li class=''>
+                                            <a href='..\search.html'>
+                                                <i class='fa fa-search'></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><div id='content' class='page-1'><div class='row'><div class='row-fluid'><div class='col-lg-3'><ul class='nav-sidebar'><li class='active'><a href='#doc'>GEP-1</a></li><li><a href='#_abstract_what_is_a_gep' class='anchor-link'>Abstract: What is a GEP?</a></li><li><a href='#_rationale_why_a_gep' class='anchor-link'>Rationale: Why a GEP?</a></li><li><a href='#_whats_in_a_gep' class='anchor-link'>What&#8217;s in a GEP?</a></li><li><a href='#_the_general_workflow' class='anchor-link'>The general workflow</a></li><li><a href='#_references' class='anchor-link'>References</a></li><li><a href='#_update_history' class='anchor-link'>Update history</a></li></ul></div><div class='col-lg-8 col-lg-pull-0'><a name='doc'></a><h1>GEP-1</h1><p>Author: <i/></p><hr/><div id="preamble">
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Metadata</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<strong>Number</strong>
+</td>
+<td class="hdlist2">
+<p>GEP-1</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Title</strong>
+</td>
+<td class="hdlist2">
+<p>Groovy Enhancement Proposal</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Version</strong>
+</td>
+<td class="hdlist2">
+<p>2.0</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Type</strong>
+</td>
+<td class="hdlist2">
+<p>Informational</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Status</strong>
+</td>
+<td class="hdlist2">
+<p>Final</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Leader</strong>
+</td>
+<td class="hdlist2">
+<p>Apache Project Leader</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Created</strong>
+</td>
+<td class="hdlist2">
+<p>2009-03-26</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Last modification</strong>&#160;
+</td>
+<td class="hdlist2">
+<p>2018-10-11</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_abstract_what_is_a_gep">Abstract: What is a GEP?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>GEP stands for Groovy Enhancement Proposal. A GEP is a document providing information to the Groovy development team and
+user community describing a new feature, an enhancement, or a change to Groovy, the language, its APIs, its integration,
+or its infrastructure. Whenever such an addition or change is significant and deserves a detailed discussion on its
+rationale, its design, or its impact on the project, the writing of a GEP should be considered.</p>
+</div>
+<div class="paragraph">
+<p>The concept of the GEP was freely inspired from Python&#8217;s <a href="http://www.python.org/dev/peps/pep-0001/">PEP</a> (Python Enhancement Proposal).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_rationale_why_a_gep">Rationale: Why a GEP?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For non-trivial, complex or strategic features, discussions on mailing-lists are difficult to lead and follow, and often
+don&#8217;t help reach a consensus. Writing a proper document explaining the design and implications of said feature allows both
+the originator of the idea and the community at large to have a chance to provide interesting and useful feedback and
+helps better understanding the rationale, the design decisions, the impact of the proposal.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_whats_in_a_gep">What&#8217;s in a GEP?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A GEP:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>is led by a "Leader" who is responsible for the writing and progress of the proposal</p>
+</li>
+<li>
+<p>is assigned a unique "Number"</p>
+</li>
+<li>
+<p>has a "Title" describing succinctly its intent</p>
+</li>
+<li>
+<p>has a "Type"</p>
+</li>
+<li>
+<p>has a "Status" giving information on its progress</p>
+</li>
+<li>
+<p>has a "Version" number indicating its current revision</p>
+</li>
+<li>
+<p>gives a "Last modification" date</p>
+</li>
+<li>
+<p>gives a "Creation" date</p>
+</li>
+<li>
+<p>features an "Abstract" explaining the intent of the GEP</p>
+</li>
+<li>
+<p>gives a "Rationale" for this enhancement</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The type of a GEP can be of the following:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Informational</dt>
+<dd>
+<p>if the GEP provides some information or guidance on a topic related to Groovy (this GEP is of such type, as well as the list of all existing GEPs)</p>
+</dd>
+<dt class="hdlist1">Feature</dt>
+<dd>
+<p>if the GEP is about the implementation of a new feature, enhancement or a change in Groovy</p>
+</dd>
+<dt class="hdlist1">Process</dt>
+<dd>
+<p>if the GEP describes a process related to the Groovy project (examples: the Groovy release process, how to enroll new committers, etc.)</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>If the GEP is a Feature GEP, it should also:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>define a "Target" Groovy version for its integration</p>
+</li>
+<li>
+<p>provide a "Reference implementation" properly covered by unit tests and commented (Groovydoc/JavaDoc/asciidoc as appropriate) so that the Groovy community can play with the enhancement and provide useful feedback</p>
+</li>
+<li>
+<p>detail the "Impact" on Groovy, especially in terms of backward-compatibility or impact on other projects</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The "Status" of a GEP can be:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Draft</dt>
+<dd>
+<p>when a GEP is currently in the writing and is in discussion but hasn&#8217;t yet reached a state ready for inclusion in Groovy</p>
+</dd>
+<dt class="hdlist1">Accepted</dt>
+<dd>
+<p>when the draft GEP, as is, is in a state which doesn&#8217;t mandate any additional modification, is ready to be
+integrated into Groovy and has been accepted by the development team, following the usual Apache principles</p>
+</dd>
+<dt class="hdlist1">Rejected</dt>
+<dd>
+<p>when consensus emerges or a development team decision has been made that deems the proposal should not be integrated into Groovy</p>
+</dd>
+<dt class="hdlist1">Final</dt>
+<dd>
+<p>when the GEP has been integrated into a released version of Groovy and has been properly documented in the Groovy wiki</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Beyond all these metadata, as appropriate, a GEP should also:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>give pointers to existing mailing-list discussions (through Nabble, Markmail or Ponymail)</p>
+</li>
+<li>
+<p>list existing papers or documentations related to this feature that provides additional material for understanding the concepts or implementation difficulties</p>
+</li>
+<li>
+<p>provide samples showing how the feature should be used and how idiomatic Groovy the solution is</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_general_workflow">The general workflow</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The general workflow of a Groovy Enhancement Proposal is as follows:</p>
+</div>
+<div class="paragraph">
+<p>The inception of a GEP generally stems from a discussion on the Groovy mailing-lists about a new feature or change
+when the Groovy Despot and the development team deem necessary to properly document and articulate this new idea,
+for further discussion and analysis. Generally, simple bug fixes and minor enhancements don&#8217;t require a full-blown GEP.
+A GEP is started solely with the agreement of the Groovy PMC.</p>
+</div>
+<div class="paragraph">
+<p>A unique Number is assigned by the Groovy PMC and a meaningful "Title" is created for this GEP.
+A proposed Target Groovy version is proposed for the inclusion of this GEP if appropriate.
+A Leader for this effort (usually the instigator of the GEP or the lead developer of it) takes care of the
+creation of the GEP, of writing a detailed document proposing this enhancement, and eventually of providing
+a reference implementation as a branch (or PR or patch) for the targeted Groovy version.
+Once the development team and the "Leader" are happy with the status of the GEP, a decision should be made to act the
+integration of this GEP into Groovy and a JIRA issue for this task should be created. As per Apache guidelines,
+the Groovy PMC has the last say on the acceptation of the GEP as a Final status GEP.</p>
+</div>
+<div class="paragraph">
+<p>The integration of the GEP in Groovy is Final once proper documentation is added to the appropriate Groovy repo and
+that the reference implementation has reached maturity and provides a good test suite covering the feature.
+If the GEP doesn&#8217;t fulfill all the requirements of the GEP process, the GEP can be rejected or deferred.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_references">References</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_jira_issues">JIRA issues:</h3>
+<div class="paragraph">
+<p><a href="https://issues.apache.org/jira/browse/GROOVY-1709">GROOVY-1709</a>: GEP: Groovy Enhancement Proposal</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_update_history">Update history</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">1.0 (2009-03-26)</dt>
+<dd>
+<p>Version as extracted from Codehaus wiki</p>
+</dd>
+<dt class="hdlist1">2.0 (2018-10-11)</dt>
+<dd>
+<p>Update to reflect changes since joining Apache</p>
+</dd>
+</dl>
+</div>
+</div>
+</div></div></div></div></div><footer id='footer'>
+                            <div class='row'>
+                                <div class='colset-3-footer'>
+                                    <div class='col-1'>
+                                        <h1>Groovy</h1><ul>
+                                            <li><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li><a href='http://groovy-lang.org/download.html'>Download</a></li><li><a href='http://groovy-lang.org/support.html'>Support</a></li><li><a href='..\/'>Contribute</a></li><li><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li>
+                                        </ul>
+                                    </div><div class='col-2'>
+                                        <h1>About</h1><ul>
+                                            <li><a href='https://github.com/apache/groovy'>Source code</a></li><li><a href='http://groovy-lang.org/security.html'>Security</a></li><li><a href='http://groovy-lang.org/learn.html#books'>Books</a></li><li><a href='http://groovy-lang.org/thanks.html'>Thanks</a></li><li><a href='http://www.apache.org/foundation/sponsorship.html'>Sponsorship</a></li><li><a href='http://groovy-lang.org/faq.html'>FAQ</a></li><li><a href='http://groovy-lang.org/search.html'>Search</a></li>
+                                        </ul>
+                                    </div><div class='col-3'>
+                                        <h1>Socialize</h1><ul>
+                                            <li><a href='http://groovy-lang.org/mailing-lists.html'>Discuss on the mailing-list</a></li><li><a href='http://groovy-lang.org/groovy-weekly.html'>Groovy newsletter</a></li><li><a href='https://twitter.com/ApacheGroovy'>Groovy on Twitter</a></li><li><a href='http://groovy-lang.org/events.html'>Events and conferences</a></li><li><a href='https://github.com/apache/groovy'>Source code on GitHub</a></li><li><a href='http://groovy-lang.org/reporting-issues.html'>Report issues in Jira</a></li><li><a href='https://google.com/+groovy'>Google+ Groovy Page</a></li><li><a href='http://bit.ly/g-community'>Google+ Groovy Community</a></li><li><a href='http://stackoverflow.com/questions/tagged/groovy'>Stack Overflow questions</a></li><li><a href='http://groovycommunity.com/'>Slack Community</a></li>
+                                        </ul>
+                                    </div><div class='col-right'>
+                                        <p>
+                                            The Groovy programming language is supported by the <a href='http://www.apache.org'>Apache Software Foundation</a> and the Groovy community
+                                        </p><img src='..\img/asf_logo.png' title='The Apache Software Foundation' alt='The Apache Software Foundation' class='img-responsive'/>
+                                    </div>
+                                </div><div class='clearfix'>&copy; 2003-2018 the Apache Groovy project &mdash; Groovy is Open Source, <a href='http://www.apache.org/licenses/LICENSE-2.0.html'>Apache 2 License</a></div>
+                            </div>
+                        </footer></div>
+                </div>
+            </div>
+        </div>
+    </div><script src='..\js/vendor/jquery-1.10.2.min.js' defer></script><script src='..\js/vendor/classie.js' defer></script><script src='..\js/vendor/bootstrap.js' defer></script><script src='..\js/vendor/sidebarEffects.js' defer></script><script src='..\js/vendor/modernizr-2.6.2.min.js' defer></script><script src='..\js/plugins.js' defer></script><script src='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js'></script><script>document.addEventListener('DOMContentLoaded',prettyPrint)</script><script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-257558-10', 'auto');
+          ga('send', 'pageview');
+    </script>
+</body></html>

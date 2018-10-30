@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]--><head>
+    <meta charset='utf-8'/><meta http-equiv='X-UA-Compatible' content='IE=edge'/><meta name='viewport' content='width=device-width, initial-scale=1'/><title>The Apache Groovy programming language - Developer docs - Adapting the release process for Apache</title><link href='..\img/favicon.ico' type='image/x-ico' rel='icon'/><link rel='stylesheet' type='text/css' href='..\css/bootstrap.css'/><link rel='stylesheet' type='text/css' href='..\css/font-awesome.min.css'/><link rel='stylesheet' type='text/css' href='..\css/style.css'/><link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css'/>
+</head><body>
+    <div id='fork-me'>
+        <a href='https://github.com/apache/groovy'>
+            <img style='position: fixed; top: -14px; right: -14px; border: 0; z-index: 100' src='https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67' alt='Fork me on GitHub' data-canonical-src='https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png'/>
+        </a>
+    </div><div id='st-container' class='st-container st-effect-9'>
+        <nav class='st-menu st-effect-9' id='menu-12'>
+            <h2 class='icon icon-lab'>Socialize</h2><ul>
+                <li>
+                    <a href='http://groovy-lang.org/mailing-lists.html' class='icon'><span class='fa fa-envelope'></span> Discuss on the mailing-list</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/groovy-weekly.html' class='icon'><span class='fa fa-envelope-o'></span> Groovy newsletter</a>
+                </li><li>
+                    <a href='https://twitter.com/ApacheGroovy' class='icon'><span class='fa fa-twitter'></span> Groovy on Twitter</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/events.html' class='icon'><span class='fa fa-calendar'></span> Events and conferences</a>
+                </li><li>
+                    <a href='https://github.com/apache/groovy' class='icon'><span class='fa fa-github'></span> Source code on GitHub</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/reporting-issues.html' class='icon'><span class='fa fa-bug'></span> Report issues in Jira</a>
+                </li><li>
+                    <a href='https://google.com/+groovy' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Page</a>
+                </li><li>
+                    <a href='http://bit.ly/g-community' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Community</a>
+                </li><li>
+                    <a href='http://stackoverflow.com/questions/tagged/groovy' class='icon'><span class='fa fa-stack-overflow'></span> Stack Overflow questions</a>
+                </li><li>
+                    <a href='http://groovycommunity.com/' class='icon'><span class='fa fa-slack'></span> Slack Community</a>
+                </li>
+            </ul>
+        </nav><div class='st-pusher'>
+            <div class='st-content'>
+                <div class='st-content-inner'>
+                    <!--[if lt IE 7]>
+                    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+                <![endif]--><div><div class='navbar navbar-default navbar-static-top' role='navigation'>
+                            <div class='container'>
+                                <div class='navbar-header'>
+                                    <button type='button' class='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
+                                        <span class='sr-only'></span><span class='icon-bar'></span><span class='icon-bar'></span><span class='icon-bar'></span>
+                                    </button><a class='navbar-brand' href='..\index.html'>
+                                        <i class='fa fa-star'></i> Apache Groovy
+                                    </a>
+                                </div><div class='navbar-collapse collapse'>
+                                    <ul class='nav navbar-nav navbar-right'>
+                                        <li class=''><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li class=''><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li class=''><a href='http://groovy-lang.org/download.html'>Download</a></li><li class=''><a href='http://groovy-lang.org/support.html'>Support</a></li><li class=''><a href='..\/'>Contribute</a></li><li class=''><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li><li>
+                                            <a data-effect='st-effect-9' class='st-trigger' href='#'>Socialize</a>
+                                        </li><li class=''>
+                                            <a href='..\search.html'>
+                                                <i class='fa fa-search'></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><div id='content' class='page-1'><div class='row'><div class='row-fluid'><div class='col-lg-3'><ul class='nav-sidebar'><li class='active'><a href='#doc'>Adapting the release process for Apache</a></li><li><a href='#_the_groovy_way' class='anchor-link'>The Groovy Way</a></li><li><a href='#_adaptations_required_for_apache' class='anchor-link'>Adaptations required for Apache</a></li></ul></div><div class='col-lg-8 col-lg-pull-0'><a name='doc'></a><h1>Adapting the release process for Apache</h1><p>Author: <i/></p><hr/><div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>v1.1, March 28, 2018</p>
+</div>
+<div class="paragraph">
+<p><em>NOTE</em></p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>This document captures some historical information and discussion about Groovy&#8217;s release process both before joining Apache and during incubation.
+Many of the ideas went into Groovy&#8217;s current release process which involves use of a gradle build at the following repo: <a href="https://github.com/apache/groovy-release/" class="bare">https://github.com/apache/groovy-release/</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_groovy_way">The Groovy Way</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Between 2010 and 2015, the Groovy team invested a lot of time in narrowing its release process to reduce human errors as much as possible. Releases were previously done from a despot personal computer, with a number of risks:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>mix of development sources and sources found in the repository. This can happen if the release manager did the release without doing a clean checkout in a separate directory. Then there were risks that source files were present on the release manager computer and not in source control.</p>
+</li>
+<li>
+<p>reliance on a local dependency repository. During development, committers usually do not suffer dependency management issues, because they do regular update and some third party dependencies are found in their local caches (Maven, Gradle). However, new developers may find themselves in a different situation, where they have no local cache. When they try to build, compilation fails because some dependencies cannot be fetched.</p>
+</li>
+<li>
+<p>manual update of properties file for release numbers</p>
+</li>
+<li>
+<p>manual tagging</p>
+</li>
+<li>
+<p>manual update of VCS after release, that can easily be forgotten</p>
+</li>
+<li>
+<p>upload of distribution to the Codehaus WebDAV repository, with a lot of failures due to the poor quality of the protocol (in particular stale lock files)</p>
+</li>
+<li>
+<p>upload of documentation took up to several hours due to the WebDAV process, and were <strong>erasing</strong> previous versions of documentation (API, GAPI, GDK) so it wasn&#8217;t possible to find online the reference API for a specific Groovy version.</p>
+</li>
+<li>
+<p>Maven artifact uploading and signing done through the Codehaus repository, which was again very slow and error-prone</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>It&#8217;s worth noting that binary artifacts are currently published in the <code>org.codehaus.groovy</code> group id and that the build uses <a href="http://gradle.org">Gradle</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="_automation">Automation</h3>
+<div class="paragraph">
+<p>For those reasons, we slowly migrated off the Codehaus infrastructure and built a new release process with a continuous integration server at its core. We reviewed several options and eventually found a sponsor, Jetbrains, for a <a href="http://ci.groovy-lang.org">TeamCity continuous integration server</a>. The reasons to choose a dedicated server are not all related to the release process. The development process itself greatly benefits from it:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>each branch of Groovy (currently 3 active branches: 2.3.x, 2.4.x, master) are built and tested against multiple JDKs : JDK 6, JDK 7, JDK 8, and older branches of Groovy are tested against older JDKs (JDK 5 for 1.8.x/2.x). Note that some Groovy versions are tested in two flavors: legacy and <em>invokedynamic</em>.</p>
+</li>
+<li>
+<p>we build unreleased versions of OpenJDK from sources, so that we can test the master branch against upcoming JDK versions, such as JDK 8 updates and even JDK 9. Those builds allowed us to find a lot of bugs in the JDK before it was released.</p>
+</li>
+<li>
+<p>some community projects are tested against development versions of Groovy (currently, Ratpack and Nextflow)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Eventually, the <a href="http://groovy-lang.org">new Groovy website</a> is built from <a href="https://github.com/groovy/groovy-website">sources</a> and deployed directly from the CI server, after each push on the <em>master</em> branch.</p>
+</div>
+<div class="paragraph">
+<p>But in addition to those benefits, it&#8217;s the release process itself which greatly improved:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>the deployment infrastructure moved from Codehaus to <a href="https://bintray.com/">Bintray</a> and <a href="http://www.jfrog.com/open-source/">Artifactory</a></p>
+</li>
+<li>
+<p>several build plans are dedicated to builds and releases:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>the <a href="http://ci.groovy-lang.org/viewType.html?buildTypeId=Groovy_BintrayIntegration_UploadSnapshots&amp;guest=1">snapshot upload</a> plan builds Groovy from sources and deploys the artifacts to the <a href="http://oss.jfrog.org/oss-snapshot-local/org/codehaus/groovy/">OSS Artifactory Snapshot Repository</a>.</p>
+</li>
+<li>
+<p>the <a href="http://ci.groovy-lang.org/viewType.html?buildTypeId=Groovy_BintrayIntegration_ReleasePlan&amp;guest=1">release plan</a> allows a release manager to release a new version of Groovy directly from the CI server</p>
+</li>
+<li>
+<p>the <a href="http://ci.groovy-lang.org/viewType.html?buildTypeId=Groovy_BintrayIntegration_GvmBroadcast">GVM broadcast</a> plan allows us to announce a new release of Groovy to <a href="http://gvmtool.net/">GVM</a> and its <a href="https://twitter.com/gvmtool">Twitter account</a> directly from the CI server</p>
+</li>
+<li>
+<p>the <a href="http://ci.groovy-lang.org/viewType.html?buildTypeId=Groovy_BintrayIntegration_GvmMakeDefault">GVM default</a> plan allows us to notify GVM that a specific Groovy version is the new default version, directly from the CI server</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The last two GVM plans are separated because they need to be triggered manually, once we are ready to announce that a new Groovy version is out. Let&#8217;s now describe what the release plan does, so that we can imagine what adaptations will be required to go the Apache Way.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_release_plan">Release plan</h3>
+<div class="paragraph">
+<p>The release plan is at the core of the Groovy release process. It reduces human interactions to the bare minimal, dramatically reducing the potential errors. In particular:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>builds are done using a verified JDK</p>
+</li>
+<li>
+<p>the CI local Maven and Gradle repository caches are cleaned every day, making sure that the build is doable from source for any developer</p>
+</li>
+<li>
+<p>release branches and tags are created automatically</p>
+</li>
+<li>
+<p>properties files are updated automatically (sets the release version, then the next version to push on VCS)</p>
+</li>
+<li>
+<p>binaries (sources, documentation, distribution, SDK) are uploaded to <a href="https://bintray.com/">Bintray</a></p>
+</li>
+<li>
+<p>documentation is uploaded to the <a href="http://groovy-lang.org">Groovy website</a> in a separate directory, so that each Groovy version has its own documentation readable online</p>
+</li>
+<li>
+<p>all artifacts (binaries+maven) are signed through the <a href="https://bintray.com/">Bintray</a> API</p>
+</li>
+<li>
+<p>Maven artifacts are uploaded to <a href="https://bintray.com/bintray/jcenter">JCenter</a></p>
+</li>
+<li>
+<p>Maven Central synchronization is done through the <a href="https://bintray.com/">Bintray</a> API</p>
+</li>
+<li>
+<p>GVM gets notified that a new version is available</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To do this, the only requirement is to fill in a form and click a button. From that, everything is automated. So when the Groovy team decides that a new release can be done, after clicking the button, the release is available online in general less than 2 hours later. This has to be compared to the previous, error prone process, which took up to 12 hours for a single release. Groovy has a tradition of maintaining multiple branches, so this time has to be multiplied by the number of active branches that we maintain, which are usually released the same day.</p>
+</div>
+<div class="paragraph">
+<p>With that regards, the decision whether to release a new version or not is done collectively, on the mailing list or in a Skype channel where the core developers agree about releases. But once the decision is made, there is almost no human process involved anymore.</p>
+</div>
+<div class="paragraph">
+<p>Last but not least, Groovy doesn&#8217;t make any difference between the source distribution (the zip of the source tree) and binary artifacts (distribution, documentation, maven artifacts). All are considered part of the release, and signed accordingly. But there is a technical difference between Maven artifacts and what we call the distribution (sources, binaries, documentation, SDKs). The distribution is only available in <a href="https://bintray.com/">Bintray</a>. It consists of zip files that the developer can download from the Groovy website. The Maven artifacts, on the other hand, are hosted in JCenter and Maven Central.</p>
+</div>
+<div class="paragraph">
+<p>To be able to upload the distribution, the release process automatically creates a new version of Groovy on <a href="https://bintray.com/">Bintray</a>. This version is some kind of folder which will host files for this specific Groovy version. When the files are uploaded, they are kept in <strong>staging</strong> for at most 48 hours. Currently, the release process automatically publishes the artifacts, so there&#8217;s effectively no staging for Groovy.</p>
+</div>
+<div class="paragraph">
+<p>It is unclear whether such a staging phase exists for the Maven artifacts uploaded to JCenter (but it seems we can), but it is clear that the Maven Central synchronization that is doable through <a href="https://bintray.com/">Bintray</a> uses a staging phase, because it directly communicates with the Nexus OSS repository. Maven Central synchronization staging repositories are directly closed by <a href="https://bintray.com/">Bintray</a>.</p>
+</div>
+<div class="paragraph">
+<p>Releasing a new version of Groovy also implies updating the website. Technically it involves two manual steps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>connect to the server and update the <em>symlinks</em> in <em>/var/www/docs/docs</em> for <em>latest</em> and <em>next</em> versions of Groovy, so that the latest documentation link points to the just released version of Groovy</p>
+</li>
+<li>
+<p><strong>then</strong> update the <em>sitemap.groovy</em> file in the Groovy Website repo to add the new version, commit, and push, leading to the generation of the website. In particular, the static website generator will fetch the release notes from JIRA and generate a pretty page using the website template, as well as generating some documentation pages from the whole documentation, again decorated with the website template.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Optionally, for major versions, release notes can be written in Asciidoctor format, and published through the website (see <a href="https://github.com/groovy/groovy-website/tree/master/site/src/site/releasenotes" class="bare">https://github.com/groovy/groovy-website/tree/master/site/src/site/releasenotes</a>).</p>
+</div>
+<div class="paragraph">
+<p>Eventually, the joint builds on the CI server need to be updated so that they use the latest snapshot versions of Groovy. This is done by changing the <code>CI_GROOVY_VERSION</code> environment variable of each build configuration.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_adaptations_required_for_apache">Adaptations required for Apache</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following section is based on our understanding of the Apache Way of releasing. This section is going to be updated based on the feedback we have from our mentors or fellow Apache members.</p>
+</div>
+<div class="paragraph">
+<p>First of all, the main and only important artifact for Apache is the <strong>sources of the project</strong>. This is going to be very important for our adaptation of the process. This means that binaries, documentation, Maven artifacts and such are not considered equally, and are not mandatory to be able to release a version.</p>
+</div>
+<div class="paragraph">
+<p>A detailed guide of the release process <strong>during incubation</strong> can be found <a href="http://incubator.apache.org/guides/releasemanagement.html">here</a> but those are derived from the final release process. Below are the main points with comments about how far we are from there.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>1.1 Checksums and PGP signatures are valid.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><em>There are no such checksums or multiple PGP signatures for Groovy, apart from those generated through <a href="https://bintray.com/">Bintray</a>. It is implied here that signatures must be checked before the release is done, that is to say that we <strong>require</strong> a staging phase and the ability to perform <strong>multiple signatures</strong>. Signatures are those of committers.</em></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>2.1 Build is successful including automated tests.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><em>We&#8217;re all clear on that. Groovy is tested before each release, and the CI server does much more in testing that a normal user can do. In particular, testing with multiple JDKs. The sources zip has been verified to build and test from sources without any issue.</em></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>3.1 DISCLAIMER is correct, filenames include "incubating".</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><em>We need to add the <strong>DISCLAIMER</strong>. The "incubating" part is disturbing. In particular, Groovy is not a new project. It&#8217;s been there for 12 years, and the last release before Apache will be 2.4.2. Does it mean that the next release will have to be named 2.4.3-incubating? It will be very disturbing for our users, and it sounds pretty bad, just as if Groovy wasn&#8217;t production ready. Should we do this, then the incubation phase should be shortened as much as possible. Another option that we consider is what are exactly the deliverables. If the only deliverable is the source zip, because only sources matter (see 3.6), then we could potentially rename only the source zip to include incubating. The binaries, the properties file, etc, could stay with 2.4.3 (without incubating) because it doesn&#8217;t seem to be mandatory that the <strong>version number</strong> includes incubating, only the filenames. And if we produce binaries that are not hosted at Apache, like we do now, they can follow their own pattern. This would imply that in Groovy, the only deliverable that would be done through Apache would be the source zip, and the <strong>filename</strong> could include incubating. All other artifacts would <strong>not</strong> belong to the release checklist.</em></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>3.2 Top-level LICENSE and NOTICE are correct for each distribution.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><em>We do have those files</em>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>3.3 All source files have license headers where appropriate.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><em>It has to be checked, but it should already be the case</em></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>3.4 The provenance of all source files is clear (ASF or software grants).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><em>This is going to be done during the incubation phase.</em></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>3.5 Dependencies licenses are ok as per <a href="http://apache.org/legal/" class="bare">http://apache.org/legal/</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><em>We will have to remove the only dependency which is now unused and not a standard OSS license: Simian.</em></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>3.6 Release consists of source code only, no binaries. Each Apache release must contain a source package. This package may not contain compiled components (such as "jar" files) because compiled components are not open source, even if they were built from open source.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><em>The source zip does contain a binary <strong>dependency</strong>: openbeans, which is not available in a third party Maven repository. We are unsure if the rule applies to it or not.</em></p>
+</div>
+<div class="paragraph">
+<p>It is also implied that we are going to change the group id from <code>org.codehaus.groovy</code> to <code>org.apache.groovy</code>. What it means for the release process (in particular synchronization with Maven Central through Bintray) are unclear.</p>
+</div>
+<div class="paragraph">
+<p>So it seems that the current process could be adapted if:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>we only release the source zip on Apache, and only this item is voted</p>
+</li>
+<li>
+<p>to do this we need to split the release process in at least 3 steps</p>
+<div class="ulist">
+<ul>
+<li>
+<p>building and deploying to a staging repository, including all artifacts. That staging period has to be extended to <strong>at least</strong> 72 hours, which is the minimal voting duration.</p>
+</li>
+<li>
+<p>signing has to be done by individuals. This implies some way to download the full artifact list (there are more than 200 binary files in total !), sign them, and upload the signatures only.</p>
+</li>
+<li>
+<p>publishing, which implies closing the Bintray staging repository, then synchronizing to Maven Central and publishing to GVM</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div></div></div></div></div><footer id='footer'>
+                            <div class='row'>
+                                <div class='colset-3-footer'>
+                                    <div class='col-1'>
+                                        <h1>Groovy</h1><ul>
+                                            <li><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li><a href='http://groovy-lang.org/download.html'>Download</a></li><li><a href='http://groovy-lang.org/support.html'>Support</a></li><li><a href='..\/'>Contribute</a></li><li><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li>
+                                        </ul>
+                                    </div><div class='col-2'>
+                                        <h1>About</h1><ul>
+                                            <li><a href='https://github.com/apache/groovy'>Source code</a></li><li><a href='http://groovy-lang.org/security.html'>Security</a></li><li><a href='http://groovy-lang.org/learn.html#books'>Books</a></li><li><a href='http://groovy-lang.org/thanks.html'>Thanks</a></li><li><a href='http://www.apache.org/foundation/sponsorship.html'>Sponsorship</a></li><li><a href='http://groovy-lang.org/faq.html'>FAQ</a></li><li><a href='http://groovy-lang.org/search.html'>Search</a></li>
+                                        </ul>
+                                    </div><div class='col-3'>
+                                        <h1>Socialize</h1><ul>
+                                            <li><a href='http://groovy-lang.org/mailing-lists.html'>Discuss on the mailing-list</a></li><li><a href='http://groovy-lang.org/groovy-weekly.html'>Groovy newsletter</a></li><li><a href='https://twitter.com/ApacheGroovy'>Groovy on Twitter</a></li><li><a href='http://groovy-lang.org/events.html'>Events and conferences</a></li><li><a href='https://github.com/apache/groovy'>Source code on GitHub</a></li><li><a href='http://groovy-lang.org/reporting-issues.html'>Report issues in Jira</a></li><li><a href='https://google.com/+groovy'>Google+ Groovy Page</a></li><li><a href='http://bit.ly/g-community'>Google+ Groovy Community</a></li><li><a href='http://stackoverflow.com/questions/tagged/groovy'>Stack Overflow questions</a></li><li><a href='http://groovycommunity.com/'>Slack Community</a></li>
+                                        </ul>
+                                    </div><div class='col-right'>
+                                        <p>
+                                            The Groovy programming language is supported by the <a href='http://www.apache.org'>Apache Software Foundation</a> and the Groovy community
+                                        </p><img src='..\img/asf_logo.png' title='The Apache Software Foundation' alt='The Apache Software Foundation' class='img-responsive'/>
+                                    </div>
+                                </div><div class='clearfix'>&copy; 2003-2018 the Apache Groovy project &mdash; Groovy is Open Source, <a href='http://www.apache.org/licenses/LICENSE-2.0.html'>Apache 2 License</a></div>
+                            </div>
+                        </footer></div>
+                </div>
+            </div>
+        </div>
+    </div><script src='..\js/vendor/jquery-1.10.2.min.js' defer></script><script src='..\js/vendor/classie.js' defer></script><script src='..\js/vendor/bootstrap.js' defer></script><script src='..\js/vendor/sidebarEffects.js' defer></script><script src='..\js/vendor/modernizr-2.6.2.min.js' defer></script><script src='..\js/plugins.js' defer></script><script src='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js'></script><script>document.addEventListener('DOMContentLoaded',prettyPrint)</script><script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-257558-10', 'auto');
+          ga('send', 'pageview');
+    </script>
+</body></html>

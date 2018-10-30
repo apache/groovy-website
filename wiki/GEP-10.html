@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]--><head>
+    <meta charset='utf-8'/><meta http-equiv='X-UA-Compatible' content='IE=edge'/><meta name='viewport' content='width=device-width, initial-scale=1'/><title>The Apache Groovy programming language - Developer docs - GEP-10</title><link href='..\img/favicon.ico' type='image/x-ico' rel='icon'/><link rel='stylesheet' type='text/css' href='..\css/bootstrap.css'/><link rel='stylesheet' type='text/css' href='..\css/font-awesome.min.css'/><link rel='stylesheet' type='text/css' href='..\css/style.css'/><link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css'/>
+</head><body>
+    <div id='fork-me'>
+        <a href='https://github.com/apache/groovy'>
+            <img style='position: fixed; top: -14px; right: -14px; border: 0; z-index: 100' src='https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67' alt='Fork me on GitHub' data-canonical-src='https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png'/>
+        </a>
+    </div><div id='st-container' class='st-container st-effect-9'>
+        <nav class='st-menu st-effect-9' id='menu-12'>
+            <h2 class='icon icon-lab'>Socialize</h2><ul>
+                <li>
+                    <a href='http://groovy-lang.org/mailing-lists.html' class='icon'><span class='fa fa-envelope'></span> Discuss on the mailing-list</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/groovy-weekly.html' class='icon'><span class='fa fa-envelope-o'></span> Groovy newsletter</a>
+                </li><li>
+                    <a href='https://twitter.com/ApacheGroovy' class='icon'><span class='fa fa-twitter'></span> Groovy on Twitter</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/events.html' class='icon'><span class='fa fa-calendar'></span> Events and conferences</a>
+                </li><li>
+                    <a href='https://github.com/apache/groovy' class='icon'><span class='fa fa-github'></span> Source code on GitHub</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/reporting-issues.html' class='icon'><span class='fa fa-bug'></span> Report issues in Jira</a>
+                </li><li>
+                    <a href='https://google.com/+groovy' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Page</a>
+                </li><li>
+                    <a href='http://bit.ly/g-community' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Community</a>
+                </li><li>
+                    <a href='http://stackoverflow.com/questions/tagged/groovy' class='icon'><span class='fa fa-stack-overflow'></span> Stack Overflow questions</a>
+                </li><li>
+                    <a href='http://groovycommunity.com/' class='icon'><span class='fa fa-slack'></span> Slack Community</a>
+                </li>
+            </ul>
+        </nav><div class='st-pusher'>
+            <div class='st-content'>
+                <div class='st-content-inner'>
+                    <!--[if lt IE 7]>
+                    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+                <![endif]--><div><div class='navbar navbar-default navbar-static-top' role='navigation'>
+                            <div class='container'>
+                                <div class='navbar-header'>
+                                    <button type='button' class='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
+                                        <span class='sr-only'></span><span class='icon-bar'></span><span class='icon-bar'></span><span class='icon-bar'></span>
+                                    </button><a class='navbar-brand' href='..\index.html'>
+                                        <i class='fa fa-star'></i> Apache Groovy
+                                    </a>
+                                </div><div class='navbar-collapse collapse'>
+                                    <ul class='nav navbar-nav navbar-right'>
+                                        <li class=''><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li class=''><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li class=''><a href='http://groovy-lang.org/download.html'>Download</a></li><li class=''><a href='http://groovy-lang.org/support.html'>Support</a></li><li class=''><a href='..\/'>Contribute</a></li><li class=''><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li><li>
+                                            <a data-effect='st-effect-9' class='st-trigger' href='#'>Socialize</a>
+                                        </li><li class=''>
+                                            <a href='..\search.html'>
+                                                <i class='fa fa-search'></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><div id='content' class='page-1'><div class='row'><div class='row-fluid'><div class='col-lg-3'><ul class='nav-sidebar'><li class='active'><a href='#doc'>GEP-10</a></li><li><a href='#_abstract_static_compilation' class='anchor-link'>Abstract: Static compilation</a></li><li><a href='#_references_and_useful_links' class='anchor-link'>References and useful links</a></li><li><a href='#_update_history' class='anchor-link'>Update history</a></li></ul></div><div class='col-lg-8 col-lg-pull-0'><a name='doc'></a><h1>GEP-10</h1><p>Author: <i/></p><hr/><div id="preamble">
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Metadata</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<strong>Number</strong>
+</td>
+<td class="hdlist2">
+<p>GEP-10</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Title</strong>
+</td>
+<td class="hdlist2">
+<p>Static compilation</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Version</strong>
+</td>
+<td class="hdlist2">
+<p>4</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Type</strong>
+</td>
+<td class="hdlist2">
+<p>Feature</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Status</strong>
+</td>
+<td class="hdlist2">
+<p>Final</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Comment</strong>
+</td>
+<td class="hdlist2">
+<p>Delivered in Groovy 2.0 and enhanced in later versions</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Leader</strong>
+</td>
+<td class="hdlist2">
+<p>Cédric Champeau</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Created</strong>
+</td>
+<td class="hdlist2">
+<p>2011-11-23</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Last modification</strong>&#160;
+</td>
+<td class="hdlist2">
+<p>2018-10-26</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_abstract_static_compilation">Abstract: Static compilation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This GEP introduces an experimental new feature in the language known as static compilation.
+Static compilation can be used when the dynamic features of Groovy are not necessary and that the
+performance of the dynamic runtime is too low. The reader must understand that :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>we do not plan to change the semantics of regular Groovy</p>
+</li>
+<li>
+<p>we want static compilation to be triggered explicitly</p>
+</li>
+<li>
+<p>we want the semantics of static groovy to be as close as possible as the semantics of dynamic Groovy</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_rationale_static_type_checking_vs_static_compilation">Rationale: Static Type Checking vs Static compilation</h3>
+<div class="paragraph">
+<p>Static compilation heavily relies on another feature called Static type checking but it is important to understand
+that they are separate steps. You can statically type check your code, and still have the dynamic runtime at work.
+Static type checking adds type inference to the compilation process. This means that, for example, type arguments
+of method calls are inferred, as well as return types of closures or methods. Those inferred types are used by the
+checker to verify the type flow of your program. When it does so, once must be aware that the static checker cannot
+behave like dynamic Groovy. This means that even if a program passes static type checking, it may behave differently at runtime.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_method_selection">Method selection</h3>
+<div class="sect3">
+<h4 id="_method_selection_in_dynamic_groovy">Method selection in dynamic Groovy</h4>
+<div class="paragraph">
+<p>Groovy supports multimethods. Especially, in dynamic Groovy, target methods are chosen at runtime,
+in opposite to Java which chooses target method at compile time. Let&#8217;s illustrate the difference with an example :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>public void foo(String arg) { System.out.println("String"); }
+public void foo(Object o) { System.out.println("Object"); }
+
+Object o = "The type of o at runtime is String";
+foo(o);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In Java, this code will output "Object", because the target method is chosen according to the type of the arguments at compile time.
+The declared type of "o" is Object, so the Object version of the method is chosen. If you want to call the String version,
+you have to define "o" as a "String", or cast o to string in the method call arguments. Now the same example in dynamic Groovy :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>void foo(String arg) { println 'String' }
+void foo(Object o) { println 'Object' }
+
+def o = 'The type of o at runtime is String'
+foo(o)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you run this snippet, you will see that Groovy prints "String". The reason is that Groovy resolves type arguments at
+runtime and chooses the most specialized version of a method signature when multiple versions are possible.
+To deal with multiple arguments, Groovy computes a distance between the actual type arguments and the declared
+argument types of a method. The method with the best score is chosen.</p>
+</div>
+<div class="paragraph">
+<p>The method selection process is complex, and makes Groovy quite powerful. It is also possible, for example,
+to define metaclasses which will choose different methods, or change the return type of a method dynamically.
+This behaviour is responsible for a large part of the poor performance of Groovy invocation times as compared to Java.
+However, performance has greatly improved with the introduction of call site caching in Groovy.
+Even with those optimizations, Groovy is far for the performance of a pure static language.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_invokedynamic">InvokeDynamic</h4>
+<div class="paragraph">
+<p>InvokeDynamic support is under development and should be introduced in the upcoming Groovy 2.0.
+What InvokeDynamic allows us to do is to, basically, replace call site caching with a native "dynamic method dispatch"
+system directly implemented by the JVM. It is still uncertain what performance improvement we will reach.
+At best, we could be close to the performance of a statically typed language.
+However, as some features are still difficult to implement with InvokeDynamic,
+most likely the performance gain will not be so high. It is important to talk about it though, because :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>invokedynamic allows JIT optimizations</p>
+</li>
+<li>
+<p>replaces the current dynamic method dispatch without changing the semantics of the language</p>
+</li>
+<li>
+<p>if performance is good, could make static compilation unnecessary</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>However, InvokeDynamic has a major drawback : it will only be available for people using a Java 7+ JVM.
+If we want to deliver Java-like performance for Groovy programs to our users, can we afford leaving
+most of them without such? Most probably, Java 7 won&#8217;t be mainstream before two or three years.</p>
+</div>
+<div class="paragraph">
+<p>Rémi Forax, however, created a backport of invokedynamic for older versions of the JVM.
+Such a backport relies on bytecode transformation to replace invokedynamic instructions with "emulated instructions".
+This "emulated" mode is great for us Groovy developers, because it would allow us to write code once and run it on
+any JVM, but for users, the performance would most probably be bad. To be sure of that, an experiment with backported
+InDy will be made once invokedynamic support is implemented in Groovy core. The most probable situation,
+though, is that performance of such code will remain far from what a static language could provide.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_static_groovy">Static Groovy</h3>
+<div class="sect3">
+<h4 id="_type_inference_based_dispatch">Type inference based dispatch</h4>
+<div class="paragraph">
+<p>This GEP is there to experiment a static compilation mode in Groovy. With what we have explained before,
+you should already understand that statically typed code implies a different behaviour from dynamic code.
+If you expect the statically checked and statically compiled code to behave exactly like dynamic Groovy,
+you should already stop there, or wait for invoke dynamic support to expect improved performance.
+If you perfectly understand that statically compiled code means different semantics,
+then you can continue reading this GEP, and help us choose the best implementation path.
+In fact, there are several options that we will explain here.</p>
+</div>
+<div class="paragraph">
+<p>The current implementation relies on the static type checker, which performs type inference.
+This means that with the previous example :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>void foo(String arg) { println 'String' }
+void foo(Object o) { println 'Object' }
+
+def o = 'The type of o at runtime is String'
+foo(o)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The compiler is able to infer that when the foo method is called, the actual type argument will be a string.
+If we compile it statically, the behaviour of this statically compiled program at runtime will be the same as dynamic Groovy.
+With such an implementation, we expect most programs to behave statically like they would in dynamic Groovy.
+However, this will never be always true. This is why we say this behaviour is "as close as possible" as the one of dynamic Groovy.</p>
+</div>
+<div class="paragraph">
+<p>The drawback of this implementation is that the developer cannot easily know what method the compiler chooses.
+For example, let&#8217;s take this example, extracted from a discussion on the mailing list:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>void foo(String msg) { println msg }
+void foo(Object msg) { println 'Object' }
+
+def doIt = {x -&gt;
+  Object o = x
+  foo(o)
+}
+
+def getXXX() { "return String" }
+
+def o2=getXXX()
+doIt o2   // "String method" or "Object method"????</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The static type checker infers the type of o2 from the return type of getXXX, so knows that doIt is called with a String,
+so you could suspect the program to choose the foo(String) method. However, doIt is a closure, which can therefore
+be reused in many places, and the type of its "x" argument is unknown. The type checker will not generate distinct
+closure classes for the different call sites where it is used. This means that when you are in the closure,
+the type of 'x' is the one declared in the closure arguments. This means that without type information on 'x',
+x is supposed an Object, and the foo method which will be statically chosen will be the one with the Object argument.</p>
+</div>
+<div class="paragraph">
+<p>While this can be surprising, this is not really difficult to understand. To behave correctly,
+you must either add explicit type arguments to the closure, which is always preferred.
+In a word, in a statically checked world, it is preferred to limit the places where types will be inferred so
+that code is understood properly. Even if you don&#8217;t do it, fixing code is easy, so we think this is not a major issue.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_java_like_method_dispatch">Java-like method dispatch</h4>
+<div class="paragraph">
+<p>The alternative implementation is not to rely on inferred types, but rather behave exactly like Java does.
+The main advantage of this is that the user doesn&#8217;t have 3 distinct method dispatch modes to understand,
+like in the previous solution (Java, dynamic Groovy, inferred static Groovy).
+The major drawback is that the semantics of static Groovy are not close to the ones of dynamic Groovy.
+For this reason, this is not the preferred experimental implementation. If you think this version should be preferred,
+do not hesitate to send an email to the mailing list so that we can discuss.
+You can even fork the current implementation to provide your own.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_testing">Testing</h3>
+<div class="paragraph">
+<p>Static compilation is now part of the Groovy 2.0.0 release. You can download the latest Groovy 2 releases and test it.</p>
+</div>
+<div class="sect3">
+<h4 id="_compilestatic">@CompileStatic</h4>
+<div class="paragraph">
+<p>You can try the following snippet :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>@groovy.transform.CompileStatic
+int fib(int i) {
+    i &lt; 2 ? 1 : fib(i - 2) + fib(i - 1)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This code should already run as fast as Java.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_the_arrow_operator_for_direct_method_calls">The "arrow" operator for direct method calls</h4>
+<div class="paragraph">
+<p>Some users have suggested another idea, related to static compilation, which is the "arrow operator".
+Basically, the idea is to introduce another way of calling methods in Groovy :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>obj.method() // dynamic dispatch
+obj-&gt;method() // static dispatch</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>While this idea sounds interesting, especially when you want to mix dynamic and static code in a single method,
+we think it has many drawbacks. First, it introduces a grammar change, something we would like to avoid as much as possible.
+Second, the idea behind this operator is to perform direct method calls when you <strong>know</strong> the type of an object.
+But, without type inference, you have two problems :</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>even if the type of 'obj' is specified, you cannot be sure that at runtime, the type will be the same</p>
+</li>
+<li>
+<p>you still have to infer the argument types too, which leaves us with the same problem as before: relying on type inference,
+or relying on Java-like behaviour where the method is chosen based on the declared types.
+If we do so, then we would introduce possible incompatibility with the static mode&#8230;&#8203;
+So we would have to choose between this mode and the full static compilation mode.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Imagine the following code :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>void write(PrintWriter out) {
+   out-&gt;write('Hello')
+   out-&gt;write(template())
+}
+
+def template() { new MarkupBuilder().html { p('Hello') } }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>While the first call can be resolved easily, this is not the same with the second one.
+You would have to rewrite your code probably this way to have this work :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>void write(PrintWriter out) {
+   out-&gt;println('Hello')
+   String content = template() // dynamic call, implicit coercion to string
+   out-&gt;println(content) // static method dispatch based on declared types only
+}
+
+def template() { new MarkupBuilder().html { p('Hello') } }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Which is not necessary if you use the @CompileStatic annotation :</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>@CompileStatic
+void write(PrintWriter out) {
+   out.println('Hello')
+   out.println(template())
+}
+
+def template() { new MarkupBuilder().html { p('Hello') } }</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_references_and_useful_links">References and useful links</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://web.archive.org/web/20150508040816/http://docs.codehaus.org/display/GroovyJSR/GEP+10+-+Static+compilation">GEP-10: Static compilation</a> (web archive link)</p>
+</li>
+<li>
+<p><a href="http://blackdragsview.blogspot.com/2011/10/flow-sensitive-typing.html">Flow Sensitive Typing?</a></p>
+</li>
+<li>
+<p><a href="https://web.archive.org/web/20150508040745/http://www.jroller.com/melix/entry/groovy_static_type_checker_status">Groovy static type checker: status update</a> (web archive)</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_mailing_list_discussions">Mailing-list discussions</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://markmail.org/thread/a4qhxtjzu3wsw6e5">groovy-dev: Static compilation for Groovy</a>:<br>
+An interesting discussion where dynamic lovers explain why they do not want static compilation</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_jira_issues">JIRA issues</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://issues.apache.org/jira/browse/GROOVY-5138">GROOVY-5138: GEP-10 - Static compilation</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_update_history">Update history</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">3 (2012-06-21)</dt>
+<dd>
+<p>Version as extracted from Codehaus wiki</p>
+</dd>
+<dt class="hdlist1">4 (2018-10-26)</dt>
+<dd>
+<p>Numerous minor tweaks</p>
+</dd>
+</dl>
+</div>
+</div>
+</div></div></div></div></div><footer id='footer'>
+                            <div class='row'>
+                                <div class='colset-3-footer'>
+                                    <div class='col-1'>
+                                        <h1>Groovy</h1><ul>
+                                            <li><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li><a href='http://groovy-lang.org/download.html'>Download</a></li><li><a href='http://groovy-lang.org/support.html'>Support</a></li><li><a href='..\/'>Contribute</a></li><li><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li>
+                                        </ul>
+                                    </div><div class='col-2'>
+                                        <h1>About</h1><ul>
+                                            <li><a href='https://github.com/apache/groovy'>Source code</a></li><li><a href='http://groovy-lang.org/security.html'>Security</a></li><li><a href='http://groovy-lang.org/learn.html#books'>Books</a></li><li><a href='http://groovy-lang.org/thanks.html'>Thanks</a></li><li><a href='http://www.apache.org/foundation/sponsorship.html'>Sponsorship</a></li><li><a href='http://groovy-lang.org/faq.html'>FAQ</a></li><li><a href='http://groovy-lang.org/search.html'>Search</a></li>
+                                        </ul>
+                                    </div><div class='col-3'>
+                                        <h1>Socialize</h1><ul>
+                                            <li><a href='http://groovy-lang.org/mailing-lists.html'>Discuss on the mailing-list</a></li><li><a href='http://groovy-lang.org/groovy-weekly.html'>Groovy newsletter</a></li><li><a href='https://twitter.com/ApacheGroovy'>Groovy on Twitter</a></li><li><a href='http://groovy-lang.org/events.html'>Events and conferences</a></li><li><a href='https://github.com/apache/groovy'>Source code on GitHub</a></li><li><a href='http://groovy-lang.org/reporting-issues.html'>Report issues in Jira</a></li><li><a href='https://google.com/+groovy'>Google+ Groovy Page</a></li><li><a href='http://bit.ly/g-community'>Google+ Groovy Community</a></li><li><a href='http://stackoverflow.com/questions/tagged/groovy'>Stack Overflow questions</a></li><li><a href='http://groovycommunity.com/'>Slack Community</a></li>
+                                        </ul>
+                                    </div><div class='col-right'>
+                                        <p>
+                                            The Groovy programming language is supported by the <a href='http://www.apache.org'>Apache Software Foundation</a> and the Groovy community
+                                        </p><img src='..\img/asf_logo.png' title='The Apache Software Foundation' alt='The Apache Software Foundation' class='img-responsive'/>
+                                    </div>
+                                </div><div class='clearfix'>&copy; 2003-2018 the Apache Groovy project &mdash; Groovy is Open Source, <a href='http://www.apache.org/licenses/LICENSE-2.0.html'>Apache 2 License</a></div>
+                            </div>
+                        </footer></div>
+                </div>
+            </div>
+        </div>
+    </div><script src='..\js/vendor/jquery-1.10.2.min.js' defer></script><script src='..\js/vendor/classie.js' defer></script><script src='..\js/vendor/bootstrap.js' defer></script><script src='..\js/vendor/sidebarEffects.js' defer></script><script src='..\js/vendor/modernizr-2.6.2.min.js' defer></script><script src='..\js/plugins.js' defer></script><script src='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js'></script><script>document.addEventListener('DOMContentLoaded',prettyPrint)</script><script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-257558-10', 'auto');
+          ga('send', 'pageview');
+    </script>
+</body></html>

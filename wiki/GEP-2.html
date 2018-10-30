@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]--><head>
+    <meta charset='utf-8'/><meta http-equiv='X-UA-Compatible' content='IE=edge'/><meta name='viewport' content='width=device-width, initial-scale=1'/><title>The Apache Groovy programming language - Developer docs - GEP-2</title><link href='..\img/favicon.ico' type='image/x-ico' rel='icon'/><link rel='stylesheet' type='text/css' href='..\css/bootstrap.css'/><link rel='stylesheet' type='text/css' href='..\css/font-awesome.min.css'/><link rel='stylesheet' type='text/css' href='..\css/style.css'/><link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css'/>
+</head><body>
+    <div id='fork-me'>
+        <a href='https://github.com/apache/groovy'>
+            <img style='position: fixed; top: -14px; right: -14px; border: 0; z-index: 100' src='https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67' alt='Fork me on GitHub' data-canonical-src='https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png'/>
+        </a>
+    </div><div id='st-container' class='st-container st-effect-9'>
+        <nav class='st-menu st-effect-9' id='menu-12'>
+            <h2 class='icon icon-lab'>Socialize</h2><ul>
+                <li>
+                    <a href='http://groovy-lang.org/mailing-lists.html' class='icon'><span class='fa fa-envelope'></span> Discuss on the mailing-list</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/groovy-weekly.html' class='icon'><span class='fa fa-envelope-o'></span> Groovy newsletter</a>
+                </li><li>
+                    <a href='https://twitter.com/ApacheGroovy' class='icon'><span class='fa fa-twitter'></span> Groovy on Twitter</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/events.html' class='icon'><span class='fa fa-calendar'></span> Events and conferences</a>
+                </li><li>
+                    <a href='https://github.com/apache/groovy' class='icon'><span class='fa fa-github'></span> Source code on GitHub</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/reporting-issues.html' class='icon'><span class='fa fa-bug'></span> Report issues in Jira</a>
+                </li><li>
+                    <a href='https://google.com/+groovy' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Page</a>
+                </li><li>
+                    <a href='http://bit.ly/g-community' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Community</a>
+                </li><li>
+                    <a href='http://stackoverflow.com/questions/tagged/groovy' class='icon'><span class='fa fa-stack-overflow'></span> Stack Overflow questions</a>
+                </li><li>
+                    <a href='http://groovycommunity.com/' class='icon'><span class='fa fa-slack'></span> Slack Community</a>
+                </li>
+            </ul>
+        </nav><div class='st-pusher'>
+            <div class='st-content'>
+                <div class='st-content-inner'>
+                    <!--[if lt IE 7]>
+                    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+                <![endif]--><div><div class='navbar navbar-default navbar-static-top' role='navigation'>
+                            <div class='container'>
+                                <div class='navbar-header'>
+                                    <button type='button' class='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
+                                        <span class='sr-only'></span><span class='icon-bar'></span><span class='icon-bar'></span><span class='icon-bar'></span>
+                                    </button><a class='navbar-brand' href='..\index.html'>
+                                        <i class='fa fa-star'></i> Apache Groovy
+                                    </a>
+                                </div><div class='navbar-collapse collapse'>
+                                    <ul class='nav navbar-nav navbar-right'>
+                                        <li class=''><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li class=''><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li class=''><a href='http://groovy-lang.org/download.html'>Download</a></li><li class=''><a href='http://groovy-lang.org/support.html'>Support</a></li><li class=''><a href='..\/'>Contribute</a></li><li class=''><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li><li>
+                                            <a data-effect='st-effect-9' class='st-trigger' href='#'>Socialize</a>
+                                        </li><li class=''>
+                                            <a href='..\search.html'>
+                                                <i class='fa fa-search'></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><div id='content' class='page-1'><div class='row'><div class='row-fluid'><div class='col-lg-3'><ul class='nav-sidebar'><li class='active'><a href='#doc'>GEP-2</a></li><li><a href='#_abstract' class='anchor-link'>Abstract</a></li><li><a href='#_approach' class='anchor-link'>Approach</a></li><li><a href='#_references_and_useful_links' class='anchor-link'>References and useful links</a></li><li><a href='#_update_history' class='anchor-link'>Update history</a></li></ul></div><div class='col-lg-8 col-lg-pull-0'><a name='doc'></a><h1>GEP-2</h1><p>Author: <i/></p><hr/><div id="preamble">
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Metadata</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<strong>Number</strong>
+</td>
+<td class="hdlist2">
+<p>GEP-2</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Title</strong>
+</td>
+<td class="hdlist2">
+<p>AST Builder Support</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Version</strong>
+</td>
+<td class="hdlist2">
+<p>8</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Type</strong>
+</td>
+<td class="hdlist2">
+<p>Feature</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Target</strong>
+</td>
+<td class="hdlist2">
+<p>Groovy 1.7</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Status</strong>
+</td>
+<td class="hdlist2">
+<p>Final</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Comment</strong>
+</td>
+<td class="hdlist2">
+<p>Included in Groovy but somewhat <em>superseded by macros</em></p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Leader</strong>
+</td>
+<td class="hdlist2">
+<p>Hamlet D&#8217;Arcy</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Created</strong>
+</td>
+<td class="hdlist2">
+<p>2009-04-01</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Last modification</strong>&#160;
+</td>
+<td class="hdlist2">
+<p>2018-10-12</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_abstract">Abstract</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Groovy 1.6 introduced the ability to perform local and global AST (Abstract Syntax Tree) transformations,
+allowing users to read and modify the AST of Groovy code as it is being compiled.
+Reading information in the AST is relatively easy in Groovy.
+The core library provides a strongly-typed visitor called GroovyCodeVisitor.
+Nodes can be read and modified using the API provided through the subtypes of ASTNode.
+Writing new AST nodes is not as simple. The AST generated from source is not always obvious,
+and using constructor calls to generate trees of nodes can be verbose.
+This GEP proposes an ASTBuilder object that allows users to easily create AST.</p>
+</div>
+<div class="paragraph">
+<p>The ASTBuilder object allows AST to be created from:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>strings containing Groovy source code</p>
+</li>
+<li>
+<p>a closure containing Groovy source</p>
+</li>
+<li>
+<p>a closure containing an AST creation DSL</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>All three approaches share the same API: a builder object is instantiated and a build* method is invoked.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_approach">Approach</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_astnode_from_string">ASTNode from String</h3>
+<div class="paragraph">
+<p>The simplest approach to implement is to provide an AST Builder with an API that takes a String and returns List&lt;ASTNode&gt;:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>def builder = new AstBuilder()
+List&lt;ASTNode&gt; statements = builder.buildFromString(
+     CompilePhase.CONVERSION,
+     true,
+     """ println "Hello World" """
+)</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>phase parameter tells the builder from which phase to return AST. This parameter is optional, and the default
+CompilePhase is CLASS_GENERATION. This provides a cleaner API for the common case, and CLASS_GENERATION was chosen
+because more types are available in later phases.</p>
+</li>
+<li>
+<p>the "statementsOnly" boolean parameter is an optional parameter, and tells the builder to discard the generated
+top level Script ClassNode. Default is true.</p>
+</li>
+<li>
+<p>The last String parameter is the input</p>
+</li>
+<li>
+<p>The builder returns List&lt;ASTNode&gt;</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The above example produces the following AST:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>BlockStatement
+-&gt; ExpressionStatement
+    -&gt; MethodCallExpression
+       -&gt; VariableExpression
+       -&gt; ConstantExpression
+       -&gt; ArgumentListExpression
+          -&gt; ConstantExpression</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_alternatives">Alternatives</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Some sort of AST Template was considered for this feature. Consider the following example:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>def astTemplate = builder.buildAst ( "println $txt" ).head()
+
+def constant = builder.buildAst ( "To be, or not to be: that is the question" ).head()
+
+def methodCallExpression = astTemplate.apply(txt: constant)
+// method call expression not contains println "To be ... "</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This templating approach adds complexity that may not be used. It overloads the GString $ operator,
+in that it is used here only with objects of type ASTNode but is used normally in GStrings with any Object type at all.
+Also, the templating approach can create order of precedence confusion.
+Consider source = "$expr * y", and later $expr is bound to "x+a". The result is "x + a * y", which was probably unintentional.
+At this time, the AST builder does not include such a feature.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_astnode_from_code_block">ASTNode from Code Block</h3>
+<div class="paragraph">
+<p>A useful API would be creating AST from code blocks.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>AstBuilder builder = new AstBuilder()
+def statementBlock = builder.buildFromCode (CompilePhase.CONVERSION, true) {
+     println "Hello World"
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Expressing Groovy source within Groovy source seems the most natural way to write it (as opposed to putting Groovy source into a String).</p>
+</li>
+<li>
+<p>Some IDE support is naturally available (highlighting, etc), but IDE warnings will be misleading for variable scoping rules</p>
+</li>
+<li>
+<p>Same issues and rules from "ASTNode from String" for phase and statementsOnly properties apply to this version</p>
+</li>
+<li>
+<p>Provides similar API as builder from String, except the code property accepts any block of code that is legal in the context of a Closure.</p>
+</li>
+<li>
+<p>Converting from a closure into AST is performed through a global compiler transformation.
+This requires that the AstBuilder reference be strongly typed so that the global annotation can be triggered.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The above example produces the following AST:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>BlockStatement
+ -&gt; ExpressionStatement
+    -&gt; MethodCallExpression
+       -&gt; VariableExpression
+       -&gt; ConstantExpression
+       -&gt; ArgumentListExpression
+          -&gt; ConstantExpression</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_alternatives_2">Alternatives</h4>
+<div class="paragraph">
+<p>If @ASTSource annotation is used, then it would be very easy to let users reuse that annotation outside of the builder.
+Consider the following example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>@AstSource(CompilePhase.CONVERSION)
+List&lt;ASTNode&gt; source = { println "compiled on: ${new Date()}" }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This option seems helpful; however, annotations on local variables are not yet supported. This approach will not be implemented.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_astnode_from_psuedo_specification">ASTNode from psuedo-specification</h3>
+<div class="paragraph">
+<p>Building AST conditionally, such as inserting an if-statement or looping, is not easily accomplished in the String or code based builders.
+Consider this example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>def builder = new AstBuilder()
+List&lt;ASTNode&gt; statements = builder.buildFromSpec {
+    methodCall {
+        variable "this"
+        constant "println"
+        argumentList {
+            if (locale == "US") constant "Hello"
+            if (locale == "FR") constant "Bonjour"
+            else constant "Ni hao"
+        }
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This library class is useful for several reasons:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Using conditionals or looping within an AST Builder will probably be a common occurrence</p>
+</li>
+<li>
+<p>It is difficult to create a Field or Method references in any of the other approaches</p>
+</li>
+<li>
+<p>Simply using the @Newify annotation does not sufficiently improve the syntax</p>
+</li>
+<li>
+<p>This construct alleviates the need to distinguish between Statement and Expressions, since those words are dropped from the method names</p>
+</li>
+<li>
+<p>There is no need for a phase or statementsOnly property in this approach</p>
+</li>
+<li>
+<p>Many expressions take a type ClassNode, which wraps a Class. The syntax for ClassNode is to just pass
+a Class instance and the builder wraps it in a ClassNode automatically.</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="_issues">Issues</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>Constructor parameter lists can be lengthy on ASTNode subtypes, and this approach removes the possibility for an IDE to help.
+This is the price to pay for a builder, and the planned builder metadata feature in 1.7 may alleviate this.</p>
+</li>
+<li>
+<p>The class creating AST from the pseudo-specification should be implemented so that it does not create a
+mirror-image class hierarchy of the current AST types. This would force all changes to the AST types to be performed
+in two places: once in the ASTNode subclass and once in this builder. If this is not possible, then at least the AST
+hierarchy doesn&#8217;t change frequently.</p>
+</li>
+<li>
+<p>Several ASTNode types have constructor signatures all of the same type: (Expression, Expression, Expression) most commonly.
+This means the parameters in the DSL are order dependent, and specifying arguments in the wrong order doesn&#8217;t create
+an exception but causes drastically different results at runtime. This is fully documented on the mailing list.</p>
+</li>
+<li>
+<p>The syntax for specifying Parameter objects is documented on the mailing list.</p>
+</li>
+<li>
+<p>A few of the ASTNode types having naming conflicts with language keywords. For instance the ClassExpression type
+cannot be abbreviated to 'class' and IfStatement cannot be reduced to 'if'. This is fully documented on the mailing list.</p>
+</li>
+<li>
+<p>Parameters have default values and can be varargs. A suitable syntax needs to be proposed.</p>
+</li>
+<li>
+<p>Sometimes the order of the constructor parameters needed to be switched within the DSL. For instance,
+consider SwitchStatement(Expression expression, List&lt;CaseStatement&gt; caseStatements, Expression defaultStatement).
+The current syntax of the DSL imposes a sort of VarArgs rigidity on the arguments: lists are just implied by repeated elements.
+So having the middle parameter of SwitchStatement be a list is problematic because the natural way to convert the
+constructor is to have it become (Expression expression, CaseStatement&#8230;&#8203; caseStatements, Expression default), which isn&#8217;t possible.
+This is fully documented on the mailing list.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_alternatives_3">Alternatives</h4>
+<div class="paragraph">
+<p>Template Haskell and Boo provide a special syntax for AST building statements.
+Quasi-quote (or Oxford quotes) can be used to trigger an AST building operation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>ConstantExpression exp = [| "Hello World" |]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Those languages also supply a splice operator $(&#8230;&#8203;) to turn AST back into code. This is not part of the AstBuilder work.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_references_and_useful_links">References and useful links</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://groovy.markmail.org/thread/4pw7uzl5ulkb5zbe">groovy-dev: Groovy AST Builder discussion</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://groovy.markmail.org/thread/bbusithri2xmhmiw">groovy-dev: Several issues with GEP-2 AST Builder "from specification"</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://en.wikipedia.org/wiki/Template_Haskell">Template Haskell</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://web.archive.org/web/20090213045341/http://blogs.codehaus.org:80/people/bamboo/archives/001593_boo_meta_methods.html">Boo meta methods</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/cython/cython/wiki/enhancements-metaprogramming">Cython Metaprogramming Proposal</a> by Martin C Martin - Contains nice write up of some use cases</p>
+</div>
+<div class="sect2">
+<h3 id="_jira_issues">JIRA issues:</h3>
+<div class="paragraph">
+<p>This feature is dependent on allowing annotations on local variables: <a href="https://issues.apache.org/jira/browse/GROOVY-3481">GROOVY-3481</a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_update_history">Update history</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">7 (2009-06-17)</dt>
+<dd>
+<p>Version as extracted from Codehaus wiki</p>
+</dd>
+<dt class="hdlist1">8 (2018-10-11)</dt>
+<dd>
+<p>Added comment about macros</p>
+</dd>
+</dl>
+</div>
+</div>
+</div></div></div></div></div><footer id='footer'>
+                            <div class='row'>
+                                <div class='colset-3-footer'>
+                                    <div class='col-1'>
+                                        <h1>Groovy</h1><ul>
+                                            <li><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li><a href='http://groovy-lang.org/download.html'>Download</a></li><li><a href='http://groovy-lang.org/support.html'>Support</a></li><li><a href='..\/'>Contribute</a></li><li><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li>
+                                        </ul>
+                                    </div><div class='col-2'>
+                                        <h1>About</h1><ul>
+                                            <li><a href='https://github.com/apache/groovy'>Source code</a></li><li><a href='http://groovy-lang.org/security.html'>Security</a></li><li><a href='http://groovy-lang.org/learn.html#books'>Books</a></li><li><a href='http://groovy-lang.org/thanks.html'>Thanks</a></li><li><a href='http://www.apache.org/foundation/sponsorship.html'>Sponsorship</a></li><li><a href='http://groovy-lang.org/faq.html'>FAQ</a></li><li><a href='http://groovy-lang.org/search.html'>Search</a></li>
+                                        </ul>
+                                    </div><div class='col-3'>
+                                        <h1>Socialize</h1><ul>
+                                            <li><a href='http://groovy-lang.org/mailing-lists.html'>Discuss on the mailing-list</a></li><li><a href='http://groovy-lang.org/groovy-weekly.html'>Groovy newsletter</a></li><li><a href='https://twitter.com/ApacheGroovy'>Groovy on Twitter</a></li><li><a href='http://groovy-lang.org/events.html'>Events and conferences</a></li><li><a href='https://github.com/apache/groovy'>Source code on GitHub</a></li><li><a href='http://groovy-lang.org/reporting-issues.html'>Report issues in Jira</a></li><li><a href='https://google.com/+groovy'>Google+ Groovy Page</a></li><li><a href='http://bit.ly/g-community'>Google+ Groovy Community</a></li><li><a href='http://stackoverflow.com/questions/tagged/groovy'>Stack Overflow questions</a></li><li><a href='http://groovycommunity.com/'>Slack Community</a></li>
+                                        </ul>
+                                    </div><div class='col-right'>
+                                        <p>
+                                            The Groovy programming language is supported by the <a href='http://www.apache.org'>Apache Software Foundation</a> and the Groovy community
+                                        </p><img src='..\img/asf_logo.png' title='The Apache Software Foundation' alt='The Apache Software Foundation' class='img-responsive'/>
+                                    </div>
+                                </div><div class='clearfix'>&copy; 2003-2018 the Apache Groovy project &mdash; Groovy is Open Source, <a href='http://www.apache.org/licenses/LICENSE-2.0.html'>Apache 2 License</a></div>
+                            </div>
+                        </footer></div>
+                </div>
+            </div>
+        </div>
+    </div><script src='..\js/vendor/jquery-1.10.2.min.js' defer></script><script src='..\js/vendor/classie.js' defer></script><script src='..\js/vendor/bootstrap.js' defer></script><script src='..\js/vendor/sidebarEffects.js' defer></script><script src='..\js/vendor/modernizr-2.6.2.min.js' defer></script><script src='..\js/plugins.js' defer></script><script src='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js'></script><script>document.addEventListener('DOMContentLoaded',prettyPrint)</script><script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-257558-10', 'auto');
+          ga('send', 'pageview');
+    </script>
+</body></html>

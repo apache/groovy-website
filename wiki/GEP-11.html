@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]--><head>
+    <meta charset='utf-8'/><meta http-equiv='X-UA-Compatible' content='IE=edge'/><meta name='viewport' content='width=device-width, initial-scale=1'/><title>The Apache Groovy programming language - Developer docs - GEP-11</title><link href='..\img/favicon.ico' type='image/x-ico' rel='icon'/><link rel='stylesheet' type='text/css' href='..\css/bootstrap.css'/><link rel='stylesheet' type='text/css' href='..\css/font-awesome.min.css'/><link rel='stylesheet' type='text/css' href='..\css/style.css'/><link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css'/>
+</head><body>
+    <div id='fork-me'>
+        <a href='https://github.com/apache/groovy'>
+            <img style='position: fixed; top: -14px; right: -14px; border: 0; z-index: 100' src='https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67' alt='Fork me on GitHub' data-canonical-src='https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png'/>
+        </a>
+    </div><div id='st-container' class='st-container st-effect-9'>
+        <nav class='st-menu st-effect-9' id='menu-12'>
+            <h2 class='icon icon-lab'>Socialize</h2><ul>
+                <li>
+                    <a href='http://groovy-lang.org/mailing-lists.html' class='icon'><span class='fa fa-envelope'></span> Discuss on the mailing-list</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/groovy-weekly.html' class='icon'><span class='fa fa-envelope-o'></span> Groovy newsletter</a>
+                </li><li>
+                    <a href='https://twitter.com/ApacheGroovy' class='icon'><span class='fa fa-twitter'></span> Groovy on Twitter</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/events.html' class='icon'><span class='fa fa-calendar'></span> Events and conferences</a>
+                </li><li>
+                    <a href='https://github.com/apache/groovy' class='icon'><span class='fa fa-github'></span> Source code on GitHub</a>
+                </li><li>
+                    <a href='http://groovy-lang.org/reporting-issues.html' class='icon'><span class='fa fa-bug'></span> Report issues in Jira</a>
+                </li><li>
+                    <a href='https://google.com/+groovy' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Page</a>
+                </li><li>
+                    <a href='http://bit.ly/g-community' class='icon'><span class='fa fa-google-plus'></span> Google+ Groovy Community</a>
+                </li><li>
+                    <a href='http://stackoverflow.com/questions/tagged/groovy' class='icon'><span class='fa fa-stack-overflow'></span> Stack Overflow questions</a>
+                </li><li>
+                    <a href='http://groovycommunity.com/' class='icon'><span class='fa fa-slack'></span> Slack Community</a>
+                </li>
+            </ul>
+        </nav><div class='st-pusher'>
+            <div class='st-content'>
+                <div class='st-content-inner'>
+                    <!--[if lt IE 7]>
+                    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+                <![endif]--><div><div class='navbar navbar-default navbar-static-top' role='navigation'>
+                            <div class='container'>
+                                <div class='navbar-header'>
+                                    <button type='button' class='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
+                                        <span class='sr-only'></span><span class='icon-bar'></span><span class='icon-bar'></span><span class='icon-bar'></span>
+                                    </button><a class='navbar-brand' href='..\index.html'>
+                                        <i class='fa fa-star'></i> Apache Groovy
+                                    </a>
+                                </div><div class='navbar-collapse collapse'>
+                                    <ul class='nav navbar-nav navbar-right'>
+                                        <li class=''><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li class=''><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li class=''><a href='http://groovy-lang.org/download.html'>Download</a></li><li class=''><a href='http://groovy-lang.org/support.html'>Support</a></li><li class=''><a href='..\/'>Contribute</a></li><li class=''><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li><li>
+                                            <a data-effect='st-effect-9' class='st-trigger' href='#'>Socialize</a>
+                                        </li><li class=''>
+                                            <a href='..\search.html'>
+                                                <i class='fa fa-search'></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><div id='content' class='page-1'><div class='row'><div class='row-fluid'><div class='col-lg-3'><ul class='nav-sidebar'><li class='active'><a href='#doc'>GEP-11</a></li><li><a href='#_abstract_groovy_3_semantics_and_new_mop' class='anchor-link'>Abstract: Groovy 3 semantics and new MOP</a></li><li><a href='#_rationale' class='anchor-link'>Rationale</a></li><li><a href='#_references_and_useful_links' class='anchor-link'>References and useful links</a></li><li><a href='#_update_history' class='anchor-link'>Update history</a></li></ul></div><div class='col-lg-8 col-lg-pull-0'><a name='doc'></a><h1>GEP-11</h1><p>Author: <i/></p><hr/><div id="preamble">
+<div class="sectionbody">
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Metadata</div>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<strong>Number</strong>
+</td>
+<td class="hdlist2">
+<p>GEP-11</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Title</strong>
+</td>
+<td class="hdlist2">
+<p>Groovy 3 semantics and new MOP</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Version</strong>
+</td>
+<td class="hdlist2">
+<p>4</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Type</strong>
+</td>
+<td class="hdlist2">
+<p>Feature</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Status</strong>
+</td>
+<td class="hdlist2">
+<p>Draft</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Leader</strong>
+</td>
+<td class="hdlist2">
+<p>Jochen "blackdrag" Theodorou</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Created</strong>
+</td>
+<td class="hdlist2">
+<p>2012-06-26</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<strong>Last modification</strong>&#160;
+</td>
+<td class="hdlist2">
+<p>2018-10-28</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_abstract_groovy_3_semantics_and_new_mop">Abstract: Groovy 3 semantics and new MOP</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For quite long we are thinking about a new MOP for Groovy, without finding the right way  to do it better this time.
+It is difficult to find the right path between being user-friendly and efficient.
+Thus the new MOP will contain some features the old did not, but will also remove some old features for
+the sake of a more straight and more easy to understand MOP.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_rationale">Rationale</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_removing_default_null_argument">Removing default null argument</h3>
+<div class="paragraph">
+<p>The default null argument is used for method calls that have one parameter,
+but the call is done without an argument for the parameter.
+Groovy will here use null, as long as the type of the parameter is not a primitive.
+In case of a primitive the call fails. This feature was mainly added in the early Groovy pre 1.0 years
+before Groovy supported default values for parameters. Another limitation of this logic is that it works
+only with single parameter methods. There have been multiple cases of confused users by this logic.
+Performance wise this logic doesn&#8217;t cost much, and certainly not more than a call with a real argument.
+But since this is a confusing feature of limited use, it should be removed.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_removing_automatic_list_expansion">Removing automatic list expansion</h3>
+<div class="paragraph">
+<p>A method call done with a list that finds no matching method for that list (a method with one parameter of type List,
+Collection, Object, etc), will cause a second method selection iteration. This time the list is "unpacked" and all
+elements of the list are taken as if the method call had been done with the elements rather than the list.
+Groovy also supports spreading of lists by an syntax element, making this automatic feature not needed.
+In fact this can be quite surprising for users and is a problem for performance.
+A spread version might be still not good in performance, but at least the user will have
+to use an extra symbol and thus have the visual indicator. As of why this feature was originally added is unclear.
+Looking at user code you will find barely intended usages of this. Thus it should be removed.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_changing_safe_navigation_to_stop_evaluation">Changing Safe Navigation to stop evaluation</h3>
+<div class="paragraph">
+<p>Currently an expression like a?.b.c will fail if a is null. It will not evaluate b, but it will try to evaluate c on null.
+This defies the intend of safe navigation to avoid a NullPointerException. Thus this should be changed to stop the
+evaluation of the path expression.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_user_wish_list">User Wish List</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Instance based Categories by Wujek Srujek<br>
+Instead of having to provide a class with static methods it would be good to be able to feed an instance to the
+use-construct and that then we will use this instance along with its instance methods. This allows instance state to be used.</p>
+</li>
+<li>
+<p>Replacing Introspector by blackdrag<br>
+Not only because of bugs like GROOVY-5019 there should be a replacement of the Introspector</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_some_of_the_leading_design_ideas_of_this_mop">Some of the leading design ideas of this MOP</h3>
+<div class="paragraph">
+<p>The plan is to orientate us a lot on the open call site caching the JVM provides with invokedynamic.
+For this to work all parts of the MOP should no longer be seen as places that do invoke something,
+but as places that return something, that then will be invoked. An invokeMethod then will for example
+return instead an object that acts as a kind of handler, which can be invoked.
+Groovy will then store it and avoid the reselection unless you invalidate it.
+In the old MOP such caching often did not happen once you interact using meta programming.
+The tasks to be solved in this are to provide an "extension point" for intercepting methods and to react to
+missing methods, as well as being able to invalidate a cached version and/or to make an uncached version possible.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mop2_outline">MOP2 outline</h3>
+<div class="paragraph">
+<p><span class="image"><img src="img/mop_2.jpg" alt="image"></span></p>
+</div>
+<div class="paragraph">
+<p>in meta class of x in pseudo code:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>cachable = getMethodInterceptor(...)
+if (cachable==null) cachable = getFittingMethod(...)
+if (cachable==null) getMethodMissingHandler(...)
+if (cachable==null) throw new MethodMissingException(...)
+storeInCallSite(cachable)
+invoke(cachable)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>as an explanation to the methods:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>getMethodInterceptor<br>
+Extension point for the user to register an interceptor, that will be used for all method calls.
+This is equal what GroovyInterceptable does using invokeMethod, only that in MOP1 the method is directly called.
+In MOP2 we will instead return a handler that then will do whatever is needed. This can for example be a method
+handle to a invokeMethod method if wanted. TODO: define guards</p>
+</li>
+<li>
+<p>getFittingMethod<br>
+Predefined way to select a method through meta class. This method will return an
+object which then can be used to invoke the selected method.</p>
+</li>
+<li>
+<p>getMethodMissingHandler<br>
+Extension point for the user to register a handler for missing methods.
+The then invoked method is comparable to what methodMissing in MOP1 would be doing.</p>
+</li>
+<li>
+<p>MethodMissingException<br>
+thrown if none of the above methods is bearing a non null result</p>
+</li>
+<li>
+<p>storeInCallSite<br>
+Predefined method to store the cachable result of the above process in the call site.
+As long as the cached object is valid the above methods will not be called again for this call site.</p>
+</li>
+<li>
+<p>invoke<br>
+Predefined method to do the Initial invocation of the cachable. Subsequent invocation may be done directly by invokedynamic.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_context_meta_class">Context Meta Class</h3>
+<div class="paragraph">
+<p>For the MOP2 Groovy will use a system of meta classes with a context element and an always existing default.
+At each call site only one such view will be valid and it will be constant.
+Those views can be used to defined "sealed" meta class, which won&#8217;t get influenced by outside
+meta classes or to allow for example calling private methods and not allowing them in other cases.
+This makes 3 possible meta class variations currently:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Default meta class<br>
+Behaves pretty much like what Java allows in regards of method calls (same class private methods are available)
+and all meta programming changes are visible</p>
+</li>
+<li>
+<p>Sealed meta class<br>
+Like the default meta class, but meta programming changes from outside the class are not visible.
+This can be especially useful to library writers.</p>
+</li>
+<li>
+<p>Test meta class (un)sealed<br>
+Like the two before but with the addition that private members will always be available.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_getting_a_meta_class">Getting a Meta Class</h3>
+<div class="paragraph">
+<p>Because of the concept of context a class does not have one direct meta class that can be generated without its context.
+The call site defines the place of the context. How the context itself is defined is a TODO.
+As an implementation strategy it is possible to for example use ClassValue to store a table with the context being a key.
+The key would probably have to be available as static information, or as easily computable information.
+Since the resulting meta class could be stored later in the call site object context changes are to be avoided,
+since it implies the invalidation of the call sites using that context.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_general_dispatch_rule_for_methods_and_properties">General dispatch rule for methods (and properties)</h3>
+<div class="paragraph">
+<p>To define the dispatch rules correctly we need to define some terms first:<br>
+<em>Static Sender Class (SSC)</em>:  This is the static information about the class a call is made from.
+If there is for example a class A and a class B extends A, and a call in a method in A,
+then even if your instance is actually a B the SSC will still be A.<br>
+<em>Inheritance based Multimethods</em> (short multimethods from now on): Given a class A and a class B extends A,
+a call made from within A may see a method defined on B as long as the method is visible (not private).
+Groovy defines a special  exception to this though. If the method call from within A is calling a method of the name m,
+then a m from B can only be visible if there is no private m defined in A.</p>
+</div>
+<div class="paragraph">
+<p>Given those two definitions a method call in A will select the set of method to decide from based on this:
+A call m() with the SSC A and done on an instance of B (extends A) will be using the methods defined in A, if A has a private m, otherwise the call is done using B.</p>
+</div>
+<div class="paragraph">
+<p>Calls to Super:<br>
+A call to super in B extends A will have the SSC B, but for the method selection process the super class of SSC (super(SSC)) will be used. In super calls mutimethods are not visible. Thus we can directly use the meta class super(SSC), but we will dispatch only on the public methods of that meta class.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_module_extension_methods_shadowing_rules">Module Extension Methods Shadowing Rules</h3>
+<div class="paragraph">
+<p>Module Extensions Methods are in the old and new MOP defined by the DefaultGroovyMethods related classes and module extension, like groovy-swing. In the definition here we will use the terms of from "inside" and from "outside" to define a callsite, that lies in the same class as the target method (inside) or not (outside). The general rules are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>public methods are shadowed</p>
+</li>
+<li>
+<p>private methods are shadowed for outside callsites, but not for inside callsites</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Subclasses of the class the module extension method has been applied to have these extended rules:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>if the subclass defines a private method of the same signature as the module extension method, then outside callsites will still see the extension method, inside callsites the private method</p>
+</li>
+<li>
+<p>A call to "super" or "this" will call the module extension method. As such the subclass is seen as outside callsite.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Open Blocks are not seen as separate classes.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_property_discovery">Property Discovery</h3>
+<div class="paragraph">
+<p>Currently MetaClass discovers properties based on the Java Beans conventions.
+It also allows pseudo properties matching a convention on java.beans.EventSetDescriptor.
+This allows the following trick in SwingBuilder for example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>button(actionPerformed: { println it })</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The pseudo property actionPerformed is inferred from the single method exposed by ActionListener,
+a type of listener that can be registered on a JButton. The code responsible for discovering these
+properties is buried in MetaClassImpl and is not accessible to the outside.
+It would be great if this mechanism be made pluggable.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_realm_concept">The Realm concept</h3>
+<div class="paragraph">
+<p>In MOP2 a Realm is a tree like structure containing the meta classes.
+There is a root realm, used as default, but there can be any number of lower realms.
+A meta class change is visible in a realm, if the change is done to the meta class in
+the same realm or to a meta class in a higher realm.
+Script execution engines are able to set a realm for example to prevent them changing meta classes they should not change.
+This can be used for unit tests to isolate meta class changes done during the tests as well.
+A library can have its own realm (defined through an annotation) to prevent other classes to
+leak their changes into that library, while the library can still use a higher realm to make
+changes more public visible, if the realm allows that. Realms can have a setting that prevents
+code executed from there to make changes to higher realms. Calling a method is always done using
+the meta classes from the current realm, even if the called class then calls other classes using
+its own realm. A realm is thus not thread local structure, it is more of a lexical scope.
+A realm can also use a different meta class flavor, to for example allow access to private methods and fields.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_work_items">Work Items</h3>
+<div class="paragraph">
+<p>This part is to guide the implementors with the course of action and planning of the subtasks.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>make indy the only compilation target in the build</p>
+</li>
+<li>
+<p>move all non-indy bytecode interfacing code to a module, which may be removed later. This includes ScriptBytecodeAdpater as well as all the custom call site caching classes</p>
+</li>
+<li>
+<p>make a new module for MOP2</p>
+</li>
+<li>
+<p>turn meta class into an immutable</p>
+</li>
+<li>
+<p>implement meta class views</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_breaking_changes_trace">Breaking changes trace</h3>
+<div class="paragraph">
+<p><code>groovy.lang.MetaObjectProtocol</code> (currently in <code>groovy.mop.MetaObjectProtocol</code>):</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>getProperties()</code> renamed to <code>getMetaProperties()</code></p>
+</li>
+<li>
+<p><code>getMethods()</code> renamed to <code>getMetaMethods()</code></p>
+</li>
+<li>
+<p><code>respondsTo(Object, String, Object[])</code> changed to <code>respondsTo(String, Object&#8230;&#8203;)</code></p>
+</li>
+<li>
+<p><code>respondsTo(Object, String)</code> replaced by <code>getMetaMethods(String, Class&#8230;&#8203;)</code> with the class argument being null</p>
+</li>
+<li>
+<p>hasProperty(Object,String) replaced by getMetaProperty(String) being null or not</p>
+</li>
+<li>
+<p>getStaticMetaMethod(String, Object[]) replaced by respondsTo(String, Object&#8230;&#8203;) and inspecting the list for static methods</p>
+</li>
+<li>
+<p>getMetaMethod(name, Object[]) replaced by respondsTo(String, Object&#8230;&#8203;) in case the arguments are no classes and getMetaMethods(String,Class&#8230;&#8203;) in case of the arguments being classes</p>
+</li>
+<li>
+<p>invokeConstructor(Object[])NO REPLACEMENT</p>
+</li>
+<li>
+<p>invokeMethod(Object, String, Object[]) NO REPLACEMENT</p>
+</li>
+<li>
+<p>invokeMethod(Object, String, Object) NO REPLACEMENT</p>
+</li>
+<li>
+<p>invokeStaticMethod(Object, String, Object[]) NO REPLACEMENT</p>
+</li>
+<li>
+<p>getProperty(Object, String) replaced by MetaProperty#invoke</p>
+</li>
+<li>
+<p>setProperty(Object, String, Object) replaced by MetaProperty#invoke</p>
+</li>
+<li>
+<p>getAttribute(Object, String) replaced by MetaProperty#getField#invoke</p>
+</li>
+<li>
+<p>setAttribute(Object, String, Object) replaced by MetaProperty#getField#invoke</p>
+</li>
+<li>
+<p><code>getMetaProperty(String)</code>, <code>getTheClass()</code> UNCHANGED</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>groovy.lang.MetaMethod</code> is split into a public interface <code>groovy.mop.MetaMethod</code> and an internal default implementation <code>groovy.mop.internal.DefaultMetaMethod</code>.</p>
+</div>
+<div class="paragraph">
+<p>Differences to groovy.mop.internal.DefaultMetaMethod:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>does no longer extend ParameterTypes and does no longer implement Clonable</p>
+</li>
+<li>
+<p>no protected fields nativeParamTypes, parameterTypes and isVargsMethod</p>
+</li>
+<li>
+<p>the constructor MetaMethod() and MetaMethod(Class[]) are removed and partially replaced by DefaultMetaMethod(Class, String, int, MethodHandle) and DefaultMetaMethod(Class, String, MethodType), which uses the MethodType or the MethodHandle to define the parameter classes</p>
+</li>
+<li>
+<p>coerceArgumentsToClasses(Object[]), correctArguments(Object[]), isValidExactMethod(Class[]), isValidExactMethod(Object[]), isValidMethod(Class[]), isValidMethod(Object[]), isVargsMethod(), isVargsMethod(Object[]) NO REPLACEMENT</p>
+</li>
+<li>
+<p>getNativeParameterTypes()replaced by getParameterClasses()</p>
+</li>
+<li>
+<p>equal(CachedClass[], CachedClass[]), equal(CachedClass[], Class[]), checkParameters(Class[]), clone(), doMethodInvoke(Object, Object[]), getDescriptor() NO REPLACEMENT</p>
+</li>
+<li>
+<p>getDeclaringClass(), getModifiers(), getName(), getReturnType(), isAbstract(), isPrivate(), isProtected(), isPublic(), isStatic(), toString() UNCHANGED</p>
+</li>
+<li>
+<p>getMopName(), getSignature(), invoke(Object, Object[]), isCacheable(), isMethod(MetaMethod), isSame(MetaMethod), processDoMethodInvokeException(Exception, Object, Object[]) NO REPLACEMENT</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>groovy.lang.MetaProperty</code> is split into a public interface <code>groovy.mop.MetaProperty</code> and an internal default implementation <code>groovy.mop.internal.DefaultMetaProperty</code>.</p>
+</div>
+<div class="paragraph">
+<p>Differences to groovy.mop.internal.DefaultMetaProperty:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>the public static field PROPERTY_SET_PREFIX is removed NO REPLACEMENT</p>
+</li>
+<li>
+<p>the protected fields name and type are now private and have to be requested through getName and getType</p>
+</li>
+<li>
+<p>getModifiers(), getName(), getType(), DefaultMetaProperty(String, Class) UNCHANGED</p>
+</li>
+<li>
+<p>getGetterName(String, Class), getSetterName(String)NO REPLACEMENT</p>
+</li>
+<li>
+<p>getProperty(Object) replaced by getter(boolean)</p>
+</li>
+<li>
+<p>setProperty(Object, Object) replaced by setter(boolean)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_references_and_useful_links">References and useful links</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://web.archive.org/web/20150508123746/http://docs.codehaus.org/display/GroovyJSR/GEP+11+-+Groovy+3+semantics+and+new+MOP">GEP-11: Groovy 3 semantics and new MOP</a> (web archive link)</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_mailing_list_discussions">Mailing-list discussions</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://markmail.org/message/zujumywsb73px2ky">groovy-user: Groovy 3</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_reference_implementation">Reference implementation</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/groovy/groovy-core/tree/GROOVY_3_FEATURE">GROOVY_3_FEATURE</a><br>
+feature branch on github</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_update_history">Update history</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1">3 (2013-10-11)</dt>
+<dd>
+<p>Version as extracted from Codehaus wiki</p>
+</dd>
+<dt class="hdlist1">4 (2018-10-28)</dt>
+<dd>
+<p>Numerous minor tweaks</p>
+</dd>
+</dl>
+</div>
+</div>
+</div></div></div></div></div><footer id='footer'>
+                            <div class='row'>
+                                <div class='colset-3-footer'>
+                                    <div class='col-1'>
+                                        <h1>Groovy</h1><ul>
+                                            <li><a href='http://groovy-lang.org/learn.html'>Learn</a></li><li><a href='http://groovy-lang.org/documentation.html'>Documentation</a></li><li><a href='http://groovy-lang.org/download.html'>Download</a></li><li><a href='http://groovy-lang.org/support.html'>Support</a></li><li><a href='..\/'>Contribute</a></li><li><a href='http://groovy-lang.org/ecosystem.html'>Ecosystem</a></li>
+                                        </ul>
+                                    </div><div class='col-2'>
+                                        <h1>About</h1><ul>
+                                            <li><a href='https://github.com/apache/groovy'>Source code</a></li><li><a href='http://groovy-lang.org/security.html'>Security</a></li><li><a href='http://groovy-lang.org/learn.html#books'>Books</a></li><li><a href='http://groovy-lang.org/thanks.html'>Thanks</a></li><li><a href='http://www.apache.org/foundation/sponsorship.html'>Sponsorship</a></li><li><a href='http://groovy-lang.org/faq.html'>FAQ</a></li><li><a href='http://groovy-lang.org/search.html'>Search</a></li>
+                                        </ul>
+                                    </div><div class='col-3'>
+                                        <h1>Socialize</h1><ul>
+                                            <li><a href='http://groovy-lang.org/mailing-lists.html'>Discuss on the mailing-list</a></li><li><a href='http://groovy-lang.org/groovy-weekly.html'>Groovy newsletter</a></li><li><a href='https://twitter.com/ApacheGroovy'>Groovy on Twitter</a></li><li><a href='http://groovy-lang.org/events.html'>Events and conferences</a></li><li><a href='https://github.com/apache/groovy'>Source code on GitHub</a></li><li><a href='http://groovy-lang.org/reporting-issues.html'>Report issues in Jira</a></li><li><a href='https://google.com/+groovy'>Google+ Groovy Page</a></li><li><a href='http://bit.ly/g-community'>Google+ Groovy Community</a></li><li><a href='http://stackoverflow.com/questions/tagged/groovy'>Stack Overflow questions</a></li><li><a href='http://groovycommunity.com/'>Slack Community</a></li>
+                                        </ul>
+                                    </div><div class='col-right'>
+                                        <p>
+                                            The Groovy programming language is supported by the <a href='http://www.apache.org'>Apache Software Foundation</a> and the Groovy community
+                                        </p><img src='..\img/asf_logo.png' title='The Apache Software Foundation' alt='The Apache Software Foundation' class='img-responsive'/>
+                                    </div>
+                                </div><div class='clearfix'>&copy; 2003-2018 the Apache Groovy project &mdash; Groovy is Open Source, <a href='http://www.apache.org/licenses/LICENSE-2.0.html'>Apache 2 License</a></div>
+                            </div>
+                        </footer></div>
+                </div>
+            </div>
+        </div>
+    </div><script src='..\js/vendor/jquery-1.10.2.min.js' defer></script><script src='..\js/vendor/classie.js' defer></script><script src='..\js/vendor/bootstrap.js' defer></script><script src='..\js/vendor/sidebarEffects.js' defer></script><script src='..\js/vendor/modernizr-2.6.2.min.js' defer></script><script src='..\js/plugins.js' defer></script><script src='https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js'></script><script>document.addEventListener('DOMContentLoaded',prettyPrint)</script><script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-257558-10', 'auto');
+          ga('send', 'pageview');
+    </script>
+</body></html>
