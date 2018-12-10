@@ -267,7 +267,7 @@ allEvents {
             <p>
             Groovy, Grails, and related technologies have seen astounding growth in interest and adoption over the past few years, and with good reason.
             </p>
-            <p>GR8Conf is a series of conferences founded to spread the word worldwide. The 2018 GR8Conf Europe is celebrating its 10th year, and it's expected to be a blast. As in 2017 the conference had a DevOps day, this year DevOps topics will be mixed with the rest of the topics. 
+            <p>GR8Conf is a series of conferences founded to spread the word worldwide. The 2018 GR8Conf Europe was the 10th anniversary of the conference but expect even more excitement in 2019!
             </p>
             <p>
             GR8Conf is an independent, affordable series of conferences and covers All Things Groovy
