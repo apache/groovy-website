@@ -413,6 +413,25 @@ block (e.g. an if-then-else statement or another anonymous code block). Anywhere
 you might need to terminate the previous statement with a semicolon. In which case, see the
 note above about refactoring your code! :-)
 
+===  Java-style non-static inner class instantiation
+
+Java syntax for non-static inner class instantiation is now supported.
+
+[source,groovy]
+--------------------------------------
+public class Computer {
+    public class Cpu {
+        int coreNumber
+
+        public Cpu(int coreNumber) {
+            this.coreNumber = coreNumber
+        }
+    }
+}
+
+assert 4 == new Computer().new Cpu(4).coreNumber
+--------------------------------------
+
 ===  Interface default methods
 
 Java 8 supports adding default implementations to interfaces. Groovy now supports this too:
