@@ -281,6 +281,19 @@ allEvents {
             </p>
         '''
     }
+    event('Devnexus-2GM') {
+        location 'Atlanta, GA, USA'
+        date 'Pre conference: March 4-5, Conference March 6-8'
+        url 'https://devnexus.com/2gm-home'
+        logo 'img/confs/devnexus-2gm.png'
+        description '''
+            <p>
+            For its 2019 conference, Devnexus has teamed up with the 2GM (Groovy, Grails, and Micronaut) communities, in furtherance of its mission, to promote and support open source values and technologies.
+            </p>
+            <p>
+            Pre-Conference Training Event: MICRONAUT FROM IOT TO GCP 
+            </p>'''
+    }
 }
 
 books {
