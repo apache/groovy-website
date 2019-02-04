@@ -279,19 +279,6 @@ allEvents {
             </p>
         '''
     }
-    event('GR8Conf US') {
-        location 'Minneapolis, MN, USA'
-        date 'July, 2019'
-        url 'http://gr8conf.us/'
-        logo 'img/confs/gr8confus.png'
-        description '''
-            <p>
-            GR8Conf US is the equivalent of GR8Conf EU, but yet different. It has its own organization and its own crew.
-            </p>
-            <p>
-            <p>The goal is the same. It is founded to spread the word about the fantastic Groovy technologies and community.
-            </p>'''
-    }
 }
 
 books {
