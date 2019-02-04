@@ -88,7 +88,7 @@ documentation {
             '2.2.0', '2.2.1', '2.2.2',
             '2.3.0', '2.3.1', '2.3.2', '2.3.3', '2.3.4', '2.3.5', '2.3.6', '2.3.7', '2.3.8', '2.3.9', '2.3.10', '2.3.11',
             '2.4.0', '2.4.1', '2.4.2', '2.4.3', '2.4.4', '2.4.5', '2.4.6', '2.4.7', '2.4.8', '2.4.9', '2.4.10', '2.4.11', '2.4.12', '2.4.13', '2.4.14', '2.4.15', '2.4.16',
-            '2.5.0-rc-1', '2.5.0-rc-2', '2.5.0-rc-3', '2.5.0', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5',
+            '2.5.0-rc-1', '2.5.0-rc-2', '2.5.0-rc-3', '2.5.0', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5', '2.5.6',
             '2.6.0-alpha-1', '2.6.0-alpha-2', '2.6.0-alpha-3', '2.6.0-alpha-4',
             '3.0.0-alpha-1', '3.0.0-alpha-2', '3.0.0-alpha-3', '3.0.0-alpha-4'
     ])
@@ -151,12 +151,7 @@ downloads {
         }
         version('3.0.0-alpha-4') {
             stable false
-            //windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-alpha-4-installer.exe'
-        }
-        version('3.0.0-alpha-3') {
-            stable false
-            archive true
-            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-alpha-3-installer.exe'
+            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-alpha-4-installer.exe'
         }
     }
     distribution('Groovy 2.6') {
@@ -172,8 +167,13 @@ downloads {
             a(href: 'versioning.html', 'version')
             yield ' of Groovy.'
         }
+        version('2.5.6') {
+            stable true
+            //windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-2.5.6-installer.exe'
+        }
         version('2.5.5') {
             stable true
+            archive true
             windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-2.5.5-installer.exe'
         }
     }
