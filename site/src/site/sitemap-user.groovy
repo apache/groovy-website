@@ -257,9 +257,13 @@ allEvents {
         date 'March 28 - 30, 2019'
         url 'http://greachconf.com'
         logo 'img/confs/greach.png'
-        description '<p>' +
-                'Android + JVM langs + JVM frameworks conference in Madrid, Spain with 100% English talks.' +
-                '</p>'
+        description '''<p>
+                Android + JVM langs + JVM frameworks conference in Madrid, Spain with 100% English talks.
+                </p>
+                <p>
+                Greach is a community conference intended for networking and collaboration in the developer community.
+
+                </p>'''
     }
     event('GR8Conf EU') {
         location 'Copenhagen, Denmark'
