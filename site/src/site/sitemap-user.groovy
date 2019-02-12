@@ -247,6 +247,19 @@ ecosystem {
 
 allEvents {
     // Note that the event image should be 257x180 to look nice
+    event('Devnexus-2GM') {
+        location 'Atlanta, GA, USA'
+        date 'Pre conference: March 4-5, Conference March 6-8'
+        url 'https://devnexus.com/2gm-home'
+        logo 'img/confs/devnexus-2gm.png'
+        description '''
+            <p>
+            For its 2019 conference, Devnexus has teamed up with the 2GM (Groovy, Grails, and Micronaut) communities, in furtherance of its mission, to promote and support open source values and technologies.
+            </p>
+            <p>
+            Pre-Conference Training Event: MICRONAUT FROM IOT TO GCP 
+            </p>'''
+    }
     event('Greach: The Groovy Spanish Conference') {
         location 'Madrid, Spain'
         date 'March 28 - 30, 2019'
@@ -275,19 +288,6 @@ allEvents {
             GR8Conf is an independent, affordable series of conferences and covers All Things Groovy
             </p>
         '''
-    }
-    event('Devnexus-2GM') {
-        location 'Atlanta, GA, USA'
-        date 'Pre conference: March 4-5, Conference March 6-8'
-        url 'https://devnexus.com/2gm-home'
-        logo 'img/confs/devnexus-2gm.png'
-        description '''
-            <p>
-            For its 2019 conference, Devnexus has teamed up with the 2GM (Groovy, Grails, and Micronaut) communities, in furtherance of its mission, to promote and support open source values and technologies.
-            </p>
-            <p>
-            Pre-Conference Training Event: MICRONAUT FROM IOT TO GCP 
-            </p>'''
     }
 }
 
