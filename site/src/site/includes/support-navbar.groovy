@@ -2,7 +2,7 @@
 ul(class: 'nav-sidebar') {
     [
             'support': 'Support',
-            'http://groovy.apache.org/index': 'Contribute',
+            'https://groovy.apache.org/index': 'Contribute',
             'reporting-issues': 'Reporting issues',
             'mailing-lists': 'Mailing-lists',
             'events': 'Events',
@@ -16,8 +16,6 @@ ul(class: 'nav-sidebar') {
             li { a(href: "${page}.html", label) }
         }
     }
-    li { a(href: relative("groovy-weekly.html#subscribe"), class: 'anchor-link', 'Subscribe') }
-    li { a(href: relative("groovy-weekly.html#archives"), class: 'anchor-link', 'Archive') }
 }
 br()
 include unescaped: 'html/twittersearch.html'

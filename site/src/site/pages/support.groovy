@@ -33,14 +33,6 @@ layout 'layouts/main.groovy', true,
                                         a(href: 'groovy-weekly.html', 'Groovy newsletter')
                                         yieldUnescaped ' &mdash; links to articles, presentations, tweets, podcasts, etc.'
                                     }
-                                    li {
-                                        a(href: 'https://google.com/+groovy', 'Google+ Groovy page')
-                                        yieldUnescaped ' &mdash; for sharing news and articles'
-                                    }
-                                    li {
-                                        a(href: 'http://bit.ly/g-community', 'Google+ Groovy community')
-                                        yieldUnescaped ' &mdash; for discussing and exchanging with other Groovy users'
-                                    }
                                 }
                             }
                             hr(class: 'divider')
