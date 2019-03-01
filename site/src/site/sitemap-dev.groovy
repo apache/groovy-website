@@ -26,7 +26,7 @@ menu {
     group('Groovy') {
         item 'Learn',                       "${userSiteBase}learn.html"
         item 'Documentation',               "${userSiteBase}documentation.html"
-        item 'Download',                    "${userSiteBase}download.html"
+        item 'Download',                    "${devSiteBase}download.html"
         item 'Support',                     "${userSiteBase}support.html"
         item 'Contribute',                  "${devSiteBase}"
         item 'Ecosystem',                   "${userSiteBase}ecosystem.html"
@@ -57,6 +57,7 @@ menu {
 pages {
 //    page 'index', 'index', [:]
     page 'search', 'search', [category: 'Search']
+    page 'download', 'download', [category: 'Download', distributions: distributions]
     page 'versioning', 'versioning', [category: 'Download']
     page 'contribute', 'index', [category: 'Develop']
     page 'buildstatus', 'buildstatus', [category: 'Develop']
@@ -68,5 +69,49 @@ documentation {
     section('Getting started','fa-graduation-cap') {
         //          NAME                                     TARGET HTML         DOCPAGE HTML                       GENERATE
         item 'Download Groovy',                             'download',         'download',                         false
+    }
+}
+
+downloads {
+    distribution('Groovy 3.0') {
+        description {
+            yield 'Groovy 3.0 is a bleeding edge '
+            a(href: 'versioning.html', 'version')
+            yield ' of Groovy designed for JDK8+ and with the new Parrot parser enabled by default. Pre-stable versions are available:'
+        }
+        version('3.0.0-alpha-4') {
+            stable false
+            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-alpha-4-installer.exe'
+        }
+    }
+    distribution('Groovy 2.6') {
+        description {
+            yield 'Groovy 2.6 is designed for JDK7+ and supports the new Parrot parser (when enabled) but has been'
+            yield ' retired before reaching final release to focus on Groovy 3.0. Alpha versions are available to help'
+            yield ' people wanting to port towards Groovy 3.0 but who are stuck on JDK7. See links under "Other versions" for details.'
+        }
+    }
+    distribution('Groovy 2.5') {
+        description {
+            yield 'Groovy 2.5 is the latest stable '
+            a(href: 'versioning.html', 'version')
+            yield ' of Groovy.'
+        }
+        version('2.5.6') {
+            stable true
+            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-2.5.6-installer.exe'
+        }
+    }
+    distribution('Groovy 2.4') {
+        description {
+            yield 'Groovy 2.4 is the previous stable '
+            a(href: 'versioning.html', 'version')
+            yield ' of Groovy.'
+            yieldUnescaped ''' Important: Releases before 2.4.4 weren't done under the Apache Software Foundation and are provided as a convenience, without any warranty.'''
+        }
+        version('2.4.16') {
+            stable true
+            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-2.4.16-installer.exe'
+        }
     }
 }

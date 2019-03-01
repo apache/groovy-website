@@ -18,14 +18,15 @@
  */
 
 wiki = false
+def devSiteBase = 'https:/groovy.apache.org/'
 
 menu {
     group('Groovy') {
         item 'Learn',                       'learn.html'
         item 'Documentation',               'documentation.html'
-        item 'Download',                    'download.html'
+        item 'Download',                    "${devSiteBase}download.html"
         item 'Support',                     'support.html'
-        item 'Contribute',                  'http://groovy.apache.org'
+        item 'Contribute',                  "${devSiteBase}"
         item 'Ecosystem',                   'ecosystem.html'
     }
 
