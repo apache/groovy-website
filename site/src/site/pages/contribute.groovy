@@ -205,11 +205,24 @@ layout 'layouts/main.groovy', true,
                                     }
                                 }
                             }
+							
+                            hr(class: 'divider')
+
+                            h2('Donating to Friends of Groovy Open Collective')
+
+                            p """
+								As an independent initiative, we have set up an open collective for Groovy:
+								${$a(href:'https://opencollective.com/friends-of-groovy', 'Friends of Groovy Open Collective')}
+								This initiative is designed to complement the Apache project and the many contributions we get from our great community and supporters.
+							"""
+							
                             hr(class: 'divider')
 
                             h2('Build status')
 
                             p "The Groovy sources are tested thanks to our ${$a(href:'buildstatus.html','continuous integration server')}."
+							
+							hr(class: 'divider')
 
                             h2('Help Wanted')
 
