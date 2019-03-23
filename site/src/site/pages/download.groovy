@@ -1,5 +1,7 @@
 import generator.SiteGenerator
 
+def userSiteBase = 'http://groovy-lang.org/'
+
 layout 'layouts/main.groovy', true,
         pageTitle: 'The Apache Groovy programming language - Download',
         mainContent: contents {
@@ -27,10 +29,10 @@ layout 'layouts/main.groovy', true,
                                     a(href: 'versioning.html', 'Groovy version scheme')
                                 }
                                 li {
-                                    a(href: 'indy.html', 'Invoke dynamic support')
+                                    a(href: "${userSiteBase}indy.html", 'Invoke dynamic support')
                                 }
                                 li {
-                                    a(href: 'releases.html', 'Release notes')
+                                    a(href: "${userSiteBase}releases.html", 'Release notes')
                                 }
                             }
                         }
@@ -68,7 +70,7 @@ layout 'layouts/main.groovy', true,
                                     }
                                     li {
                                         yield 'Grab the latest '
-                                        a(href: 'ides.html', 'plugin')
+                                        a(href: "${userSiteBase}ides.html", 'plugin')
                                         yield ' for your IDE and follow the installation instructions.'
                                     }
                                     li {
@@ -213,7 +215,7 @@ layout 'layouts/main.groovy', true,
                                         }
                                         p {
                                             yield 'Please consult the '
-                                            a(href: "changelogs/changelog-${v}.html", ' change log')
+                                            a(href: "${userSiteBase}changelogs/changelog-${v}.html", ' change log')
                                             yield ' for details. '
                                         }
                                     }
@@ -242,7 +244,7 @@ layout 'layouts/main.groovy', true,
                                     }
                                     p {
                                         yield 'You can also read the changelogs for '
-                                        a(href: "changelogs.html", 'all versions')
+                                        a(href: "${userSiteBase}changelogs.html", 'all versions')
                                         yield '.'
                                     }
                                 }
@@ -251,7 +253,7 @@ layout 'layouts/main.groovy', true,
 
                                     p {
                                         yield 'Please read the '
-                                        a(href: "indy.html", 'invoke dynamic support information')
+                                        a(href: "${userSiteBase}indy.html", 'invoke dynamic support information')
                                         yield ' if you would like to enable indy support and are using Groovy on JDK 7+.'
                                     }
                                 }
@@ -472,7 +474,7 @@ layout 'layouts/main.groovy', true,
                                         }
                                     }
                                     yield '* If you plan to use invoke dynamic support, please read the '
-                                    a(href: "indy.html", 'support information')
+                                    a(href: "${userSiteBase}indy.html", 'support information')
                                     yield '.'
                                 }
                             }

@@ -18,7 +18,7 @@
  */
 
 wiki = false
-def devSiteBase = 'https:/groovy.apache.org/'
+def devSiteBase = 'https://groovy.apache.org/'
 
 menu {
     group('Groovy') {
@@ -362,7 +362,7 @@ usergroups {
     // Europe
     userGroup('Aarhus Groovy & Grails Meetup') {
         location 'Europe/Denmark'
-        url 'https://www.linkedin.com/grps/Groovy-Grails-Meetup-Aarhus-3702945/'
+        url 'https://www.linkedin.com/groups/3702945/'
     }
     userGroup('Paris Groovy Grails User Group') {
          location 'Europe/France'
@@ -373,7 +373,6 @@ usergroups {
     }
     userGroup('Groovy & Grails Israel User Group') {
         location 'Europe/Israel'
-        url 'http://www.meetup.com/Groovy-Grails-Israel-Meetup-Group/'
     }
     userGroup('Warsaw Groovy User Group') {
         location 'Europe/Poland'
@@ -407,7 +406,7 @@ usergroups {
     }
     userGroup('Groovy Users of Minnesota') {
         location 'North-America/United States'
-        url 'http://groovy.mn'
+        url 'https://www.meetup.com/groovymn/'
     }
     userGroup('NYC Groovy / Grails Meetup') {
         location 'North-America/United States'

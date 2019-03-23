@@ -18,7 +18,7 @@ layout 'layouts/main.groovy', true,
                                 p 'The Groovy newsletter is no longer produced on a regular basis but you can still view the archives:'
                                 ul {
                                     li {
-                                        a(href: 'http://us4.campaign-archive2.com/home/?u=cb8b56e9d6a1cb1696cecc673&id=1a76961630',
+                                        a(href: 'https://us4.campaign-archive2.com/home/?u=cb8b56e9d6a1cb1696cecc673&id=1a76961630',
                                                 'View past editions of the Groovy newsletter.')
                                     }
                                 }

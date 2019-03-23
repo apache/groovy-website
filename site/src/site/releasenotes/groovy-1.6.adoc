@@ -998,7 +998,7 @@ SwingBuilder.build {
 Running this script shows up the frame below with a text field and a
 label below, and the label's text is bound on the text field's content.
 
-image:https://web.archive.org/web/20160102200636/http://www.infoq.com/resource/articles/groovy-1-6/en/resources/bindable-example.png[image]
+image:https://web.archive.org/web/20160102200635/http://www.infoq.com/resource/articles/groovy-1-6/en/resources/sc-without-visu.png[image]
 
 SwingBuilder has evolved so nicely in the past year that the Groovy
 Swing team decided to launch a new project based on it, and on the
