@@ -79,8 +79,13 @@ downloads {
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK8+ and with the new Parrot parser enabled by default. Pre-stable versions are available:'
         }
+        version('3.0.0-beta-1') {
+            stable false
+            //windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-beta-1-installer.exe'
+        }
         version('3.0.0-alpha-4') {
             stable false
+            archive true
             windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-alpha-4-installer.exe'
         }
     }
