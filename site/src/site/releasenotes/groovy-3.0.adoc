@@ -503,6 +503,11 @@ Read the _Notes_ column in the table below for further details.
 |New copied class/package name +
 (3.0 and above)
 |Notes
+3+^| Module: groovy-ant
+| groovy.util
+| groovy.ant
+| Add an `import groovy.ant.AntBuilder` to classes/scripts
+using `AntBuilder` or you will still be using the deprecated version.
 3+^| Module: groovy-console
 | groovy.ui.ConsoleApplet
 | N/A
