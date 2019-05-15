@@ -466,6 +466,86 @@ assert 'Greetings, Daniel' == daniel.greet()
 a| NOTE: _Experimental Status:_ While this feature will remain, we regard its current implementation as experimental. Currently, interface default methods are implemented using traits. This means that they work even when using JDK7 (i.e. using Groovy 2.6 with Parrot parser enabled on a version 7 JRE). We are currently exploring supporting native default methods in interfaces instead of, or in addition to, the trait implementation. If we change the implementation, we would expect no change in logical behavior though the new implementation may have different performance characteristics in some circumstances and the native implementation would only work on JDK8+.  Our goal is to clarify this aspect of the language before reaching release candidate status.
 |===
 
+[[Groovy3.0releasenotes-Splitpackages]]
+== Split package changes
+
+The Java Platform Module System requires that classes in distinct modules
+have distinct package names. Groovy has it's own "modules" but these haven't
+historically been structured according to the above requirement.
+For this reason, Groovy 2.x and 3.0 should be added to the classpath not module path
+when using JDK9+. This places Groovy's classes into the unnamed module
+where the split package naming requirement is not enforced.
+
+Groovy 3 is making changes to allow the codebase to move towards the compliant
+rules and allow Groovy users to begin the migration process.
+Groovy 4 is our target version for fully-compliant artifacts but you can
+start getting your classes ready ahead of time while using Groovy 3.
+
+As part of this change, some classes are moving packages.
+In a subset of those moved classes, it makes sense
+for Groovy 3 to have two copies of such classes:
+
+* a deprecated class having the old package name
+* a new class having the new package name
+
+This can aid with migration. In many cases, you will be able to recompile
+existing Groovy classes without change and they will use the old versions of the
+classes. You may notice deprecation warnings depending on how you edit classes.
+You should migrate as soon as convenient since your classes may no longer compile under Groovy 4
+if you haven't migrated to the new class location.
+Be aware that in some cases, some work is required even under Groovy 3.
+Read the _Notes_ column in the table below for further details.
+
+[cols="1a,1a,2a"]
+|===
+|Original class/package name
+(3.0 and lower if applicable)
+|New copied class/package name +
+(3.0 and above)
+|Notes
+3+^| Module: groovy-console
+| groovy.ui.ConsoleApplet
+| N/A
+| The `java.applet` API is deprecated. No replacement is planned for this Groovy class in Groovy 4.
+| groovy.inspect
+| groovy.console
+.3+| `groovyConsole` is normally used as a command-line tool and its use in that form is unaffected.
+     If you use any of the classes directly you can use the old versions until you migrate.
+     You should not mix and match old and new classes.
+| groovy.inspect.swingui
+| groovy.console.ui
+| groovy.ui
+| groovy.console.ui
+3+^| Module: groovy-groovysh
+| org.codehaus.groovy.tools.shell
+| org.apache.groovy.groovysh
+| `groovysh` is normally used as a command-line tool and its use in that form is unaffected.
+If you use any of the classes directly you can use the old versions until you migrate.
+You should not mix and match old and new classes.
+3+^| Module: groovy-nio
+| org.codehaus.groovy.runtime. +
+NioGroovyMethods | org.apache.groovy.nio.extensions. +
+NioExtensions | In normal use, related extension methods will simply be automatically available from the new location.
+| org.codehaus.groovy.runtime. +
+WritablePath |org.apache.groovy.nio.runtime
+| We recommend that you reference `WritablePath` via its interfaces in which case you have nothing to do.
+If you must reference the class, we recommend changing imports and recompiling all affected classes.
+If this is difficult, you can use the old class (and directly use the related `NioGroovyMethods` methods)
+until you are ready to migrate.
+You should not mix and match old and new classes.
+3+^| Module: groovy-test
+| org.codehaus.groovy.runtime. +
+ScriptTestAdapter
+| org.apache.groovy.test
+| Available for use in your own classes if already in use but won't be recognized
+by Groovy 3's JUnit-related test suite classes.
+| groovy.transform. +
+NotYetImplemented
+| groovy.test.transform. +
+NotYetImplemented
+| Both point to the (moved but otherwise unchanged) AST transform class.
+|===
+
 [[Groovy3.0releasenotes-Miscimprovements]]
 == Miscellaneous improvements
 
@@ -546,7 +626,7 @@ As part of implementing the new grammar, additional support has been added.
 
 == JDK requirements
 
-Groovy 3.0 requires JDK8+ to build and JDK8 is the minimum version of the JRE that we support. As additional Java 9/10 support is added, the version
+Groovy 3.0 requires JDK9+ to build and JDK8 is the minimum version of the JRE that we support. As additional Java 9/10 support is added, the version
 required to build may be bumped to JDK9.
 
 [[Groovy3.0releasenotes-Moreinformation]]
