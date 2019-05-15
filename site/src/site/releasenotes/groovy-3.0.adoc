@@ -546,7 +546,7 @@ ScriptTestAdapter
 by Groovy 3's JUnit-related test suite classes.
 | groovy.transform. +
 NotYetImplemented
-| groovy.test.transform. +
+| groovy.test. +
 NotYetImplemented
 | Both point to the (moved but otherwise unchanged) AST transform class.
 |===
