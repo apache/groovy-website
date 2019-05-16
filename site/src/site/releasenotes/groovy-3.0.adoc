@@ -555,6 +555,16 @@ NotYetImplemented
 get the deprecated version. You will need to do this before Groovy 4.
 | groovy.lang
 | groovy.test
+3+^| Module: groovy-xml
+| groovy.util
+| groovy.xml
+| For classes like `XmlParser` and `XmlSlurper`, you need to import `groovy.xml.XmlParser` and `groovy.xml.XmlSlurper` respectively to not
+  get the deprecated versions. You will need to do this before Groovy 4. If you are using `groovy.xml.XmlUtil.serialize` on a
+  `groovy.util.slurpersupport.GPathResult`, you will need to swap to using the deprecated methods in `groovy.util.XmlUtil` since
+  `groovy.xml.XmlUtil` only handles the new classes.
+| org.codehaus.groovy.tools.xml.DomToGroovy
+| org.apache.groovy.xml.tools
+|
 |===
 
 [[Groovy3.0releasenotes-Miscimprovements]]
