@@ -542,13 +542,19 @@ You should not mix and match old and new classes.
 | org.codehaus.groovy.runtime. +
 ScriptTestAdapter
 | org.apache.groovy.test
-| Available for use in your own classes if already in use but won't be recognized
-by Groovy 3's JUnit-related test suite classes.
+| The old class remains available for use in your own classes if already in use
+but won't be recognized by Groovy 3's JUnit-related test suite classes.
 | groovy.transform. +
 NotYetImplemented
 | groovy.test. +
 NotYetImplemented
 | Both point to the (moved but otherwise unchanged) AST transform class.
+| groovy.util
+| groovy.test
+.2+| For classes like `GroovyTestCase`, you need to import `groovy.test.GroovyTestCase` to not
+get the deprecated version. You will need to do this before Groovy 4.
+| groovy.lang
+| groovy.test
 |===
 
 [[Groovy3.0releasenotes-Miscimprovements]]
