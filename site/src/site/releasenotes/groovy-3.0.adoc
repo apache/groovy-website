@@ -534,6 +534,12 @@ using `AntBuilder` or you will still be using the deprecated version.
 | `groovysh` is normally used as a command-line tool and its use in that form is unaffected.
 If you use any of the classes directly you can use the old versions until you migrate.
 You should not mix and match old and new classes.
+3+^| *Module: groovy-jmx*
+| groovy.util.GroovyMBean
+| groovy.jmx
+| You need to add the import for `GroovyMBean` before Groovy 4.
+Feel free to use the old class in your own code but `JmxBuilder` only uses the new class.
+You should not mix the old and new classes.
 3+^| *Module: groovy-nio*
 | org.codehaus.groovy.runtime. +
 NioGroovyMethods | org.apache.groovy.nio.extensions. +
