@@ -467,7 +467,7 @@ a| NOTE: _Experimental Status:_ While this feature will remain, we regard its cu
 |===
 
 [[Groovy3.0releasenotes-Splitpackages]]
-== Split package changes
+== Split package changes (from beta-2)
 
 The Java Platform Module System requires that classes in distinct modules
 have distinct package names. Groovy has it's own "modules" but these haven't
@@ -503,12 +503,19 @@ Read the _Notes_ column in the table below for further details.
 |New copied class/package name +
 (3.0 and above)
 |Notes
-3+^| Module: groovy-ant
+3+^| *Module: groovy*
+| groovy.xml.QName
+| groovy.namespace
+| You need to migrate to using the new class at the same time as you migrate to affected modules
+using that class as a parameter in methods including `groovy-ant` and `groovy-xml` but only if you
+are using methods with `QName` parameters. You can continue to use the legacy class in your existing
+code or with the legacy versions of affected classes until Groovy 4.
+3+^| *Module: groovy-ant*
 | groovy.util
 | groovy.ant
 | Add an `import groovy.ant.AntBuilder` to classes/scripts
 using `AntBuilder` or you will still be using the deprecated version.
-3+^| Module: groovy-console
+3+^| *Module: groovy-console*
 | groovy.ui.ConsoleApplet
 | N/A
 | The `java.applet` API is deprecated. No replacement is planned for this Groovy class in Groovy 4.
@@ -521,13 +528,13 @@ using `AntBuilder` or you will still be using the deprecated version.
 | groovy.console.ui
 | groovy.ui
 | groovy.console.ui
-3+^| Module: groovy-groovysh
+3+^| *Module: groovy-groovysh*
 | org.codehaus.groovy.tools.shell
 | org.apache.groovy.groovysh
 | `groovysh` is normally used as a command-line tool and its use in that form is unaffected.
 If you use any of the classes directly you can use the old versions until you migrate.
 You should not mix and match old and new classes.
-3+^| Module: groovy-nio
+3+^| *Module: groovy-nio*
 | org.codehaus.groovy.runtime. +
 NioGroovyMethods | org.apache.groovy.nio.extensions. +
 NioExtensions | In normal use, related extension methods will simply be automatically available from the new location.
@@ -538,7 +545,16 @@ If you must reference the class, we recommend changing imports and recompiling a
 If this is difficult, you can use the old class (and directly use the related `NioGroovyMethods` methods)
 until you are ready to migrate.
 You should not mix and match old and new classes.
-3+^| Module: groovy-test
+3+^| *Module: groovy-swing*
+| org.codehaus.groovy.binding
+| org.apache.groovy.swing.binding
+.3+| You can continue to use the old classes if you use them in your existing code or from within legacy classes still
+using the old classes. `SwingBuilder` now uses the bew classes.
+| groovy.model
+| groovy.swing.model
+| groovy.inspect.swingui
+| org.apache.groovy.swing.table
+3+^| *Module: groovy-test*
 | org.codehaus.groovy.runtime. +
 ScriptTestAdapter
 | org.apache.groovy.test
@@ -555,7 +571,7 @@ NotYetImplemented
 get the deprecated version. You will need to do this before Groovy 4.
 | groovy.lang
 | groovy.test
-3+^| Module: groovy-xml
+3+^| *Module: groovy-xml*
 | groovy.util
 | groovy.xml
 | For classes like `XmlParser` and `XmlSlurper`, you need to import `groovy.xml.XmlParser` and `groovy.xml.XmlSlurper` respectively to not
