@@ -555,7 +555,7 @@ You should not mix and match old and new classes.
 | org.codehaus.groovy.binding
 | org.apache.groovy.swing.binding
 .3+| You can continue to use the old classes if you use them in your existing code or from within legacy classes still
-using the old classes. `SwingBuilder` now uses the bew classes.
+using the old classes. `SwingBuilder` now uses the new classes.
 | groovy.model
 | groovy.swing.model
 | groovy.inspect.swingui
@@ -669,8 +669,7 @@ As part of implementing the new grammar, additional support has been added.
 
 == JDK requirements
 
-Groovy 3.0 requires JDK9+ to build and JDK8 is the minimum version of the JRE that we support. As additional Java 9/10 support is added, the version
-required to build may be bumped to JDK9.
+Groovy 3.0 requires JDK9+ to build and JDK8 is the minimum version of the JRE that we support.
 
 [[Groovy3.0releasenotes-Moreinformation]]
 == More information
