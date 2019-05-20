@@ -30,7 +30,7 @@ layout 'layouts/main.groovy', true,
                                 ul {
                                     minor.each { v->
                                         li {
-                                            yieldUnescaped "Changelog for "
+                                            yieldUnescaped ( !v.contains('-') && versions.any{ it.startsWith("$v-") } ? "Aggregate c" : "C" ) + "hangelog for "
                                             a(href: "changelogs/changelog-${v}.html", "Groovy $v")
                                         }
                                     }
