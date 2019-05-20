@@ -73,12 +73,13 @@ class ChangelogParser {
         def allMajor = changelogs.groupBy {
             def v = it.groovyVersion
             v.contains('-')?v-v.substring(v.indexOf('-')):v
-        }.findAll { ver, logs -> ver in releasedVersions }
+        }.findAll { ver, logs -> ver in releasedVersions || ver in ['2.6.0', '3.0.0'] }
         allMajor.collect { k,v ->
             def changelog = changelogs.find { it.groovyVersion == k }
             if (!changelog) {
                 println "Not found: $k"
-                changelog = new Changelog(groovyVersion: k, issues:[])
+                // it's useful to have an aggregate when we haven't done a '.0' release yet, use '-placeholder' to track
+                changelog = new Changelog(groovyVersion: k + '-placeholder', issues:[])
                 changelogs << changelog
             }
             v.each {
