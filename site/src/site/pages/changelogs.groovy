@@ -29,14 +29,14 @@ layout 'layouts/main.groovy', true,
                                 h2("Groovy $mj")
                                 ul {
                                     minor.each { v ->
-                                        def ver = v
-                                        def unreleased = ''
-                                        if (v.endsWith('-unreleased')) {
-                                            ver = (v - '-unreleased') + ' (unreleased)'
-                                        }
+                                        def unreleased = v.endsWith('-unreleased')
+                                        def ver = unreleased ? v - '-unreleased' : v
                                         li {
                                             yieldUnescaped ( v.endsWith('-unreleased') || (!v.contains('-') && versions.any{ it.startsWith("$v-") }) ? "Aggregate c" : "C" ) + "hangelog for "
                                             a(href: "changelogs/changelog-${v}.html", "Groovy $ver")
+                                            if (unreleased) {
+                                                yieldUnescaped "&nbsp;&nbsp;[Unreleased: ${generator.ChangelogParser.UNRELEASED[ver]}]"
+                                            }
                                         }
                                     }
                                 }

@@ -35,6 +35,12 @@ class ChangelogParser {
     private static final String ITEM_MARK = '    * '
     private static final Pattern ITEM_PATTERN = ~/\[(GROOVY-[0-9]+)\] - (.+)/
     private static final String VERSION_PATTERN = /^((1\.)|[23]\.)/
+    public static final Map<String, String> UNRELEASED = [
+            '1.1.0': 'renamed to 1.5.0',
+            '1.9.0': 'renamed to 2.0.0',
+            '2.6.0': 'discontinued',
+            '3.0.0': 'upcoming new release',
+    ]
 
     static List<Changelog> fetchReleaseNotes(File cacheDirectory) {
         def slurper = new JsonSlurper()
@@ -73,12 +79,12 @@ class ChangelogParser {
         def allMajor = changelogs.groupBy {
             def v = it.groovyVersion
             v.contains('-')?v-v.substring(v.indexOf('-')):v
-        }.findAll { ver, logs -> ver in releasedVersions || ver in ['2.6.0', '3.0.0'] } // 2.6, 3.0 added to get aggregate changelog
+        }.findAll { ver, logs -> ver in releasedVersions || ver in UNRELEASED.keySet() } // add some unreleased versions to get aggregate changelog
         allMajor.collect { k,v ->
             def changelog = changelogs.find { it.groovyVersion == k }
             if (!changelog) {
                 println "Not found: $k"
-                // it's useful to have an aggregate when we haven't done a '.0' release yet, use '-unreleased' to track
+                // it's useful to have an aggregate when we haven't done a '.0' release, use '-unreleased' to track
                 changelog = new Changelog(groovyVersion: k + '-unreleased', issues:[])
                 changelogs << changelog
             }
