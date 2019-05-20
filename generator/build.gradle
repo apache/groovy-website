@@ -24,8 +24,8 @@ repositories {
 }
 
 dependencies {
-    ext.groovyVersion = '2.4.15'
-    ext.asciidocVersion = '1.5.8.1'
+    ext.groovyVersion = '2.4.17'
+    ext.asciidocVersion = '2.0.0'
     compile "org.codehaus.groovy:groovy:$groovyVersion"
     compile "org.codehaus.groovy:groovy-json:$groovyVersion"
     compile "org.codehaus.groovy:groovy-templates:$groovyVersion"
@@ -38,5 +38,5 @@ dependencies {
     //compile "org.jruby:jruby-complete:9.1.17.0"
 }
 
-compileGroovy.sourceCompatibility = '1.7'
-compileGroovy.targetCompatibility = '1.7'
+compileGroovy.sourceCompatibility = '1.8'
+compileGroovy.targetCompatibility = '1.8'
