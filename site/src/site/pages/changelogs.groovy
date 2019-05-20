@@ -28,17 +28,15 @@ layout 'layouts/main.groovy', true,
                                 a(name: "changelog$mj") {}
                                 h2("Groovy $mj")
                                 ul {
-                                    minor.each { raw ->
-                                        def v = raw
+                                    minor.each { v ->
+                                        def ver = v
                                         def unreleased = ''
-                                        if (v.endsWith('-placeholder')) {
-                                            v -= '-placeholder'
-                                            unreleased = ' (unreleased)'
+                                        if (v.endsWith('-unreleased')) {
+                                            ver = (v - '-unreleased') + ' (unreleased)'
                                         }
                                         li {
-                                            yieldUnescaped ( !v.contains('-') && versions.any{ it.startsWith("$v-") } ? "Aggregate c" : "C" ) + "hangelog for "
-                                            a(href: "changelogs/changelog-${v}.html", "Groovy $v")
-                                            yieldUnescaped unreleased
+                                            yieldUnescaped ( v.endsWith('-unreleased') || (!v.contains('-') && versions.any{ it.startsWith("$v-") }) ? "Aggregate c" : "C" ) + "hangelog for "
+                                            a(href: "changelogs/changelog-${v}.html", "Groovy $ver")
                                         }
                                     }
                                 }
