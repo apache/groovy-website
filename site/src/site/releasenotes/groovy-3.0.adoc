@@ -511,7 +511,14 @@ assert 'Greetings, Daniel' == daniel.greet()
 
 [width="80%",align="center"]
 |===
-a| NOTE: _Experimental Status:_ While this feature will remain, we regard its current implementation as experimental. Currently, interface default methods are implemented using traits. This means that they work even when using JDK7 (i.e. using Groovy 2.6 with Parrot parser enabled on a version 7 JRE). We are currently exploring supporting native default methods in interfaces instead of, or in addition to, the trait implementation. If we change the implementation, we would expect no change in logical behavior though the new implementation may have different performance characteristics in some circumstances and the native implementation would only work on JDK8+.  Our goal is to clarify this aspect of the language before reaching release candidate status.
+a| NOTE: _Experimental Status:_ While this feature will remain, we regard its current implementation as experimental.
+Currently, interface default methods are implemented using traits. This means that they work even when using JDK7
+(i.e. using Groovy 2.6 with Parrot parser enabled on a version 7 JRE).
+We are currently exploring supporting native default methods in interfaces instead of, or in addition to,
+the trait implementation. If we change the implementation, we would expect no change in logical behavior
+though the new implementation may have different performance characteristics in some circumstances and the
+native implementation would only work on JDK8+.
+Our goal is to clarify this aspect of the language before reaching release candidate status.
 |===
 
 [[Groovy3.0releasenotes-Splitpackages]]
@@ -722,4 +729,5 @@ Groovy 3.0 requires JDK9+ to build and JDK8 is the minimum version of the JRE th
 [[Groovy3.0releasenotes-Moreinformation]]
 == More information
 
-You can browse all the link:../changelogs/changelog-3.0.0-alpha-1.html[tickets closed for Groovy 3.0 in JIRA]. Note: some of the tickets relevant for this release are contained in the link:../changelogs/changelog-2.6.0-alpha-1.html[tickets closed for Groovy 2.6].
+You can browse all the link:../changelogs/changelog-3.0.0-unreleased.html[tickets closed for Groovy 3.0 in JIRA].
+Note: some of the tickets relevant for this release are contained in the link:../changelogs/changelog-2.6.0-unreleased.html[tickets closed for Groovy 2.6].
