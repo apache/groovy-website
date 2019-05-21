@@ -5,7 +5,10 @@
 [width="80%",align="center"]
 |===
 a| NOTE: _WARNING:_
-Material on this page is still under development! We are currently creating alpha versions of Groovy 3.0 with a goal of gathering feedback on the language changes from our community. In addition, the alpha versions assist other projects and tool vendors within the Groovy ecosystem to begin assessing the impact of moving to/supporting Groovy 3.0. Caution should be exercised if using new features as the details may change before final release.)
+Material on this page is still under development! We are currently releasing beta versions of Groovy 3.0 with a goal
+of gathering feedback on the language changes from our community. In addition, the beta versions assist other projects
+and tool vendors within the Groovy ecosystem to begin assessing the impact of moving to/supporting Groovy 3.0.
+Caution should be exercised if using new features as the details may change before final release.
 |===
 
 [[Groovy3.0releasenotes-Parrot]]
@@ -164,11 +167,7 @@ assert addWithDefault(1) == 101
 === Method references
 
 The Java 8 method reference syntax using the double colon syntax is now supported.
-
-[width="80%",align="center"]
-|===
-a| NOTE: _Experimental Status:_ While this feature will remain, we regard its current implementation as experimental. Currently, a method reference is turned into a Groovy method closure. This means that it even works when using JDK7 (i.e. using Groovy 2.6 with Parrot parser enabled on a version 7 JRE). We are currently exploring supporting native method references either instead of, or in addition to, method closures. If we change the implementation, we would expect no change in logical behavior though the new implementation may have different performance characteristics in some circumstances and the native implementation would only work on JDK8+.  Our goal is to clarify this aspect of the language before reaching release candidate status.
-|===
+Let's first look at some of the supported cases before coming back to some implementation details.
 
 The following examples illustrate referencing both static and instance methods of a class:
 
@@ -247,6 +246,54 @@ def names = pets.map(Animal::toString).collect(Collectors.joining( "," ))
 assert names == 'Animal(cat),Animal(dog)'
 --------------------------------------
 
+==== Implementation details and static optimization
+
+While for the most part you can ignore implementation details, it is useful
+to understand the implementation behind method references in some scenarios.
+For dynamic Groovy, a method reference is implemented as a Closure method reference.
+So `String::toUpperCase` is the same as `String.&toUpperCase`.
+In the spirit of providing a more Java-like experience when using `@CompileStatic`,
+we support native method references for static Groovy.
+
+For this example (using `String.transform` from JDK 12):
+[source,groovy]
+--------------------------------------
+@groovy.transform.CompileStatic
+def method() {
+  assert 'Hi'.transform(String::toUpperCase) == 'HI'
+}
+--------------------------------------
+The compiler will produce bytecode very similar to what Java would produce
+for this case (involves `INVOKEDYNAMIC`, method handles and `LambdaMetafactory` for the bytecode geeks).
+If you are already using `@CompileStatic` for extra compile-time type safety or performance,
+then the code will be semantically equivalent but optimized similar to Java.
+
+If you have code making use of dynamic features, then you should not use `@CompileStatic` with your method references, e.g.:
+
+[source,groovy]
+--------------------------------------
+def convertCase(boolean upper, String arg) {
+    arg.transform(String::"${upper ? 'toUpperCase' : 'toLowerCase'}")
+}
+assert convertCase(true, 'Hi') == 'HI'
+assert convertCase(false, 'Bye') == 'bye'
+--------------------------------------
+Since here the GString prohibits the compiler from knowing how to write the
+optimized code that would be required.
+Note: this example is a little contrived and could be refactored to call one
+of two optimized method references but hopefully you get the idea.
+
+The same caveat applies if you want to make use of the Closure nature behind the dynamic
+implementation, e.g.:
+
+[source,groovy]
+--------------------------------------
+def upper = String::toUpperCase
+assert upper('hi') == 'HI'
+def upperBye = upper.curry('bye')
+assert upperBye() == 'BYE'
+--------------------------------------
+
 === !in and !instanceof operators
 
 When wanting the negated form, rather than having to bracket expressions containing
@@ -285,7 +332,8 @@ assert he.toString() == 'Element(Helium, 2)'
 
 === Identity comparison operators
 
-Both `===` and `!==` are supported which are the same as calling the `is()` method.
+Both `===` and `!==` are supported which are the same as calling the `is()` method,
+and negating a call to the `is()` method respectively.
 
 [source,groovy]
 --------------------------------------
