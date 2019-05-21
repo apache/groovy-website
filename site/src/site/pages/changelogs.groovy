@@ -28,15 +28,17 @@ layout 'layouts/main.groovy', true,
                                 a(name: "changelog$mj") {}
                                 h2("Groovy $mj")
                                 ul {
-                                    minor.each { v ->
+                                    minor.sort{ a, b ->
+                                            aInfo = generator.ChangelogParser.INFO[a]
+                                            bInfo = generator.ChangelogParser.INFO[b]
+                                            (bInfo ? bInfo.split(' ')[-1] : '~') <=> (aInfo ? aInfo.split(' ')[-1] : '~')
+                                    }.each { v ->
                                         def unreleased = v.endsWith('-unreleased')
                                         def ver = unreleased ? v - '-unreleased' : v
                                         li {
                                             yieldUnescaped ( v.endsWith('-unreleased') || (!v.contains('-') && versions.any{ it.startsWith("$v-") }) ? "Aggregate c" : "C" ) + "hangelog for "
                                             a(href: "changelogs/changelog-${v}.html", "Groovy $ver")
-                                            if (unreleased) {
-                                                yieldUnescaped "&nbsp;&nbsp;[Unreleased: ${generator.ChangelogParser.UNRELEASED[ver]}]"
-                                            }
+                                            yieldUnescaped "&nbsp;&nbsp;[${generator.ChangelogParser.INFO[ver]}]"
                                         }
                                     }
                                 }

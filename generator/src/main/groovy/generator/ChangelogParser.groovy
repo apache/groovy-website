@@ -35,11 +35,11 @@ class ChangelogParser {
     private static final String ITEM_MARK = '    * '
     private static final Pattern ITEM_PATTERN = ~/\[(GROOVY-[0-9]+)\] - (.+)/
     private static final String VERSION_PATTERN = /^((1\.)|[23]\.)/
-    public static final Map<String, String> UNRELEASED = [
-            '1.1.0': 'renamed to 1.5.0',
-            '1.9.0': 'renamed to 2.0.0',
-            '2.6.0': 'discontinued',
-            '3.0.0': 'upcoming new release',
+    public static final Map<String, String> INFO = [
+            '1.1.0': 'Unreleased: renamed to 1.5.0',
+            '1.9.0': 'Unreleased: renamed to 2.0.0',
+            '2.6.0': 'Unreleased: discontinued',
+            '3.0.0': 'Unreleased: upcoming new release',
     ]
 
     static List<Changelog> fetchReleaseNotes(File cacheDirectory) {
@@ -49,7 +49,9 @@ class ChangelogParser {
             it.name =~ VERSION_PATTERN &&
                     it.released == true
         }.collectEntries {
-            [fixName(it.name), it.id]
+            def name = fixName(it.name)
+            INFO[name] = "Released: $it.releaseDate"
+            [name, it.id]
         }
 
         def raw = versionMap.collect { name, id ->
@@ -79,7 +81,7 @@ class ChangelogParser {
         def allMajor = changelogs.groupBy {
             def v = it.groovyVersion
             v.contains('-')?v-v.substring(v.indexOf('-')):v
-        }.findAll { ver, logs -> ver in releasedVersions || ver in UNRELEASED.keySet() } // add some unreleased versions to get aggregate changelog
+        }.findAll { ver, logs -> ver in releasedVersions || ver in INFO.keySet() } // add some unreleased versions to get aggregate changelog
         allMajor.collect { k,v ->
             def changelog = changelogs.find { it.groovyVersion == k }
             if (!changelog) {
