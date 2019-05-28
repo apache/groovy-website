@@ -100,22 +100,22 @@ layout 'layouts/main.groovy', true,
                                 ul {
                                     li {
                                         yield 'the '
-                                        a(href: 'single-page-documentation.html', 'reference documentation')
+                                        a(href: 'http://groovy-lang.org/single-page-documentation.html', 'reference documentation')
                                         yield ' covering the language specification, the user guides, getting started, and more.'
                                     }
                                     li {
                                         yield 'the '
-                                        a(href: 'api.html', 'GroovyDoc APIs')
+                                        a(href: 'http://groovy-lang.org/api.html', 'GroovyDoc APIs')
                                         yield ' documenting the classes of the Groovy code base'
                                     }
                                     li {
                                         yield 'the '
-                                        a(href: 'gdk.html', 'Groovy GDK')
+                                        a(href: 'http://groovy-lang.org/gdk.html', 'Groovy GDK')
                                         yield ' documentation, explaining how Groovy enriches the JDK APIs'
                                     }
                                     li {
                                         yield 'this '
-                                        a(href: 'https://github.com/groovy/groovy-website', 'website')
+                                        a(href: 'https://github.com/apache/groovy-website', 'website')
                                     }
                                 }
                                 p {
@@ -125,7 +125,7 @@ layout 'layouts/main.groovy', true,
                                 }
                                 p {
                                     yield 'All the above is stored in our code '
-                                    a(href: 'https://github.com/groovy', 'repositories on Github')
+                                    a(href: 'https://github.com/apache/groovy-website', 'repositories on Github')
                                     yield ', so having an account on Github would be ideal.'
                                 }
                                 p """
@@ -147,7 +147,7 @@ layout 'layouts/main.groovy', true,
                                     yield '''
                                         of possible easy contributions that could get you started on your journey
                                         to become a Groovy committer. Just raise your hand on the Groovy developer '''
-                                    a(href: 'mailing-lists.html', 'mailing-list')
+                                    a(href: 'http://groovy-lang.org/mailing-lists.html', 'mailing-list')
                                     yield ''' to tell us about your desire to work on that ticket.'''
                                 }
                                 p '''
