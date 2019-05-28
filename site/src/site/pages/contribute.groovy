@@ -44,7 +44,7 @@ layout 'layouts/main.groovy', true,
                                     }
                                     li {
                                         yield 'improving this '
-                                        a(href: 'https://github.com/groovy/groovy-website', 'website')
+                                        a(href: 'https://github.com/apache/groovy-website', 'website')
                                     }
                                     li 'covering the code base with more tests to avoid future regressions, '
                                     li {
