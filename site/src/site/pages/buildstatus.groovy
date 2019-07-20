@@ -68,7 +68,7 @@ layout 'layouts/main.groovy', true,
                                 p """
                                     The Groovy development team is keen to test Groovy development versions against important
                                     ecosystem projects. If you want your project to be added to the list, please contact
-                                    us on the ${$a(href:'mailing-lists.html','development mailing list')}.
+                                    us on the ${$a(href:'http://groovy-lang.org/mailing-lists.html','development mailing list')}.
                                 """
                             }
                         }
