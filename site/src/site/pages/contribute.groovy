@@ -59,7 +59,7 @@ layout 'layouts/main.groovy', true,
                                     yield '''
                                         If you encounter a problem, want to discuss a new feature,
                                         share interesting findings, and more, then the '''
-                                    a(href: 'mailing-lists.html', 'mailing-lists')
+                                    a(href: 'http://groovy-lang.org/mailing-lists.html', 'mailing-lists')
                                     yield '''
                                         are the place to go to start a conversation with the Groovy developers
                                         and other Groovy users. Discussions on the mailing list are archived.
