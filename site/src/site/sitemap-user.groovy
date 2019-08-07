@@ -118,9 +118,9 @@ documentation {
     }
 
     section ('Tools','fa-gears') {
-        item 'groovyc — the Groovy compiler',               'groovyc',          'tools-groovyc'
-        item 'groovysh — the Groovy command -like shell',   'groovysh',         'groovysh'
-        item 'groovyConsole — the Groovy Swing console',    'groovyconsole',    'groovy-console'
+        item 'groovyc - the Groovy compiler',               'groovyc',          'tools-groovyc'
+        item 'groovysh - the Groovy repl-like shell',       'groovysh',         'groovysh'
+        item 'groovyConsole - the Groovy Swing console',    'groovyconsole',    'groovy-console'
         item 'IDE integration', 'ides', 'tools-ide'
     }
 
@@ -252,42 +252,38 @@ ecosystem {
 
 allEvents {
     // Note that the event image should be 257x180 to look nice
-    event('Devnexus-2GM') {
-        location 'Atlanta, GA, USA'
-        date 'Pre conference: March 4-5, Conference March 6-8'
-        url 'https://devnexus.com/2gm-home'
-        logo 'img/confs/devnexus-2gm.png'
+    event('ApacheCon-NA') {
+        location 'Las Vegas, NV, USA'
+        date 'September 9-12, 2019'
+        url 'https://www.apachecon.com/acna19/'
+        logo 'img/confs/apacheconNA.png'
         description '''
             <p>
-            For its 2019 conference, Devnexus has teamed up with the 2GM (Groovy, Grails, and Micronaut) communities, in furtherance of its mission, to promote and support open source values and technologies.
+            Groovy highlights: Apache Groovy Update and Roadmap, possibly some Data Science with Groovy plus some planned hackerthon/BOF/barcamp activities.
             </p>
-            <p>
-            Pre-Conference Training Event: MICRONAUT FROM IOT TO GCP 
-            </p>'''
+        '''
     }
-    event('Greach: The Groovy Spanish Conference') {
-        location 'Madrid, Spain'
-        date 'March 28 - 30, 2019'
-        url 'http://greachconf.com'
-        logo 'img/confs/greach.png'
-        description '''<p>
-                Android + JVM langs + JVM frameworks conference in Madrid, Spain with 100% English talks.
-                </p>
-                <p>
-                Greach is a community conference intended for networking and collaboration in the developer community.
-
-                </p>'''
+    event('Oracle Code One') {
+        location 'Moscone Center, San Francisco'
+        date 'September 16-19, 2019'
+        url 'https://www.oracle.com/code-one/'
+        logo 'img/confs/codeone.png'
+        description '''
+            <p>
+            Groovy highlights: Talks on Micronaut, Spock, Venkat's cool JVM things talk
+            </p>
+        '''
     }
     event('GR8Conf EU') {
         location 'Copenhagen, Denmark'
-        date 'May 27 - 29, 2019'
+        date 'May/June, 2020'
         url 'http://gr8conf.eu/'
         logo 'img/confs/gr8confeu.png'
         description '''
             <p>
             Groovy, Grails, and related technologies have seen astounding growth in interest and adoption over the past few years, and with good reason.
             </p>
-            <p>GR8Conf is a series of conferences founded to spread the word worldwide. The 2018 GR8Conf Europe was the 10th anniversary of the conference but expect even more excitement in 2019!
+            <p>GR8Conf is a series of conferences founded to spread the word worldwide. The 2020 GR8Conf Europe will be the 12th anniversary of the conference. Expect some exciting content!
             </p>
             <p>
             GR8Conf is an independent, affordable series of conferences and covers All Things Groovy
