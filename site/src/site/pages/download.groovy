@@ -291,6 +291,15 @@ layout 'layouts/main.groovy', true,
                                 }
                                 article {
                                     p {
+                                        a(href: 'https://snapcraft.io/', 'SnapCraft')
+                                        yield ' is "the app store for Linux". Groovy is supported in the '
+                                        a(href: 'https://snapcraft.io/groovy', 'store')
+                                        yield ' or via the commandline:'
+                                    }
+                                    pre { code '$ sudo snap install groovy --classic' }
+                                }
+                                article {
+                                    p {
                                         a(href: 'http://www.macports.org/', 'MacPorts')
                                         yield ' is a system for managing tools on macOS:'
                                     }
