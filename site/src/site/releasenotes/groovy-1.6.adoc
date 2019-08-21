@@ -8,7 +8,7 @@ release are:
 * Optional return in `if`/`else` and `try`/`catch` blocks
 * Java 5 annotation definition
 * *AST transformations* and all the provided transformation annotations
-like`@Singleton`, `@Lazy`, `@Immutable`, `@Delegate` and friends
+like `@Singleton`, `@Lazy`, `@Immutable`, `@Delegate` and friends
 * The Grape module and dependency system and its `@Grab` transformation
 * Various Swing builder improvements, thanks to the Swing
 / link:http://griffon-framework.org/[Griffon] team, as well as several Swing
