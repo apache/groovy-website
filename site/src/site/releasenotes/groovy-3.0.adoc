@@ -110,23 +110,16 @@ assert groovyBooks.every{ it.contains('Groovy') }
 
 The Java syntax for lambda expressions is now supported.
 
-[width="80%",align="center"]
-|===
-a| NOTE: _Experimental Status:_ While this feature will remain, we regard its current implementation as experimental. Currently, lambda expressions are turned into equivalent Groovy closures. An advantage of this approach is that it works even when using JDK7 (i.e. using Groovy 2.6 with Parrot parser enabled on a version 7 JRE) but it doesn't easily enable the same level of type inference and checking that Java 8 offers even when using `@TypeChecked` or `@CompileStatic` and might be much less performant in a range of scenarios. We are currently exploring supporting native lambda expression either instead of, or in addition to, conversion to closures. If we change the implementation, most users would experience no behavioral differences in their programs though a native implementation would likely be faster but only work on JDK8+. Our goal is to clarify this aspect of the language before reaching release candidate status.
-|===
-
 Examples:
 
 [source,groovy]
 --------------------------------------
-import static java.util.stream.Collectors.toList
-
-(1..10).forEach((it) -> { println it })
+(1..10).forEach(e -> { println e })
 
 assert (1..10).stream()
-        .filter((it) -> it % 2 == 0)
-        .map((it) -> it * 2)
-        .collect(toList()) == [4, 8, 12, 16, 20]
+                .filter(e -> e % 2 == 0)
+                .map(e -> e * 2)
+                .toList() == [4, 8, 12, 16, 20]
 --------------------------------------
 
 The normal variants are supported and Groovy adds additional features such as default parameter values:
@@ -164,6 +157,13 @@ assert addWithDefault(1, 200) == 201
 assert addWithDefault(1) == 101
 --------------------------------------
 
+==== Implementation details and static optimization
+
+For dynamic Groovy, lambda expressions are turned into equivalent Groovy closures.
+So `(e) -> { println e }` is the same as `{e -> println e}`.
+In the spirit of providing a more Java-like experience when using `@CompileStatic`,
+we support native lambda expressions for static Groovy.
+
 === Method references
 
 The Java 8 method reference syntax using the double colon syntax is now supported.
@@ -174,19 +174,18 @@ The following examples illustrate referencing both static and instance methods o
 [source,groovy]
 --------------------------------------
 import java.util.stream.Stream
-import static java.util.stream.Collectors.toList
 
 // class::staticMethod
 assert ['1', '2', '3'] ==
         Stream.of(1, 2, 3)
                 .map(String::valueOf)
-                .collect(toList())
+                .toList()
 
 // class::instanceMethod
 assert ['A', 'B', 'C'] ==
         ['a', 'b', 'c'].stream()
                 .map(String::toUpperCase)
-                .collect(toList())
+                .toList()
 --------------------------------------
 
 The following examples illustrate referencing methods of instance variables:
@@ -278,7 +277,7 @@ def convertCase(boolean upper, String arg) {
 assert convertCase(true, 'Hi') == 'HI'
 assert convertCase(false, 'Bye') == 'bye'
 --------------------------------------
-Since here the GString prohibits the compiler from knowing how to write the
+Since here the `GString` prohibits the compiler from knowing how to write the
 optimized code that would be required.
 Note: this example is a little contrived and could be refactored to call one
 of two optimized method references but hopefully you get the idea.
@@ -416,10 +415,21 @@ def wrestle(s) {
     }
 }
 
+def wrestle2(s) {
+    FromResource from = new FromResource(s)
+    try (from; ToResource to = new ToResource()) { // Enhanced try-with-resources in Java 9+
+        to << from
+        return to.toString()
+    }
+}
+
 assert wrestle("ARM was here!").contains('arm')
+assert wrestle2("ARM was here!").contains('arm')
 --------------------------------------
 Which yields the following output:
 --------------------------------------
+ToResource closing
+FromResource closing
 ToResource closing
 FromResource closing
 --------------------------------------
