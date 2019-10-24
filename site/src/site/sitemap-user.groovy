@@ -249,27 +249,17 @@ ecosystem {
 
 allEvents {
     // Note that the event image should be 257x180 to look nice
-    event('ApacheCon-NA') {
-        location 'Las Vegas, NV, USA'
-        date 'September 9-12, 2019'
-        url 'https://www.apachecon.com/acna19/'
-        logo 'img/confs/apacheconNA.png'
-        description '''
-            <p>
-            Groovy highlights: Apache Groovy Update and Roadmap, possibly some Data Science with Groovy plus some planned hackerthon/BOF/barcamp activities.
-            </p>
-        '''
-    }
-    event('Oracle Code One') {
-        location 'Moscone Center, San Francisco'
-        date 'September 16-19, 2019'
-        url 'https://www.oracle.com/code-one/'
-        logo 'img/confs/codeone.png'
-        description '''
-            <p>
-            Groovy highlights: Talks on Micronaut, Spock, Venkat's cool JVM things talk
-            </p>
-        '''
+    event('Greach') {
+        location 'Madrid, Spain'
+        date 'March 26-28, 2020'
+        url 'https://www.greachconf.com'
+        logo 'img/confs/greach.png'
+        description '''<p>
+                Android + JVM langs + JVM frameworks conference in Madrid, Spain with 100% English talks, usually with lots of Groovy content.
+                </p>
+                <p>
+                Greach is a community conference intended for networking and collaboration in the developer community.
+                </p>'''
     }
     event('GR8Conf EU') {
         location 'Copenhagen, Denmark'
