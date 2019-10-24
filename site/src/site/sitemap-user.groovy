@@ -249,6 +249,18 @@ ecosystem {
 
 allEvents {
     // Note that the event image should be 257x180 to look nice
+    event('Greach') {
+        location 'Madrid, Spain'
+        date 'March 26-28, 2020'
+        url 'https://www.greachconf.com'
+        logo 'img/confs/greach.png'
+        description '''<p>
+                Android + JVM langs + JVM frameworks conference in Madrid, Spain with 100% English talks, usually with lots of Groovy content.
+                </p>
+                <p>
+                Greach is a community conference intended for networking and collaboration in the developer community.
+                </p>'''
+    }
     event('GR8Conf EU') {
         location 'Copenhagen, Denmark'
         date 'May/June, 2020'
