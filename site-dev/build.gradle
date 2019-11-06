@@ -45,19 +45,6 @@ def gitboxUrl = project.findProperty('gitPublishRemote') ?: 'https://gitbox.apac
 def stagingDevSite = "$project.buildDir/staging-dev-site/"
 def generatedDevSite = "$project.buildDir/site/"
 
-def shell = { cmd ->
-    println cmd
-    exec {
-        if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-            executable 'cmd.exe'
-            args '/c', cmd
-        } else {
-            executable 'sh'
-            args '-c', cmd
-        }
-    }
-}
-
 task copyAssets(type:Copy) {
     from file('../site/src/site/assets')
     into file("$buildDir/site")
@@ -218,6 +205,16 @@ task publishWebsite(dependsOn: commitWebsite) {
         }
 
         // Because git.push() fails to authenticate, run git push directly.
-        shell "git push asf-site asf-site"
+        def cmd = 'git push origin asf-site'
+        exec {
+            workingDir stagingDevSite
+            if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+                executable 'cmd.exe'
+                args '/c', cmd
+            } else {
+                executable 'sh'
+                args '-c', cmd
+            }
+        }
     }
 }
