@@ -17,7 +17,8 @@
 
 == Abstract: Groovy 3 semantics and new MOP
 
-For quite long we are thinking about a new MOP for Groovy, without finding the right way  to do it better this time.
+For some time we have been thinking about a new MOP for Groovy but haven't been able to decide on a final
+design which mostly keeps backwards compatibility but also improves various cases that we want to improve.
 It is difficult to find the right path between being user-friendly and efficient.
 Thus the new MOP will contain some features the old did not, but will also remove some old features for
 the sake of a more straight and more easy to understand MOP.
