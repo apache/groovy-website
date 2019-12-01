@@ -1,0 +1,148 @@
+//////////////////////////////////////////
+
+  Sous licence Apache Software Foundation (ASF), un 
+   ou plusieurs contrats de licence de contributeur. Voir le fichier NOTICE
+   distribué avec ce travail pour des informations supplémentaires
+   en ce qui concerne la propriété du droit d'auteur. L'ASF autorise ce fichier
+   sous licence Apache, version 2.0 (le logiciel
+   "Licence"); vous ne pouvez pas utiliser ce fichier sauf en conformité
+   avec la licence. Vous pouvez obtenir une copie de la licence à l'adresse
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+ Sauf si requis par la loi applicable ou convenu par écrit,
+   Les logiciels distribués sous licence sont distribués sur une base
+   "EN L'ÉTAT", SANS GARANTIES NI CONDITIONS D'AUCUNE
+   SORTE, soit explicite ou implicite. Voir la licence pour le
+   langage spécifique régissant les autorisations et les limitations
+   sous licence.
+
+//////////////////////////////////////////
+
+= Site web GROOVY
+L'équipe de développement groovy
+:revdate: 2019-11-05
+:build-icon: http://ci.groovy-lang.org:8111/app/rest/builds/buildType:(id:Groovy_Website)/statusIcon
+:noheader:
+:groovy-www: http://groovy-lang.org/
+:groovy-ci: http://ci.groovy-lang.org/viewType.html?buildTypeId=Groovy_Website&guest=1
+:gradle: http://www.gradle.org
+:markupte: http://docs.groovy-lang.org/latest/html/documentation/markup-template-engine.html
+
+[.left.text-left]
+image::http://groovy-lang.org/img/groovy-logo.png[]
+{groovy-www}[Groovy] est un langage multi-facettes pour la machine virtuelle Java. Il est construit
+sur les atouts de Java, mais dispose de fonctionnalités puissantes supplémentaires inspirées des langages tels que
+Python, Ruby et Smalltalk.
+
+Groovy met à la disposition des développeurs Java des fonctionnalités de programmation modernes avec presque aucun 
+apprentissage, il peut aussi prendre en charge les langages spécifiques à un domaine et autre syntaxe compacte
+de sorte que votre code devient facile à lire et à maintenir.
+
+Groovy facilite l'écriture des scripts shell et des scripts de construction avec ses puissantes processus primitives,
+Capacités OO et un DSL Ant.
+
+Il augmente également la productivité des développeurs en réduisant le code du squelette lors du développement d'une application Web.
+GUI, bases de données ou console. Groovy simplifie les tests en prenant en charge les tests unitaires
+et la création de mock pour tester d'autres objets non implémenté.
+Groovy s'intègre également de manière transparente à toutes les classes Java existantes
+et des bibliothèques et compile directement en bytecode Java afin que vous puissiez l'utiliser partout où vous pouvez utiliser Java.
+
+== Les sources pour le site web Groovy
+
+Ce projet contruit deux site web Groovy:
+
+* Le site web _utilisateur contient des informations pour les utilisateurs du langage de programmation Apache Groovy
+* Le site web _développeur contient des informations pour ceux qui sont interessé à la contribution du langage de développement
+
+Les sites web sont statique une fois généré. Le processus de génération utilise {gradle}[Gradle] et 
+le template groovy est capable de générer les sites.
+
+
+La construction est image:{build-icon}[build status, link={groovy-ci}].
+
+== Génération du site web utilisateur
+
+----
+git clone https://github.com/apache/groovy-website
+cd groovy-website
+./gradlew :site-user:webzip
+----
+
+Le résultat peut être trouver dans le dossier `site-user/build`:
+
+----
+site-user/build
+  |---- site            : La génération statique du site web
+  |---- reports         : Signalement des liens morts
+  |---- distributions   : Le zip du site web
+----
+
+== Génération du site web développeur
+
+----
+git clone https://github.com/apache/groovy-website
+cd groovy-website
+./gradlew :site-dev:webzip
+----
+
+Le résultat peut être trouver dans le dossier `site-dev/build`:
+
+----
+site-dev/build
+  |---- site            : La génération statique du site web
+  |---- reports         : Signalement des liens morts
+  |---- distributions   : Le zip du site web
+----
+
+== Contribution
+
+Le site Web est généré grâce à Gradle et utilise le {markupte}[Markup Template Engine].
+La structure du projet est composée de ces modules / répertoires:
+
+----
+generator                       : module pour l'utilisation des classes et le modele pour la génération du site web
+site                            : Répertoire avec le contenu du site web partagé
+site-user                       : module qui décrit le contenu qui apparait dans site web utilisateur
+site-dev                        : module qui décrit le contenu qui apparait dans le site web développeur
+----
+
+Le sous-projet `site` consite en:
+
+----
+src/main/site                   : les sources pour le site web statique
+          |--- assets           : les ressources staitque tel que les images, les CSS files, ...
+          |--- html             : éléments que les modèles incluent en tant que contenu HTML brut
+          |--- includes         : comprend les utilisations par les modèles 
+          |--- layouts          : mises en page pour les différentes pages
+          |--- pages            : pages individuelles
+----
+
+Le sous-projet `site-user` consiste en:
+
+----
+build.gradle                    : logique de conception de site Web pour le site utilisateur
+----
+
+The `site-dev` subproject consists of:
+
+----
+build.gradle                    : logique de conception de site Web pour le site développeur
+----
+
+Détails supplémentaires (un peu daté mais très pertinent) on peut trouver dans ce lien
+http://melix.github.io/blog/2014/07/new-groovy-website.html[blog post].
+
+== Intégrations Continues
+
+Le serveur officiel tourne {groovy-ci}[ici] (connectez-vous en tant qu'invité et laissez le mot de passe vide)
+et c'est sponsorisé par http://www.jetbrains.com[JetBrains].
+
+ATTENTOIN: Le site web évolue constamment par la branche _asf-site_ .
+Cela veut dire que *chaque merge sur master est immediatement publiée*.
+Les modifications qui doivent être appliquées à une date donnée doivent être effectuées sur une branche dédiée..
+
+== License
+
+Groovy est sous licence sous les terme de
+http://www.apache.org/licenses/LICENSE-2.0.html[Apache License, Version 2.0]
