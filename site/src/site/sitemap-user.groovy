@@ -151,12 +151,7 @@ downloads {
         }
         version('3.0.0-rc-2') {
             stable false
-//            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-rc-2-installer.exe'
-        }
-        version('3.0.0-rc-1') {
-            stable false
-            archive true
-            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-rc-1-installer.exe'
+            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-rc-2-installer.exe'
         }
     }
     distribution('Groovy 2.6') {
