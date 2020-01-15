@@ -396,7 +396,7 @@ usergroups {
     }
     userGroup('Boston Groovy, Grails, Spring Meetup (B2GS)') {
         location 'North-America/United States'
-        url 'https://www.meetup.com/Grails-Boston/'
+        url 'https://twitter.com/B2GSMeetup'
     }
     userGroup('Coder Consortium of Sacramento') {
         location 'North-America/United States'

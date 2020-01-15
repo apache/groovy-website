@@ -105,10 +105,7 @@ layout 'layouts/main.groovy', true,
                                     that you might wish to have a look at, to learn more about Groovy, delve into particular topics, and more.
                                 """
                                 p """
-                                    Below are a few selected presentations given at the
-                                    SpringOne2GX,
-                                    ${$a(href: 'http://gr8conf.eu/', 'GR8Conf')} and
-                                    ${$a(href: 'http://greach.es/', 'Greach')} conferences.
+                                    Below are a few selected presentations given at Groovy-related conferences.
                                 """
 
                                 videos.each { Video video ->
