@@ -37,10 +37,23 @@ to `org.apache.groovy`. Please update your Gradle/Maven/other build settings app
 [[Groovy4.0other]]
 == Other improvements
 
+=== JavaShell (incubating)
+
+A Java equivalent of GroovyShell, allowing to more easily work with snippets of Java code.
+
 === JSR308 improvements (work in progress)
 
 Groovy has been improving JSR-308 support over recent versions.
 In Groovy 4.0, additional support has been added.
+
+=== Java-inspired changes (under investigation)
+
+The following changes are being explored:
+
+* Switch expressions
+* Support for text blocks
+* Module definitions written in Groovy
+* Support for records
 
 == JDK requirements
 
