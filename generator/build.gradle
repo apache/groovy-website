@@ -24,9 +24,10 @@ repositories {
 }
 
 dependencies {
-    ext.groovyVersion = '2.4.17'
-    ext.asciidocVersion = '2.0.0'
+    ext.groovyVersion = '2.5.9'
+    ext.asciidocVersion = '2.2.0'
     compile "org.codehaus.groovy:groovy:$groovyVersion"
+    compile "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
     compile "org.codehaus.groovy:groovy-json:$groovyVersion"
     compile "org.codehaus.groovy:groovy-templates:$groovyVersion"
     compile("org.asciidoctor:asciidoctorj:$asciidocVersion") {

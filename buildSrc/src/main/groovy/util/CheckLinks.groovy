@@ -25,7 +25,7 @@ import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.gradle.api.logging.Logger
-import org.gradle.util.GFileUtils
+import org.apache.tools.ant.util.FileUtils
 
 class CheckLinks {
     Logger logger = null
@@ -92,7 +92,7 @@ class CheckLinks {
     }
 
     def checkPage(File f) {
-        def currentPath = GFileUtils.relativePath(baseDir, f.parentFile)
+        def currentPath = FileUtils.getRelativePath(baseDir, f.parentFile)
         f.eachLine('utf-8') { String line, int nb ->
             def dead = []
             [/\shref=['"](.+?)['"]/, /src=['"](.+?)['"]/].each { regex ->
