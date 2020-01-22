@@ -51,7 +51,6 @@ In Groovy 4.0, additional support has been added.
 The following changes are being explored:
 
 * Switch expressions
-* Support for text blocks
 * Module definitions written in Groovy
 * Support for records
 
