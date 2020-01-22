@@ -5,9 +5,9 @@
 [width="80%",align="center"]
 |===
 a| NOTE: _WARNING:_
-Material on this page is still under development! We are currently releasing beta versions of Groovy 3.0 with a goal
+Material on this page is still under development! We are currently releasing alpha versions of Groovy 4.0 with a goal
 of gathering feedback on the language changes from our community. In addition, the beta versions assist other projects
-and tool vendors within the Groovy ecosystem to begin assessing the impact of moving to/supporting Groovy 3.0.
+and tool vendors within the Groovy ecosystem to begin assessing the impact of moving to/supporting Groovy 4.0.
 Caution should be exercised if using new features as the details may change before final release.
 |===
 
