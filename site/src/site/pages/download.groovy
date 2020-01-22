@@ -139,7 +139,7 @@ layout 'layouts/main.groovy', true,
                                         }
                                         null
                                     }
-                                    def buildExtras = { String type, String area, String v, boolean preferPermalink ->
+                                    def buildExtras = { String prefix, String type, String area, String v, boolean preferPermalink ->
                                         def extras = [:]
                                         def url = findUrl(type, area, v, 'asc', preferPermalink)
                                         if (url) { extras.asc = url }
@@ -150,13 +150,12 @@ layout 'layouts/main.groovy', true,
                                         if (extras) {
                                             def first = true
                                             br()
-                                            yield '('
+                                            span(style: 'font-variant: small-caps', prefix)
                                             extras.each { ext, u ->
                                                 if (first) first = false
                                                 else yield ' '
                                                 a(href: u, ext)
                                             }
-                                            yield ')'
                                         }
                                     }
                                     def srcUrl = { pkg ->
@@ -174,7 +173,10 @@ layout 'layouts/main.groovy', true,
                                                         br()
                                                         yield 'binary'
                                                     }
-                                                    buildExtras('binary', 'distribution', v, true)
+                                                    buildExtras(pkg.archive ? '' : 'dist: ', 'binary', 'distribution', v, pkg.archive)
+                                                    if (!pkg.archive) {
+                                                        buildExtras('perm: ', 'binary', 'distribution', v, true)
+                                                    }
                                                 }
                                                 td {
                                                     a(href: srcUrl(pkg)) {
@@ -182,7 +184,7 @@ layout 'layouts/main.groovy', true,
                                                         br()
                                                         yield ' source'
                                                     }
-                                                    buildExtras('src', 'sources', v, pkg.archive)
+                                                    buildExtras('', 'src', 'sources', v, pkg.archive)
                                                 }
                                                 td {
                                                     a(href: "https://dl.bintray.com/groovy/maven/apache-groovy-docs-${v}.zip") {
@@ -190,7 +192,10 @@ layout 'layouts/main.groovy', true,
                                                         br()
                                                         yield ' documentation'
                                                     }
-                                                    buildExtras('docs', 'distribution', v, true)
+                                                    buildExtras(pkg.archive ? '' : 'dist: ', 'docs', 'distribution', v, pkg.archive)
+                                                    if (!pkg.archive) {
+                                                        buildExtras('perm: ', 'docs', 'distribution', v, true)
+                                                    }
                                                 }
                                                 td {
                                                     a(href: "https://dl.bintray.com/groovy/maven/apache-groovy-sdk-${v}.zip") {
@@ -198,7 +203,10 @@ layout 'layouts/main.groovy', true,
                                                         br()
                                                         yield ' SDK bundle'
                                                     }
-                                                    buildExtras('sdk', 'distribution', v, true)
+                                                    buildExtras(pkg.archive ? '' : 'dist: ', 'sdk', 'distribution', v, pkg.archive)
+                                                    if (!pkg.archive) {
+                                                        buildExtras('perm: ', 'sdk', 'distribution', v, true)
+                                                    }
                                                 }
                                                 if (pkg.windowsInstaller) {
                                                     td {
