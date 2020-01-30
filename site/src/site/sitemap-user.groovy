@@ -261,20 +261,16 @@ allEvents {
                 Greach is a community conference intended for networking and collaboration in the developer community.
                 </p>'''
     }
-    event('GR8Conf EU') {
+    event('GR8Conf & JDK IO') {
         location 'Copenhagen, Denmark'
-        date 'May/June, 2020'
+        date 'June 2nd-4th, 2020'
         url 'http://gr8conf.eu/'
-        logo 'img/confs/gr8confeu.png'
+        logo 'img/confs/gr8conf-jdkio.svg'
         description '''
             <p>
-            Groovy, Grails, and related technologies have seen astounding growth in interest and adoption over the past few years, and with good reason.
+            For the past 11 years, GR8Conf has provided a high-quality conference experience for the tight-knit Apache Groovy programming language community. This year, we are joining forces with JDK IO - an annual conference run by the Danish Java user group covering technologies relevant to the entire JVM. The combined conference will be known as GR8Conf & JDK IO and will focus on All Things Groovy and Java, with DevOps, Microservices and Frontend Technologies sprinkled in.
             </p>
-            <p>GR8Conf is a series of conferences founded to spread the word worldwide. The 2020 GR8Conf Europe will be the 12th anniversary of the conference. Expect some exciting content!
-            </p>
-            <p>
-            GR8Conf is an independent, affordable series of conferences and covers All Things Groovy
-            </p>
+            <p>We feature the Hackergarten and have an awesome Meet & Greet with craft beers brewed by the crew!</p>
         '''
     }
 }
