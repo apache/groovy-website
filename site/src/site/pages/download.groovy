@@ -406,6 +406,9 @@ layout 'layouts/main.groovy', true,
                                                 br()
                                                 em '2.5.1+:'
                                                 yield ' as above but "groovy-jaxb" is moved to become optional'
+                                                br()
+                                                em '3.0.0+:'
+                                                yield ' as above but "groovy-yaml" is a new optional module'
                                             }
                                         }
                                         tr {
@@ -454,7 +457,12 @@ layout 'layouts/main.groovy', true,
                                         }
                                         tbody {
                                             tr {
-                                                td { b '3.0 - current' }
+                                                td { b '4.0 - current' }
+                                                td 'N/A'
+                                                td '1.8+'
+                                            }
+                                            tr {
+                                                td { b '3.x' }
                                                 td '1.8+'
                                                 td '1.8+'
                                             }

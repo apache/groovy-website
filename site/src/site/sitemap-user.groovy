@@ -252,6 +252,18 @@ ecosystem {
 
 allEvents {
     // Note that the event image should be 257x180 to look nice
+    event('dev.next') {
+        location 'Broomfield, Colorado, USA'
+        date 'March 24-27, 2020'
+        url 'https://www.devdotnext.com/'
+        logo 'img/confs/devdotnext.png'
+        description '''<p>
+                Come to dev.next to learn with the practitioners, experts, and creators of the technologies that you care about.
+                </p>
+                <p>
+                In particular, check out the dedicated Groovy, Grails, and Micronaut track.
+                </p>'''
+    }
     event('Greach') {
         location 'Madrid, Spain'
         date 'March 26-28, 2020'
@@ -274,6 +286,18 @@ allEvents {
             For the past 11 years, GR8Conf has provided a high-quality conference experience for the tight-knit Apache Groovy programming language community. This year, we are joining forces with JDK IO - an annual conference run by the Danish Java user group covering technologies relevant to the entire JVM. The combined conference will be known as GR8Conf & JDK IO and will focus on All Things Groovy and Java, with DevOps, Microservices and Frontend Technologies sprinkled in.
             </p>
             <p>We feature the Hackergarten and have an awesome Meet & Greet with craft beers brewed by the crew!</p>
+        '''
+    }
+    event('ApacheCon NA') {
+        location 'New Orleans, USA'
+        date 'Sept 28 - Oct 2, 2020'
+        url 'https://www.apachecon.com/acna2020/'
+        logo 'img/confs/apacheconNA.png'
+        description '''
+            <p>
+            The latest innovations from dozens of Apache projects and their communities in a collaborative, vendor-neutral environment.
+            </p>
+            <p>There is a whole track dedicated to Groovy!</p>
         '''
     }
 }
