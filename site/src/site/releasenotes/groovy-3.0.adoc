@@ -363,14 +363,22 @@ assert null == personInfo?['name']
 === "var" reserved type
 
 Groovy supports a `def` type placeholder.
-It can be used with fields, local variables and methods.
-In dynamic Groovy, you use `def` when the type of the field or local variable (or return type for methods)
-is deemed not important at compile time - normal runtime typing still applies.
+It can be used with fields, local variables, method parameters and as a method's return type.
+In dynamic Groovy, you use `def` when the type is deemed not important at compile time - normal runtime typing still applies.
 For static Groovy, it is used when type inference is preferred over an explicit type.
 
 In Groovy 3.0, a new type placeholder is available: `var`.
 It provides the syntax equivalent of Java 10's `var` reserved type (but you can use it with Groovy 3 from JDK 8).
-It can be used for fields and local variables and can be considered an alias for `def`.
+It can be used for fields, local variables and parameters.
+It can also be used for lambda parameters (a Java 11 feature).
+In all cases, it can be considered an alias for `def`.
+
+[source,groovy]
+--------------------------------------
+var two = 2                                                      // Java 10
+IntFunction<Integer> twice = (final var x) -> x * two            // Java 11
+assert [1, 2, 3].collect{ twice.apply(it) } == [2, 4, 6]
+--------------------------------------
 
 [width="80%",align="center"]
 |===
