@@ -1,0 +1,64 @@
+:source-highlighter: pygments
+:pygments-style: emacs
+:icons: font
+
+[width="80%",align="center"]
+|===
+a| NOTE: _WARNING:_
+Material on this page is still under development! We are currently releasing alpha versions of Groovy 4.0 with a goal
+of gathering feedback on the language changes from our community. In addition, the beta versions assist other projects
+and tool vendors within the Groovy ecosystem to begin assessing the impact of moving to/supporting Groovy 4.0.
+Caution should be exercised if using new features as the details may change before final release.
+|===
+
+[[Groovy4.0old-parser]]
+== Old parser removal
+
+In Groovy 4.0, the old Antlr2 based parser is removed. Please use Groovy versions up to 3.x if you require the old parser.
+
+[[Groovy4.0indy]]
+== Classic bytecode generation removal
+
+For many versions, Groovy could generate classic _call-site based_ bytecode
+or bytecode targetting the JDK7+ invoke dynamic ("indy") bytecodes.
+In Groovy 4.0, only bytecode using the latter approach can be generated.
+Consequently, there are no longer any "-indy" jars.
+
+Currently, the Groovy runtime still contains any necessary support for
+classes compiled using older versions of Groovy.
+Please use Groovy versions up to 3.x if you need to generate old bytecode.
+
+[[Groovy4.0maven-coordinates]]
+== Maven coordinates
+
+In Groovy 4.0, the _groupId_ of the maven coordinates for Groovy have changed from `org.codehaus.groovy`
+to `org.apache.groovy`. Please update your Gradle/Maven/other build settings appropriately.
+
+[[Groovy4.0other]]
+== Other improvements
+
+=== JavaShell (incubating)
+
+A Java equivalent of GroovyShell, allowing to more easily work with snippets of Java code.
+
+=== JSR308 improvements (work in progress)
+
+Groovy has been improving JSR-308 support over recent versions.
+In Groovy 4.0, additional support has been added.
+
+=== Java-inspired changes (under investigation)
+
+The following changes are being explored:
+
+* Switch expressions
+* Module definitions written in Groovy
+* Support for records
+
+== JDK requirements
+
+Groovy 4.0 requires JDK9+ to build and JDK8 is the minimum version of the JRE that we support.
+
+[[Groovy4.0releasenotes-Moreinformation]]
+== More information
+
+You can browse all the link:../changelogs/changelog-4.0.0-unreleased.html[tickets closed for Groovy 4.0 in JIRA].

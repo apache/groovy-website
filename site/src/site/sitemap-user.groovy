@@ -86,11 +86,11 @@ documentation {
             '2.1.0', '2.1.1', '2.1.2', '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.8', '2.1.9',
             '2.2.0', '2.2.1', '2.2.2',
             '2.3.0', '2.3.1', '2.3.2', '2.3.3', '2.3.4', '2.3.5', '2.3.6', '2.3.7', '2.3.8', '2.3.9', '2.3.10', '2.3.11',
-            '2.4.0', '2.4.1', '2.4.2', '2.4.3', '2.4.4', '2.4.5', '2.4.6', '2.4.7', '2.4.8', '2.4.9', '2.4.10', '2.4.11', '2.4.12', '2.4.13', '2.4.14', '2.4.15', '2.4.16', '2.4.17',
-            '2.5.0-rc-1', '2.5.0-rc-2', '2.5.0-rc-3', '2.5.0', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5', '2.5.6', '2.5.7', '2.5.8',
+            '2.4.0', '2.4.1', '2.4.2', '2.4.3', '2.4.4', '2.4.5', '2.4.6', '2.4.7', '2.4.8', '2.4.9', '2.4.10', '2.4.11', '2.4.12', '2.4.13', '2.4.14', '2.4.15', '2.4.16', '2.4.17', '2.4.18',
+            '2.5.0-rc-1', '2.5.0-rc-2', '2.5.0-rc-3', '2.5.0', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5', '2.5.6', '2.5.7', '2.5.8', '2.5.9',
             '2.6.0-alpha-1', '2.6.0-alpha-2', '2.6.0-alpha-3', '2.6.0-alpha-4',
             '3.0.0-alpha-1', '3.0.0-alpha-2', '3.0.0-alpha-3', '3.0.0-alpha-4', '3.0.0-beta-1', '3.0.0-beta-2',
-            '3.0.0-beta-3', '3.0.0-rc-1'
+            '3.0.0-beta-3', '3.0.0-rc-1', '3.0.0-rc-2', '3.0.0-rc-3', '3.0.0'
     ])
 
     section('Getting started','fa-graduation-cap') {
@@ -143,50 +143,48 @@ documentation {
 }
 
 downloads {
-    distribution('Groovy 3.0') {
+    distribution('Groovy 4.0') {
         description {
-            yield 'Groovy 3.0 is a bleeding edge '
+            yield 'Groovy 4.0 is a bleeding edge '
             a(href: 'versioning.html', 'version')
-            yield ' of Groovy designed for JDK8+ and with the new Parrot parser enabled by default. Pre-stable versions are available:'
-        }
-        version('3.0.0-rc-1') {
-            stable false
-//            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-rc-1-installer.exe'
-        }
-        version('3.0.0-beta-3') {
-            stable false
-            archive true
-            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-beta-3-installer.exe'
+            yield ' of Groovy designed for JDK8+ with much improved JPMS support. Alpha releases are expected soon.'
         }
     }
-    distribution('Groovy 2.6') {
+    distribution('Groovy 3.0') {
         description {
-            yield 'Groovy 2.6 is designed for JDK7+ and supports the new Parrot parser (when enabled) but has been'
-            yield ' retired before reaching final release to focus on Groovy 3.0. Alpha versions are available to help'
-            yield ' people wanting to port towards Groovy 3.0 but who are stuck on JDK7. See links under "Other versions" for details.'
+            yield 'Groovy 3.0 is the latest stable '
+            a(href: 'versioning.html', 'version')
+            yield ' of Groovy designed for JDK8+ with a new more flexible parser (aka Parrot parser).'
+        }
+        version('3.0.0') {
+            stable true
+//            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-installer.exe'
+        }
+        version('3.0.0-rc-3') {
+            stable false
+            archive true
+            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-rc-3-installer.exe'
         }
     }
     distribution('Groovy 2.5') {
         description {
-            yield 'Groovy 2.5 is the latest stable '
+            yield 'Groovy 2.5 is the previous stable '
             a(href: 'versioning.html', 'version')
             yield ' of Groovy.'
         }
-        version('2.5.8') {
+        version('2.5.9') {
             stable true
-            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-2.5.8-installer.exe'
+            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-2.5.9-installer.exe'
         }
     }
     distribution('Groovy 2.4') {
         description {
-            yield 'Groovy 2.4 is the previous stable '
-            a(href: 'versioning.html', 'version')
-            yield ' of Groovy.'
+            yield 'Groovy 2.4 is an earlier version of Groovy still in widespread use.'
             yieldUnescaped ''' Important: Releases before 2.4.4 weren't done under the Apache Software Foundation and are provided as a convenience, without any warranty.'''
         }
-        version('2.4.17') {
+        version('2.4.18') {
             stable true
-            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-2.4.17-installer.exe'
+            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-2.4.18-installer.exe'
         }
     }
 }
@@ -261,6 +259,18 @@ ecosystem {
 
 allEvents {
     // Note that the event image should be 257x180 to look nice
+    event('dev.next') {
+        location 'Broomfield, Colorado, USA'
+        date 'March 24-27, 2020'
+        url 'https://www.devdotnext.com/'
+        logo 'img/confs/devdotnext.png'
+        description '''<p>
+                Come to dev.next to learn with the practitioners, experts, and creators of the technologies that you care about.
+                </p>
+                <p>
+                In particular, check out the dedicated Groovy, Grails, and Micronaut track.
+                </p>'''
+    }
     event('Greach') {
         location 'Madrid, Spain'
         date 'March 26-28, 2020'
@@ -273,20 +283,28 @@ allEvents {
                 Greach is a community conference intended for networking and collaboration in the developer community.
                 </p>'''
     }
-    event('GR8Conf EU') {
+    event('GR8Conf & JDK IO') {
         location 'Copenhagen, Denmark'
-        date 'May/June, 2020'
+        date 'June 2nd-4th, 2020'
         url 'http://gr8conf.eu/'
-        logo 'img/confs/gr8confeu.png'
+        logo 'img/confs/gr8conf-jdkio.svg'
         description '''
             <p>
-            Groovy, Grails, and related technologies have seen astounding growth in interest and adoption over the past few years, and with good reason.
+            For the past 11 years, GR8Conf has provided a high-quality conference experience for the tight-knit Apache Groovy programming language community. This year, we are joining forces with JDK IO - an annual conference run by the Danish Java user group covering technologies relevant to the entire JVM. The combined conference will be known as GR8Conf & JDK IO and will focus on All Things Groovy and Java, with DevOps, Microservices and Frontend Technologies sprinkled in.
             </p>
-            <p>GR8Conf is a series of conferences founded to spread the word worldwide. The 2020 GR8Conf Europe will be the 12th anniversary of the conference. Expect some exciting content!
-            </p>
+            <p>We feature the Hackergarten and have an awesome Meet & Greet with craft beers brewed by the crew!</p>
+        '''
+    }
+    event('ApacheCon NA') {
+        location 'New Orleans, USA'
+        date 'Sept 28 - Oct 2, 2020'
+        url 'https://www.apachecon.com/acna2020/'
+        logo 'img/confs/apacheconNA.png'
+        description '''
             <p>
-            GR8Conf is an independent, affordable series of conferences and covers All Things Groovy
+            The latest innovations from dozens of Apache projects and their communities in a collaborative, vendor-neutral environment.
             </p>
+            <p>There is a whole track dedicated to Groovy!</p>
         '''
     }
 }
@@ -393,7 +411,7 @@ usergroups {
     }
     userGroup('Boston Groovy, Grails, Spring Meetup (B2GS)') {
         location 'North-America/United States'
-        url 'https://www.meetup.com/Grails-Boston/'
+        url 'https://twitter.com/B2GSMeetup'
     }
     userGroup('Coder Consortium of Sacramento') {
         location 'North-America/United States'

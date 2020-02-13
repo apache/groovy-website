@@ -78,7 +78,7 @@ faster the compilation will be.
 
 However, the most noticeable changes will be in the general runtime
 performance improvements of Groovy. We used several benchmarks from
-the link:http://shootout.alioth.debian.org/[Great Language Shootout] to
+the link:https://salsa.debian.org/benchmarksgame-team/archive-alioth-benchmarksgame/tree/master/contributed-source-code/shootout[Great Language Shootout] to
 measure our progress. On those we selected, compared to the old Groovy
 1.5.x line, the*performance improvements ranged from 150% to 460%*.
 Micro-benchmarks obviously rarely reflect the kind of code you have in

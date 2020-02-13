@@ -24,6 +24,11 @@ import util.CssFilter
 import util.JsFilter
 import util.CheckLinks
 
+plugins {
+    id 'base'                  // common lifecycle tasks and artifact types
+    id 'org.ajoberstar.grgit' version '4.0.1' // to publish website to asf-git branch
+}
+
 ext.watchmode = project.hasProperty('watchmode')?project.getProperty('watchmode'):'false'
 // a collection of links which have either been validated or are dummy links
 ext.excludeFromChecks = [
@@ -35,7 +40,10 @@ ext.excludeFromChecks = [
         'http://localhost:8080/groovy/hello.groovy'
 ]
 
-apply plugin: 'base'
+def commitedChanges = false
+def gitboxUrl = project.findProperty('gitPublishRemote') ?: 'https://gitbox.apache.org/repos/asf/groovy-dev-site.git'
+def stagingDevSite = "$project.buildDir/staging-dev-site/"
+def generatedDevSite = "$project.buildDir/site/"
 
 task copyAssets(type:Copy) {
     from file('../site/src/site/assets')
@@ -122,5 +130,91 @@ task webzip(type:Zip, dependsOn: checkDeadLinks) {
     }
     from (checkDeadLinks.outputDir) {
         into 'reports'
+    }
+}
+
+// Creates a new commit on asf-site branch
+task commitWebsite(dependsOn: webzip) {
+    doLast {
+        assert grgit : "git repository not found?"
+        assert file("$generatedDevSite/index.html").exists()
+        // get the latest commit on master
+        def gitin = grgit.open()
+        def latestCommit = gitin.log(maxCommits: 1)[0].abbreviatedId
+
+        def gitout
+        if (project.hasProperty('skipClone')) {
+            gitout = grgit.open(dir: stagingDevSite)
+        } else {
+            println "Cloning $gitboxUrl to $stagingDevSite. This may take a few minutes ..."
+            gitout = grgit.clone(dir: stagingDevSite, uri: gitboxUrl)
+        }
+
+        gitout.checkout(branch: 'asf-site')
+
+        // Delete the previous content. These are asf-site branch paths.
+        gitout.remove(patterns: ['.'])
+        fileTree(stagingDevSite).exclude('.git').visit { delete it.file }
+        assert !file("${stagingDevSite}/index.html").exists()
+
+        // Copy the built content and add it.
+        copy {
+            from generatedDevSite
+            into stagingDevSite
+        }
+        assert file("${stagingDevSite}/index.html").exists()
+        gitout.add(patterns: ['.'], update: true)
+
+        if (!gitout.status().staged.getAllChanges()) {
+            println 'No changes to commit'
+        } else {
+            println 'Creating commit for changes'
+            def now = new Date().format('yyyy/MM/dd HH:mm:ss')
+            String message = "$now: Generated dev website from groovy-website@$latestCommit"
+            commitedChanges = true
+            gitout.commit(message: message)
+        }
+    }
+}
+
+/*
+ * Pushes the asf-site branch commits.
+ *
+ * This requires write access to the asf-site branch and can be run on
+ * Jenkins executors with the git-websites label.
+ *
+ * For more details on publishing, see:
+ * https://www.apache.org/dev/project-site.html
+ * https://github.com/apache/infrastructure-puppet/blob/deployment/modules/gitwcsub/files/config/gitwcsub.cfg
+ *
+ * You can test this locally with a forked repository by manually adding the
+ * website-publish remote pointing to your forked repository, for example:
+ *   git remote add website-publish git@github.com:${GITUSER}/groovy-website.git
+ * because the remote is only added if it doesn't exist. The remote needs
+ * to be added before every execution of the publishing.
+ */
+task publishWebsite(dependsOn: commitWebsite) {
+    doLast {
+        assert grgit : "git repository not found?"
+
+        def git = grgit.open(dir: stagingDevSite)
+        git.checkout(branch: 'asf-site')
+        if (!commitedChanges) {
+            println 'No changes to push'
+            return
+        }
+
+        // Because git.push() fails to authenticate, run git push directly.
+        def cmd = 'git push origin asf-site'
+        exec {
+            workingDir stagingDevSite
+            if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+                executable 'cmd.exe'
+                args '/c', cmd
+            } else {
+                executable 'sh'
+                args '-c', cmd
+            }
+        }
     }
 }

@@ -22,6 +22,7 @@ buildscript {
         jcenter()
     }
     dependencies {
+        classpath 'org.apache.ant:ant:1.9.13'
         classpath 'com.yahoo.platform.yui:yuicompressor:2.4.7'
     }
 }

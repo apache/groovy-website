@@ -17,9 +17,16 @@
 
 == Abstract: SAM coercion
 
-SAM stands for Single Abstract Method.  SAM coercion is here a Groovy style transformation of a
+SAM stands for Single Abstract Method.
+A SAM type is an abstract class or interface with a single abstract method.
+SAM coercion involves transforming a
 `groovy.lang.Closure` instance into an object suitable for our SAM type.
-A SAM type is an abstract class or interface with a single abstract method. The coercion can happen as part of an assignment or as the result of a method call. Since this transformation might be outside of the types provided by Closure itself, it can be more than a simple Java style cast. Closure becomes a kind of sub type to all SAM types. Groovy has other such transformations without explicit cast or asType usage, which are number object transformations as well as the conversion of GString to String.
+The coercion can happen as part of an assignment or as the result of a method call.
+Since this transformation might be outside of the types provided by Closure itself,
+it can be more than a simple Java style cast.
+Closure becomes a kind of sub type to all SAM types.
+Groovy has other such transformations without explicit cast or asType usage,
+which are number object transformations as well as the conversion of GString to String.
 
 === Motivation
 Even before Java8 we had discussions about supporting different interfaces with Closure like Runnable and Callable.

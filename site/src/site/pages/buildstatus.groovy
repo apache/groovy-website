@@ -37,8 +37,8 @@ layout 'layouts/main.groovy', true,
                                                 tr {
                                                     td(name)
                                                     td {
-                                                        a(href: "http://ci.groovy-lang.org/viewType.html?buildTypeId=$id&branch=$branch&tab=buildTypeStatusDiv&guest=1") {
-                                                            img(src: """http://ci.groovy-lang.org:8111/app/rest/builds/buildType:(id:$id)${branch?",branch:$branch":''}/statusIcon""")
+                                                        a(href: "https://ci.groovy-lang.org/viewType.html?buildTypeId=$id&tab=buildTypeStatusDiv&guest=1") {
+                                                            img(src: """https://ci.groovy-lang.org/app/rest/builds/buildType:(id:$id)${branch?",branch:$branch":''}/statusIcon""")
                                                         }
                                                     }
                                                 }
@@ -47,12 +47,11 @@ layout 'layouts/main.groovy', true,
                                     }
                                 }
                                 renderBuilds([
-                                        'Groovy master, JDK 7': ['Groovy_Jdk7Build', 'master'],
-                                        'Groovy master, JDK 8': ['Groovy_Jdk8Build_2', 'master'],
-                                        'Groovy master, JDK 9': ['Groovy_Jdk9Build', 'master'],
-                                        'Groovy 2.4.X, JDK 6': ['Groovy_Jdk6Build', 'GROOVY_2_4_X'],
-                                        'Groovy 2.4.X, JDK 7': ['Groovy_Jdk7Build', 'GROOVY_2_4_X'],
-                                        'Groovy 2.5.X, JDK 7': ['Groovy_Jdk7Build_2', 'GROOVY_2_5_X']
+                                        'Groovy master, JDK 11': ['GroovyTestAllJdk11', ''],
+                                        'Groovy master, JDK 8': ['GroovyTestAllJdk8', ''],
+                                        'Groovy 3.0.X, JDK 8': ['Groovy30xTestAllJdk8', ''],
+                                        'Groovy 2.5.X, JDK 11': ['Groovy25xJdk11', ''],
+                                        'Groovy 2.4.X, JDK 8': ['Groovy24xCheckJdk8', '']
                                 ])
 
                                 hr(class: 'divider')

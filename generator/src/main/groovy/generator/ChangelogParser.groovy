@@ -39,7 +39,7 @@ class ChangelogParser {
             '1.1.0': 'Unreleased: renamed to 1.5.0',
             '1.9.0': 'Unreleased: renamed to 2.0.0',
             '2.6.0': 'Unreleased: discontinued',
-            '3.0.0': 'Unreleased: upcoming new release',
+            '4.0.0': 'Unreleased: upcoming new release',
     ]
 
     static List<Changelog> fetchReleaseNotes(File cacheDirectory) {

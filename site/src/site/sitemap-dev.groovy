@@ -73,50 +73,48 @@ documentation {
 }
 
 downloads {
-    distribution('Groovy 3.0') {
+    distribution('Groovy 4.0') {
         description {
-            yield 'Groovy 3.0 is a bleeding edge '
+            yield 'Groovy 4.0 is a bleeding edge '
             a(href: 'versioning.html', 'version')
-            yield ' of Groovy designed for JDK8+ and with the new Parrot parser enabled by default. Pre-stable versions are available:'
-        }
-        version('3.0.0-rc-1') {
-            stable false
-//            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-rc-1-installer.exe'
-        }
-        version('3.0.0-beta-3') {
-            stable false
-            archive true
-            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-beta-3-installer.exe'
+            yield ' of Groovy designed for JDK8+ with much improved JPMS support. Alpha releases are expected soon.'
         }
     }
-    distribution('Groovy 2.6') {
+    distribution('Groovy 3.0') {
         description {
-            yield 'Groovy 2.6 is designed for JDK7+ and supports the new Parrot parser (when enabled) but has been'
-            yield ' retired before reaching final release to focus on Groovy 3.0. Alpha versions are available to help'
-            yield ' people wanting to port towards Groovy 3.0 but who are stuck on JDK7. See links under "Other versions" for details.'
+            yield 'Groovy 3.0 is the latest stable '
+            a(href: 'versioning.html', 'version')
+            yield ' of Groovy designed for JDK8+ with a new more flexible parser (aka Parrot parser).'
+        }
+        version('3.0.0') {
+            stable true
+//            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-installer.exe'
+        }
+        version('3.0.0-rc-3') {
+            stable false
+            archive true
+            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0-rc-3-installer.exe'
         }
     }
     distribution('Groovy 2.5') {
         description {
-            yield 'Groovy 2.5 is the latest stable '
+            yield 'Groovy 2.5 is the previous stable '
             a(href: 'versioning.html', 'version')
             yield ' of Groovy.'
         }
-        version('2.5.8') {
+        version('2.5.9') {
             stable true
-            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-2.5.8-installer.exe'
+            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-2.5.9-installer.exe'
         }
     }
     distribution('Groovy 2.4') {
         description {
-            yield 'Groovy 2.4 is the previous stable '
-            a(href: 'versioning.html', 'version')
-            yield ' of Groovy.'
+            yield 'Groovy 2.4 is an earlier version of Groovy still in widespread use.'
             yieldUnescaped ''' Important: Releases before 2.4.4 weren't done under the Apache Software Foundation and are provided as a convenience, without any warranty.'''
         }
-        version('2.4.17') {
+        version('2.4.18') {
             stable true
-            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-2.4.17-installer.exe'
+            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-2.4.18-installer.exe'
         }
     }
 }

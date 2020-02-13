@@ -44,7 +44,7 @@ parallel collections, actors, dataflow
 support, link:http://www.jroller.com/vaclav/entry/gpars_actors_and_dataflow_for[Google App Engine support], etc.
 
 Be sure to check
-the link:http://www.jroller.com/vaclav/entry/i_like_the_smell_of[release announcement] and read the “what’s new section”
+the link:https://web.archive.org/web/20170408172729/http://www.jroller.com/vaclav/entry/i_like_the_smell_of[release announcement] and read the “what’s new section”
 of the GPars user guide.
 You can also have a look at the
 detailed link:https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12318123&version=17007[JIRA release notes].

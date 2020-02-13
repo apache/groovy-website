@@ -21,7 +21,7 @@
 
 = Groovy website
 The Groovy development team
-:revdate: 2018-12-10
+:revdate: 2019-11-05
 :build-icon: http://ci.groovy-lang.org:8111/app/rest/builds/buildType:(id:Groovy_Website)/statusIcon
 :noheader:
 :groovy-www: http://groovy-lang.org/
