@@ -814,4 +814,4 @@ Groovy 3.0 requires JDK9+ to build and JDK8 is the minimum version of the JRE th
 [[Groovy3.0releasenotes-Moreinformation]]
 == More information
 
-You can browse all the link:../changelogs/changelog-3.0.0-unreleased.html[tickets closed for Groovy 3.0 in JIRA].
+You can browse all the link:../changelogs/changelog-3.0.0.html[tickets closed for Groovy 3.0 in JIRA].
