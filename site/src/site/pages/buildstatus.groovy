@@ -50,7 +50,7 @@ layout 'layouts/main.groovy', true,
                                         'Groovy master, JDK 11': ['GroovyTestAllJdk11', ''],
                                         'Groovy master, JDK 8': ['GroovyTestAllJdk8', ''],
                                         'Groovy 3.0.X, JDK 8': ['Groovy30xTestAllJdk8', ''],
-                                        'Groovy 2.5.X, JDK 11': ['Groovy25xCheckJdk11', ''],
+                                        'Groovy 2.5.X, JDK 11': ['Groovy25xJdk11', ''],
                                         'Groovy 2.4.X, JDK 8': ['Groovy24xCheckJdk8', '']
                                 ])
 
