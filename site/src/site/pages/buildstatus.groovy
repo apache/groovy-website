@@ -37,8 +37,8 @@ layout 'layouts/main.groovy', true,
                                                 tr {
                                                     td(name)
                                                     td {
-                                                        a(href: "http://ci.groovy-lang.org/viewType.html?buildTypeId=$id&branch=$branch&tab=buildTypeStatusDiv&guest=1") {
-                                                            img(src: """http://ci.groovy-lang.org:8111/app/rest/builds/buildType:(id:$id)${branch?",branch:$branch":''}/statusIcon""")
+                                                        a(href: "https://ci.groovy-lang.org/viewType.html?buildTypeId=$id&tab=buildTypeStatusDiv&guest=1") {
+                                                            img(src: """https://ci.groovy-lang.org/app/rest/builds/buildType:(id:$id)${branch?",branch:$branch":''}/statusIcon""")
                                                         }
                                                     }
                                                 }
