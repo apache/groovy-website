@@ -47,12 +47,11 @@ layout 'layouts/main.groovy', true,
                                     }
                                 }
                                 renderBuilds([
-                                        'Groovy master, JDK 7': ['Groovy_Jdk7Build', 'master'],
-                                        'Groovy master, JDK 8': ['Groovy_Jdk8Build_2', 'master'],
-                                        'Groovy master, JDK 9': ['Groovy_Jdk9Build', 'master'],
-                                        'Groovy 2.4.X, JDK 6': ['Groovy_Jdk6Build', 'GROOVY_2_4_X'],
-                                        'Groovy 2.4.X, JDK 7': ['Groovy_Jdk7Build', 'GROOVY_2_4_X'],
-                                        'Groovy 2.5.X, JDK 7': ['Groovy_Jdk7Build_2', 'GROOVY_2_5_X']
+                                        'Groovy master, JDK 11': ['GroovyMasterTestAllJdk11', 'master'],
+                                        'Groovy master, JDK 8': ['GroovyMasterTestAllJdk8', 'master'],
+                                        'Groovy 3.0.X, JDK 8': ['Groovy30xTestAllJdk8', 'GROOVY_3_0_X'],
+                                        'Groovy 2.5.X, JDK 11': ['GroovyGroovy25xCheckJdk11', 'GROOVY_2_5_X'],
+                                        'Groovy 2.4.X, JDK 8': ['Groovy24xCheckJdk8', 'GROOVY_2_4_X']
                                 ])
 
                                 hr(class: 'divider')
