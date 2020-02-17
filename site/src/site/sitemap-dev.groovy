@@ -88,12 +88,7 @@ downloads {
         }
         version('3.0.1') {
             stable true
-//            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.1.msi'
-        }
-        version('3.0.0') {
-            stable true
-            archive true
-            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.0.msi'
+            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.1.msi'
         }
     }
     distribution('Groovy 2.5') {
