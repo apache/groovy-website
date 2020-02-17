@@ -123,7 +123,7 @@ layout 'layouts/main.groovy', true,
                                     }
                                     def archiveUrl = { String type, String area, v -> "https://archive.apache.org/dist/groovy/${v}/${area}/apache-groovy-${type}-${v}.zip".toString() }
                                     def archiveExtUrl = { String type, String area, v, String ext -> "${archiveUrl(type, area, v)}.$ext".toString() }
-                                    def distUrl = { String type, String area, v -> "https://www.apache.org/dist/groovy/${v}/${area}/apache-groovy-${type}-${v}.zip".toString() }
+                                    def distUrl = { String type, String area, v -> "https://downloads.apache.org/groovy/${v}/${area}/apache-groovy-${type}-${v}.zip".toString() }
                                     def distExtUrl = { String type, String area, v, String ext -> "${distUrl(type, area, v)}.$ext".toString() }
                                     def findUrl = { String type, String area, v, String ext, boolean preferPermalink ->
                                         def u
