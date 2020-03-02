@@ -812,6 +812,7 @@ In addition to the split package changes, the following other breaking changes e
 
 * For JDK13+ users, consider using `stripIndent(true)` instead of `stripIndent()`
 (link:https://issues.apache.org/jira/browse/GROOVY-9423[GROOVY-9423])
+* If a Groovy switch statement has a default branch, it is now required to be the last branch.
 
 == JDK requirements
 
