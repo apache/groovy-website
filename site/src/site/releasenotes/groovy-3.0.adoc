@@ -812,7 +812,23 @@ In addition to the split package changes, the following other breaking changes e
 
 * For JDK13+ users, consider using `stripIndent(true)` instead of `stripIndent()`
 (link:https://issues.apache.org/jira/browse/GROOVY-9423[GROOVY-9423])
-* If a Groovy switch statement has a default branch, it is now required to be the last branch.
+* If a Groovy switch statement has a default branch, it is now required to be the last branch
+* If you extend `ProcessingUnit` and override `setConfiguration`, override `configure` instead
+(link:https://issues.apache.org/jira/browse/GROOVY-9122[GROOVY-9122])
+* If you override `GroovyClassLoader`, be aware that the types for `sourceCache` and `classCache`
+have changed from `Map` to stronger types
+(link:https://issues.apache.org/jira/browse/GROOVY-9112[GROOVY-9112])
+* You may notice some minor changes wrt whitespace positioning for help output
+for Groovy tools and CliBuilder usage with Picocli
+(link:https://issues.apache.org/jira/browse/GROOVY-8925[GROOVY-8925])
+* Iterating over a String has been made consistent between static and dynamic Groovy
+(link:https://issues.apache.org/jira/browse/GROOVY-8882[GROOVY-8882])
+* Alpha versions of Groovy 3 incorrectly let you leave off the brackets when printing empty maps,
+but they are now requried, e.g `println([:])`
+(link:https://issues.apache.org/jira/browse/GROOVY-8778[GROOVY-8778])
+* To avoid usually unnecessary import processing, `ImportCustomizer` is applied once per module rather than previously once per class
+(link:https://issues.apache.org/jira/browse/GROOVY-8399[GROOVY-8399]). If you need the old behavior, see the workaround in
+(link:https://issues.apache.org/jira/browse/GROOVY-9407[GROOVY-9407]).
 
 == JDK requirements
 
