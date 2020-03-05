@@ -1,7 +1,6 @@
 Groovy 2.5 comes with a host of new features and capabilities.
 
 [[Groovy2.5releasenotes-Packaging]]
-
 == Jar packaging and JDK9 support
 
 Groovy versions prior to 2.5 included a core groovy jar and
@@ -45,7 +44,6 @@ you can probably use them on the module path. The Groovy build currently
 doesn't test such usage.
 
 [[Groovy2.5releasenotes-Macros]]
-
 == Macro support
 
 Groovy is well known for its extensible compilation process.
@@ -721,3 +719,16 @@ please consider doing one of the following:
 * remove groovy-jaxb jar from your Groovy distribution's lib directory
 * copy the startGroovy or startGroovy.bat script files from master
 * copy the four jars mentioned in the above JDK11 table entry into your lib directory
+
+[[Groovy2.5releasenotes-Addendum2510]]
+== Addendum for 2.5.10
+
+=== Known issues
+
+* 2.5.10 may fail to compile code containing a switch statement under certain conditions.
+It only affects code where the switch statement is the last statement in a method and the
+switch statement includes a case statement with a `break` statement and no other statements.
+See
+(link:https://issues.apache.org/jira/browse/GROOVY-9424[GROOVY-9424])
+for known workarounds.
+

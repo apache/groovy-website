@@ -807,6 +807,7 @@ get the deprecated versions. You will need to do this before Groovy 4. If you ar
 |
 |===
 
+[[Groovy3.0releasenotes-OtherBreaking]]
 == Other breaking changes
 In addition to the split package changes, the following other breaking changes exist:
 
@@ -824,7 +825,7 @@ for Groovy tools and CliBuilder usage with Picocli
 * Iterating over a String has been made consistent between static and dynamic Groovy
 (link:https://issues.apache.org/jira/browse/GROOVY-8882[GROOVY-8882])
 * Alpha versions of Groovy 3 incorrectly let you leave off the brackets when printing empty maps,
-but they are now requried, e.g `println([:])`
+but they are now required, e.g `println([:])`
 * Groovy used to bundle a version of picocli in the distribution but that locked folks into using the supplied version.
 You may now need to add an extra `@Grab` in certain scripts.
 (link:https://issues.apache.org/jira/browse/GROOVY-9165[GROOVY-9165])
@@ -832,6 +833,12 @@ You may now need to add an extra `@Grab` in certain scripts.
 (link:https://issues.apache.org/jira/browse/GROOVY-8399[GROOVY-8399]). If you need the old behavior, see the workaround in
 (link:https://issues.apache.org/jira/browse/GROOVY-9407[GROOVY-9407]).
 
+[[Groovy3.0releasenotes-KnownIssues]]
+== Known issues
+
+* 3.0.0 was missing some classes needed for complete operation on JDK9+ without warnings.
+
+[[Groovy3.0releasenotes-JdkRequirements]]
 == JDK requirements
 
 Groovy 3.0 requires JDK9+ to build and JDK8 is the minimum version of the JRE that we support.
