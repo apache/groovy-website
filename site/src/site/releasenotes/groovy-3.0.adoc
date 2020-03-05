@@ -825,7 +825,9 @@ for Groovy tools and CliBuilder usage with Picocli
 (link:https://issues.apache.org/jira/browse/GROOVY-8882[GROOVY-8882])
 * Alpha versions of Groovy 3 incorrectly let you leave off the brackets when printing empty maps,
 but they are now requried, e.g `println([:])`
-(link:https://issues.apache.org/jira/browse/GROOVY-8778[GROOVY-8778])
+* Groovy used to bundle a version of picocli in the distribution but that locked folks into using the supplied version.
+You may now need to add an extra `@Grab` in certain scripts.
+(link:https://issues.apache.org/jira/browse/GROOVY-9165[GROOVY-9165])
 * To avoid usually unnecessary import processing, `ImportCustomizer` is applied once per module rather than previously once per class
 (link:https://issues.apache.org/jira/browse/GROOVY-8399[GROOVY-8399]). If you need the old behavior, see the workaround in
 (link:https://issues.apache.org/jira/browse/GROOVY-9407[GROOVY-9407]).
