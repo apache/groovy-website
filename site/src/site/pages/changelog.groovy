@@ -2,6 +2,7 @@ layout 'layouts/main.groovy', true,
         pageTitle: "The Apache Groovy programming language - Groovy $groovyVersion Changelog",
         mainContent: contents {
             def issueMap = issues.groupBy { it.type }
+            def hasBreaking = issues.any{ it.description.endsWith(' *') }
             def issueTypes = issueMap.keySet().sort()
 
             div(id: 'content', class: 'page-1') {
@@ -31,6 +32,9 @@ layout 'layouts/main.groovy', true,
                                     }
                                 }
 
+                            }
+                            if (hasBreaking) {
+                                p('* potentially breaking change (read issue for details - even minor differences are sometimes flagged as potentially breaking changes)')
                             }
                         }
                     }

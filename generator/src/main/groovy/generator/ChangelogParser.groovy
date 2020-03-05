@@ -125,7 +125,9 @@ class ChangelogParser {
                 }
             }
         }
-
+        def json = new JsonSlurper().parse("$JIRA_SERVER/rest/api/2/search?jql=labels%20in%20(breaking)%20and%20fixVersion%20in%20($id)%20and%20project=GROOVY".toURL())
+        def keys = json.issues*.key
+        issues.findAll{ it.id in keys }.each{ it.description += ' *' }
         issues
     }
 }
