@@ -161,7 +161,7 @@ layout 'layouts/main.groovy', true,
                                     yield ' Courses'
                                 }
                                 p '''
-                                    Another great resource for learning Groovy is by watching a course. You could spend time hunting down
+                                    Another great resource for learning Groovy is through a course. You could spend time hunting down
                                     various videos on the web but these courses have all the information you need packed into one place.
                                   '''
 

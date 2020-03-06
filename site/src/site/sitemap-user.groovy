@@ -264,7 +264,9 @@ allEvents {
         date 'March 24-27, 2020'
         url 'https://www.devdotnext.com/'
         logo 'img/confs/devdotnext.png'
-        description '''<p>
+        description '''
+                <b>Cancelled due to COVID-19: Let's hope 2021 works out better!</b>
+                <p>
                 Come to dev.next to learn with the practitioners, experts, and creators of the technologies that you care about.
                 </p>
                 <p>
@@ -276,7 +278,9 @@ allEvents {
         date 'March 26-28, 2020'
         url 'https://www.greachconf.com'
         logo 'img/confs/greach.png'
-        description '''<p>
+        description '''
+                <b>Cancelled due to COVID-19: Let's hope 2021 works out better!</b>
+                <p>
                 Android + JVM langs + JVM frameworks conference in Madrid, Spain with 100% English talks, usually with lots of Groovy content.
                 </p>
                 <p>
@@ -289,6 +293,7 @@ allEvents {
         url 'http://gr8conf.eu/'
         logo 'img/confs/gr8conf-jdkio.svg'
         description '''
+            <b>Call for presentations is closed.</b>
             <p>
             For the past 11 years, GR8Conf has provided a high-quality conference experience for the tight-knit Apache Groovy programming language community. This year, we are joining forces with JDK IO - an annual conference run by the Danish Java user group covering technologies relevant to the entire JVM. The combined conference will be known as GR8Conf & JDK IO and will focus on All Things Groovy and Java, with DevOps, Microservices and Frontend Technologies sprinkled in.
             </p>
@@ -301,6 +306,7 @@ allEvents {
         url 'https://www.apachecon.com/acna2020/'
         logo 'img/confs/apacheconNA.png'
         description '''
+            <b>Call for presentations is <a href='https://www.apachecon.com/acna2020/cfp.html'>open</a>.</b>
             <p>
             The latest innovations from dozens of Apache projects and their communities in a collaborative, vendor-neutral environment.
             </p>
@@ -508,15 +514,68 @@ courses {
         instructor 'Dan Vega'
         url 'https://www.udemy.com/apache-groovy/?couponCode=LEARN_GROOVY'
         description '''
-            <p>I am going to teach you everything you need to know to start using The Groovy Programming language. This course is really designed
-            for 2 different types of people and I think both will benefit from it. If you’re a beginner programmer with a some experience in
-            another language like Python or Ruby this course is for you. Dynamic languages are generally thought of as easier for total beginners
-            to learn because they’re flexible and fun. If you’re an existing Java Developer (Beginner or Experienced) this course is also for you.</p>
+            <p>I am going to teach you everything you need to know to start using The Groovy Programming language.
+            If you're a beginner programmer with a some experience in another language like Python or Ruby this course is for you.
+            Dynamic languages are generally thought of as easier for total beginners to learn because they're flexible and fun.
+            If you're an existing Java Developer (Beginner or Experienced) this course is also for you.</p>
 
-            <p>This course is packed with almost 14 hours of content. We are going to start off with getting your development environment up and running
-            and then go through the very basics of the language. From there we are going to build on that in each section cover topics like closures, meta-programming,
-            builders and so much more. I feel like this is one of the most complete courses around and I am excited for you to join me on this adventure.</p>
+            <p>This course is packed with almost 14 hours of content. We are going to start off with getting your
+            development environment up and running and then go through the very basics of the language.
+            From there we are going to build on that in each section cover topics like closures, meta-programming,
+            builders and so much more.</p>
         '''
         cover 'groovy-course-cover.png'
+    }
+    course('Groovy Fundamentals') {
+        instructor 'Ken Kousen'
+        url 'https://www.oreilly.com/library/view/groovy-programming-fundamentals/9781491926253/'
+        description '''
+            <p>Learn the advantages of using Groovy by itself and with existing Java projects. This video workshop takes
+            you into the heart of this JVM language and shows you how Groovy can help increase your productivity through
+            dynamic language features similar to those of Python, Ruby, and Smalltalk.</p>
+        '''
+        cover 'groovy-course-fundamentals.png'
+    }
+    course('Practical Groovy Programming') {
+        instructor 'Ken Kousen'
+        url 'https://learning.oreilly.com/videos/practical-groovy-programming/9781491930908/'
+        description '''
+            <p>Take your basic Groovy skills to the next level with this practical video workshop. Presenter and Java consultant
+            Ken Kousen shows you how to work with XML and JSON, implement runtime metaprogramming, and use several AST transformations.
+            You'll also dive into operator overloading, Groovy SQL, and the Groovy JDK.</p>
+        '''
+        cover 'groovy-course-practical.png'
+    }
+    course('Mastering Groovy Programming') {
+        instructor 'Ken Kousen'
+        url 'https://learning.oreilly.com/videos/mastering-groovy-programming/9781491930915'
+        description '''
+            <p>Learn advanced techniques for working with the Groovy programming language. In this video workshop, presenter
+            and Java consultant Ken Kousen shows you how to create RESTful web services, conduct Unit Tests, apply Groovy's
+            functional programming features, and use Java's Spring Framework in conjunction with Groovy.</p>
+        '''
+        cover 'groovy-course-mastering.png'
+    }
+    course('Groovy Beginner To Advanced') {
+        instructor 'Object Computing'
+        url 'https://objectcomputing.com/services/training/catalog/grails/groovy-beginner-to-advanced'
+        description '''
+            <p>This 2-day, comprehensive course covers a lot of material and takes JVM developers from beginner to advanced
+            with the Groovy language by way of comprehensive lecture, demonstration, and hands-on exercises.
+            Developers will leave the experience with all of the skills needed to effectively use the Groovy programming
+            language to build many kinds of JVM applications.</p>
+        '''
+        cover 'groovy-course-beginner.png'
+    }
+    course('Groovy Metaprogramming') {
+        instructor 'Object Computing'
+        url 'https://objectcomputing.com/services/training/catalog/grails/advanced-groovy-metaprogramming-with-grails-3'
+        description '''
+            <p>The course covers, in-depth, how Groovy's dynamic dispatch mechanism works and how application and plugin
+            code can participate with that dispatch mechanism to provide more simple application code. You'll also learn
+            techniques that may be applied at compile time to enhance classes, including AST Transformations,
+            automatically enhancing Grails artifacts with traits and more.</p>
+        '''
+        cover 'groovy-course-metaprogramming.png'
     }
 }

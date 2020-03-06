@@ -27,6 +27,7 @@ layout 'layouts/main.groovy', true,
                                         }
                                     }
                                     time event.date
+                                    br()
                                     yieldUnescaped event.description
                                 }
                             }
