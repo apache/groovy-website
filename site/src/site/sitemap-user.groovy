@@ -265,7 +265,7 @@ allEvents {
         url 'https://www.devdotnext.com/'
         logo 'img/confs/devdotnext.png'
         description '''
-                <b>Cancelled due to COVID-19: Let's hope 2021 works out better!</b>
+                <strong style="color: red;">Cancelled</strong> <b>due to COVID-19: Let's hope 2021 works out better!</b>
                 <p>
                 Come to dev.next to learn with the practitioners, experts, and creators of the technologies that you care about.
                 </p>
@@ -279,7 +279,7 @@ allEvents {
         url 'https://www.greachconf.com'
         logo 'img/confs/greach.png'
         description '''
-                <b>Cancelled due to COVID-19: Let's hope 2021 works out better!</b>
+                <strong style="color: red;">Cancelled</strong> <b>due to COVID-19: Let's hope 2021 works out better!</b>
                 <p>
                 Android + JVM langs + JVM frameworks conference in Madrid, Spain with 100% English talks, usually with lots of Groovy content.
                 </p>
