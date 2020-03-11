@@ -60,6 +60,7 @@ pages {
     page 'download', 'download', [category: 'Download', distributions: distributions]
     page 'versioning', 'versioning', [category: 'Download']
     page 'contribute', 'index', [category: 'Develop']
+    page 'guidelines', 'guidelines', [category: 'Develop']
     page 'buildstatus', 'buildstatus', [category: 'Develop']
     page 'faq', 'faq', [category: 'Documentation']
     page '404','404', [:]
