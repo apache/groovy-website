@@ -843,6 +843,17 @@ You may now need to add an extra `@Grab` in certain scripts.
 
 Groovy 3.0 requires JDK9+ to build and JDK8 is the minimum version of the JRE that we support.
 
+[[Groovy3.0releasenotes-3.0.1]]
+== Addendum for 3.0.1
+
+JUnit 3 users using the `@NotYetImplemented` annotation should consider one of the following:
+
+* Stick with the legacy/deprecated `@groovy.transform.NotYetImplemented` annotation
+* If using the now recommended `@groovy.test.NotYetImplemented` annotation, use the `exception=junit.framework.AssertionFailedError` annotation attribute
+* Consider upgrading to JUnit 4 or 5
+
+For further details see (link:https://issues.apache.org/jira/browse/GROOVY-9492[GROOVY-9492]).
+
 [[Groovy3.0releasenotes-Moreinformation]]
 == More information
 
