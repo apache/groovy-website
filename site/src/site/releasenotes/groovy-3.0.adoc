@@ -609,6 +609,12 @@ assert newYear - xmas == 7 // a week apart
 [[Groovy3.0releasenotes-Miscimprovements]]
 == Miscellaneous improvements
 
+=== @NullCheck AST transformation
+
+Allows null checking guards to be automatically added to methods or constructors
+which ensure all parameters are supplied with non-null values
+(link:https://issues.apache.org/jira/browse/GROOVY-8935[GROOVY-8935]).
+
 === Embedded Groovydoc
 
 You can now embed Groovydoc comments in various ways:
