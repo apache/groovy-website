@@ -210,7 +210,7 @@ layout 'layouts/main.groovy', true,
                                                 }
                                                 if (pkg.windowsInstaller) {
                                                     td {
-                                                        a(href: pkg.windowsInstaller) {
+                                                        a(href: pkg.windowsInstaller, rel: 'nofollow') {
                                                             i(class: 'fa fa-windows fa-4x') {}
                                                             br()
                                                             yield ' Windows installer'
