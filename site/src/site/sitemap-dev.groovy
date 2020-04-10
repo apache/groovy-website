@@ -87,8 +87,13 @@ downloads {
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK8+ with a new more flexible parser (aka Parrot parser).'
         }
+        version('3.0.3') {
+            stable true
+            //windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.3.msi'
+        }
         version('3.0.2') {
             stable true
+            archive true
             windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.2.msi'
         }
     }

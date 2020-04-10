@@ -90,7 +90,7 @@ documentation {
             '2.5.0-rc-1', '2.5.0-rc-2', '2.5.0-rc-3', '2.5.0', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5', '2.5.6', '2.5.7', '2.5.8', '2.5.9', '2.5.10',
             '2.6.0-alpha-1', '2.6.0-alpha-2', '2.6.0-alpha-3', '2.6.0-alpha-4',
             '3.0.0-alpha-1', '3.0.0-alpha-2', '3.0.0-alpha-3', '3.0.0-alpha-4', '3.0.0-beta-1', '3.0.0-beta-2',
-            '3.0.0-beta-3', '3.0.0-rc-1', '3.0.0-rc-2', '3.0.0-rc-3', '3.0.0', '3.0.1', '3.0.2'
+            '3.0.0-beta-3', '3.0.0-rc-1', '3.0.0-rc-2', '3.0.0-rc-3', '3.0.0', '3.0.1', '3.0.2', '3.0.3'
     ])
 
     section('Getting started','fa-graduation-cap') {
@@ -156,14 +156,14 @@ downloads {
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK8+ with a new more flexible parser (aka Parrot parser).'
         }
+        version('3.0.3') {
+            stable true
+            //windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.3.msi'
+        }
         version('3.0.2') {
             stable true
-//            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.2.msi'
-        }
-        version('3.0.1') {
-            stable true
             archive true
-            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.1.msi'
+            windowsInstaller 'https://dl.bintray.com/groovy/Distributions/groovy-3.0.2.msi'
         }
     }
     distribution('Groovy 2.5') {
