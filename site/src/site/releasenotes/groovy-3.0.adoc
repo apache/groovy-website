@@ -9,7 +9,22 @@ Groovy 3.0 comes with a brand new parser (code-named Parrot) and host of other n
 
 Groovy 3.0, has a new parser that is far more flexible and maintainable than the parser in previous versions of Groovy.
 It's called the Parrot parser because in the early days of creating the parser, the goal was for the new parser's output to be an exact echo of what the old parser produced.
-The new parser has since been extended to support additional syntax options and language features.
+The new parser has since been extended to support additional syntax options and language features. Some of the new features include:
+
+* do-while loops; enhanced (now supporting commas) classic for loops, e.g. `for(int i = 0, j = 10; i < j; i++, j--) {..}`)
+* lambda expressions, e.g. `stream.map(e -> e + 1)`
+* method references and constructor references
+* try-with-resources, AKA ARM
+* code blocks, i.e. `{..}`
+* Java style array initializers, e.g. `new int[] {1, 2, 3}`
+* default methods within interfaces
+* additional places for type annotations
+* new operators: identity operators(`===`, `!==`), elvis assignment(`?=`), `!in`, `!instanceof`
+* safe index, e.g. `nullableVar?[1, 2]`
+* non-static inner class instantiation, e.g. `outer.new Inner()`
+* runtime groovydoc, i.e. groovydoc with `@Groovydoc`; groovydoc attached to AST node as metadata
+
+*P.S. Parrot is based on the highly optimized version of antlr4(com.tunnelvisionlabs:antlr4), which is licensed under BSD.*
 
 === do/while loop
 
@@ -543,20 +558,23 @@ It results in the same behavior as Java's implementation but with less compact b
 We are still exploring approaches to also support native default methods in interfaces.
 |===
 
-=== Other information about Parrot
+=== System properties to configure that new parser
 
-[width="80%",align="center"]
-|===
-a| NOTE: _Disabling Parrot:_ The new parser is enabled by default in Groovy 3.0.
-You can disable the new parser by using a system property.
-Use `-Dgroovy.antlr4=false` (set via `JAVA_OPTS` if needed).
-It is not envisaged that this property would be needed in normal
-use. However, at least initially, if you have a problematic source
-file that doesn't seem to work with the new parser, you may be
-able to revert to the old parser to compile just that file.
+* `groovy.antlr4` can be set to `false` in Groovy 3.x to disable the new parser (set via `JAVA_OPTS` if needed).
+This property is not needed in normal use, however, at least initially, if you have a problematic source file that
+doesn't seem to work with the new parser, you may be able to revert to the old parser to compile just that file.
 You won't be able to use any of the new language features with the old parser.
 The old parser is deprecated and will be removed in Groovy 4.
-|===
+* `groovy.attach.groovydoc`: whether to attach groovydoc to node as metadata while parsing groovy source code(default: false)
+* `groovy.attach.runtime.groovydoc`: whether to attach `@Groovydoc` annotation to all members which have groovydoc(i.e. `/** ... */`)
+* `groovy.antlr4.cache.threshold`: how frequently to clear the DFA cache, which is used to store symbol
+information during parsing (default: 64). The more frequently the DFA cache is cleared, the poorer parsing performance will be, but less memory will be used.
+The implementation may restrict the threshold to not be lower than some minimum value. +
+**Notice:** This is an advanced internal setting which affects the memory allocation behavior of the parser.
+You should only need to adjust this value if you are facing memory problems when compiling large Groovy files.
+* `groovy.clear.lexer.dfa.cache`: whether to clear the DFA cache of the Groovy lexer once a threshold is reached (default: false) +
+**Notice:** This is an advanced internal setting which affects the memory allocation behavior of the parser.
+You should only need to adjust this value if you are facing memory problems when compiling large Groovy files.
 
 [[Groovy3.0releasenotes-GDKimprovements]]
 == GDK improvements
