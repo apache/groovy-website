@@ -103,8 +103,13 @@ downloads {
             a(href: 'versioning.html', 'version')
             yield ' of Groovy.'
         }
+        version('2.5.12') {
+            stable true
+//            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-2.5.12-installer#files'
+        }
         version('2.5.11') {
             stable true
+            archive true
             windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-2.5.11-installer#files'
         }
     }
