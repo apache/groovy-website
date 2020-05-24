@@ -31,7 +31,7 @@ layout 'layouts/main.groovy', true,
                                 'gcse:search'(linkTarget: '_blank'){}
                                 style '''
                                     .gsc-input-box {
-                                        height: 30px;
+                                        height: auto;
                                     }
                                     input.gsc-search-button, input.gsc-search-button-v2 {
                                         height: 30px;
@@ -66,7 +66,13 @@ layout 'layouts/main.groovy', true,
                                         width: 120px !important;
                                     }
                                     td.gsc-search-button {
-                                        padding-top: 6px;
+                                        padding-top: 0;
+                                    }
+                                    button.gsc-search-button.gsc-search-button-v2 > svg {
+                                        vertical-align: middle;
+                                    }
+                                    div.gsc-control-cse.gsc-control-cse-en {
+                                        padding: 0;
                                     }
                                     td.gsc-orderby-container {
                                         padding-right: 20px;
