@@ -882,3 +882,25 @@ JUnit 3 users using the `@NotYetImplemented` annotation should consider one of t
 * Consider upgrading to JUnit 4 or 5
 
 For further details see (link:https://issues.apache.org/jira/browse/GROOVY-9492[GROOVY-9492]).
+
+[[Groovy3.0releasenotes-3.0.4]]
+== Addendum for 3.0.4
+
+We bumped the Groovy dependency for TestNG to 7.2.0. Unfortunately, at the time of release, that version exists only in jcenter,
+not Maven central. If you are using the groovy-all pom or bom, you can add jcenter as a repository if not already listed:
+[source,groovy]
+--------------------------------------
+repositories {
+    jcenter()
+    ...
+}
+--------------------------------------
+Alternatively, if you are not using TestNG, you can exclude `groovy-testng`, e.g.:
+[source,groovy]
+--------------------------------------
+dependencies {
+    implementation("org.codehaus.groovy:groovy-all:$groovyVersion") {
+        exclude(group: 'org.codehaus.groovy', module: 'groovy-testng')
+    }
+}
+--------------------------------------
