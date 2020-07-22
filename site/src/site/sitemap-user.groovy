@@ -86,7 +86,7 @@ documentation {
             '2.1.0', '2.1.1', '2.1.2', '2.1.3', '2.1.4', '2.1.5', '2.1.6', '2.1.7', '2.1.8', '2.1.9',
             '2.2.0', '2.2.1', '2.2.2',
             '2.3.0', '2.3.1', '2.3.2', '2.3.3', '2.3.4', '2.3.5', '2.3.6', '2.3.7', '2.3.8', '2.3.9', '2.3.10', '2.3.11',
-            '2.4.0', '2.4.1', '2.4.2', '2.4.3', '2.4.4', '2.4.5', '2.4.6', '2.4.7', '2.4.8', '2.4.9', '2.4.10', '2.4.11', '2.4.12', '2.4.13', '2.4.14', '2.4.15', '2.4.16', '2.4.17', '2.4.18', '2.4.19',
+            '2.4.0', '2.4.1', '2.4.2', '2.4.3', '2.4.4', '2.4.5', '2.4.6', '2.4.7', '2.4.8', '2.4.9', '2.4.10', '2.4.11', '2.4.12', '2.4.13', '2.4.14', '2.4.15', '2.4.16', '2.4.17', '2.4.18', '2.4.19', '2.4.20',
             '2.5.0-rc-1', '2.5.0-rc-2', '2.5.0-rc-3', '2.5.0', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5', '2.5.6', '2.5.7', '2.5.8', '2.5.9', '2.5.10', '2.5.11', '2.5.12',
             '2.6.0-alpha-1', '2.6.0-alpha-2', '2.6.0-alpha-3', '2.6.0-alpha-4',
             '3.0.0-alpha-1', '3.0.0-alpha-2', '3.0.0-alpha-3', '3.0.0-alpha-4', '3.0.0-beta-1', '3.0.0-beta-2',
@@ -187,8 +187,13 @@ downloads {
             yield 'Groovy 2.4 is an earlier version of Groovy still in widespread use.'
             yieldUnescaped ''' Important: Releases before 2.4.4 weren't done under the Apache Software Foundation and are provided as a convenience, without any warranty.'''
         }
+        version('2.4.20') {
+            stable true
+//            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-2.4.20-installer#files'
+        }
         version('2.4.19') {
             stable true
+            archive true
             windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-2.4.19-installer#files'
         }
     }

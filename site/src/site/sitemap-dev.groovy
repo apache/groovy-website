@@ -108,8 +108,13 @@ downloads {
             yield 'Groovy 2.4 is an earlier version of Groovy still in widespread use.'
             yieldUnescaped ''' Important: Releases before 2.4.4 weren't done under the Apache Software Foundation and are provided as a convenience, without any warranty.'''
         }
+        version('2.4.20') {
+            stable true
+//            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-2.4.20-installer#files'
+        }
         version('2.4.19') {
             stable true
+            archive true
             windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-2.4.19-installer#files'
         }
     }
