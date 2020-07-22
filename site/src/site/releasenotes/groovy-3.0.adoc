@@ -887,20 +887,88 @@ For further details see (link:https://issues.apache.org/jira/browse/GROOVY-9492[
 == Addendum for 3.0.4
 
 We bumped the Groovy dependency for TestNG to 7.2.0. Unfortunately, at the time of release, that version exists only in jcenter,
-not Maven central. If you are using the groovy-all pom or bom, you can add jcenter as a repository if not already listed:
+not Maven central. If you are using the groovy-all pom or bom, you can add jcenter as a repository to your configuration if not already listed:
+
+++++
+<details open>
+<summary>Gradle: build.gradle</summary>
+++++
+
 [source,groovy]
---------------------------------------
+----
 repositories {
     jcenter()
     ...
 }
---------------------------------------
+----
+
+++++
+</details>
+++++
+
+++++
+<details>
+<summary>Maven: pom.xml</summary>
+++++
+
+[source,xml]
+----
+<repositories>
+  <repository>
+    <id>central</id>
+    <name>bintray</name>
+    <url>http://jcenter.bintray.com</url>
+  </repository>
+</repositories>
+----
+
+++++
+</details>
+++++
+
 Alternatively, if you are not using TestNG, you can exclude `groovy-testng`, e.g.:
+
+++++
+<details open>
+<summary>Gradle: build.gradle</summary>
+++++
+
 [source,groovy]
---------------------------------------
+----
 dependencies {
-    implementation("org.codehaus.groovy:groovy-all:$groovyVersion") {
+    implementation("org.codehaus.groovy:groovy-all:3.0.4") {
         exclude(group: 'org.codehaus.groovy', module: 'groovy-testng')
     }
 }
---------------------------------------
+----
+
+++++
+</details>
+++++
+
+++++
+<details>
+<summary>Maven: pom.xml</summary>
+++++
+
+[source,xml]
+----
+<dependencies>
+  <dependency>
+    <groupId>org.codehaus.groovy</groupId>
+    <artifactId>groovy-all</artifactId>
+    <version>3.0.4</version>
+    <scope>compile</scope>
+    <exclusions>
+      <exclusion>
+        <groupId>org.codehaus.groovy</groupId>
+        <artifactId>groovy-testng</artifactId>
+      </exclusion>
+    </exclusions>
+  </dependency>
+</dependencies>
+----
+
+++++
+</details>
+++++
