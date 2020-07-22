@@ -972,3 +972,28 @@ dependencies {
 ++++
 </details>
 ++++
+
+[[Groovy3.0releasenotes-3.0.5]]
+== Addendum for 3.0.5
+
+=== Potentially unexpected dependency changes
+
+* We have reverted TestNG to 7.1.0, so the workarounds mentioned in the 3.0.4 release notes
+are no longer needed. You can exclude 7.1.0 and explicitly include 7.2.0 if you specifically
+need that version of TestNG.
+
+=== Breaking changes
+
+* If you are using `SecureASTCustomizer` and relying on the exact wording of error
+messages, e.g. perhaps in tests, then you may need to tweak the wording in those tests
+(link:https://issues.apache.org/jira/browse/GROOVY-9594[GROOVY-9594]).
+
+* If you are using the `groovy-cli-picocli` module or scripting most of Groovy's command line tools
+(e.g. `groovy`, `groovyc`, `groovysh`, `groovydoc` etc.)
+and you are relying on the exact wording of error messages, e.g. perhaps in tests,
+then you may need to tweak the wording in those tests
+(link:https://issues.apache.org/jira/browse/GROOVY-9627[GROOVY-9627]).
+
+* Groovy is now more compliant with the JavaBeans specification for one edge case scenario
+involving any field having a name starting with an uppercase letter
+(link:https://issues.apache.org/jira/browse/GROOVY-9618[GROOVY-9618]).
