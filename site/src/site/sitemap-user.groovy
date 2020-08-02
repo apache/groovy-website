@@ -129,6 +129,7 @@ documentation {
         item 'Parsing and producing JSON',          'json',             'json-userguide'
         item 'Working with a relational database',  'databases',        'sql-userguide'
         item 'Processing XML',                      'processing-xml',   'xml-userguide'
+        item 'Processing YAML',                     'processing-yaml',  'yaml-userguide'
         item 'Scripting Ant tasks',                 'scripting-ant',    'ant-builder'
         item 'Template engines',                    'templating',       'template-engines'
         item 'Creating Swing UIs',                  'swing',            'swing-builder'
