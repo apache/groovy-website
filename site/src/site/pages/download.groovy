@@ -438,7 +438,7 @@ layout 'layouts/main.groovy', true,
                                     }
                                 }
                                 h3 'Maven repositories'
-                                p "Groovy release jars are available from ${$a(href:'http://repo1.maven.org/maven2/org/codehaus/groovy/','Maven Central')} or ${$a(href:'http://jcenter.bintray.com/org/codehaus/groovy/','JCenter')}."
+                                p "Groovy release jars are available from ${$a(href:'https://repo1.maven.org/maven2/org/codehaus/groovy/','Maven Central')} or ${$a(href:'https://jcenter.bintray.com/org/codehaus/groovy/','JCenter')}."
                                 p "Groovy snapshot jars are available from ${$a(href:'https://oss.jfrog.org/oss-snapshot-local/org/codehaus/groovy','JFrog OpenSource Snapshots repository')}. Snapshots are not official releases but are provided to assist with integration testing leading up to an official release."
                             }
                             hr(class: 'divider')
