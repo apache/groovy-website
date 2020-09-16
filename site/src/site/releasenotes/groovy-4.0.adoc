@@ -54,6 +54,16 @@ The following changes are being explored:
 * Module definitions written in Groovy
 * Support for records
 
+== Potential breaking changes
+
+* Numerous classes previously "leaked" ASM constants which are essentially an internal implementation detail by virtue of
+implementing an `Opcodes` interface. This will not normally affect the majority of
+Groovy scripts but might impact code which manipulates AST nodes such as AST transforms.
+Before compiling with Groovy 4, some of these may need one or more appropriate static import statements added.
+AST transforms which extend `AbstractASTTransformation` are one example of potentially affected classes.
+(link:https://issues.apache.org/jira/browse/GROOVY-9736[GROOVY-9736]).
+
+
 == JDK requirements
 
 Groovy 4.0 requires JDK9+ to build and JDK8 is the minimum version of the JRE that we support.
