@@ -37,6 +37,17 @@ to `org.apache.groovy`. Please update your Gradle/Maven/other build settings app
 [[Groovy4.0other]]
 == Other improvements
 
+=== GString performance improvements
+
+* GString internals were revamped to improve performance.
+In numerous cases, GString data structures are automatically cached.
+While rarely used, GStrings do permit their internal data structures to
+be viewed (and even changed!). In such circumstances, caching is disabled.
+If you wish to view and not change the internal data structures, you can
+call a `freeze()` method in `GStringImpl` to disallow changing of the internal
+data structures which allows caching to remain active.
+link:https://issues.apache.org/jira/browse/GROOVY-9637[GROOVY-9637]
+
 === JavaShell (incubating)
 
 A Java equivalent of GroovyShell, allowing to more easily work with snippets of Java code.
@@ -54,7 +65,7 @@ The following changes are being explored:
 * Module definitions written in Groovy
 * Support for records
 
-== Potential breaking changes
+== Other breaking changes
 
 * Numerous classes previously "leaked" ASM constants which are essentially an internal implementation detail by virtue of
 implementing an `Opcodes` interface. This will not normally affect the majority of
@@ -62,7 +73,23 @@ Groovy scripts but might impact code which manipulates AST nodes such as AST tra
 Before compiling with Groovy 4, some of these may need one or more appropriate static import statements added.
 AST transforms which extend `AbstractASTTransformation` are one example of potentially affected classes.
 (link:https://issues.apache.org/jira/browse/GROOVY-9736[GROOVY-9736]).
-
+* `ASTTest` previously had `RUNTIME` retention but now has `SOURCE` retention.
+We know of no users making use of the old retention but are aware of various
+issues keeping the old value.
+link:https://issues.apache.org/jira/browse/GROOVY-9702[GROOVY-9702]
+* There were some inconsistencies with JavaBean property naming conventions
+for various edge cases, e.g. for a field with a name being a single uppercase `X` and having a `getX` accessor,
+then the field was given priority over the accessor.
+link:https://issues.apache.org/jira/browse/GROOVY-9618[GROOVY-9618]
+* Numerous mostly internal data structure classes, e.g. AbstractConcurrentMapBase, AbstractConcurrentMap, ManagedConcurrentMap
+were deprecated and their usage replaced with better alternatives.
+This should be mostly invisible but some changes might impact users using
+internal Groovy classes directly.
+link:https://issues.apache.org/jira/browse/GROOVY-9631[GROOVY-9631]
+* We bumped our Picocli version. This resulted in minor formatting changes
+of some CLI help messages. We recommend not relying on the exact format of such messages.
+link:https://issues.apache.org/jira/browse/GROOVY-9627[GROOVY-9627]
+>>>>>>> c9e657d... fix typo
 
 == JDK requirements
 
