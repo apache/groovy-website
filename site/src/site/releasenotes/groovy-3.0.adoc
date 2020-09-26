@@ -712,7 +712,7 @@ As part of implementing the new grammar, additional support has been added.
 == Split package changes (from beta-2)
 
 The Java Platform Module System requires that classes in distinct modules
-have distinct package names. Groovy has it's own "modules" but these haven't
+have distinct package names. Groovy has its own "modules" but these haven't
 historically been structured according to the above requirement.
 For this reason, Groovy 2.x and 3.0 should be added to the classpath not module path
 when using JDK9+. This places Groovy's classes into the unnamed module

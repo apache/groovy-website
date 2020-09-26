@@ -480,7 +480,7 @@ videos {
         speaker 'Andrés Almiray'
         summary '''
             <p>Groovy is a well established player in the JVM since a few years ago.
-            It's increased popularity across the years has spawned several projects that conform the Groovy Ecosystem.
+            Its increased popularity across the years has spawned several projects that conform the Groovy Ecosystem.
             You've probably heard of Grails, Gradle, Griffon and Spock.
             But what about the rest of projects that are just waiting around the corner to be discovered and make your life easier?
             This talk presents them tools and libraries that use Groovy as the main driving force to get the job done.</p>
