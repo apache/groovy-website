@@ -185,8 +185,8 @@ num=42, list=[1, 2, 3], range=[0, 1, 2, 3, 4, 5], string=foo
 --------------------------------------
 
 Here, the `NV` macro method springs into action during the compilation process.
-The compiler replaces the apparent global `NV` method with a `println` statement
-which outputs the variables name and `toString()` value.
+The compiler replaces the apparent global `NV` method call with an expression
+which combines the names and `toString()` values of the supplied variables.
 
 Two other variations exist. `NVI` calls Groovy's `inspect()` method rather than
 `toString()` and `NVD` calls Groovy's `dump()` method. So this code:
@@ -238,7 +238,7 @@ assert coordClass.newInstance(5, 10).toString() == 'Coord[x=5, y=10]'
 This feature is used in numerous places within the Groovy codebase for testing purposes.
 Various code snippets are compiled using both Java and Groovy to ensure the compiler is behaving as intended.
 We also use this feature to provide a productivity enhancement for polyglot developers allowing
-Java code to be run (as Java) within the Groovy Console:
+Java code to be compiled and/or run (as Java) from within the Groovy Console:
 
 image:img/groovyconsole_run_as_java.png[image] +
 
@@ -261,11 +261,16 @@ This feature is typically used for generating classes which need to be used with
 in situations where Java might become confused by Groovy's "plumbing" methods.
 
 The feature is incubating. Currently, the presence of the annotation should be
-treated like a hint to the compiler to produce bytecode not relying on the Groovy runtime
-if it can but not a guarantee. Users of `@CompileStatic` will know that certain dynamic
+treated like a _hint_ to the compiler to produce bytecode not relying on the
+Groovy runtime if it can, but _not a guarantee_.
+
+Users of `@CompileStatic` will know that certain dynamic
 features aren't possible when they switch to static Groovy.
-Even so, while the desire is to produce Java-like code,
-there are numerous Groovy feature which still work for some scenarios.
+They might expect that using `@CompileStatic` and `@POJO`
+might result in even more restrictions.
+This isn't strictly the case.
+Adding `@POJO` does result in more Java-like code in certain places,
+but numerous Groovy features still work.
 
 Consider the following example. First a Groovy `Point` class:
 
@@ -290,6 +295,9 @@ class PointList {
     List<Point> points
 }
 --------------------------------------
+
+We can compile those classes using `groovyc` in the normal way
+and should see the expected _Point.class_ and _PointList.class_ files produced.
 
 We can then compile the following Java code.
 We do not need the Groovy jars available for `javac` or `java`,
@@ -317,7 +325,8 @@ System.out.println(count);
 
 Note that while our `PointList` class has numerous list methods available
 (`size`, `contains`, `forEach`, `stream`, etc.) courtesy of Groovy's `@Delegate` transform,
-these are baked into the class file, not calling into any Groovy library or runtime code.
+these are baked into the class file, and the bytecode produced doesn't call
+into any Groovy libraries or rely on any runtime code.
 
 When run, the following output is produced:
 
