@@ -1071,6 +1071,76 @@ html.noScroll body, html.noScroll .st-container, html.noScroll .st-pusher, html.
     padding-left: 0.125em;
 }
 
+.admonitionblock td.content > .title {
+    line-height: 1.4;
+    color: #db4800;
+    font-weight: 300;
+    margin-top: 0.2em;
+    margin-bottom: 0.5em;
+}
+
+.admonitionblock > table {
+    border: 0;
+    background: none;
+    width: 100%;
+}
+
+.admonitionblock > table td.icon {
+    text-align: center;
+    width: 80px;
+}
+
+.admonitionblock > table td.icon img {
+    max-width: none;
+}
+
+.admonitionblock > table td.icon .title {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.admonitionblock > table td.content {
+    padding-left: 1.125em;
+    padding-right: 1.25em;
+    border-left: 1px solid #dddddd;
+    color: #6f6f6f;
+}
+
+.admonitionblock > table td.content > :last-child > :last-child {
+    margin-bottom: 0;
+}
+
+.admonitionblock td.icon [class^="icon-"]:before {
+    font-size: 2.5em;
+    /* text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);*/
+    cursor: default;
+}
+
+.admonitionblock td.icon .icon-note:before {
+    content: "\f05a";
+    color: #4298b8;
+}
+
+.admonitionblock td.icon .icon-tip:before {
+    content: "\f0eb";
+    color: #ffe400;
+}
+
+.admonitionblock td.icon .icon-warning:before {
+    content: "\f071";
+    color: #ff8c00;
+}
+
+.admonitionblock td.icon .icon-caution:before {
+    content: "\f06d";
+    color: #db4800;
+}
+
+.admonitionblock td.icon .icon-important:before {
+    content: "\f06a";
+    color: #db4800;
+}
+
 #content #toc ul {
     list-style-type: none;
     padding-left: 0.2em;
