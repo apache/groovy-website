@@ -78,7 +78,11 @@ downloads {
         description {
             yield 'Groovy 4.0 is a bleeding edge '
             a(href: 'versioning.html', 'version')
-            yield ' of Groovy designed for JDK8+ with much improved JPMS support. Alpha releases are expected soon.'
+            yield ' of Groovy designed for JDK8+ with much improved JPMS support.'
+        }
+        version('4.0.0-alpha-1') {
+            stable false
+//            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-4.0.0-alpha-1-installer#files'
         }
     }
     distribution('Groovy 3.0') {
@@ -93,6 +97,7 @@ downloads {
         }
         version('3.0.5') {
             stable true
+            archive true
             windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-3.0.5-installer#files'
         }
     }

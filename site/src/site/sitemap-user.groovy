@@ -90,7 +90,8 @@ documentation {
             '2.5.0-rc-1', '2.5.0-rc-2', '2.5.0-rc-3', '2.5.0', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5', '2.5.6', '2.5.7', '2.5.8', '2.5.9', '2.5.10', '2.5.11', '2.5.12', '2.5.13',
             '2.6.0-alpha-1', '2.6.0-alpha-2', '2.6.0-alpha-3', '2.6.0-alpha-4',
             '3.0.0-alpha-1', '3.0.0-alpha-2', '3.0.0-alpha-3', '3.0.0-alpha-4', '3.0.0-beta-1', '3.0.0-beta-2',
-            '3.0.0-beta-3', '3.0.0-rc-1', '3.0.0-rc-2', '3.0.0-rc-3', '3.0.0', '3.0.1', '3.0.2', '3.0.3', '3.0.4', '3.0.5', '3.0.6'
+            '3.0.0-beta-3', '3.0.0-rc-1', '3.0.0-rc-2', '3.0.0-rc-3', '3.0.0', '3.0.1', '3.0.2', '3.0.3', '3.0.4', '3.0.5', '3.0.6',
+            '4.0.0-alpha-1'
     ])
 
     section('Getting started','fa-graduation-cap') {
@@ -148,7 +149,11 @@ downloads {
         description {
             yield 'Groovy 4.0 is a bleeding edge '
             a(href: 'versioning.html', 'version')
-            yield ' of Groovy designed for JDK8+ with much improved JPMS support. Alpha releases are expected soon.'
+            yield ' of Groovy designed for JDK8+ with much improved JPMS support.'
+        }
+        version('4.0.0-alpha-1') {
+            stable false
+//            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-4.0.0-alpha-1-installer#files'
         }
     }
     distribution('Groovy 3.0') {
@@ -163,6 +168,7 @@ downloads {
         }
         version('3.0.5') {
             stable true
+            archive true
             windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-3.0.5-installer#files'
         }
     }
