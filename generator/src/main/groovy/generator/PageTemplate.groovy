@@ -39,7 +39,7 @@ abstract class PageTemplate extends BaseTemplate {
     String relative(String path) {
         String base = (String) model.get(BASEDIR)
         if (base && !path.startsWith('http') && !path.startsWith(File.separator)) {
-            String up = "..${File.separator}"
+            String up = "../"
             "${up*(1+base.count(File.separator))}$path"
         } else {
             path
