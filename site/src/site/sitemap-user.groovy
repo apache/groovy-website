@@ -90,7 +90,7 @@ documentation {
             '2.5.0-rc-1', '2.5.0-rc-2', '2.5.0-rc-3', '2.5.0', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5', '2.5.6', '2.5.7', '2.5.8', '2.5.9', '2.5.10', '2.5.11', '2.5.12', '2.5.13',
             '2.6.0-alpha-1', '2.6.0-alpha-2', '2.6.0-alpha-3', '2.6.0-alpha-4',
             '3.0.0-alpha-1', '3.0.0-alpha-2', '3.0.0-alpha-3', '3.0.0-alpha-4', '3.0.0-beta-1', '3.0.0-beta-2',
-            '3.0.0-beta-3', '3.0.0-rc-1', '3.0.0-rc-2', '3.0.0-rc-3', '3.0.0', '3.0.1', '3.0.2', '3.0.3', '3.0.4', '3.0.5'
+            '3.0.0-beta-3', '3.0.0-rc-1', '3.0.0-rc-2', '3.0.0-rc-3', '3.0.0', '3.0.1', '3.0.2', '3.0.3', '3.0.4', '3.0.5', '3.0.6'
     ])
 
     section('Getting started','fa-graduation-cap') {
@@ -156,6 +156,10 @@ downloads {
             yield 'Groovy 3.0 is the latest stable '
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK8+ with a new more flexible parser (aka Parrot parser).'
+        }
+        version('3.0.6') {
+            stable true
+//            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-3.0.6-installer#files'
         }
         version('3.0.5') {
             stable true
