@@ -251,7 +251,7 @@ allEvents {
     // Note that the event image should be 257x180 to look nice
     event('Greach') {
         location 'Madrid, Spain'
-        date 'March 26-28, 2020'
+        date 'March, 2021'
         url 'https://www.greachconf.com'
         logo 'img/confs/greach.png'
         description '''<p>
@@ -263,10 +263,13 @@ allEvents {
     }
     event('GR8Conf & JDK IO') {
         location 'Copenhagen, Denmark'
-        date 'June 2nd-4th, 2020'
+        date 'June, 2021'
         url 'http://gr8conf.eu/'
-        logo 'img/confs/gr8conf-jdkio.svg'
+        logo 'img/confs/gr8confeu.png'
         description '''
+            <p>
+                Hopefully in 2021 we will be able to do another GR8Conf as 2020 was cancelled due to Covid-19
+            </p>
             <p>
             For the past 11 years, GR8Conf has provided a high-quality conference experience for the tight-knit Apache Groovy programming language community. This year, we are joining forces with JDK IO - an annual conference run by the Danish Java user group covering technologies relevant to the entire JVM. The combined conference will be known as GR8Conf & JDK IO and will focus on All Things Groovy and Java, with DevOps, Microservices and Frontend Technologies sprinkled in.
             </p>
