@@ -501,28 +501,29 @@ In Groovy 4.0, additional support has been added.
 
 === Other areas under investigation
 
-==== .Net-inspired changes (under investigation)
+==== GINQ, a.k.a. Groovy-Integrated Query (incubating)
 
-Can we provide a Groovy equivalent to .Net's Language Integrated Query (LINQ)?
-It would support code like below:
+GINQ supports querying collections in a SQL-like style.
 
 [source,groovy]
 --------------------------------------
-from p of persons
-leftjoin c of cities
-on p.city.name == c.name
-select p.name, c.name
+from p in persons
+leftjoin c in cities on p.city.name == c.name
+where c.name == 'Shanghai'
+select p.name, c.name as cityName
 
-from p of persons
+from p in persons
 groupby p.gender
 having p.gender == 'Male'
 select p.gender, max(p.age)
 
-from p of persons
-orderby p.age desc
-thenby p.name asc
+from p in persons
+orderby p.age in desc, p.name
 select p.name
 --------------------------------------
+
+More examples could be found at
+link:https://github.com/apache/groovy/blob/master/subprojects/groovy-ginq/src/spec/test/org/apache/groovy/ginq/GinqTest.groovy[GINQ examples]
 
 ==== Python-inspired changes (under investigation)
 
