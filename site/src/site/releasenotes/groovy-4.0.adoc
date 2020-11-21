@@ -415,7 +415,7 @@ and are keen to understand where our users might use records or record-like stru
 
 [width="80%",align="center"]
 |===
-a| WARNING:
+a| NOTE: _WARNING:_
 The implementation of records is not final, hence the incubating status.
 We are still weighing up numerous options.
 We can make our record-like classes much more flexible than the Java variant,
