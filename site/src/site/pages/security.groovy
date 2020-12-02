@@ -9,6 +9,9 @@ layout 'layouts/main.groovy', true,
                             ul(class: 'nav-sidebar') {
                                 li(class: 'active') {
                                     a(href: '#security', "Security updates")
+                                    a(href: '#CVE-2015-3253', "CVE-2015-3253")
+                                    a(href: '#CVE-2016-6814', "CVE-2016-6814")
+                                    a(href: '#reporting', "Reporting problems")
                                 }
                             }
                         }
@@ -19,11 +22,10 @@ layout 'layouts/main.groovy', true,
                             p '''Here you can find information about security patches or updates released for Apache Groovy. Note that unless specified otherwise,
 no binary or source patches are available. To obtain a security fix, you need to upgrade to the latest maintained version of Apache Groovy.'''
                             p '''Releases prior to 2.4.4 were not released under Apache so no official patches for security updates are available for older versions.'''
-                            ul {
-                                li {
-                                    h2 "Groovy 2.4.x vulnerabilities"
-                                    h3 'CVE-2015-3253 Apache Groovy Information Disclosure'
-                                    asciidoc '''
+
+                            a(name: 'CVE-2015-3253') {}
+                            h2 'CVE-2015-3253 Apache Groovy Information Disclosure'
+                            asciidoc '''
 Severity: Important
 
 Vendor: The Apache Software Foundation
@@ -67,8 +69,9 @@ References:
 * http://groovy-lang.org/security.html
 
 '''
-                                    h3 'CVE-2016-6814 Apache Groovy Information Disclosure'
-                                    asciidoc '''
+                            a(name: 'CVE-2016-6814') {}
+                            h2 'CVE-2016-6814 Apache Groovy Information Disclosure'
+                            asciidoc '''
 Severity: Important
 
 Vendor: The Apache Software Foundation
@@ -133,16 +136,15 @@ References:
 * http://groovy-lang.org/security.html
 
 '''
-                                }
-                                li {
-                                    h2 "Reporting problems"
-                                    p """The Apache Software Foundation takes a very active stance in eliminating security problems in its software products.
+
+                            a(name: 'reporting') {}
+                            h2 "Reporting problems"
+                            p """
+The Apache Software Foundation takes a very active stance in eliminating security problems in its software products.
 If you have questions about how to configure or use Groovy securely, you should send them to the users ${$a(href: 'mailing-lists.html', 'mailing list')}.
 If you find any security problems due to bugs in Groovy software, you should raise issues in the ${$a(href: 'contribute.html#reporting-issues', 'bug tracker')}.
 The Apache Software Foundation has a dedicated ${$a(href: 'http://www.apache.org/security/', 'security team')} which you may contact should the need arise.
 """
-                                }
-                            }
                         }
                     }
                 }
