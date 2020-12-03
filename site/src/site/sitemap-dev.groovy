@@ -80,9 +80,14 @@ downloads {
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK8+ with much improved JPMS support.'
         }
+//        version('4.0.0-alpha-2') {
+//            stable false
+//            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-4.0.0-alpha-2-installer#files'
+//        }
         version('4.0.0-alpha-1') {
             stable false
-//            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-4.0.0-alpha-1-installer#files'
+            archive true
+            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-4.0.0-alpha-1-installer#files'
         }
     }
     distribution('Groovy 3.0') {
@@ -91,14 +96,14 @@ downloads {
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK8+ with a new more flexible parser (aka Parrot parser).'
         }
+        version('3.0.7') {
+            stable true
+//            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-3.0.7-installer#files'
+        }
         version('3.0.6') {
             stable true
-//            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-3.0.6-installer#files'
-        }
-        version('3.0.5') {
-            stable true
             archive true
-            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-3.0.5-installer#files'
+            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-3.0.6-installer#files'
         }
     }
     distribution('Groovy 2.5') {
@@ -107,8 +112,13 @@ downloads {
             a(href: 'versioning.html', 'version')
             yield ' of Groovy.'
         }
+        version('2.5.14') {
+            stable true
+//            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-2.5.14-installer#files'
+        }
         version('2.5.13') {
             stable true
+            archive true
             windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-2.5.13-installer#files'
         }
     }
@@ -117,8 +127,13 @@ downloads {
             yield 'Groovy 2.4 is an earlier version of Groovy still in widespread use.'
             yieldUnescaped ''' Important: Releases before 2.4.4 weren't done under the Apache Software Foundation and are provided as a convenience, without any warranty.'''
         }
+        version('2.4.21') {
+            stable true
+//            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-2.4.21-installer#files'
+        }
         version('2.4.20') {
             stable true
+            archive true
             windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-2.4.20-installer#files'
         }
     }
