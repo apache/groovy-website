@@ -80,10 +80,10 @@ downloads {
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK8+ with much improved JPMS support.'
         }
-//        version('4.0.0-alpha-2') {
-//            stable false
+        version('4.0.0-alpha-2') {
+            stable false
 //            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-4.0.0-alpha-2-installer#files'
-//        }
+        }
         version('4.0.0-alpha-1') {
             stable false
             archive true
