@@ -104,11 +104,20 @@ layout 'layouts/main.groovy', true,
                                 }
                                 h3 'Verification'
                                 p {
-                                    yield "We provide OpenPGP signatures ('.asc') files and checksums for every release artifact. We recommend that you "
+                                    yield "We provide OpenPGP signatures ('.asc') files and checksums ('.sha256') for every release artifact. We recommend that you "
                                     a(href: 'https://www.apache.org/info/verification.html', 'verify')
                                     yield ' the integrity of downloaded files by generating your own checksums and matching them against ours and checking signatures using the '
                                     a(href: 'https://www.apache.org/dist/groovy/KEYS', 'KEYS')
                                     yield " file which contains the OpenPGP keys of Groovy's Release Managers across all releases."
+                                }
+                                p {
+                                    yield "Newer releases have two sets of verification links. The "
+                                    span(style: 'font-variant: small-caps', 'dist')
+                                    yield " labelled links are through the normal Apache distribution mechanism. The "
+                                    span(style: 'font-variant: small-caps', 'perm')
+                                    yield " labelled links are through the Apache archive server. The latter "
+                                    yield " of these won't change but may not be available for a short while (usually less than a day) after a release. "
+                                    yield " Older releases are only available from the archive server. "
                                 }
 
                                 distributions.each { dist ->
@@ -126,41 +135,28 @@ layout 'layouts/main.groovy', true,
                                     def distUrl = { String type, String area, v -> "https://downloads.apache.org/groovy/${v}/${area}/apache-groovy-${type}-${v}.zip".toString() }
                                     def distExtUrl = { String type, String area, v, String ext -> "${distUrl(type, area, v)}.$ext".toString() }
                                     def findUrl = { String type, String area, v, String ext, boolean preferPermalink ->
-                                        def u
-                                        if (preferPermalink) {
-                                            u = archiveExtUrl(type, area, v, ext)
-                                            if (SiteGenerator.exists(u)) return u
+                                        def u = preferPermalink ? archiveExtUrl(type, area, v, ext) : distExtUrl(type, area, v, ext)
+                                        if (!SiteGenerator.exists(u)) {
+                                            println "WARNING: URL $u does not yet exist!"
                                         }
-                                        u = distExtUrl(type, area, v, ext)
-                                        if (SiteGenerator.exists(u)) return u
-                                        if (!preferPermalink) {
-                                            u = archiveExtUrl(type, area, v, ext)
-                                            if (SiteGenerator.exists(u)) return u
-                                        }
-                                        null
+                                        u
                                     }
                                     def buildExtras = { String prefix, String type, String area, String v, boolean preferPermalink ->
-                                        def extras = [:]
-                                        def url = findUrl(type, area, v, 'asc', preferPermalink)
-                                        if (url) { extras.asc = url }
-                                        url = findUrl(type, area, v, 'md5', preferPermalink)
-                                        if (url) { extras.md5 = url }
-                                        url = findUrl(type, area, v, 'sha256', preferPermalink)
-                                        if (url) { extras.sha256 = url }
-                                        if (extras) {
-                                            def first = true
-                                            br()
-                                            span(style: 'font-variant: small-caps', prefix)
-                                            extras.each { ext, u ->
-                                                if (first) first = false
-                                                else yield ' '
-                                                a(href: u, ext)
-                                            }
+                                        def extras = [
+                                                asc   : findUrl(type, area, v, 'asc', preferPermalink),
+                                                sha256: findUrl(type, area, v, 'sha256', preferPermalink)]
+                                        def first = true
+                                        br()
+                                        span(style: 'font-variant: small-caps', prefix)
+                                        extras.each { ext, u ->
+                                            if (first) first = false
+                                            else yield ' '
+                                            a(href: u, ext)
                                         }
                                     }
                                     def srcUrl = { pkg ->
                                         def v = pkg.version
-                                        pkg.archive ? archiveUrl('src', 'sources', v) : "http://www.apache.org/dyn/closer.cgi/groovy/${v}/sources/apache-groovy-src-${v}.zip"
+                                        pkg.archive ? archiveUrl('src', 'sources', v) : "https://www.apache.org/dyn/closer.cgi/groovy/${v}/sources/apache-groovy-src-${v}.zip"
                                     }
                                     dist.packages.each { pkg ->
                                         def v = pkg.version
