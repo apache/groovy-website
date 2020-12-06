@@ -58,7 +58,7 @@ pages {
     page 'ecosystem', 'ecosystem', [category: 'Ecosystem', ecosys: ecosystem]
     page 'learn', 'learn', [category: 'Learn', docSections: documentationSections, allBooks: library, videos: videos, courses: courses]
     page 'documentation', 'documentation', [category: 'Documentation', docSections: documentationSections, allDocVersions: allDocVersions]
-    page 'download', 'download', [category: 'Download', distributions: distributions]
+//    page 'download', 'download', [category: 'Download', distributions: distributions]
     page 'versioning', 'versioning', [category: 'Download']
     page 'indy', 'indy', [category: 'Download']
     page 'security', 'security', [category: 'Learn']
@@ -144,52 +144,6 @@ documentation {
     }
 }
 
-downloads {
-    distribution('Groovy 4.0') {
-        description {
-            yield 'Groovy 4.0 is a bleeding edge '
-            a(href: 'versioning.html', 'version')
-            yield ' of Groovy designed for JDK8+ with much improved JPMS support.'
-        }
-        version('4.0.0-alpha-2') {
-            stable false
-            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-4.0.0-alpha-2-installer#files'
-        }
-    }
-    distribution('Groovy 3.0') {
-        description {
-            yield 'Groovy 3.0 is the latest stable '
-            a(href: 'versioning.html', 'version')
-            yield ' of Groovy designed for JDK8+ with a new more flexible parser (aka Parrot parser).'
-        }
-        version('3.0.7') {
-            stable true
-            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-3.0.7-installer#files'
-        }
-    }
-    distribution('Groovy 2.5') {
-        description {
-            yield 'Groovy 2.5 is the previous stable '
-            a(href: 'versioning.html', 'version')
-            yield ' of Groovy.'
-        }
-        version('2.5.14') {
-            stable true
-            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-2.5.14-installer#files'
-        }
-    }
-    distribution('Groovy 2.4') {
-        description {
-            yield 'Groovy 2.4 is an earlier version of Groovy still in widespread use.'
-            yieldUnescaped ''' Important: Releases before 2.4.4 weren't done under the Apache Software Foundation and are provided as a convenience, without any warranty.'''
-        }
-        version('2.4.21') {
-            stable true
-            windowsInstaller 'https://bintray.com/groovy/Distributions/Windows-Installer/groovy-2.4.21-installer#files'
-        }
-    }
-}
-
 ecosystem {
     project('Grails') {
         description 'Grails is an Open Source, full stack, web application framework for the JVM. It takes advantage of the Groovy programming language and convention over configuration to provide a productive and stream-lined development experience.'
@@ -260,58 +214,28 @@ ecosystem {
 
 allEvents {
     // Note that the event image should be 257x180 to look nice
-    event('dev.next') {
-        location 'Broomfield, Colorado, USA'
-        date 'March 24-27, 2020'
-        url 'https://www.devdotnext.com/'
-        logo 'img/confs/devdotnext.png'
-        description '''
-                <strong style="color: red;">Cancelled</strong> <b>due to COVID-19: Let's hope 2021 works out better!</b>
-                <p>
-                Come to dev.next to learn with the practitioners, experts, and creators of the technologies that you care about.
-                </p>
-                <p>
-                In particular, check out the dedicated Groovy, Grails, and Micronaut track.
-                </p>'''
-    }
-    event('Greach') {
-        location 'Madrid, Spain'
-        date 'March 26-28, 2020'
-        url 'https://www.greachconf.com'
-        logo 'img/confs/greach.png'
-        description '''
-                <strong style="color: red;">Cancelled</strong> <b>due to COVID-19: Let's hope 2021 works out better!</b>
-                <p>
-                Android + JVM langs + JVM frameworks conference in Madrid, Spain with 100% English talks, usually with lots of Groovy content.
-                </p>
-                <p>
-                Greach is a community conference intended for networking and collaboration in the developer community.
-                </p>'''
-    }
-    event('GR8Conf & JDK IO') {
-        location 'Copenhagen, Denmark'
-        date 'June 2nd-4th, 2020'
-        url 'http://gr8conf.eu/'
-        logo 'img/confs/gr8conf-jdkio.svg'
-        description '''
-            <b>Call for presentations is closed.</b>
-            <p>
-            For the past 11 years, GR8Conf has provided a high-quality conference experience for the tight-knit Apache Groovy programming language community. This year, we are joining forces with JDK IO - an annual conference run by the Danish Java user group covering technologies relevant to the entire JVM. The combined conference will be known as GR8Conf & JDK IO and will focus on All Things Groovy and Java, with DevOps, Microservices and Frontend Technologies sprinkled in.
-            </p>
-            <p>We feature the Hackergarten and have an awesome Meet & Greet with craft beers brewed by the crew!</p>
-        '''
-    }
-    event('ApacheCon NA') {
-        location 'New Orleans, USA'
+    event('ApacheCon @Home') {
+        location 'Virtual'
         date 'Sept 28 - Oct 2, 2020'
         url 'https://www.apachecon.com/acna2020/'
         logo 'img/confs/apacheconNA.png'
         description '''
-            <b>Call for presentations is <a href='https://www.apachecon.com/acna2020/cfp.html'>open</a>.</b>
             <p>
             The latest innovations from dozens of Apache projects and their communities in a collaborative, vendor-neutral environment.
             </p>
             <p>There is a whole track dedicated to Groovy!</p>
+        '''
+    }
+    event('GR8Conf & JDK IO') {
+        location 'Copenhagen, Denmark'
+        date 'May 26-28, 2021'
+        url 'http://gr8conf.eu/'
+        logo 'img/confs/gr8conf-jdkio.svg'
+        description '''
+            <p>
+            For the past 12 years, GR8Conf has provided a high-quality conference experience for the tight-knit Apache Groovy programming language community. This year, we are joining forces with JDK IO - an annual conference run by the Danish Java user group covering technologies relevant to the entire JVM. The combined conference will be known as GR8Conf & JDK IO and will focus on All Things Groovy and Java, with DevOps, Microservices and Frontend Technologies sprinkled in.
+            </p>
+            <p>We feature the Hackergarten and have an awesome Meet & Greet with craft beers brewed by the crew!</p>
         '''
     }
 }
