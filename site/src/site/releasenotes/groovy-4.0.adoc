@@ -361,7 +361,7 @@ records "model _plain data_ aggregates with less ceremony".
 Groovy has features like the `@Immutable` transformation which already support
 modeling data aggregates with less ceremony, and while these features overlap to some degree
 with the design of records, they are not a direct equivalent.
-Records are a slight re-mixing of the features of `@Immutable` with a fex variations added to the mix.
+Records are a slight re-mixing of the features of `@Immutable` with a few variations added to the mix.
 
 Luckily for us, Groovy's `@Immutable` is itself a meta-annotation (also known as annotation collector)
 which combines more fine-grained features. It is relatively simple to provide a record-like re-mix
