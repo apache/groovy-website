@@ -997,3 +997,18 @@ then you may need to tweak the wording in those tests
 * Groovy is now more compliant with the JavaBeans specification for one edge case scenario
 involving any field having a name starting with an uppercase letter
 (link:https://issues.apache.org/jira/browse/GROOVY-9618[GROOVY-9618]).
+
+[[Groovy3.0releasenotes-3.0.8]]
+== Addendum for 3.0.8
+
+=== Breaking changes
+
+* A regression in the parser which distinguishes between variable declarations and command
+expressions for a particular edge case has been fixed to align with pre Groovy 3 behavior.
+Previously, expressions  like `foo bar` and `pass:[_]foo bar` were treated
+as command expressions whereas `Foo bar` was deemed  a variable expression.
+The `foo` and `Foo` cases remained unaltered but the `pass:[_]foo` case was
+unintentionally flipped. Anyone relying on the flipped behavior should change their code to align
+with previous behavior. The edge case only involves variable declarations
+with an explicit type where the type starts with a dollar or underscore character.
+(link:https://issues.apache.org/jira/browse/GROOVY-9936[GROOVY-9936]).
