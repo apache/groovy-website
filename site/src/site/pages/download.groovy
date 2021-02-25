@@ -342,6 +342,13 @@ layout 'layouts/main.groovy', true,
                                     }
                                     tbody {
                                         tr {
+                                            td(colspan: 3, style: 'text-align:center') {
+                                                strong {
+                                                    em 'Groovy versions 1.x to 3.x'
+                                                }
+                                            }
+                                        }
+                                        tr {
                                             td {
                                                 code 'org.codehaus.groovy:groovy:x.y.z'
                                             }
@@ -391,6 +398,22 @@ layout 'layouts/main.groovy', true,
                                             }
                                         }
                                         tr {
+                                            td(colspan: 3, style: 'text-align:center') {
+                                                strong {
+                                                    em 'Groovy versions 4.0+'
+                                                }
+                                            }
+                                        }
+                                        tr {
+                                            td(colspan: 3) {
+                                                yield 'As above but use '
+                                                code 'org.apache.groovy'
+                                                yield ' instead of '
+                                                code 'org.codehaus.groovy'
+                                                yield '.'
+                                            }
+                                        }
+                                        tr {
                                             td(colspan: 3) {
                                                 yield '* Modules:'
                                                 br()
@@ -405,6 +428,9 @@ layout 'layouts/main.groovy', true,
                                                 br()
                                                 em '3.0.0+:'
                                                 yield ' as above but "groovy-yaml" is a new optional module'
+                                                br()
+                                                em '4.0.0+:'
+                                                yield ' as above but "groovy-contracts" is a new module, "groovy-yaml" is now included in "groovy-all", and "groovy-testng" is now an optional module'
                                             }
                                         }
                                         tr {
