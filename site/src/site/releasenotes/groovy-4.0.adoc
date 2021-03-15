@@ -613,6 +613,24 @@ subclasses or inner classes are involved
 You may notice breakages in Groovy 4 code in such scenarios until this issue is progressed.
 As a workaround in the meantime, you may be able to use local variable outside a closure
 to reference the relevant fields and then reference those local variables in the closure.
+* Earlier Groovy versions unintentionally stored the constants -0.0f and -0.0d to be the same
+as 0.0f and 0.0d respectively. This only applied to explicit constants, i.e. it didn't apply
+to calculations which resulted in positive or negative zero. This also meant that certain
+comparisons of positive and negative zero returned true in cases where they should have
+been different, and calling `unique` might have resulted in a set containing just positive zero
+instead of both positive and negative zero (the correct answer as per IEEE-745).
+Depending on whether you are using primitive or wrapper floating point variants,
+you may or may not be affected.
+Consider using `equalsIgnoreZeroSign` and the boolean `ignoreZeroSign`
+constructor variant to `NumberAwareComparator` if you are affected and desire the old behavior.
+These modifications have also been back-ported to Groovy 3, so consider using them in
+Groovy 3 code instead of relying on the old behavior so that your code can work
+correctly across versions. The fix itself hasn't been back-ported to avoid breaking
+existing code relying on the unintended flawed behavior. +
+Bug fix:
+link:https://issues.apache.org/jira/browse/GROOVY-9797[GROOVY-9797] +
+Improved documentation and helper methods:
+link:https://issues.apache.org/jira/browse/GROOVY-9981[GROOVY-9981]
 
 [[Groovy4.0-requirements]]
 == JDK requirements
