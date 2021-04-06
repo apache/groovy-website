@@ -430,7 +430,7 @@ layout 'layouts/main.groovy', true,
                                                 yield ' as above but "groovy-yaml" is a new optional module'
                                                 br()
                                                 em '4.0.0+:'
-                                                yield ' as above but "groovy-contracts" is a new module, "groovy-yaml" is now included in "groovy-all", and "groovy-testng" is now an optional module'
+                                                yield ' as above but "groovy-contracts", "groovy-typecheckers" and "groovy-macro-library" are new optional modules, "groovy-jaxb" is no longer supported, "groovy-yaml" is now included in "groovy-all", and "groovy-testng" is now an optional module'
                                             }
                                         }
                                         tr {
@@ -460,9 +460,35 @@ layout 'layouts/main.groovy', true,
                                     }
                                 }
                                 h3 'Maven repositories'
-                                p "Groovy release jars are available from ${$a(href:'https://repo1.maven.org/maven2/org/codehaus/groovy/','Maven Central')} or ${$a(href:'https://jcenter.bintray.com/org/codehaus/groovy/','JCenter')}."
-                                p "Groovy 1.x-3.x snapshot(*) jars are available from ${$a(href:'https://groovy.jfrog.io/artifactory/libs-snapshot-local/org/codehaus/groovy','Groovy artifactory snapshots repository')}."
-                                p "Groovy 4.x+ snapshot(*) jars are available from ${$a(href:'https://repository.apache.org/content/repositories/snapshots/org/apache/groovy','ASF Snapshots repository')}."
+                                table(class: 'table') {
+                                    thead {
+                                        tr {
+                                            th 'Groovy version(s)'
+                                            th 'Release Jars'
+                                            th 'Snapshot(*) Jars'
+                                        }
+                                    }
+                                    tbody {
+                                        tr {
+                                            td {
+                                                strong {
+                                                    em 'Groovy versions 1.x to 3.x'
+                                                }
+                                            }
+                                            td "${$a(href:'https://repo1.maven.org/maven2/org/codehaus/groovy/','Maven Central')} or ${$a(href:'https://groovy.jfrog.io/artifactory/libs-release-local/org/codehaus/groovy','Groovy artifactory release repository')}"
+                                            td "${$a(href:'https://groovy.jfrog.io/artifactory/libs-snapshot-local/org/codehaus/groovy','Groovy artifactory snapshots repository')}"
+                                        }
+                                        tr {
+                                            td {
+                                                strong {
+                                                    em 'Groovy versions 4.x+'
+                                                }
+                                            }
+                                            td "${$a(href:'https://repo1.maven.org/maven2/org/apache/groovy/','Maven Central')} or ${$a(href:'https://groovy.jfrog.io/artifactory/libs-release-local/org/apache/groovy','Groovy artifactory release repository')}"
+                                            td "${$a(href:'https://repository.apache.org/content/repositories/snapshots/org/apache/groovy','ASF Snapshots repository')}"
+                                        }
+                                    }
+                                }
                                 p "(*) Snapshots are not official releases but are provided to assist with integration testing leading up to an official release."
                             }
                             hr(class: 'divider')
