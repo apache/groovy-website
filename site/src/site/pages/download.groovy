@@ -46,7 +46,7 @@ layout 'layouts/main.groovy', true,
                             def linkVersionToDownload = distributions.collect { it.packages }.flatten().find { it.stable }.version
                             button(id: 'big-download-button', type: 'button', class: 'btn btn-default',
                                     title: "Download Apache Groovy ${linkVersionToDownload} binary zip\nSee below for verification information",
-                                    onclick: "window.location.href=\"https://dl.bintray.com/groovy/maven/apache-groovy-sdk-${linkVersionToDownload}.zip\"") {
+                                    onclick: "window.location.href=\"https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-sdk-${linkVersionToDownload}.zip\"") {
                                 i(class: 'fa fa-download') {}
                                 yield " Download ${linkVersionToDownload}"
                             }
@@ -164,7 +164,7 @@ layout 'layouts/main.groovy', true,
                                         table(width: '100%', class: 'download-table') {
                                             tr {
                                                 td {
-                                                    a(href: "https://dl.bintray.com/groovy/maven/apache-groovy-binary-${v}.zip") {
+                                                    a(href: "https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-binary-${v}.zip") {
                                                         i(class: 'fa fa-gears fa-4x') {}
                                                         br()
                                                         yield 'binary'
@@ -183,7 +183,7 @@ layout 'layouts/main.groovy', true,
                                                     buildExtras('', 'src', 'sources', v, pkg.archive)
                                                 }
                                                 td {
-                                                    a(href: "https://dl.bintray.com/groovy/maven/apache-groovy-docs-${v}.zip") {
+                                                    a(href: "https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-docs-${v}.zip") {
                                                         i(class: 'fa fa-file-text fa-4x') {}
                                                         br()
                                                         yield ' documentation'
@@ -194,7 +194,7 @@ layout 'layouts/main.groovy', true,
                                                     }
                                                 }
                                                 td {
-                                                    a(href: "https://dl.bintray.com/groovy/maven/apache-groovy-sdk-${v}.zip") {
+                                                    a(href: "https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-sdk-${v}.zip") {
                                                         i(class: 'fa fa-file-zip-o fa-4x') {}
                                                         br()
                                                         yield ' SDK bundle'
@@ -241,7 +241,7 @@ layout 'layouts/main.groovy', true,
                                                 yield "Bintray's "
                                                 a(href: 'http://bintray.com/groovy/', 'Groovy repository')
                                                 yield '. Register on Bintray to rate, review, and register for new version notifications. Or '
-                                                a(href: 'https://dl.bintray.com/groovy/maven/', 'browse')
+                                                a(href: 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/', 'browse')
                                                 yield ' all versions.'
                                             }
                                         }
