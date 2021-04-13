@@ -491,6 +491,13 @@ long e = System.currentTimeMillis()
 println "${e - b}ms"
 --------------------------------------
 
+=== Enhanced Ranges
+
+Groovy has always supported inclusive, e.g. `3..5`, and exclusive (or open on the right), e.g. `4..<10`, ranges.
+From Groovy 4, ranges can be closed, open on the left, e.g. `3<..5`, right or both sides, e.g. `0<..<3`.
+The range will exclude the left or right-most values for such ranges.
+link:https://issues.apache.org/jira/browse/GROOVY-9649[GROOVY-9649]
+
 [[Groovy4.0-ongoing]]
 == On-going work
 
