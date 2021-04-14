@@ -238,11 +238,9 @@ layout 'layouts/main.groovy', true,
                                                 yield '.'
                                             }
                                             li {
-                                                yield "Bintray's "
-                                                a(href: 'http://bintray.com/groovy/', 'Groovy repository')
-                                                yield '. Register on Bintray to rate, review, and register for new version notifications. Or '
-                                                a(href: 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/', 'browse')
-                                                yield ' all versions.'
+                                                yield "Groovy's "
+                                                a(href: 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/', 'artifactory instance')
+                                                yield ' (includes pre-ASF versions).'
                                             }
                                         }
                                     }

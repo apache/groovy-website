@@ -38,10 +38,10 @@ layout 'layouts/main.groovy', true,
                                         the ${$a(href: 'http://www.jetbrains.com/idea/', 'IntelliJ IDEA')} development environment.
                                     """
                                     li """
-                                        ${$a(href: 'http://www.jfrog.com/', 'JFrog')} provide the infrastructure
-                                        for deploying and hosting our snapshots and releases,
-                                        thanks to the ${$a(href: 'https://bintray.com/', 'Bintray')} social platform for distribution,
-                                        and the OSS ${$a(href: 'http://www.jfrog.com/home/v_artifactory_opensource_overview', 'Artifactory')} repository.
+                                        ${$a(href: 'http://www.jfrog.com/', 'JFrog')} provide infrastructure
+                                        for deploying and hosting snapshots and releases of older versions of Groovy
+                                        and an additional mirror for newer versions,
+                                        thanks to their ${$a(href: 'https://jfrog.com/artifactory/', 'Artifactory')} offering.
                                     """
                                 }
                                 p """
