@@ -1,5 +1,6 @@
 script: ./gradlew -q -s generate
+dist: trusty
 jdk:
-- oraclejdk8
+- openjdk11
 
 
