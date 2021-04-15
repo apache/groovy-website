@@ -428,7 +428,7 @@ layout 'layouts/main.groovy', true,
                                                 yield ' as above but "groovy-yaml" is a new optional module'
                                                 br()
                                                 em '4.0.0+:'
-                                                yield ' as above but "groovy-contracts", "groovy-typecheckers" and "groovy-macro-library" are new optional modules, "groovy-jaxb" is no longer supported, "groovy-yaml" is now included in "groovy-all", and "groovy-testng" is now an optional module'
+                                                yield ' as above but "groovy-contracts", "groovy-typecheckers" and "groovy-macro-library" are new optional modules, "groovy-jaxb" and "groovy-bsf" are no longer supported, "groovy-yaml" is now included in "groovy-all", and "groovy-testng" is now an optional module'
                                             }
                                         }
                                         tr {
