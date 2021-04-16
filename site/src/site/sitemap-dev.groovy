@@ -86,6 +86,7 @@ downloads {
         }
         version('4.0.0-alpha-2') {
             stable false
+            archive true
             windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-4.0.0-alpha-2/'
         }
     }
