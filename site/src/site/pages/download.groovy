@@ -463,7 +463,6 @@ layout 'layouts/main.groovy', true,
                                         tr {
                                             th 'Groovy version(s)'
                                             th 'Release Jars'
-                                            th 'Snapshot(*) Jars'
                                         }
                                     }
                                     tbody {
@@ -474,7 +473,6 @@ layout 'layouts/main.groovy', true,
                                                 }
                                             }
                                             td "${$a(href:'https://repo1.maven.org/maven2/org/codehaus/groovy/','Maven Central')} or ${$a(href:'https://groovy.jfrog.io/artifactory/libs-release-local/org/codehaus/groovy','Groovy artifactory release repository')}"
-                                            td "${$a(href:'https://groovy.jfrog.io/artifactory/libs-snapshot-local/org/codehaus/groovy','Groovy artifactory snapshots repository')}"
                                         }
                                         tr {
                                             td {
@@ -483,11 +481,10 @@ layout 'layouts/main.groovy', true,
                                                 }
                                             }
                                             td "${$a(href:'https://repo1.maven.org/maven2/org/apache/groovy/','Maven Central')} or ${$a(href:'https://groovy.jfrog.io/artifactory/libs-release-local/org/apache/groovy','Groovy artifactory release repository')}"
-                                            td "${$a(href:'https://repository.apache.org/content/repositories/snapshots/org/apache/groovy','ASF Snapshots repository')}"
                                         }
                                     }
                                 }
-                                p "(*) Snapshots are not official releases but are provided to assist with integration testing leading up to an official release."
+                                p "Note for the development community: developers needing access to pre-release artifacts to assist with integration testing leading up to an official release should consult the appropriate ${$a(href: 'snapshots.html','developer documentation')}."
                             }
                             hr(class: 'divider')
 
