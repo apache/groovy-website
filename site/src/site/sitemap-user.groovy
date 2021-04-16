@@ -214,18 +214,6 @@ ecosystem {
 
 allEvents {
     // Note that the event image should be 257x180 to look nice
-    event('ApacheCon @Home') {
-        location 'Virtual'
-        date 'Sept 28 - Oct 2, 2020'
-        url 'https://www.apachecon.com/acna2020/'
-        logo 'img/confs/apacheconNA.png'
-        description '''
-            <p>
-            The latest innovations from dozens of Apache projects and their communities in a collaborative, vendor-neutral environment.
-            </p>
-            <p>There is a whole track dedicated to Groovy!</p>
-        '''
-    }
     event('GR8Conf & JDK IO') {
         location 'Copenhagen, Denmark'
         date 'May 26-28, 2021'
@@ -236,6 +224,18 @@ allEvents {
             For the past 12 years, GR8Conf has provided a high-quality conference experience for the tight-knit Apache Groovy programming language community. This year, we are joining forces with JDK IO - an annual conference run by the Danish Java user group covering technologies relevant to the entire JVM. The combined conference will be known as GR8Conf & JDK IO and will focus on All Things Groovy and Java, with DevOps, Microservices and Frontend Technologies sprinkled in.
             </p>
             <p>We feature the Hackergarten and have an awesome Meet & Greet with craft beers brewed by the crew!</p>
+        '''
+    }
+    event('ApacheCon @Home') {
+        location 'Virtual'
+        date 'Sep 21-23, 2021'
+        url 'https://www.apachecon.com/acah2021/'
+        logo 'img/confs/acah2021.png'
+        description '''
+            <p>
+            The latest innovations from dozens of Apache projects and their communities in a collaborative, vendor-neutral environment.
+            </p>
+            <p>There is a whole track dedicated to Groovy!</p>
         '''
     }
 }
