@@ -77,18 +77,13 @@ documentation {
 downloads {
     distribution('Groovy 4.0') {
         description {
-            yield 'Groovy 4.0 is a bleeding edge '
+            yield 'Groovy 4.0 is the next major '
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK8+ with much improved JPMS support.'
         }
         version('4.0.0-alpha-3') {
             stable false
-//            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-4.0.0-alpha-3/'
-        }
-        version('4.0.0-alpha-2') {
-            stable false
-            archive true
-            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-4.0.0-alpha-2/'
+            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-4.0.0-alpha-3/'
         }
     }
     distribution('Groovy 3.0') {
@@ -97,8 +92,13 @@ downloads {
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK8+ with a new more flexible parser (aka Parrot parser).'
         }
+        version('3.0.8') {
+            stable true
+//            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-3.0.8/'
+        }
         version('3.0.7') {
             stable true
+            archive true
             windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-3.0.7/'
         }
     }
