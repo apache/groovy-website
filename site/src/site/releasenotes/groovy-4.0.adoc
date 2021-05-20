@@ -8,13 +8,14 @@ Groovy 4 builds upon existing features and streamlines various legacy options.
 |===
 a| NOTE: _WARNING:_
 Material on this page is still under development! +
-We are currently releasing alpha versions of Groovy 4.0 with a goal
-of gathering feedback on the language changes from our community. In addition, early versions assist other projects
-and tool vendors within the Groovy ecosystem to begin assessing the impact of moving to/supporting Groovy 4.0.
+We are currently releasing beta versions of Groovy 4.0 with a goal
+of gathering feedback on the language changes from our community.
+In addition, early versions assist other projects and tool vendors within the
+Groovy ecosystem to begin assessing the impact of moving to/supporting Groovy 4.0.
 Caution should be exercised if using new features as the details may change before final release. +
 Some features described here as "incubating" may become stable before 4.0.0 final is released,
 others are expected to remain incubating for version 4.
-We don't recommend using alpha versions or incubating features for production systems.
+We don't recommend using beta versions or incubating features for production systems.
 |===
 
 
@@ -31,13 +32,15 @@ to `org.apache.groovy`. Please update your Gradle/Maven/other build settings app
 === Legacy package removal
 
 The Java Platform Module System (JPMS) requires that classes in distinct modules
-have distinct package names. Groovy has its own "modules" but these haven't
-historically been structured according to the above requirement.
+have distinct package names (known as the "split packaging requirement").
+Groovy has its own "modules" that weren't
+historically structured according to this requirement.
 
 Groovy 3 provided duplicate versions of numerous classes (in old and new packages)
 to allow Groovy users to migrate towards the new JPMS compliant package names.
 See the link:http://groovy-lang.org/releasenotes/groovy-3.0.html#Groovy3.0releasenotes-Splitpackages[Groovy 3 release notes]
-for more details.
+for more details. Groovy 4 no longer provides the duplicate legacy classes.
+
 In short, time to stop using `groovy.util.XmlSlurper` and start using `groovy.xml.XmlSlurper`.
 Similarly, you should now be using `groovy.xml.XmlParser`, `groovy.ant.AntBuilder`, `groovy.test.GroovyTestCase`
 and the other classes mentioned in the prior mentioned Groovy 3 release notes.
@@ -463,6 +466,76 @@ and that any class invariant is true before and after a method is called.
 
 This module replaces the previously external `gcontracts` project which is now archived.
 
+=== GINQ, a.k.a. Groovy-Integrated Query (incubating)
+
+GINQ supports querying collections in a SQL-like style.
+
+[source, sql]
+--------------------------------------
+from p in persons
+leftjoin c in cities on p.city.name == c.name
+where c.name == 'Shanghai'
+select p.name, c.name as cityName
+
+from p in persons
+groupby p.gender
+having p.gender == 'Male'
+select p.gender, max(p.age)
+
+from p in persons
+orderby p.age in desc, p.name
+select p.name
+
+from n in numbers
+where n > 0 && n <= 3
+select n * 2
+
+from n1 in nums1
+innerjoin n2 in nums2 on n1 == n2
+select n1 + 1, n2
+--------------------------------------
+
+More examples could be found at
+link:https://github.com/apache/groovy/blob/master/subprojects/groovy-ginq/src/spec/test/org/apache/groovy/ginq/GinqTest.groovy[GINQ examples]
+
+=== TOML Support (incubating)
+
+Support is now available for handling link:https://toml.io/en/[TOML]-based files including building:
+
+[source,groovy]
+--------------------------------------
+def builder = new TomlBuilder()
+builder.records {
+    car {
+        name 'HSV Maloo'
+        make 'Holden'
+        year 2006
+        country 'Australia'
+        homepage new URL('http://example.org')
+        record {
+            type 'speed'
+            description 'production pickup truck with speed of 271kph'
+        }
+    }
+}
+--------------------------------------
+
+and parsing:
+
+[source,groovy]
+--------------------------------------
+def ts = new TomlSlurper()
+def toml = ts.parseText(builder.toString())
+
+assert 'HSV Maloo' == toml.records.car.name
+assert 'Holden' == toml.records.car.make
+assert 2006 == toml.records.car.year
+assert 'Australia' == toml.records.car.country
+assert 'http://example.org' == toml.records.car.homepage
+assert 'speed' == toml.records.car.record.type
+assert 'production pickup truck with speed of 271kph' == toml.records.car.record.description
+--------------------------------------
+
 [[Groovy4.0-other]]
 == Other improvements
 
@@ -498,46 +571,98 @@ From Groovy 4, ranges can be closed, open on the left, e.g. `3<..5`, right or bo
 The range will exclude the left or right-most values for such ranges.
 link:https://issues.apache.org/jira/browse/GROOVY-9649[GROOVY-9649]
 
+=== JSR308 improvements (incubating)
+
+Groovy has been improving JSR-308 support over recent versions.
+In Groovy 4.0, additional support has been added. In particular,
+type annotations are now supported on generic types. This is useful
+for users of tools like the link:https://jqwik.net/[Jqwik] property-based testing library
+and technologies like the link:https://beanvalidation.org/2.0/[Bean Validation 2] framework.
+Here is an example of a Jqwik test:
+
+[source,groovy]
+--------------------------------------
+@Grab('net.jqwik:jqwik:1.5.1')
+import net.jqwik.api.*
+import net.jqwik.api.constraints.*
+
+class PropertyBasedTests {
+    @Property
+    def uniqueInList(@ForAll @Size(5) @UniqueElements List<@IntRange(min = 0, max = 10) Integer> aList) {
+        assert aList.size() == aList.toSet().size()
+        assert aList.every{ anInt -> anInt >= 0 && anInt <= 10 }
+    }
+}
+--------------------------------------
+
+In earlier versions of Groovy, the `@Forall`, `@Size`, and `@UniqueElements` annotations
+were handled, but the `@IntRange` annotation on the `List` generic type didn't appear in the
+generated bytecode and now does.
+
+Here is a Bean Validation 2 framework example:
+
+[source,groovy]
+--------------------------------------
+@Grab('org.hibernate.validator:hibernate-validator:7.0.1.Final')
+@Grab('org.hibernate.validator:hibernate-validator-cdi:7.0.1.Final')
+@Grab('org.glassfish:jakarta.el:4.0.0')
+import jakarta.validation.constraints.*
+import jakarta.validation.*
+import groovy.transform.*
+
+@Canonical
+class Car {
+    @NotNull @Size(min = 2, max = 14) String make
+    @Min(1L) int seats
+    List<@NotBlank String> owners
+}
+
+def validator = Validation.buildDefaultValidatorFactory().validator
+
+def violations = validator.validate(new Car(make: 'T', seats: 1))
+assert violations*.message == ['size must be between 2 and 14']
+
+violations = validator.validate(new Car(make: 'Tesla', owners: ['']))
+assert violations*.message.toSet() == ['must be greater than or equal to 1', 'must not be blank'] as Set
+
+violations = validator.validate(new Car(make: 'Tesla', owners: ['Elon'], seats: 2))
+assert !violations
+--------------------------------------
+
+Again, all annotations except the `@NonBlank` annotation on the `List` generic type
+were previously supported, and now `@NonBlank` will appear in the bytecode too.
+
+This feature is marked as incubating. The generated bytecode is not expected to change
+but some minor details of the AST representation of the annotations during compilation
+may change slightly before the feature leaves incubating status.
+
+In addition, type annotations that appear in code,
+e.g. local variable types, cast expression types, catch block exception types,
+are still work in progress.
+
 [[Groovy4.0-ongoing]]
 == On-going work
 
-=== JSR308 improvements (work in progress)
+=== Enhanced switch (under investigation)
 
-Groovy has been improving JSR-308 support over recent versions.
-In Groovy 4.0, additional support has been added.
+Groovy has always had a very powerful switch statement.
+The statement could be made more powerful, e.g. support destructuring,
+and could be supported in contexts where expressions are expected.
 
-=== Other areas under investigation
+As inspiration, Java has made, or is investigating future enhancements
+including switch expressions and other related enhancements:
+link:https://openjdk.java.net/jeps/354[JEP 354: Switch Expressions (Second Preview)]
+link:https://openjdk.java.net/jeps/361[JEP 361: Switch Expressions]
+link:https://openjdk.java.net/jeps/405[JEP 405: Record Patterns & Array Patterns (Preview)]
+link:https://openjdk.java.net/jeps/406[JEP 406: Pattern Matching for switch (Preview)]
+We should investigate these proposals both in terms of enhancing the existing Groovy switch
+but also in terms of deciding which syntax from Java we might like to support in the future.
 
-==== GINQ, a.k.a. Groovy-Integrated Query (incubating)
+Other languages like Python are also improving their switch statements:
+https://www.python.org/dev/peps/pep-0622/[PEP 622 -- Structural Pattern Matching].
+We should investigate whether any features of their design make sense for Groovy's dynamic nature.
 
-GINQ supports querying collections in a SQL-like style.
-
-[source, sql]
---------------------------------------
-from p in persons
-leftjoin c in cities on p.city.name == c.name
-where c.name == 'Shanghai'
-select p.name, c.name as cityName
-
-from p in persons
-groupby p.gender
-having p.gender == 'Male'
-select p.gender, max(p.age)
-
-from p in persons
-orderby p.age in desc, p.name
-select p.name
---------------------------------------
-
-More examples could be found at
-link:https://github.com/apache/groovy/blob/master/subprojects/groovy-ginq/src/spec/test/org/apache/groovy/ginq/GinqTest.groovy[GINQ examples]
-
-==== Python-inspired changes (under investigation)
-
-Can we support additional destructuring options
-for e.g. switch statements as per https://www.python.org/dev/peps/pep-0622/[PEP 622 -- Structural Pattern Matching]?
-
-If supported, then instead of the following existing code:
+As an example of destructuring, instead of the following existing code:
 
 [source,groovy]
 --------------------------------------
@@ -576,13 +701,52 @@ def make3D(pt) {
 }
 --------------------------------------
 
-==== Java-inspired changes (under investigation)
+An example of guarded patterns being considered for Java:
 
-The following are being explored as candidate changes for Groovy 4:
+[source,java]
+--------------------------------------
+static void testTriangle(Shape s) {
+    switch (s) {
+        case null ->
+            System.out.println("Null!");
+        case Triangle t && (t.calculateArea() > 100) ->
+            System.out.println("Large triangle");
+        case Triangle t ->
+            System.out.println("Small triangle");
+        default ->
+            System.out.println("Non-triangle");
+    }
+}
+--------------------------------------
 
-* Switch expressions
-link:https://openjdk.java.net/jeps/354[JEP 354: Switch Expressions (Second Preview)]
-link:https://openjdk.java.net/jeps/361[JEP 361: Switch Expressions]
+Another destructuring example:
+
+[source,java]
+--------------------------------------
+int eval(Expr n) {
+     return switch(n) {
+         case IntExpr(int i) -> i;
+         case NegExpr(Expr n) -> -eval(n);
+         case AddExpr(Expr left, Expr right) -> eval(left) + eval(right);
+         case MulExpr(Expr left, Expr right) -> eval(left) * eval(right);
+         default -> throw new IllegalStateException();
+     };
+}
+--------------------------------------
+
+We should consider the currently proposed nested record pattern when exploring our
+destructuring options, e.g.:
+
+[source,java]
+--------------------------------------
+static void printColorOfUpperLeftPoint(Rectangle r) {
+    if (r instanceof Rectangle(ColoredPoint(Point p, Color c), ColoredPoint lr)) {
+        System.out.println(c);
+    }
+}
+--------------------------------------
+
+=== Other Java-inspired enhancements
 
 * Module definitions written in Groovy (i.e. module-info.groovy)
 link:https://issues.apache.org/jira/browse/GROOVY-9273[GROOVY-9273]
