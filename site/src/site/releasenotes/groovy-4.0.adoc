@@ -581,7 +581,12 @@ def half = .5
 def otherHalf = 0.5  // leading zero remains supported
 double third = .333d
 float quarter = .25f
+def fractions = [.1, .2, .3]
+def exclusiveRange = -1.5..<.5
+def inclusiveRange = -1.5..0.5 // leading zero edge case <1>
+assert inclusiveRange == [-1.5, -.5, .5]
 --------------------------------------
+<1> The leading zero is still required where the second number in a range specification is a fractional value
 
 === JSR308 improvements (incubating)
 
