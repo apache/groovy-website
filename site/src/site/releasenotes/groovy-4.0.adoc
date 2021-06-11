@@ -571,6 +571,18 @@ From Groovy 4, ranges can be closed, open on the left, e.g. `3<..5`, right or bo
 The range will exclude the left or right-most values for such ranges.
 link:https://issues.apache.org/jira/browse/GROOVY-9649[GROOVY-9649]
 
+=== Support for decimal fraction literals without a leading zero
+
+Groovy has previously required a leading zero for fractional values, but leaving off the leading zero is now also supported.
+
+[source,groovy]
+--------------------------------------
+def half = .5
+def otherHalf = 0.5  // leading zero remains supported
+double third = .333d
+float quarter = .25f
+--------------------------------------
+
 === JSR308 improvements (incubating)
 
 Groovy has been improving JSR-308 support over recent versions.
