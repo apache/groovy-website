@@ -582,11 +582,17 @@ def otherHalf = 0.5  // leading zero remains supported
 double third = .333d
 float quarter = .25f
 def fractions = [.1, .2, .3]
-def exclusiveRange = -1.5..<.5
-def inclusiveRange = -1.5..0.5 // leading zero edge case <1>
-assert inclusiveRange == [-1.5, -.5, .5]
+
+// can be used for ranges too (with a rare edge case you might want to avoid)
+def range1 = -1.5..<.5    // okay here
+def range2 = -1.5.. .5    // space is okay but harder for humans <1>
+def range3 = -1.5..0.5    // leading zero edge case <1>
+assert range3 == [-1.5, -.5, .5]
 --------------------------------------
-<1> The leading zero is still required where the second number in a range specification is a fractional value
+<1> A fractional value without a leading zero can't appear immediately after the range `..` operator.
+The three dots in a row would be confusing and similar to the varargs notation.
+You should leave a space (might still be confusing for humans readers) or
+retain the leading zero (recommended).
 
 === JSR308 improvements (incubating)
 
