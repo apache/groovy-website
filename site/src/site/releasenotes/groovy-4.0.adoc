@@ -93,6 +93,163 @@ to help improve overall performance of the indy bytecode.
 [[Groovy4.0-new]]
 == New features
 
+[[Groovy4.0-switch-expressions]]
+=== Switch expressions
+
+Groovy has always had a very powerful switch _statement_, but there are times when
+a switch _expression_ would be more convenient.
+
+In switch statements, case branches with fallthrough behavior are usually much rarer
+than branches which handle one case and then break out of the switch.
+The `break` statements clutter the code as shown here.
+
+[source,groovy]
+--------------------------------------
+def result
+switch(i) {
+  case 0: result = 'zero'; break
+  case 1: result = 'one'; break
+  case 2: result = 'two'; break
+  default: throw new IllegalStateException('unknown number')
+}
+--------------------------------------
+
+A common trick is to introduce a method to wrap the switch.
+In simple cases, multiple statements might reduce to a single return statement.
+The `break` statements are gone, albeit replaced by `return` statements.
+
+[source,groovy]
+--------------------------------------
+def stringify(int i) {
+  switch(i) {
+    case 0: return 'zero'
+    case 1: return 'one'
+    case 2: return 'two'
+    default: throw new IllegalStateException('unknown number')
+  }
+}
+
+def result = stringify(i)
+--------------------------------------
+
+Switch expressions (borrowing heavily from Java) provide a nicer alternative still:
+
+[source,groovy]
+--------------------------------------
+def result = switch(i) {
+    case 0 -> 'zero'
+    case 1 -> 'one'
+    case 2 -> 'two'
+    default -> throw new IllegalStateException('unknown number')
+}
+--------------------------------------
+
+Here, the right-hand side (following the `\->`) must be a single expression. If multiple statements are needed, a block can be used.
+For example, the first case branch from the previous example could be re-written as:
+
+[source,groovy]
+--------------------------------------
+    case 0 -> { def a = 'ze'; def b = 'ro'; a + b }
+--------------------------------------
+
+Switch expressions can also use the traditional `:` form with multiple statements
+but in this case, a `yield` statement must be executed.
+
+[source,groovy]
+--------------------------------------
+def result = switch(i) {
+    case 0:
+        def a = 'ze'
+        def b = 'ro'
+        if (true) yield a + b
+        else yield b + a
+    case 1:
+        yield 'one'
+    case 2:
+        yield 'two'
+    default:
+        throw new IllegalStateException('unknown number')
+}
+--------------------------------------
+
+The `\->` and `:` forms cannot be mixed.
+
+All of the normal Groovy case expressions are still catered for, e.g.:
+
+[source,groovy]
+--------------------------------------
+class Custom {
+  def isCase(o) { o == -1 }
+}
+
+class Coord {
+  int x, y
+}
+
+def items = [10, -1, 5, null, 41, 3.5f, 38, 99, new Coord(x: 4, y: 5), 'foo']
+def result = items.collect { a ->
+  switch(a) {
+    case null -> 'null'
+    case 5 -> 'five'
+    case new Custom() -> 'custom'
+    case 0..15 -> 'range'
+    case [37, 41, 43] -> 'prime'
+    case Float -> 'float'
+    case { it instanceof Number && it % 2 == 0 } -> 'even'
+    case Coord -> a.with { "x: $x, y: $y" }
+    case ~/../ -> 'two chars'
+    default -> 'none of the above'
+  }
+}
+
+assert result == ['range', 'custom', 'five', 'null', 'prime', 'float',
+                  'even', 'two chars', 'x: 4, y: 5', 'none of the above']
+--------------------------------------
+
+Switch expressions are particularly handy for cases where
+the visitor pattern might have been traditionally used, e.g.:
+
+[source,groovy]
+--------------------------------------
+import groovy.transform.Immutable
+
+interface Expr { }
+@Immutable class IntExpr implements Expr { int i }
+@Immutable class NegExpr implements Expr { Expr n }
+@Immutable class AddExpr implements Expr { Expr left, right }
+@Immutable class MulExpr implements Expr { Expr left, right }
+
+int eval(Expr e) {
+    e.with {
+        switch(it) {
+            case IntExpr -> i
+            case NegExpr -> -eval(n)
+            case AddExpr -> eval(left) + eval(right)
+            case MulExpr -> eval(left) * eval(right)
+            default -> throw new IllegalStateException()
+        }
+    }
+}
+
+@Newify(pattern=".*Expr")
+def test() {
+    def exprs = [
+        IntExpr(4),
+        NegExpr(IntExpr(4)),
+        AddExpr(IntExpr(4), MulExpr(IntExpr(3), IntExpr(2))), // 4 + (3*2)
+        MulExpr(IntExpr(4), AddExpr(IntExpr(3), IntExpr(2)))  // 4 * (3+2)
+    ]
+    assert exprs.collect { eval(it) } == [4, -4, 10, 20]
+}
+
+test()
+--------------------------------------
+
+==== Differences to Java
+
+* Currently, there is no requirement that all possible values of the switch target
+are covered exhaustively by case branches.
+
 [[Groovy4.0-new-checkers]]
 === Built-in type checkers
 
