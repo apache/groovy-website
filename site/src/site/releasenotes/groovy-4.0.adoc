@@ -248,7 +248,27 @@ test()
 ==== Differences to Java
 
 * Currently, there is no requirement that all possible values of the switch target
-are covered exhaustively by case branches.
+are covered exhaustively by case branches. If no `default` branch is present, an
+implicit one returning `null` is added. For this reason, in contexts where `null`
+is not desired, e.g.&nbsp;storing the result in a primitive, or constructing
+a non-nullable `Optional`, then an explicit `default` should be given, e.g.:
+
+[source,groovy]
+--------------------------------------
+// default branch avoids GroovyCastException
+int i = switch(s) {
+    case 'one' -> 1
+    case 'two' -> 2
+    default -> 0
+}
+
+// default branch avoids NullPointerException
+Optional.of(switch(i) {
+    case 1 -> 'one'
+    case 2 -> 'two'
+    default -> 'buckle my shoe'
+})
+--------------------------------------
 
 [[Groovy4.0-new-checkers]]
 === Built-in type checkers
