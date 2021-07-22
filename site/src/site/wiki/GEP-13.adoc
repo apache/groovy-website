@@ -1,0 +1,98 @@
+= GEP-13: Sealed classes
+
+:icons: font
+
+.Metadata
+****
+[horizontal,options="compact"]
+*Number*:: GEP-13
+*Title*:: Sealed classes
+*Version*:: 1
+*Type*:: Feature
+*Status*:: Draft
+*Leader*:: Paul King
+*Created*:: 2021-07-22
+*Last modification*&#160;:: 2021-07-22
+****
+
+== Abstract: Sealed classes
+
+Sealed classes and interfaces restrict which other classes or interfaces may extend or implement them.
+By supporting sealed classes and interfaces, the Groovy programming language
+can offer an additional mechanism for controlling class hierarchy construction.
+
+=== Motivation
+
+Inheritance is a powerful mechanism for creating hierarchies of related class and interfaces.
+Sometimes, it is desirable to restrict the definition of children in such hierarchies.
+Modifiers already provide some mechanisms:
+
+* If all of our classes and interfaces are public, this indicates that we want
+maximum reuse.
+
+* The `final` modifier offers one mechanism for restricting further inheritance at the method or class level.
+It effectively limits all further extension and indicates no further code reuse is desired.
+
+* By making a base class package-private we can limit extension to only classes within
+the same package. If an abstract `Shape` class is package-private, I could have
+public classes `Square` and `Circle` in the same package. This indicates that we want
+code reuse to occur only within the package. While it does limit creation of
+new shapes outside the original package, it offers no abstraction for a shape which
+could be either a square or circle since `Shape` is not public.
+
+Sealed classes or interfaces can be public but have an associated list of allowed children.
+Classes or interfaces which are not in that list cannot inherit from those sealed types.
+This indicates that we want code reuse within the hierarchy but not beyond.
+Parent classes in the hierarchy can be made _accessible_, without also making them _extensible_.
+This allows hierarchies to be created with maximum reuse within but without having
+to defensively code for arbitrary extensions added at a later time.
+
+Such classes are useful in defining Algebraic Data Types (ADTs) and in scenarios where
+we might want to reason about whether we have accounted for all possible types, e.g.&nbsp;the
+static compiler may wish to give a warning if a switch block doesn't exhaustively
+cover all possible types by respective case branches.
+
+==== Initial implementation
+
+* Provide a `@Sealed` marker annotation or AST transform which allows a list of
+permitted children to be defined. Use of this annotation will be an incubating
+feature subject to change. Explicit use may eventually be discouraged and instead
+a keyword, e.g. `sealed` would be encouraged instead. However, the annotation
+could be retained to offer support for this feature on earlier JVMs or versions
+of Groovy prior to any grammar changes.
+
+* Prohibit extension of JDK16+ sealed classes or annotated `@Sealed` classes. Likewise for interfaces. This also applies for anonymous inner classes and traits.
+
+* Provide checks in other places where such extension might occur implicitly, e.g.:&nbsp;with `@Delegate`,
+when using type coercion, etc.
+
+==== Potential extensions
+
+* Introduce the `sealed` modifier and `permits` clause in the grammar.
+
+* Support `non-sealed` or `unsealed` sub-hierarchies.
+
+* Add warnings to the static compiler if a switch is used for a sealed hiearchy and not all types
+are exhaustively covered.
+
+* When running on JDK16+, also add sealed class information into the bytecode.
+
+== References and useful links
+
+* https://openjdk.java.net/jeps/360[JEP 360: Sealed Classes (Preview)]
+* https://openjdk.java.net/jeps/397[JEP 397: Sealed Classes (Second Preview)]
+* https://openjdk.java.net/jeps/409[JEP 409: Sealed Classes]
+* https://kotlinlang.org/docs/sealed-classes.html[Sealed Classes] in Kotlin
+* https://docs.scala-lang.org/sips/sealed-types.html[Sealed Classes] in Scala
+
+=== Reference implementation
+
+* TBD
+
+=== JIRA issues
+
+* https://issues.apache.org/jira/browse/GROOVY-10148[GROOVY-10148: Groovy should not allow classes to extend sealed Java classes]
+
+== Update history
+
+1 (2021-07-22) Initial draft
