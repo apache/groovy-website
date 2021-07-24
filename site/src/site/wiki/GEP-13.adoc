@@ -61,19 +61,27 @@ a keyword, e.g. `sealed` would be encouraged instead. However, the annotation
 could be retained to offer support for this feature on earlier JVMs or versions
 of Groovy prior to any grammar changes.
 
-* Prohibit extension of JDK16+ sealed classes or annotated `@Sealed` classes. Likewise for interfaces. This also applies for anonymous inner classes and traits.
+* Prohibit extension of JDK16+ sealed classes or annotated `@Sealed` classes.
+Likewise for interfaces. This also applies for anonymous inner classes and traits.
 
 * Provide checks in other places where such extension might occur implicitly, e.g.:&nbsp;with `@Delegate`,
 when using type coercion, etc.
 
 ==== Potential extensions
 
+The following potential extensions are possibly all desirable but
+are non-goals for the first implementation:
+
 * Introduce the `sealed` modifier and `permits` clause in the grammar.
 
 * Support `non-sealed` or `unsealed` sub-hierarchies.
 
-* Add warnings to the static compiler if a switch is used for a sealed hiearchy and not all types
-are exhaustively covered.
+* Require that all classes within a sealed hierarchy be compiled at the same time.
+
+* Require that all classes within a sealed hierarchy belong to the same module.
+
+* Add warnings to the static compiler if a switch is used for a sealed hierarchy
+and not all types are exhaustively covered.
 
 * When running on JDK16+, also add sealed class information into the bytecode.
 
