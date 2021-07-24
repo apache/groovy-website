@@ -220,14 +220,12 @@ interface Expr { }
 @Immutable class MulExpr implements Expr { Expr left, right }
 
 int eval(Expr e) {
-    e.with {
-        switch(it) {
-            case IntExpr -> i
-            case NegExpr -> -eval(n)
-            case AddExpr -> eval(left) + eval(right)
-            case MulExpr -> eval(left) * eval(right)
-            default -> throw new IllegalStateException()
-        }
+    switch(e) {
+        case IntExpr(i) -> i
+        case NegExpr(n) -> -eval(n)
+        case AddExpr(left, right) -> eval(left) + eval(right)
+        case MulExpr(left, right) -> eval(left) * eval(right)
+        default -> throw new IllegalStateException()
     }
 }
 
