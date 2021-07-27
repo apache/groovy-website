@@ -40,6 +40,10 @@ code reuse to occur only within the package. While it does limit creation of
 new shapes outside the original package, it offers no abstraction for a shape which
 could be either a square or circle since `Shape` is not public.
 
+* We can use `protected` visibility to limit access of members strictly to children
+but that doesn't help us solve the aforementioned problems like lack of a visible
+abstraction for `Shape` in the discussed example.
+
 Sealed classes or interfaces can be public but have an associated list of allowed children.
 Classes or interfaces which are not in that list cannot inherit from those sealed types.
 This indicates that we want code reuse within the hierarchy but not beyond.
@@ -67,6 +71,11 @@ Likewise for interfaces. This also applies for anonymous inner classes and trait
 * Provide checks in other places where such extension might occur implicitly, e.g.:&nbsp;with `@Delegate`,
 when using type coercion, etc.
 
+* Support `non-sealed` or `unsealed` sub-hierarchies. (See JEP-409)
+
+* Allow the permitted subclasses to be inferred automatically just for the case
+where the base and all permitted subclasses are in the same file. (See JEP-409)
+
 ==== Potential extensions
 
 The following potential extensions are possibly all desirable but
@@ -74,11 +83,9 @@ are non-goals for the first implementation:
 
 * Introduce the `sealed` modifier and `permits` clause in the grammar.
 
-* Support `non-sealed` or `unsealed` sub-hierarchies.
-
 * Require that all classes within a sealed hierarchy be compiled at the same time.
 
-* Require that all classes within a sealed hierarchy belong to the same module.
+* Require that all classes within a sealed hierarchy belong to the same JPMS module.
 
 * Add warnings to the static compiler if a switch is used for a sealed hierarchy
 and not all types are exhaustively covered.
@@ -95,7 +102,7 @@ and not all types are exhaustively covered.
 
 === Reference implementation
 
-* TBD
+https://github.com/apache/groovy/pull/1606
 
 === JIRA issues
 
