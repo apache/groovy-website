@@ -17,5 +17,16 @@
  *  under the License.
  */
 
+plugins {
+    id "com.gradle.enterprise" version "3.5.2"
+}
+
 rootProject.name = 'groovy-website'
 include 'generator','site-dev','site-user'
+
+gradleEnterprise {
+    buildScan {
+        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+        termsOfServiceAgree = 'yes'
+    }
+}

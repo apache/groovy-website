@@ -19,21 +19,12 @@
 
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath 'org.apache.ant:ant:1.9.13'
+        classpath 'org.apache.ant:ant:1.10.11'
         classpath 'com.yahoo.platform.yui:yuicompressor:2.4.7'
     }
-}
-
-plugins {
-    id 'com.gradle.build-scan' version '1.0'
-}
-
-buildScan {
-    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
-    licenseAgree = 'yes'
 }
 
 allprojects {

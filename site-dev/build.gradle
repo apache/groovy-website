@@ -26,9 +26,12 @@ import util.CheckLinks
 
 plugins {
     id 'base'                  // common lifecycle tasks and artifact types
-    id 'org.ajoberstar.grgit' version '4.0.1' // to publish website to asf-git branch
+    id 'org.ajoberstar.grgit' version '4.1.0' // to publish website to asf-git branch
 }
 
+ext {
+    grgitClass = org.ajoberstar.grgit.Grgit
+}
 ext.watchmode = project.hasProperty('watchmode')?project.getProperty('watchmode'):'false'
 // a collection of links which have either been validated or are dummy links
 ext.excludeFromChecks = [
@@ -136,18 +139,18 @@ task webzip(type:Zip, dependsOn: checkDeadLinks) {
 // Creates a new commit on asf-site branch
 task commitWebsite(dependsOn: webzip) {
     doLast {
-        assert grgit : "git repository not found?"
+        assert grgitClass : "git repository not found?"
         assert file("$generatedDevSite/index.html").exists()
         // get the latest commit on master
-        def gitin = grgit.open()
+        def gitin = grgitClass.open(dir: rootProject.projectDir)
         def latestCommit = gitin.log(maxCommits: 1)[0].abbreviatedId
 
         def gitout
         if (project.hasProperty('skipClone')) {
-            gitout = grgit.open(dir: stagingDevSite)
+            gitout = grgitClass.open(dir: stagingDevSite)
         } else {
             println "Cloning $gitboxUrl to $stagingDevSite. This may take a few minutes ..."
-            gitout = grgit.clone(dir: stagingDevSite, uri: gitboxUrl)
+            gitout = grgitClass.clone(dir: stagingDevSite, uri: gitboxUrl)
         }
 
         gitout.checkout(branch: 'asf-site')
