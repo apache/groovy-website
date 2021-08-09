@@ -270,6 +270,66 @@ Optional.of(switch(i) {
 })
 --------------------------------------
 
+[[Groovy4.0-sealed-types]]
+=== Sealed types
+
+Sealed classes and interfaces restrict which other classes or interfaces may extend or implement them.
+For further details, see (link:https://groovy.apache.org/wiki/GEP-13.html[GEP-13]) and the
+Groovy documentation.
+
+As a motivating example, sealed hierarchies can be useful when specifying
+Algebraic or Abstract Data Types (ADTs) as shown in the following example:
+
+[source,groovy]
+--------------------------------------
+import groovy.transform.*
+
+@Sealed interface Tree<T> {}
+@Singleton final class Empty implements Tree {
+    String toString() { 'Empty' }
+}
+@Canonical final class Node<T> implements Tree<T> {
+    T value
+    Tree<T> left, right
+}
+
+Tree<Integer> tree = new Node<>(42, new Node<>(0, Empty.instance, Empty.instance), Empty.instance)
+assert tree.toString() == 'Node(42, Node(0, Empty, Empty), Empty)'
+--------------------------------------
+
+Here we are using the annotation syntax.
+
+As another example, sealed types can be useful when creating enhanced enum-like hierarchies. Here is a weather example using the `sealed` keyword:
+
+[source,groovy]
+--------------------------------------
+sealed abstract class Weather { }
+class Rainy extends Weather { Integer rainfall }
+class Sunny extends Weather { Integer temp }
+class Cloudy extends Weather { Integer uvIndex }
+def threeDayForecast = [
+    new Rainy(rainfall: 12),
+    new Sunny(temp: 35),
+    new Cloudy(uvIndex: 6)
+]
+--------------------------------------
+
+==== Differences to Java
+
+* The `non-sealed` keyword (or `@NonSealed` annotation) isn't required to indicate that
+subclasses are open to extension. A future version of Codenarc may have a rule that allows
+Groovy developers who wish to follow that Java practice if they desire. Having said that,
+keeping restrictions on extension (by using `final` or `sealed`) will lead to more places
+where future type checking can check for exhaustive use of types (e.g. switch expressions).
+* Currently, Groovy adds an annotation (@Sealed) to sealed classes but doesn't write
+sealed information into the bytecode (_native_ sealed classes).
+This allows Groovy sealed classes to be used for JDK8+.
+A future version of Groovy will write such information into the bytecode when using a JDK &gt; 17 and setting the target bytecode level to 17+. This will allow Java compilers to respect sealed Groovy classes
+in integration scenarios. Groovy does read such information from Java classes on JDKs where it is available.
+* Java has requirements around classes within a sealed hierarchy being in the same module or
+same package. Groovy currently doesn't enforce this requirement but may do so in a future version.
+In particular, it is likely _native_ sealed classes (see previous dot point) will need this requirement.
+
 [[Groovy4.0-new-checkers]]
 === Built-in type checkers
 
