@@ -24,15 +24,15 @@ Releases can be initiated by a committer, as long as:
 
 * an email has been sent to the dev mailing list, where a committer volunteers for a release
 * there's a general agreement that a release can be done. There's still no explicit rule telling when a new Groovy version can be released, but the history of the project shows that releases are usually done when a significant amount of bugfixes have been done justifying a release, or that new major features are ready.
-* release manager has his personal setup ready. In particular:
-** release manager can log into his people.apache.org account using SSH
+* release manager has their personal setup ready. In particular:
+** release manager can log into their people.apache.org account using SSH
 ** release manager has administration privileges on {teamcity}[the CI server]
 
 Releases are launched from the CI server. A release should never be done from a personal computer.
 
 == Preparing a release
 
-Releases are done from the CI server, but since it will involve creating tags, branches and several commits, and that the CI server doesn't have privileges to do it, we cannot work on the Apache Git origin. Instead, it is required that the release manager forks the repository and pushes changes to his personal fork. Given that `GROOVY_2_4_X` is the branch to release, `upstream` references Apache Git, and `origin` the release manager fork on GitHub, preparing for a release usually starts with:
+Releases are done from the CI server, but since it will involve creating tags, branches and several commits, and that the CI server doesn't have privileges to do it, we cannot work on the Apache Git origin. Instead, it is required that the release manager forks the repository and pushes changes to their personal fork. Given that `GROOVY_2_4_X` is the branch to release, `upstream` references Apache Git, and `origin` the release manager fork on GitHub, preparing for a release usually starts with:
 
 ```
 git checkout GROOVY_2_4_X

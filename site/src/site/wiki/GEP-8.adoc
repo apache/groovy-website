@@ -55,7 +55,7 @@ named TypeChecked. If set, then the AST transformation will perform type inferen
 information in AST nodes metadata. Eventually, if errors are found, it will add errors to the compiler
 through a dedicated addStaticTypeError method which basically does the same as the traditional
 addError method but prefixes the messages with a "Static type checking" message.
-This is done to help the developer determine whether the error he is seeing is a "plain Groovy" error,
+This is done to help the developer determine whether the error they are seeing is a "plain Groovy" error,
 or an error thrown by the STC mode.
 
 ==== The StaticTypeCheckingTestCase class
