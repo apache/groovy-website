@@ -842,7 +842,7 @@ Here is an example of a Jqwik test:
 
 [source,groovy]
 --------------------------------------
-@Grab('net.jqwik:jqwik:1.5.1')
+@Grab('net.jqwik:jqwik:1.5.5')
 import net.jqwik.api.*
 import net.jqwik.api.constraints.*
 
