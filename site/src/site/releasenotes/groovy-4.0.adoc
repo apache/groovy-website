@@ -1025,6 +1025,27 @@ AST transforms which extend `AbstractASTTransformation` are one example of poten
 We know of no users making use of the old retention but are aware of various
 issues keeping the old value.
 link:https://issues.apache.org/jira/browse/GROOVY-9702[GROOVY-9702]
+* Groovy's `intersect` DGM method had a different semantics to other languages
+when supplied with a projecting closure/comparator.
+Other languages often have a `intersectBy` method in this case rather than overloading the `intersect` operator like Groovy does.
+When no projecting function is in play,
+`a.intersect(b)` should always equal `b.intersect(a)`.
+When a projecting function is in play, most languages define `a.intersect(b)` as
+the subset of elements from `a` which when projected match a projected value from `b`.
+So the resulting values are always drawn from `a`. The arguments can be reversed
+to draw the elements from `a`. Groovy's semantics used to be the reverse of most
+other languages but is now aligned. Some examples with the new behavior: +
+ +
+`def abs = { a, b \-> a.abs() \<=&gt; b.abs() }` +
+`assert [1, 2].intersect([-2, -3], abs) == [2]` +
+`assert [-2, -3].intersect([1, 2], abs) == [-2]` +
+ +
+`def round = { a, b \-> a.round() \<=&gt; b.round() }` +
+`assert [1.1, 2.2].intersect([2.5, 3.5], round) == [2.2]` +
+`assert [2.5, 3.5].intersect([1.1, 2.2], round) == [2.5]` +
+ +
+Simply reverse the ordering to get the previous behavior.
+link:https://issues.apache.org/jira/browse/GROOVY-10275[GROOVY-10275]
 * There were some inconsistencies with JavaBean property naming conventions
 for various edge cases, e.g. for a field with a name being a single uppercase `X` and having a `getX` accessor,
 then the field was given priority over the accessor.
