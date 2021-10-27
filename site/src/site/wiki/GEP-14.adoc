@@ -1,0 +1,102 @@
+= GEP-14: Record classes
+
+:icons: font
+
+.Metadata
+****
+[horizontal,options="compact"]
+*Number*:: GEP-14
+*Title*:: Record classes
+*Version*:: 1
+*Type*:: Feature
+*Status*:: Draft
+*Leader*:: Paul King
+*Created*:: 2021-10-26
+*Last modification*&#160;:: 2021-10-26
+****
+
+== Abstract
+
+Record classes, or _records_ for short, are a special kind of class
+useful for modelling plain data aggregates.
+They provide a compact syntax with less ceremony than normal classes.
+Groovy already has AST transforms such as `@Immutable` and `@Canonical`
+which already dramatically reduce ceremony but records have been
+introduced in Java and record classes in Groovy are designed to align
+with Java record classes.
+
+=== Motivation
+
+For motivation of the general concept for records,
+see the References and useful links section below.
+The overall summary is that very succinct classes can be written
+for the special case of plain data aggregates, e.g.:
+
+[source,groovy]
+----
+record Point3D(int x, int y, int z) { }
+----
+or:
+
+[source,groovy]
+----
+record Person(String firstName, String lastName) { }
+----
+
+Such classes have automatic `toString`, `hashCode` and `equals` methods
+and an automatic tuple constructor. All of these factor into account the
+properties (known as record components) of the class.
+
+=== Motivation
+
+Requirements:
+
+* Maintain Java syntax compatibility where possible including the compact constructor syntax.
+* Produce classes equivalent to Java record classes when compiling on suitable JDK versions.
+
+Additional nice-to-have features:
+
+* Leverage Groovy's existing implementations e.g. inside the `@ToString` transform if/when it makes sense.
+* Assuming it is possible to leverage existing implementations, provide a fallback for earlier
+JDK versions which produce record-like classes.
+* Allow Groovy's existing transforms to augment records to offer some configurability (when it makes sense)
+* Support Groovy's named-parameter syntax
+* Support Groovy's `get` method for positional access of properties
+* Support Groovy's default parameter concept
+
+==== Initial implementation
+
+* Provide a `@RecordType` annotation collector which collects
+existing AST transforms suitable for providing the desired functionality.
+* Provide a `@RecordBase` AST transform which encapsulates any special
+treatment not found in existing transforms.
+
+==== Envisaged extensions
+
+* Introduce the `record` keyword in the grammar.
+* Support the compact constructor notation.
+
+== References and useful links
+
+* https://openjdk.java.net/jeps/395[JEP 395: Records]
+* https://openjdk.java.net/jeps/384[JEP 384: Records (Second Preview)]
+* https://openjdk.java.net/jeps/359[JEP 359: Records (Preview)]
+* https://docs.oracle.com/en/java/javase/16/language/records.html[Record Classes] Java documentation
+* https://kotlinlang.org/docs/data-classes.html[Kotlin data classes]
+* https://docs.scala-lang.org/tour/case-classes.html[Scala case classes]
+
+=== Reference implementation
+
+https://github.com/apache/groovy/pull/1375
+https://github.com/apache/groovy/pull/1633
+https://github.com/apache/groovy/pull/1645
+
+=== JIRA issues
+
+* https://issues.apache.org/jira/browse/GROOVY-9754[GROOVY-9754: Provide a record-like equivalent]
+* https://issues.apache.org/jira/browse/GROOVY-10240[GROOVY-10240: Support record grammar]
+* https://issues.apache.org/jira/browse/GROOVY-10298[GROOVY-10298: Refine records to not use system properties]
+
+== Update history
+
+1 (2021-10-26) Initial draft
