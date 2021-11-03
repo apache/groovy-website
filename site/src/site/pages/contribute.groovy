@@ -211,7 +211,7 @@ layout 'layouts/main.groovy', true,
                             h2('Donating to Friends of Groovy Open Collective')
 
                             p """
-								As an independent initiative, we have set up an open collective for Groovy:
+								As an independent initiative, members of the broader Groovy community have set up an open collective for Groovy:
 								${$a(href:'https://opencollective.com/friends-of-groovy', 'Friends of Groovy Open Collective')}
 								This initiative is designed to complement the Apache project and the many contributions we get from our great community and supporters.
 							"""
