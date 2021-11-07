@@ -52,17 +52,18 @@ properties (known as record components) of the class.
 Requirements:
 
 * Maintain Java syntax compatibility where possible including the compact constructor syntax.
-* Produce classes equivalent to Java record classes when compiling on suitable JDK versions.
+* Produce classes equivalent to Java record classes when compiling on suitable JDK versions (16+).
 
-Additional nice-to-have features:
+=== Groovy special features
 
 * Leverage Groovy's existing implementations e.g. inside the `@ToString` transform if/when it makes sense.
-* Assuming it is possible to leverage existing implementations, provide a fallback for earlier
-JDK versions which produce record-like classes.
+* Provide a fallback for earlier JDK versions which produce record-like classes.
 * Allow Groovy's existing transforms to augment records to offer some configurability (when it makes sense)
 * Support Groovy's named-parameter syntax
-* Support Groovy's `get` method for positional access of properties
+* Support Groovy's `getAt` method for positional access of components
 * Support Groovy's default parameter concept
+* Support additional helper methods found in other languages, e.g. Kotlin data classes and Scala case classes. Candidates include `copyWith`, `size`, `toMap`, `toList`.
+* Support destructuring of records
 
 ==== Initial implementation
 
@@ -70,11 +71,10 @@ JDK versions which produce record-like classes.
 existing AST transforms suitable for providing the desired functionality.
 * Provide a `@RecordBase` AST transform which encapsulates any special
 treatment not found in existing transforms.
-
-==== Envisaged extensions
-
-* Introduce the `record` keyword in the grammar.
-* Support the compact constructor notation.
+* Provide a `@RecordOptions` annotation which allows the constructed
+record implementation to be customised.
+* Provide support for the `record` keyword in the grammar which can be used
+instead of the `@RecordType` annotation.
 
 == References and useful links
 
@@ -96,7 +96,9 @@ https://github.com/apache/groovy/pull/1645
 * https://issues.apache.org/jira/browse/GROOVY-9754[GROOVY-9754: Provide a record-like equivalent]
 * https://issues.apache.org/jira/browse/GROOVY-10240[GROOVY-10240: Support record grammar]
 * https://issues.apache.org/jira/browse/GROOVY-10298[GROOVY-10298: Refine records to not use system properties]
+* https://issues.apache.org/jira/browse/GROOVY-10338[GROOVY-10338: Enhance records with additional helper methods]
 
 == Update history
 
 1 (2021-10-26) Initial draft
+2 (2021-11-06) Update to align with 4.0.0-beta-2
