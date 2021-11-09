@@ -47,18 +47,38 @@ Such classes have automatic `toString`, `hashCode` and `equals` methods
 and an automatic tuple constructor. All of these factor into account the
 properties (known as record components) of the class.
 
-=== Motivation
+=== Requirements
 
-Requirements:
+The main requirement is to provide equivalent functionality to Java record classes when compiling on suitable JDK versions (16+).
+By _equivalent functionality_, the following aspects are relevant:
 
+* Support reduced ceremony when writing records.
+* Store appropriate information at the bytecode level so that Groovy records are recognised by Java.
+We refer to classes with such bytecode information as _native_ records.
 * Maintain Java syntax compatibility where possible including the compact constructor syntax.
-* Produce classes equivalent to Java record classes when compiling on suitable JDK versions (16+).
+
+==== Non-goals
+
+* Provide native record support on versions of the JDK which supported records in preview mode
+
+=== Design considerations
+
+* Numerous Groovy AST transforms already provide functionality that overlaps with some features of Java records, e.g. `@ToString`
+helps reduce ceremony by offering a declarative mechanism to achieve an _automatic_ `toString` method.
+Where it makes sense, Groovy's record implementation should leverage such existing functionality.
+* Even though existing Groovy AST transforms can be pieced together to achieve mimic record functionality,
+it sees worth providing a pre-canned packaging of those pieces to mirror record functionality in a concise way.
+Records should not introduce any additional impedance for Java developers learning or using Groovy.
+* Groovy's existing AST transforms offer additional customization options and additional boilerplate reduction options.
+These should be available with Groovy records (when it makes sense).
+* Given that Groovy's existing AST transforms work for JDK versions prior to JDK16, Groovy's record functionality can
+allow the creation of _record-like_ classes. Unlike _native_ records, these won't have record information at the
+bytecode level but will otherwise follow the same conventions as native records. Such classes will store record
+information using annotations. They will be recognised by the Groovy compiler but not a Java compiler.
+* Given that records are primarily designed to be data aggregates, Groovy records are `@CompileStatic` by default.
 
 === Groovy special features
 
-* Leverage Groovy's existing implementations e.g. inside the `@ToString` transform if/when it makes sense.
-* Provide a fallback for earlier JDK versions which produce record-like classes.
-* Allow Groovy's existing transforms to augment records to offer some configurability (when it makes sense)
 * Support Groovy's named-parameter syntax
 * Support Groovy's `getAt` method for positional access of components
 * Support Groovy's default parameter concept

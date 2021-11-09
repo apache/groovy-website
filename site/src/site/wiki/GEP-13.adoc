@@ -34,7 +34,7 @@ maximum reuse.
 It effectively limits all further extension and indicates no further code reuse is desired.
 
 * By making a base class package-private we can limit extension to only classes within
-the same package. If an abstract `Shape` class is package-private, I could have
+the same package. If an abstract `Shape` class is package-private, we could have
 public classes `Square` and `Circle` in the same package. This indicates that we want
 code reuse to occur only within the package. While it does limit creation of
 new shapes outside the original package, it offers no abstraction for a shape which
@@ -65,8 +65,8 @@ a keyword, e.g. `sealed` would be encouraged instead. However, the annotation
 could be retained to offer support for this feature on earlier JVMs or versions
 of Groovy prior to any grammar changes.
 
-* Prohibit extension of JDK16+ sealed classes or annotated `@Sealed` classes.
-Likewise for interfaces. This also applies for anonymous inner classes and traits.
+* Prohibit extension of JDK17+ sealed classes or annotated `@Sealed` classes.
+This also applies for interfaces, anonymous inner classes and traits.
 
 * Provide checks in other places where such extension might occur implicitly, e.g.:&nbsp;with `@Delegate`,
 when using type coercion, etc.
@@ -76,12 +76,20 @@ when using type coercion, etc.
 * Allow the permitted subclasses to be inferred automatically just for the case
 where the base and all permitted subclasses are in the same file. (See JEP-409)
 
+* Introduce the `sealed` modifier and `permits` clause in the grammar.
+
+* By default, when running on JDK17+, sealed class information is added into the bytecode.
+We refer to such classes as _native_ sealed classes.
+
+* By default, when running on earlier JDKs, an annotation is added to a class to indicate that
+a class is sealed. Such classes will be recognized by Groovy 4+ compilers but not by Java.
+
+* The `@SealedOptions` annotation has a `mode` annotation attribute which can override the default behavior.
+
 ==== Potential extensions
 
 The following potential extensions are possibly all desirable but
 are non-goals for the first implementation:
-
-* Introduce the `sealed` modifier and `permits` clause in the grammar.
 
 * Require that all classes within a sealed hierarchy be compiled at the same time.
 
@@ -89,8 +97,6 @@ are non-goals for the first implementation:
 
 * Add warnings to the static compiler if a switch is used for a sealed hierarchy
 and not all types are exhaustively covered.
-
-* When running on JDK16+, also add sealed class information into the bytecode.
 
 == References and useful links
 
@@ -111,3 +117,4 @@ https://github.com/apache/groovy/pull/1606
 == Update history
 
 1 (2021-07-22) Initial draft
+2 (2021-11-06) Update to align with 4.0.0-beta-2
