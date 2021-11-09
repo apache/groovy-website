@@ -107,7 +107,7 @@ layout 'layouts/main.groovy', true,
                                     yield "We provide OpenPGP signatures ('.asc') files and checksums ('.sha256') for every release artifact. We recommend that you "
                                     a(href: 'https://www.apache.org/info/verification.html', 'verify')
                                     yield ' the integrity of downloaded files by generating your own checksums and matching them against ours and checking signatures using the '
-                                    a(href: 'https://www.apache.org/dist/groovy/KEYS', 'KEYS')
+                                    a(href: 'https://downloads.apache.org/groovy/KEYS', 'KEYS')
                                     yield " file which contains the OpenPGP keys of Groovy's Release Managers across all releases."
                                 }
                                 p {
@@ -156,7 +156,7 @@ layout 'layouts/main.groovy', true,
                                     }
                                     def srcUrl = { pkg ->
                                         def v = pkg.version
-                                        pkg.archive ? archiveUrl('src', 'sources', v) : "https://www.apache.org/dyn/closer.cgi/groovy/${v}/sources/apache-groovy-src-${v}.zip"
+                                        pkg.archive ? archiveUrl('src', 'sources', v) : "https://www.apache.org/dyn/closer.lua/groovy/${v}/sources/apache-groovy-src-${v}.zip?action=download"
                                     }
                                     dist.packages.each { pkg ->
                                         def v = pkg.version
@@ -232,7 +232,7 @@ layout 'layouts/main.groovy', true,
                                         ul {
                                             li {
                                                 yield "Apache's "
-                                                a(href: 'http://www.apache.org/dyn/closer.cgi/groovy/', 'release mirrors')
+                                                a(href: 'https://www.apache.org/dyn/closer.lua/groovy/', 'release mirrors')
                                                 yield ' and '
                                                 a(href: 'https://archive.apache.org/dist/groovy/', 'archive repository')
                                                 yield '.'
