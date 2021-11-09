@@ -330,6 +330,84 @@ in integration scenarios. Groovy does read such information from Java classes on
 same package. Groovy currently doesn't enforce this requirement but may do so in a future version.
 In particular, it is likely _native_ sealed classes (see previous dot point) will need this requirement.
 
+[[Groovy4.0-new-records]]
+=== Record-like classes (incubating)
+
+Java 14 and 15 introduced _records_ as a _preview_ feature and for Java 16 records graduated from preview status.
+As per this https://www.infoq.com/articles/java-14-feature-spotlight/[records spotlight article],
+records "model _plain data aggregates_ with less ceremony".
+
+Groovy has features like the `@Immutable` and `@Canonical` AST transformations which already support
+modeling data aggregates with less ceremony, and while these features overlap to some degree
+with the design of records, they are not a direct equivalent.
+Records are closest to `@Immutable` with a few variations added to the mix.
+
+Groovy 4 adds support for "_native_" records for JDK16+ and also for record-like classes on earlier JDKs.
+Record-like classes have all the features of native records but don't have the same information at the
+bytecode level as native records, and so won't be recognised as records by a Java compiler in cross-language
+integration scenarios.
+
+Record-like classes look somewhat similar to classes generated when using Groovy's `@Immutable` AST transform.
+That transform is itself a meta-annotation (also known as annotation collector)
+which combines more fine-grained features. It is relatively simple to provide a record-like re-mix
+of those features and that is what Groovy 4 provides with its record implementation.
+
+You can write a record definition as follows:
+
+[source,groovy]
+--------------------------------------
+record Cyclist(String firstName, String lastName) { }
+--------------------------------------
+
+Or in this longer form (which is more or less what the above single-line definition is converted into):
+
+[source,groovy]
+--------------------------------------
+@groovy.transform.RecordType
+class Cyclist {
+    String firstName
+    String lastName
+}
+--------------------------------------
+
+And you'd use it as per the following example:
+
+[source,groovy]
+--------------------------------------
+def richie = new Cyclist('Richie', 'Porte')
+--------------------------------------
+
+This produces a class with the following characteristics:
+
+* it is implicitly final
+* it has a private final field `firstName` with an accessor method `firstName()`; ditto for `lastName`
+* it has a default `Cyclist(String, String)` constructor
+* it has a default `serialVersionUID` of 0L
+* it has implicit `toString()`, `equals()` and `hashCode()` methods
+
+The `@RecordType` annotation combines the following transforms/marker annotations:
+
+[source,groovy]
+--------------------------------------
+@RecordBase
+@ToString(cache = true, includeNames = true)
+@EqualsAndHashCode(cache = true, useCanEqual = false)
+@ImmutableOptions
+@PropertyOptions
+@TupleConstructor
+@CompileStatic
+@POJO
+--------------------------------------
+
+We are seeking feedback on the implementation details in the meantime
+and are keen to understand where our users might use records or record-like structures.
+
+[width="80%",align="center"]
+|===
+a| NOTE: _WARNING:_
+The implementation of records is not final, hence the incubating status.
+|===
+
 [[Groovy4.0-new-checkers]]
 === Built-in type checkers
 
@@ -590,78 +668,6 @@ Your mileage may vary as to whether using this approach will or won't require
 the Groovy jars to be on the classpath. While we anticipate some improvements over time
 allowing more Groovy constructs to work with `@POJO`, we currently make no guarantees that
 all constructs will eventually be supported. Hence the incubating status.
-|===
-
-[[Groovy4.0-new-records]]
-=== Record-like classes (incubating)
-
-Java 14 introduced _records_ as a _preview_ feature.
-As per this https://www.infoq.com/articles/java-14-feature-spotlight/[records spotlight article],
-records "model _plain data_ aggregates with less ceremony".
-Groovy has features like the `@Immutable` transformation which already support
-modeling data aggregates with less ceremony, and while these features overlap to some degree
-with the design of records, they are not a direct equivalent.
-Records are a slight re-mixing of the features of `@Immutable` with a few variations added to the mix.
-
-Luckily for us, Groovy's `@Immutable` is itself a meta-annotation (also known as annotation collector)
-which combines more fine-grained features. It is relatively simple to provide a record-like re-mix
-of those features and that is what Groovy 4 provides with its `@RecordType` transform.
-It combines the following transforms/marker annotations:
-
-[source,groovy]
---------------------------------------
-@RecordBase
-@ToString(cache = true, includeNames = true)
-@EqualsAndHashCode(cache = true, useCanEqual = false)
-@ImmutableOptions
-@PropertyOptions(propertyHandler = ImmutablePropertyHandler)
-@TupleConstructor(defaults = false)
-@MapConstructor
-@KnownImmutable
-@POJO
---------------------------------------
-
-You define and use a record-like class as follows:
-
-[source,groovy]
---------------------------------------
-@groovy.transform.RecordType
-class Cyclist {
-    String firstName
-    String lastName
-}
-
-def richie = new Cyclist('Richie', 'Porte')
---------------------------------------
-
-This produces a class with the following characteristics:
-
-* it is implicitly final
-* it has a private final field `firstName` with an accessor method `firstName()`; ditto for `lastName`
-* it has a default `Cyclist(String, String)` constructor
-* it has a default `serialVersionUID` of 0L
-* it has implicit `toString()`, `equals()` and `hashCode()` methods
-
-In future releases, we may provide some syntactic sugar to allow the above definition to be written like this:
-
-[source,groovy]
---------------------------------------
-record Cyclist(String firstName, String lastName) { }    // possible future syntax
---------------------------------------
-
-This syntax is *not* currently supported.
-We are seeking feedback on the implementation details in the meantime
-and are keen to understand where our users might use records or record-like structures.
-
-[width="80%",align="center"]
-|===
-a| NOTE: _WARNING:_
-The implementation of records is not final, hence the incubating status.
-We are still weighing up numerous options.
-We can make our record-like classes much more flexible than the Java variant,
-so long as we follow the rules such classes are expected to follow.
-However, at some point, if we provide too many differences, it may cause
-future issues as Java records evolve.
 |===
 
 [[Groovy4.0-new-contracts]]
@@ -1087,7 +1093,7 @@ link:https://issues.apache.org/jira/browse/GROOVY-9981[GROOVY-9981]
 [[Groovy4.0-requirements]]
 == JDK requirements
 
-Groovy 4.0 requires JDK11+ to build and JDK8 is the minimum version of the JRE that we support.
+Groovy 4.0 requires JDK16+ to build and JDK8 is the minimum version of the JRE that we support.
 Groovy has been tested on JDK versions 8 through 17.
 
 [[Groovy4.0-more-info]]
