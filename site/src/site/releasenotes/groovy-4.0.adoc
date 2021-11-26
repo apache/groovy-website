@@ -906,6 +906,24 @@ In addition, type annotations that appear in code,
 e.g. local variable types, cast expression types, catch block exception types,
 are still work in progress.
 
+=== AST transformation priorities
+
+The order in which AST transforms are processed is determined first by the `phase`
+declared in a transform's `@GroovyASTTransformation` declaration.
+For transforms declared to be in the same phase, the order in which the
+associated transform annotations appear in the source code is then used.
+
+Now, transformation writers can also specify a priority for their transforms.
+To do so, the AST transformation must implement the `TransformWithPriority` interface
+and return their priority as an integer in the implemented `priority()` method.
+The default priority is `0`. The transformation with the highest positive priority
+will be processed first. Negative priorities will be processed after all transformations
+with a priority of zero (the default).
+
+Note that transformations are still all processed together. The priority only
+affects ordering between other transformations. Other parts of the respective
+compiler phase remain unchanged.
+
 [[Groovy4.0-ongoing]]
 == On-going work
 
