@@ -8,7 +8,7 @@ Groovy 4 builds upon existing features and streamlines various legacy options.
 |===
 a| NOTE: _WARNING:_
 Material on this page is still under development! +
-We are currently releasing beta versions of Groovy 4.0 with a goal
+We are currently working on release candidate versions of Groovy 4.0 with a goal
 of gathering feedback on the language changes from our community.
 In addition, early versions assist other projects and tool vendors within the
 Groovy ecosystem to begin assessing the impact of moving to/supporting Groovy 4.0.
@@ -1107,6 +1107,28 @@ Bug fix:
 link:https://issues.apache.org/jira/browse/GROOVY-9797[GROOVY-9797] +
 Improved documentation and helper methods:
 link:https://issues.apache.org/jira/browse/GROOVY-9981[GROOVY-9981]
+* Various Groovy test classes had unnecessary hidden dependencies on JUnit 3/4 classes.
+After modification, these classes can now be used with e.g. JUnit 5 (or Spock)
+without Junit 3/4 on the classpath. It is a breaking change only if
+code is looking explicitly at the class of thrown exceptions
+or inspecting the class hierarchy through reflection. +
+`NotYetImplemented`:
+link:https://issues.apache.org/jira/browse/GROOVY-9492[GROOVY-9492] +
+`GroovyAssert`:
+link:https://issues.apache.org/jira/browse/GROOVY-9767[GROOVY-9767]
+* Several `Sql#call` variants incorrectly throw `Exception` rather than `SQLException`.
+This is a binary breaking change. Care should be taken with compiling code relying
+on those methods with an older version of Groovy and then running on Groovy 4
+and vice versa.
+link:https://issues.apache.org/jira/browse/GROOVY-9923[GROOVY-9923]
+* We removed `StaticTypeCheckingVisitor#collectAllInterfacesByName`
+from our public API as it was buggy and there were numerous alternatives
+available. We weren't aware of any framework use of this method.
+Even though it was public, it was considered mostly internal.
+link:https://issues.apache.org/jira/browse/GROOVY-10123[GROOVY-10123]
+* Two jar files (`servlet-api.jar` and `jsp-api.jar`) were notionally "provided" dependencies but were previously
+copied into the Groovy binary distribution. This is no longer the case.
+link:https://issues.apache.org/jira/browse/GROOVY-9827[GROOVY-9827]
 
 [[Groovy4.0-requirements]]
 == JDK requirements
