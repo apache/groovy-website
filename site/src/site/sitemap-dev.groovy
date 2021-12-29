@@ -77,22 +77,20 @@ documentation {
 downloads {
     distribution('Groovy 4.0') {
         description {
-            yield 'Groovy 4.0 is the next major '
+            a(href: "${userSiteBase}releasenotes/groovy-4.0.html", 'Groovy 4.0')
+            yield ' is the next major '
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK8+ with much improved JPMS support.'
         }
         version('4.0.0-rc-2') {
             stable false
-//            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-4.0.0-rc-2/'
-        }
-        version('4.0.0-rc-1') {
-            stable false
-            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-4.0.0-rc-1/'
+            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-4.0.0-rc-2/'
         }
     }
     distribution('Groovy 3.0') {
         description {
-            yield 'Groovy 3.0 is the latest stable '
+            a(href: "${userSiteBase}releasenotes/groovy-3.0.html", 'Groovy 3.0')
+            yield ' is the latest stable '
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK8+ with a new more flexible parser (aka Parrot parser).'
         }
@@ -103,7 +101,8 @@ downloads {
     }
     distribution('Groovy 2.5') {
         description {
-            yield 'Groovy 2.5 is the previous stable '
+            a(href: "${userSiteBase}releasenotes/groovy-2.5.html", 'Groovy 2.5')
+            yield ' is the previous stable '
             a(href: 'versioning.html', 'version')
             yield ' of Groovy.'
         }
@@ -114,7 +113,8 @@ downloads {
     }
     distribution('Groovy 2.4') {
         description {
-            yield 'Groovy 2.4 is an earlier version of Groovy still in widespread use.'
+            a(href: "${userSiteBase}releasenotes/groovy-2.4.html", 'Groovy 2.4')
+            yield ' is an earlier version of Groovy still in widespread use.'
             yieldUnescaped ''' Important: Releases before 2.4.4 weren't done under the Apache Software Foundation and are provided as a convenience, without any warranty.'''
         }
         version('2.4.21') {
