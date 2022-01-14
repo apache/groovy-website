@@ -1056,19 +1056,23 @@ When no projecting function is in play,
 `a.intersect(b)` should always equal `b.intersect(a)`.
 When a projecting function is in play, most languages define `a.intersect(b)` as
 the subset of elements from `a` which when projected match a projected value from `b`.
-So the resulting values are always drawn from `a`. The arguments can be reversed
-to draw the elements from `a`. Groovy's semantics used to be the reverse of most
-other languages but is now aligned. Some examples with the new behavior: +
- +
-`def abs = { a, b \-> a.abs() \<=&gt; b.abs() }` +
-`assert [1, 2].intersect([-2, -3], abs) == [2]` +
-`assert [-2, -3].intersect([1, 2], abs) == [-2]` +
- +
-`def round = { a, b \-> a.round() \<=&gt; b.round() }` +
-`assert [1.1, 2.2].intersect([2.5, 3.5], round) == [2.2]` +
-`assert [2.5, 3.5].intersect([1.1, 2.2], round) == [2.5]` +
- +
-Simply reverse the ordering to get the previous behavior.
+So the resulting values are always drawn from `a`. The objects involved can be reversed
+to draw the elements from `b`. Groovy's semantics used to be the reverse of most
+other languages but is now aligned. Some examples with the new behavior:
++
+[source,groovy]
+----
+def abs = { a, b -> a.abs() <=> b.abs() }
+assert [1, 2].intersect([-2, -3], abs) == [2]
+assert [-2, -3].intersect([1, 2], abs) == [-2]
+
+def round = { a, b -> a.round() <=> b.round() }
+assert [1.1, 2.2].intersect([2.5, 3.5], round) == [2.2]
+assert [2.5, 3.5].intersect([1.1, 2.2], round) == [2.5]
+----
++
+Simply reverse the order of the objects to get the previous behavior,
+e.g. use `foo.intersect(bar)` instead of `bar.intersect(foo)`.
 link:https://issues.apache.org/jira/browse/GROOVY-10275[GROOVY-10275]
 * There were some inconsistencies with JavaBean property naming conventions
 for various edge cases, e.g. for a field with a name being a single uppercase `X` and having a `getX` accessor,
@@ -1129,6 +1133,24 @@ link:https://issues.apache.org/jira/browse/GROOVY-10123[GROOVY-10123]
 * Two jar files (`servlet-api.jar` and `jsp-api.jar`) were notionally "provided" dependencies but were previously
 copied into the Groovy binary distribution. This is no longer the case.
 link:https://issues.apache.org/jira/browse/GROOVY-9827[GROOVY-9827]
+* Groovy code involving `plus` on arrays broke referential transparency
+in certain contexts.
+The expression `b + c`, where `b` and `c` are arrays,
+potentially gave different results in the two expressions `a = b + c` and `b = b + c`.
+The latter of these expressions (shorthand for `b += c`) was type preserving
+but the former was returned as an Object[]. The type preserving behavior
+was the intended one.
+link:https://issues.apache.org/jira/browse/GROOVY-6837[GROOVY-6837].
++
+[TIP]
+====
+To mimick the old behavior: If `b` is not an Object array and you desire an Object
+array result, then instead of `b + c`, use one of:
+
+* `b.union(c)`
+* `new Object[0] + b + c`
+* `[] as Object[] + b + c`
+====
 
 [[Groovy4.0-requirements]]
 == JDK requirements
