@@ -1151,6 +1151,11 @@ array result, then instead of `b + c`, use one of:
 * `new Object[0] + b + c`
 * `[] as Object[] + b + c`
 ====
+* Groovy's syntax borrows an "information hiding principal" idea from the Eiffel programming
+language whereby accessing a public field or a property (private field with a getter)
+can have the same syntactic form. This idea wasn't carried over to the `getProperties()`
+method in an object's metaclass. Now `getProperties()` also returns public fields.
+link:https://issues.apache.org/jira/browse/GROOVY-10449[GROOVY-10449].
 
 [[Groovy4.0-requirements]]
 == JDK requirements
