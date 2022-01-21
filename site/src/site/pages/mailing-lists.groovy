@@ -86,27 +86,6 @@ layout 'layouts/main.groovy', true,
                                         """
                                     }
 
-                                    li {
-                                        p """
-                                        The mailing lists are archived on ${
-                                            $a(href: 'http://www.nabble.com/', 'Nabble')
-                                        }: ${
-                                            $a(href: 'http://groovy.329449.n5.nabble.com/', 'combined')
-                                        } ${
-                                            $a(href: 'http://groovy.329449.n5.nabble.com/Groovy-Users-f329450.html', 'users')
-                                        } ${
-                                            $a(href: 'http://groovy.329449.n5.nabble.com/Groovy-Dev-f372993.html', 'dev')
-                                        } ${
-                                            $a(href: 'http://groovy.329449.n5.nabble.com/Groovy-Commits-f5723493.html', 'commits')
-                                        } ${
-                                            $a(href: 'http://groovy.329449.n5.nabble.com/Groovy-Notifications-f5723494.html', 'notifications')
-                                        }"""
-                                        p """
-                                        You can even post messages to a mailing list through Nabble
-                                        but you first need to be subscribed to the appropriate list!
-                                        """
-                                    }
-
                                     li """
                                     You can also find archives on mail-archive.com: ${
                                         $a(href: 'https://www.mail-archive.com/users@groovy.apache.org/', 'users')} ${
@@ -121,6 +100,12 @@ layout 'layouts/main.groovy', true,
                                         $a(href: 'https://marc.info/?l=groovy-dev&r=1&s=groovy&q=b&w=4', 'groovy-dev')
                                     }
                                     """
+
+                                    li """
+                                    Historically, the mailing lists were also available through Nabble. These are archived on the Internet Archive: ${
+                                        $a(href: 'https://web.archive.org/web/20210507154652/http://groovy.329449.n5.nabble.com/', 'combined')
+                                    """
+                                    }
                                 }
                             }
                         }
