@@ -104,8 +104,8 @@ layout 'layouts/main.groovy', true,
                                     li """
                                     Historically, the mailing lists were also available through Nabble. These are archived on the Internet Archive: ${
                                         $a(href: 'https://web.archive.org/web/20210507154652/http://groovy.329449.n5.nabble.com/', 'combined')
-                                    """
                                     }
+                                    """
                                 }
                             }
                         }
