@@ -34,12 +34,12 @@ class ChangelogParser {
     private static final String BUGTYPE_MARK = '** '
     private static final String ITEM_MARK = '    * '
     private static final Pattern ITEM_PATTERN = ~/\[(GROOVY-[0-9]+)\] - (.+)/
-    private static final String VERSION_PATTERN = /^((1\.)|[234]\.)/
+    private static final String VERSION_PATTERN = /^((1\.)|[2345]\.)/
     public static final Map<String, String> INFO = [
             '1.1.0': 'Unreleased: renamed to 1.5.0',
             '1.9.0': 'Unreleased: renamed to 2.0.0',
             '2.6.0': 'Unreleased: discontinued',
-            '4.0.0': 'Unreleased: upcoming new release',
+            '5.0.0': 'Unreleased: upcoming new release',
     ]
 
     static List<Changelog> fetchReleaseNotes(File cacheDirectory) {

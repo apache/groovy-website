@@ -1,0 +1,156 @@
+:source-highlighter: pygments
+:pygments-style: emacs
+:icons: font
+
+Groovy 5 builds upon existing features of earlier versions of Groovy.
+In addition, it incorporates numerous new features and streamlines various legacy aspects of the Groovy codebase.
+
+[width="80%",align="center"]
+|===
+a| NOTE: _WARNING:_
+Material on this page is still under development!
+We are currently working on alpha versions of Groovy 5.0 with a goal of gathering feedback on the language changes from our community. In addition, early versions assist other projects and tool vendors within the Groovy ecosystem to begin assessing the impact of moving to/supporting Groovy 5.0. Caution should be exercised if using new features as the details may change before final release.
+Some features described here as "incubating" may become stable before 5.0.0 final is released, others are expected to remain incubating for version 5. We don’t recommend using alpha versions or incubating features for production systems.
+|===
+
+
+[[Groovy5.0-new]]
+== New features
+
+[[Groovy5.0-other]]
+== Other improvements
+
+[[Groovy5.0-ongoing]]
+== On-going work
+
+=== Enhanced switch (under investigation)
+
+Groovy has always had a very powerful switch statement.
+The statement could be made more powerful, e.g. support destructuring,
+and could be supported in contexts where expressions are expected.
+
+As inspiration, Java has made, or is investigating future enhancements
+including switch expressions and other related enhancements:
+link:https://openjdk.java.net/jeps/354[JEP 354: Switch Expressions (Second Preview)]
+link:https://openjdk.java.net/jeps/361[JEP 361: Switch Expressions]
+link:https://openjdk.java.net/jeps/405[JEP 405: Record Patterns & Array Patterns (Preview)]
+link:https://openjdk.java.net/jeps/406[JEP 406: Pattern Matching for switch (Preview)]
+We should investigate these proposals both in terms of enhancing the existing Groovy switch
+but also in terms of deciding which syntax from Java we might like to support in the future.
+
+Other languages like Python are also improving their switch statements:
+https://www.python.org/dev/peps/pep-0622/[PEP 622 -- Structural Pattern Matching].
+We should investigate whether any features of their design make sense for Groovy's dynamic nature.
+
+As an example of destructuring, instead of the following existing code:
+
+[source,groovy]
+--------------------------------------
+def make3D(pt) {
+    switch(pt) {
+        case Point3D:
+            return pt
+        case Point2D:
+            return new Point3D(pt.x, pt.y, 0)
+        case List:
+            def (x, y, z) = pt
+            if (x == 0 && y == 0 && z == 0)
+                throw new IllegalArgumentException("Origin not allowed")
+            return new Point3D(x, y, z)
+            ...
+    }
+}
+--------------------------------------
+
+You could use something like:
+
+[source,groovy]
+--------------------------------------
+def make3D(pt) {
+    switch(pt) {
+        case Point3D:
+            return pt
+        case Point2D(x, y):
+            return new Point3D(x, y, 0)
+        case [0, 0, 0]:
+            throw new IllegalArgumentException("Origin not allowed")
+        case [x, y, z]:
+            return new Point3D(x, y, z)
+            ...
+    }
+}
+--------------------------------------
+
+An example of guarded patterns being considered for Java:
+
+[source,java]
+--------------------------------------
+static void testTriangle(Shape s) {
+    switch (s) {
+        case null ->
+            System.out.println("Null!");
+        case Triangle t && (t.calculateArea() > 100) ->
+            System.out.println("Large triangle");
+        case Triangle t ->
+            System.out.println("Small triangle");
+        default ->
+            System.out.println("Non-triangle");
+    }
+}
+--------------------------------------
+
+Another destructuring example:
+
+[source,java]
+--------------------------------------
+int eval(Expr n) {
+     return switch(n) {
+         case IntExpr(int i) -> i;
+         case NegExpr(Expr n) -> -eval(n);
+         case AddExpr(Expr left, Expr right) -> eval(left) + eval(right);
+         case MulExpr(Expr left, Expr right) -> eval(left) * eval(right);
+         default -> throw new IllegalStateException();
+     };
+}
+--------------------------------------
+
+We should consider the currently proposed nested record pattern when exploring our
+destructuring options, e.g.:
+
+[source,java]
+--------------------------------------
+static void printColorOfUpperLeftPoint(Rectangle r) {
+    if (r instanceof Rectangle(ColoredPoint(Point p, Color c), ColoredPoint lr)) {
+        System.out.println(c);
+    }
+}
+--------------------------------------
+
+=== Other Java-inspired enhancements
+
+* Module definitions written in Groovy (i.e. module-info.groovy)
+link:https://issues.apache.org/jira/browse/GROOVY-9273[GROOVY-9273]
+* Use of "_" (underscore) for unused parameters (see "Treatment of underscores" in https://openjdk.java.net/jeps/302[JEP 302: Lambda Leftovers])
+
+[[Groovy5.0-breaking]]
+== Other breaking changes
+
+* Numerous classes previously "leaked" ASM constants which are essentially an internal implementation detail by virtue of
+implementing an `Opcodes` interface. This will not normally affect the majority of
+Groovy scripts but might impact code which manipulates AST nodes such as AST transforms.
+Before compiling with Groovy 4, some of these may need one or more appropriate static import statements added.
+AST transforms which extend `AbstractASTTransformation` are one example of potentially affected classes.
+(link:https://issues.apache.org/jira/browse/GROOVY-9736[GROOVY-9736]).
+
+[[Groovy5.0-requirements]]
+== JDK requirements
+
+Groovy 5.0 requires JDK16+ to build and JDK8 is the
+minimum version of the JRE that we support.
+This may change before the GA version of Groovy 5 is released.
+Groovy has been tested on JDK versions 8 through 17.
+
+[[Groovy5.0-more-info]]
+== More information
+
+You can browse all the link:../changelogs/changelog-5.0.0-unreleased.html[tickets closed for Groovy 5.0 in JIRA].

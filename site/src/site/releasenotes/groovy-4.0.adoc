@@ -2,20 +2,17 @@
 :pygments-style: emacs
 :icons: font
 
-Groovy 4 builds upon existing features and streamlines various legacy options.
+Groovy 4 builds upon existing features of earlier versions of Groovy.
+In addition, it incorporates numerous new features and streamlines various legacy aspects of the Groovy codebase.
 
 [width="80%",align="center"]
 |===
 a| NOTE: _WARNING:_
-Material on this page is still under development! +
-We are currently working on release candidate versions of Groovy 4.0 with a goal
-of gathering feedback on the language changes from our community.
-In addition, early versions assist other projects and tool vendors within the
-Groovy ecosystem to begin assessing the impact of moving to/supporting Groovy 4.0.
-Caution should be exercised if using new features as the details may change before final release. +
-Some features described here as "incubating" may become stable before 4.0.0 final is released,
-others are expected to remain incubating for version 4.
-We don't recommend using beta versions or incubating features for production systems.
+Some features of Groovy 4 are designated as "incubating".
+Where appropriate, related classes or APIs of these features may be annotated with the `@Incubating` annotation. +
+Caution should be exercised when using incubating features as the details may change
+in subsequent versions of Groovy.
+We don't recommend using incubating features for production systems.
 |===
 
 
@@ -55,40 +52,6 @@ The `groovy-testng` module is less widely used and is no longer included in `gro
 Please adjust your build script dependencies if needed.
 If you are using the Groovy distribution, no changes are required since it
 includes the optional modules.
-
-[[Groovy4.0-consolidation]]
-== Legacy consolidation
-
-[[Groovy4.0-parrot-only]]
-=== Old parser removal
-
-Groovy 3 introduced the new "Parrot" parser which supports lambdas, method
-references, and numerous other tweaks. In Groovy 3, You could still revert back to the old parser
-if you wanted. In Groovy 4, the old Antlr2 based parser is removed.
-Please use older versions of Groovy if you require the old parser.
-
-[[Groovy4.0-indy-only]]
-=== Classic bytecode generation removal
-
-For many versions, Groovy could generate classic _call-site based_ bytecode
-or bytecode targeting the JDK7+ invoke dynamic ("indy") bytecode instructions.
-You could switch between them with a compiler switch and we had two sets of
-jars ("normal" and "-indy") built with and without the switch enabled.
-In Groovy 4.0, only bytecode using the latter approach can be generated.
-There is now one set of jars and they happen to be indy flavored.
-
-Currently, the Groovy runtime still contains any necessary support for
-classes compiled using older versions of Groovy.
-Please use Groovy versions up to 3.x if you need to generate the older
-style bytecode.
-
-This work was originally planned for Groovy 3.0, but there were numerous places
-where "indy" code was noticeably slower than "classic" bytecode.
-We have made numerous speed improvements (starting with https://issues.apache.org/jira/browse/GROOVY-8298[GROOVY-8298])
-and have some ability to tune internal thresholds (search the code base for
-`groovy.indy.optimize.threshold` and `groovy.indy.fallback.threshold`).
-That work gave us useful speed improvements, but we welcome further feedback
-to help improve overall performance of the indy bytecode.
 
 [[Groovy4.0-new]]
 == New features
@@ -248,11 +211,13 @@ test()
 ==== Differences to Java
 
 * Currently, there is no requirement that all possible values of the switch target
-are covered exhaustively by case branches. If no `default` branch is present, an
-implicit one returning `null` is added. For this reason, in contexts where `null`
+are covered exhaustively by case branches.
+If no `default` branch is present, an
+implicit one returning `null` is added.
+For this reason, in contexts where `null`
 is not desired, e.g.&nbsp;storing the result in a primitive, or constructing
 a non-nullable `Optional`, then an explicit `default` should be given, e.g.:
-
++
 [source,groovy]
 --------------------------------------
 // default branch avoids GroovyCastException
@@ -269,16 +234,29 @@ Optional.of(switch(i) {
     default -> 'buckle my shoe'
 })
 --------------------------------------
++
+In future Groovy versions, or perhaps through tooling like CodeNarc,
+we expect to support the stricter checking of exhaustive case branches similar to Java.
+This may be implemented automatically when using Groovy's static nature
+or via an additional optional type checking extension.
+For this reason, developers may wish to not rely on the automatic
+default branch returning `null` and instead provide their own default or exhaustively
+cover all branches.
 
 [[Groovy4.0-sealed-types]]
 === Sealed types
 
-Sealed classes and interfaces restrict which other classes or interfaces may extend or implement them.
+Sealed classes, interfaces and traits restrict which other classes or interfaces may extend or implement them.
+Groovy supports using a `sealed` keyword or a `@Sealed` annotation when writing a sealed type.
+The permitted subclasses for a sealed type can be given explicitly
+(using a `permits` clause with the `sealed` keyword or a `permittedSubclasses` annotation attribute for `@Sealed`), or automatically detected if compiling the relevant types
+all at the same time.
 For further details, see (link:https://groovy.apache.org/wiki/GEP-13.html[GEP-13]) and the
 Groovy documentation.
 
 As a motivating example, sealed hierarchies can be useful when specifying
-Algebraic or Abstract Data Types (ADTs) as shown in the following example:
+Algebraic or Abstract Data Types (ADTs) as shown in the following example
+(using the annotation syntax):
 
 [source,groovy]
 --------------------------------------
@@ -296,8 +274,6 @@ import groovy.transform.*
 Tree<Integer> tree = new Node<>(42, new Node<>(0, Empty.instance, Empty.instance), Empty.instance)
 assert tree.toString() == 'Node(42, Node(0, Empty, Empty), Empty)'
 --------------------------------------
-
-Here we are using the annotation syntax.
 
 As another example, sealed types can be useful when creating enhanced enum-like hierarchies. Here is a weather example using the `sealed` keyword:
 
@@ -321,17 +297,43 @@ subclasses are open to extension. A future version of Codenarc may have a rule t
 Groovy developers who wish to follow that Java practice if they desire. Having said that,
 keeping restrictions on extension (by using `final` or `sealed`) will lead to more places
 where future type checking can check for exhaustive use of types (e.g. switch expressions).
-* Currently, Groovy adds an annotation (@Sealed) to sealed classes but doesn't write
-sealed information into the bytecode (_native_ sealed classes).
-This allows Groovy sealed classes to be used for JDK8+.
-A future version of Groovy will write such information into the bytecode when using a JDK &gt; 17 and setting the target bytecode level to 17+. This will allow Java compilers to respect sealed Groovy classes
-in integration scenarios. Groovy does read such information from Java classes on JDKs where it is available.
+* Groovy uses the `@Sealed` annotation to support sealed classes for JDK8+.
+These are known as _emulated_ sealed classes.
+Such classes will be recognised as sealed by the Groovy
+compiler but not the Java compiler.
+For JDK17+, Groovy will write sealed class information into the bytecode.
+These are known as _native_ sealed classes.
+See the `@SealedOptions` annotation to have further control over whether
+emulated or native sealed classes are created.
 * Java has requirements around classes within a sealed hierarchy being in the same module or
 same package. Groovy currently doesn't enforce this requirement but may do so in a future version.
 In particular, it is likely _native_ sealed classes (see previous dot point) will need this requirement.
 
+[width="80%",align="center"]
+|===
+a| NOTE: _TIP:_
+Sealed classes can use the `sealed` (and related) keywords
+or the `@Sealed` (and related) annotations.
+The keyword style is generally more succinct, however
+if you have an editor or other tooling which doesn't yet provide
+support for the new keywords, you might prefer the annotation style.
+The syntax used for writing your sealed classes doesn't impact whether
+_native_ or _emulated_ sealed classes are created.
+This is determined solely by the bytecode version and options
+given in `@SealedOptions`. Note that it is fine to use `@SealedOptions`
+annotation on a class defined using the keyword style.
+|===
+
+[width="80%",align="center"]
+|===
+a| NOTE: _WARNING:_
+Sealed classes are an _incubating_ feature.
+While we don't expect large changes, some minor details
+may change in future Groovy versions.
+|===
+
 [[Groovy4.0-new-records]]
-=== Record-like classes (incubating)
+=== Records and record-like classes (incubating)
 
 Java 14 and 15 introduced _records_ as a _preview_ feature and for Java 16 records graduated from preview status.
 As per this https://www.infoq.com/articles/java-14-feature-spotlight/[records spotlight article],
@@ -342,10 +344,13 @@ modeling data aggregates with less ceremony, and while these features overlap to
 with the design of records, they are not a direct equivalent.
 Records are closest to `@Immutable` with a few variations added to the mix.
 
-Groovy 4 adds support for "_native_" records for JDK16+ and also for record-like classes on earlier JDKs.
+Groovy 4 adds support for _native_ records for JDK16+ and also for
+record-like classes (also known as _emulated_ records) on earlier JDKs.
 Record-like classes have all the features of native records but don't have the same information at the
 bytecode level as native records, and so won't be recognised as records by a Java compiler in cross-language
 integration scenarios.
+See the `@RecordOptions` annotation for further control over whether
+_emulated_ or _native_ records are created.
 
 Record-like classes look somewhat similar to classes generated when using Groovy's `@Immutable` AST transform.
 That transform is itself a meta-annotation (also known as annotation collector)
@@ -390,22 +395,42 @@ The `@RecordType` annotation combines the following transforms/marker annotation
 [source,groovy]
 --------------------------------------
 @RecordBase
-@ToString(cache = true, includeNames = true)
-@EqualsAndHashCode(cache = true, useCanEqual = false)
-@ImmutableOptions
+@RecordOptions
+@TupleConstructor(namedVariant = true, force = true, defaultsMode = DefaultsMode.AUTO)
 @PropertyOptions
-@TupleConstructor
-@CompileStatic
+@KnownImmutable
 @POJO
+@CompileStatic
 --------------------------------------
 
-We are seeking feedback on the implementation details in the meantime
-and are keen to understand where our users might use records or record-like structures.
+The `RecordBase` annotation also provides
+`@ToString` and `@EqualsAndHashCode` functionality, either delegating
+to those transforms or providing special native record equivalents.
+
+We are keen for further feedback on how Groovy users might use
+records or record-like structures.
+
+[width="80%",align="center"]
+|===
+a| NOTE: _TIP:_
+You can use the `record` keyword
+or the `@RecordType` annotation for either _native_ or _emulated_ records.
+The keyword style is generally more succinct, however
+if you have an editor or other tooling which doesn't yet provide
+support for the new keyword and compact syntax, you might prefer the annotation style.
+The syntax used for writing your records doesn't impact whether
+_native_ or _emulated_ records are created.
+This is determined solely by the bytecode version and options
+given in `@RecordOptions`. Note that it is fine to use `@RecordOptions`
+annotation on a record defined using the keyword style.
+|===
 
 [width="80%",align="center"]
 |===
 a| NOTE: _WARNING:_
-The implementation of records is not final, hence the incubating status.
+Records are an _incubating_ feature.
+While we don't expect large changes, some minor details
+may change in future Groovy versions.
 |===
 
 [[Groovy4.0-new-checkers]]
@@ -419,7 +444,7 @@ This mechanism allows users to:
 
 So far, we know this feature has been used internally by companies (e.g. type-checked DSLs),
 but we haven't seen widespread sharing of type checker extensions.
-From Groovy 4, we plan to bundle some select type checkers within the optional
+From Groovy 4, we bundle some select type checkers within the optional
 `groovy-typecheckers` module,
 to encourage further use of this feature.
 
@@ -471,7 +496,7 @@ to be replaced with transformed code during compilation.
 
 A bit like type checker extensions, we know this feature has been used in numerous places,
 but so far, we haven't seen widespread sharing of macro methods.
-From Groovy 4, we plan to bundle some select macro methods within the optional
+From Groovy 4, we bundle some select macro methods within the optional
 `groovy-macro-library` module,
 to encourage further use of this feature.
 
@@ -489,11 +514,15 @@ def string = 'foo'
 Suppose now you want to print those out for debugging purposes.
 You could write some appropriate `println` statements and maybe sprinkle in some
 calls to `format()`. You might even have an IDE help you do that.
-Alternatively, the `NV` macro method comes to the rescue:
+Alternatively, the `SV` and NV` macro methods come to the rescue.
+
+The `SV` macro method creates a String (actually a gapi:groovy.lang.GString)
+which contains the variables name and value.
+Here is an example:
 
 [source,groovy]
 --------------------------------------
-println NV(num, list, range, string)
+println SV(num, list, range, string)
 --------------------------------------
 
 which outputs:
@@ -502,16 +531,16 @@ which outputs:
 num=42, list=[1, 2, 3], range=[0, 1, 2, 3, 4, 5], string=foo
 --------------------------------------
 
-Here, the `NV` macro method springs into action during the compilation process.
-The compiler replaces the apparent global `NV` method call with an expression
+Here, the `SV` macro method springs into action during the compilation process.
+The compiler replaces the apparent global `SV` method call with an expression
 which combines the names and `toString()` values of the supplied variables.
 
-Two other variations exist. `NVI` calls Groovy's `inspect()` method rather than
-`toString()` and `NVD` calls Groovy's `dump()` method. So this code:
+Two other variations exist. `SVI` calls Groovy's `inspect()` method rather than
+`toString()` and `SVD` calls Groovy's `dump()` method. So this code:
 
 [source,groovy]
 --------------------------------------
-println NVI(range)
+println SVI(range)
 --------------------------------------
 
 produces the following output:
@@ -524,13 +553,33 @@ And this code:
 
 [source,groovy]
 --------------------------------------
-println NVD(range)
+println SVD(range)
 --------------------------------------
 
 yields:
 
 --------------------------------------
-range=<groovy.lang.IntRange@14 from=0 to=5 reverse=false inclusive=true modCount=0>
+range=<groovy.lang.IntRange@14 from=0 to=5 reverse=false inclusiveRight=true inclusiveLeft=true modCount=0>
+--------------------------------------
+
+The `NV` macro method provides similar functionality to `SV` but instead of
+creating a "string", it creates a gapi:groovy.lang.NamedValue which lets
+you further process the name and value information. Here is an example:
+
+[source,groovy]
+--------------------------------------
+def r = NV(range)
+assert r instanceof NamedValue
+assert r.name == 'range' && r.val == 0..5
+--------------------------------------
+
+There is also a `NVL` macro method which creates a list of `NamedValue` instances.
+
+[source,groovy]
+--------------------------------------
+def nsl = NVL(num, string)
+assert nsl*.name == ['num', 'string']
+assert nsl*.val == [42, 'foo']
 --------------------------------------
 
 We welcome further feedback on additional macro methods to include within Groovy.
@@ -924,117 +973,39 @@ Note that transformations are still all processed together. The priority only
 affects ordering between other transformations. Other parts of the respective
 compiler phase remain unchanged.
 
-[[Groovy4.0-ongoing]]
-== On-going work
+[[Groovy4.0-consolidation]]
+== Legacy consolidation
 
-=== Enhanced switch (under investigation)
+[[Groovy4.0-parrot-only]]
+=== Old parser removal
 
-Groovy has always had a very powerful switch statement.
-The statement could be made more powerful, e.g. support destructuring,
-and could be supported in contexts where expressions are expected.
+Groovy 3 introduced the new "Parrot" parser which supports lambdas, method
+references, and numerous other tweaks. In Groovy 3, You could still revert back to the old parser
+if you wanted. In Groovy 4, the old Antlr2 based parser is removed.
+Please use older versions of Groovy if you require the old parser.
 
-As inspiration, Java has made, or is investigating future enhancements
-including switch expressions and other related enhancements:
-link:https://openjdk.java.net/jeps/354[JEP 354: Switch Expressions (Second Preview)]
-link:https://openjdk.java.net/jeps/361[JEP 361: Switch Expressions]
-link:https://openjdk.java.net/jeps/405[JEP 405: Record Patterns & Array Patterns (Preview)]
-link:https://openjdk.java.net/jeps/406[JEP 406: Pattern Matching for switch (Preview)]
-We should investigate these proposals both in terms of enhancing the existing Groovy switch
-but also in terms of deciding which syntax from Java we might like to support in the future.
+[[Groovy4.0-indy-only]]
+=== Classic bytecode generation removal
 
-Other languages like Python are also improving their switch statements:
-https://www.python.org/dev/peps/pep-0622/[PEP 622 -- Structural Pattern Matching].
-We should investigate whether any features of their design make sense for Groovy's dynamic nature.
+For many versions, Groovy could generate classic _call-site based_ bytecode
+or bytecode targeting the JDK7+ invoke dynamic ("indy") bytecode instructions.
+You could switch between them with a compiler switch and we had two sets of
+jars ("normal" and "-indy") built with and without the switch enabled.
+In Groovy 4.0, only bytecode using the latter approach can be generated.
+There is now one set of jars and they happen to be indy flavored.
 
-As an example of destructuring, instead of the following existing code:
+Currently, the Groovy runtime still contains any necessary support for
+classes compiled using older versions of Groovy.
+Please use Groovy versions up to 3.x if you need to generate the older
+style bytecode.
 
-[source,groovy]
---------------------------------------
-def make3D(pt) {
-    switch(pt) {
-        case Point3D:
-            return pt
-        case Point2D:
-            return new Point3D(pt.x, pt.y, 0)
-        case List:
-            def (x, y, z) = pt
-            if (x == 0 && y == 0 && z == 0)
-                throw new IllegalArgumentException("Origin not allowed")
-            return new Point3D(x, y, z)
-            ...
-    }
-}
---------------------------------------
-
-You could use something like:
-
-[source,groovy]
---------------------------------------
-def make3D(pt) {
-    switch(pt) {
-        case Point3D:
-            return pt
-        case Point2D(x, y):
-            return new Point3D(x, y, 0)
-        case [0, 0, 0]:
-            throw new IllegalArgumentException("Origin not allowed")
-        case [x, y, z]:
-            return new Point3D(x, y, z)
-            ...
-    }
-}
---------------------------------------
-
-An example of guarded patterns being considered for Java:
-
-[source,java]
---------------------------------------
-static void testTriangle(Shape s) {
-    switch (s) {
-        case null ->
-            System.out.println("Null!");
-        case Triangle t && (t.calculateArea() > 100) ->
-            System.out.println("Large triangle");
-        case Triangle t ->
-            System.out.println("Small triangle");
-        default ->
-            System.out.println("Non-triangle");
-    }
-}
---------------------------------------
-
-Another destructuring example:
-
-[source,java]
---------------------------------------
-int eval(Expr n) {
-     return switch(n) {
-         case IntExpr(int i) -> i;
-         case NegExpr(Expr n) -> -eval(n);
-         case AddExpr(Expr left, Expr right) -> eval(left) + eval(right);
-         case MulExpr(Expr left, Expr right) -> eval(left) * eval(right);
-         default -> throw new IllegalStateException();
-     };
-}
---------------------------------------
-
-We should consider the currently proposed nested record pattern when exploring our
-destructuring options, e.g.:
-
-[source,java]
---------------------------------------
-static void printColorOfUpperLeftPoint(Rectangle r) {
-    if (r instanceof Rectangle(ColoredPoint(Point p, Color c), ColoredPoint lr)) {
-        System.out.println(c);
-    }
-}
---------------------------------------
-
-=== Other Java-inspired enhancements
-
-* Module definitions written in Groovy (i.e. module-info.groovy)
-link:https://issues.apache.org/jira/browse/GROOVY-9273[GROOVY-9273]
-* Use of "_" (underscore) for unused parameters (see "Treatment of underscores" in https://openjdk.java.net/jeps/302[JEP 302: Lambda Leftovers])
+This work was originally planned for Groovy 3.0, but there were numerous places
+where "indy" code was noticeably slower than "classic" bytecode.
+We have made numerous speed improvements (starting with https://issues.apache.org/jira/browse/GROOVY-8298[GROOVY-8298])
+and have some ability to tune internal thresholds (search the code base for
+`groovy.indy.optimize.threshold` and `groovy.indy.fallback.threshold`).
+That work gave us useful speed improvements, but we welcome further feedback
+to help improve overall performance of the indy bytecode.
 
 [[Groovy4.0-breaking]]
 == Other breaking changes
