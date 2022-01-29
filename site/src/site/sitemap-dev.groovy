@@ -75,10 +75,18 @@ documentation {
 }
 
 downloads {
+    distribution('Groovy 5.0') {
+        description {
+            a(href: "${userSiteBase}releasenotes/groovy-5.0.html", 'Groovy 5.0')
+            yield ' is the next major '
+            a(href: 'versioning.html', 'version')
+            yield ' of Groovy. We expect to have alpha releases soon.'
+        }
+    }
     distribution('Groovy 4.0') {
         description {
             a(href: "${userSiteBase}releasenotes/groovy-4.0.html", 'Groovy 4.0')
-            yield ' is the next major '
+            yield ' is the latest stable '
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK8+ with much improved JPMS support.'
         }
@@ -90,7 +98,7 @@ downloads {
     distribution('Groovy 3.0') {
         description {
             a(href: "${userSiteBase}releasenotes/groovy-3.0.html", 'Groovy 3.0')
-            yield ' is the latest stable '
+            yield ' is the previous stable '
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK8+ with a new more flexible parser (aka Parrot parser).'
         }
@@ -102,7 +110,7 @@ downloads {
     distribution('Groovy 2.5') {
         description {
             a(href: "${userSiteBase}releasenotes/groovy-2.5.html", 'Groovy 2.5')
-            yield ' is the previous stable '
+            yield ' is an earlier version of Groovy still in widespread use.'
             a(href: 'versioning.html', 'version')
             yield ' of Groovy.'
         }
@@ -115,6 +123,7 @@ downloads {
         description {
             a(href: "${userSiteBase}releasenotes/groovy-2.4.html", 'Groovy 2.4')
             yield ' is an earlier version of Groovy still in widespread use.'
+            yield ' We encourage users to upgrade from this version as we no longer support this version actively.'
             yieldUnescaped ''' Important: Releases before 2.4.4 weren't done under the Apache Software Foundation and are provided as a convenience, without any warranty.'''
         }
         version('2.4.21') {
