@@ -787,8 +787,58 @@ innerjoin n2 in nums2 on n1 == n2
 select n1 + 1, n2
 --------------------------------------
 
-More examples could be found at
-link:https://github.com/apache/groovy/blob/master/subprojects/groovy-ginq/src/spec/test/org/apache/groovy/ginq/GinqTest.groovy[GINQ examples]
+Let's look at a complete example. Suppose we have information
+in JSON format about fruits, their prices (per 100g) and
+the concentration of vitamin C (per 100g).
+We can process the JSON as follows:
+
+[source,groovy]
+--------------------------------------
+import groovy.json.JsonSlurper
+def json = new JsonSlurper().parseText('''
+{
+    "prices": [
+        {"name": "Kakuda plum",      "price": 13},
+        {"name": "Camu camu",        "price": 25},
+        {"name": "Acerola cherries", "price": 39},
+        {"name": "Guava",            "price": 2.5},
+        {"name": "Kiwifruit",        "price": 0.4},
+        {"name": "Orange",           "price": 0.4}
+    ],
+    "vitC": [
+        {"name": "Kakuda plum",      "conc": 5300},
+        {"name": "Camu camu",        "conc": 2800},
+        {"name": "Acerola cherries", "conc": 1677},
+        {"name": "Guava",            "conc": 228},
+        {"name": "Kiwifruit",        "conc": 144},
+        {"name": "Orange",           "conc": 53}
+    ]
+}
+''')
+--------------------------------------
+
+Now, suppose we are on a budget and want to select
+the most cost-effective fruits to buy to help us achieve
+our daily vitamin C requirements.
+We _join_ the _prices_ and _vitC_ information and
+order by most cost-effective fruit.
+We'll select the top 2 in case our first choice isn't in stock
+when we go shopping. We can see, for this data,
+Kakadu plums followed by Kiwifruit are our best choices:
+
+[source,groovy]
+--------------------------------------
+assert GQ {
+    from p in json.prices
+    join c in json.vitC on c.name == p.name
+    orderby c.conc / p.price in desc
+    limit 2
+    select p.name
+}.toList() == ['Kakuda plum', 'Kiwifruit']
+--------------------------------------
+
+More examples could be found in the link:../using-ginq.html[groovy-ginq documentation] (or directly in
+link:https://github.com/apache/groovy/blob/master/subprojects/groovy-ginq/src/spec/test/org/apache/groovy/ginq/GinqTest.groovy[the source repo]).
 
 === TOML Support (incubating)
 
@@ -827,6 +877,8 @@ assert 'http://example.org' == toml.records.car.homepage
 assert 'speed' == toml.records.car.record.type
 assert 'production pickup truck with speed of 271kph' == toml.records.car.record.description
 --------------------------------------
+
+More examples could be found in the link:../processing-toml.html[groovy-toml] documentation.
 
 [[Groovy4.0-other]]
 == Other improvements

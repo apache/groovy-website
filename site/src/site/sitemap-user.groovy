@@ -126,10 +126,12 @@ documentation {
     }
 
     section('Groovy module guides', 'fa-cubes') {
-        item 'Parsing and producing JSON',          'json',             'json-userguide'
+        item 'Parsing and producing JSON',          'processing-json',  'json-userguide'
         item 'Working with a relational database',  'databases',        'sql-userguide'
         item 'Processing XML',                      'processing-xml',   'xml-userguide'
         item 'Processing YAML',                     'processing-yaml',  'yaml-userguide'
+        item 'Processing TOML',                     'processing-toml',  'toml-userguide'
+        item 'SQL-like querying of collections',    'using-ginq',       'ginq-userguide'
         item 'Scripting Ant tasks',                 'scripting-ant',    'ant-builder'
         item 'Template engines',                    'templating',       'template-engines'
         item 'Creating Swing UIs',                  'swing',            'swing-builder'
