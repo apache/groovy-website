@@ -881,6 +881,29 @@ assert GQ {
 }.toList() == ['Kakuda plum', 'Kiwifruit']
 --------------------------------------
 
+In a future Groovy version we hope to provide GQuery support for SQL databases
+where an optimised SQL query is generated based on the GQuery expression
+much like Groovy's DataSet functionality.
+In the meantime, for small volumes of data, you can use Groovy's standard
+SQL capabilities which return queries from the database as collections.
+Here is what the code would look like for a database with
+`Price` and `VitaminC` tables both having `name` and `per100g` columns:
+
+[source,groovy]
+--------------------------------------
+// ... create sql connection ...
+def price = sql.rows('SELECT * FROM Price')
+def vitC = sql.rows('SELECT * FROM VitaminC')
+assert GQ {
+    from p in price
+    join c in vitC on c.name == p.name
+    orderby c.per100g / p.per100g in desc
+    limit 2
+    select p.name
+}.toList() == ['Kakuda plum', 'Kiwifruit']
+// ... close connect ...
+--------------------------------------
+
 More examples could be found in the link:../using-ginq.html[GQuery documentation] (or directly in
 link:https://github.com/apache/groovy/blob/master/subprojects/groovy-ginq/src/spec/test/org/apache/groovy/ginq/GinqTest.groovy[the source repo]).
 
