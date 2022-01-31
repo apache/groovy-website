@@ -901,7 +901,7 @@ assert GQ {
     limit 2
     select p.name
 }.toList() == ['Kakuda plum', 'Kiwifruit']
-// ... close connect ...
+// ... close connection ...
 --------------------------------------
 
 More examples could be found in the link:../using-ginq.html[GQuery documentation] (or directly in
