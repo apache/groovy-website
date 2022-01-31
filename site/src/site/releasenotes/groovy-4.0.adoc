@@ -758,9 +758,12 @@ and that any class invariant is true before and after a method is called.
 
 This module replaces the previously external `gcontracts` project which is now archived.
 
-=== GINQ, a.k.a. Groovy-Integrated Query (incubating)
+=== GINQ, a.k.a. Groovy-Integrated Query or GQuery (incubating)
 
-GINQ supports querying collections in a SQL-like style.
+GQuery supports querying collections in a SQL-like style.
+This could involve lists and/or maps or your own domain objects
+or those returned when processing for instance JSON, XML and other
+structured data.
 
 [source, sql]
 --------------------------------------
@@ -837,7 +840,48 @@ assert GQ {
 }.toList() == ['Kakuda plum', 'Kiwifruit']
 --------------------------------------
 
-More examples could be found in the link:../using-ginq.html[groovy-ginq documentation] (or directly in
+We can look at the same example again for XML.
+Our XML processing code might look something like:
+
+[source,groovy]
+--------------------------------------
+import groovy.xml.XmlSlurper
+def root = new XmlSlurper().parseText('''
+<root>
+    <prices>
+        <price name="Kakuda plum">13</price>
+        <price name="Camu camu">25</price>
+        <price name="Acerola cherries">39</price>
+        <price name="Guava">2.5</price>
+        <price name="Kiwifruit">0.4</price>
+        <price name="Orange">0.4</price>
+    </prices>
+    <vitaminC>
+        <conc name="Kakuda plum">5300</conc>
+        <conc name="Camu camuum">2800</conc>
+        <conc name="Acerola cherries">1677</conc>
+        <conc name="Guava">228</conc>
+        <conc name="Kiwifruit">144</conc>
+        <conc name="Orange">53</conc>
+    </vitaminC>
+</root>
+''')
+--------------------------------------
+
+Our GQuery code might look like:
+
+[source,groovy]
+--------------------------------------
+assert GQ {
+    from p in root.prices.price
+    join c in root.vitaminC.conc on c.@name == p.@name
+    orderby c.toInteger() / p.toDouble() in desc
+    limit 2
+    select p.@name
+}.toList() == ['Kakuda plum', 'Kiwifruit']
+--------------------------------------
+
+More examples could be found in the link:../using-ginq.html[GQuery documentation] (or directly in
 link:https://github.com/apache/groovy/blob/master/subprojects/groovy-ginq/src/spec/test/org/apache/groovy/ginq/GinqTest.groovy[the source repo]).
 
 === TOML Support (incubating)
