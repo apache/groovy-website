@@ -1129,6 +1129,10 @@ to help improve overall performance of the indy bytecode.
 [[Groovy4.0-breaking]]
 == Other breaking changes
 
+* Groovy added some very minor enhancements when using the link:https://javaee.github.io/jaxb-v2/[JAXB technology] in its optional `groovy-jaxb` module. Since JAXB is link:https://openjdk.java.net/jeps/320[no longer bundled in the JDK], we removed this module. Users wanting that functionality are likely able to use the Groovy 3 version of that module with Groovy 4, though we don't guarantee this going forward.
+(link:https://issues.apache.org/jira/browse/GROOVY-10005[GROOVY-10005]).
+* The optional `groovy-bsf` module provides a Groovy BSF engine for the version 2 of BSF (a.k.a. beanshell) framework. This version hasn't had a release since 2005 and has reached end-of-life. In Groovy 4 we have removed this module. Users wanting that functionality are likely able to use the Groovy 3 version of that module with Groovy 4, though we don't guarantee this going forward.
+(link:https://issues.apache.org/jira/browse/GROOVY-10023[GROOVY-10023]).
 * Numerous classes previously "leaked" ASM constants which are essentially an internal implementation detail by virtue of
 implementing an `Opcodes` interface. This will not normally affect the majority of
 Groovy scripts but might impact code which manipulates AST nodes such as AST transforms.
