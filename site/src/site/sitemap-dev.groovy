@@ -110,9 +110,9 @@ downloads {
     distribution('Groovy 2.5') {
         description {
             a(href: "${userSiteBase}releasenotes/groovy-2.5.html", 'Groovy 2.5')
-            yield ' is an earlier version of Groovy still in widespread use.'
+            yield ' is an earlier '
             a(href: 'versioning.html', 'version')
-            yield ' of Groovy.'
+            yield ' of Groovy still in widespread use.'
         }
         version('2.5.15') {
             stable true
@@ -122,7 +122,9 @@ downloads {
     distribution('Groovy 2.4') {
         description {
             a(href: "${userSiteBase}releasenotes/groovy-2.4.html", 'Groovy 2.4')
-            yield ' is an earlier version of Groovy still in widespread use.'
+            yield ' is an earlier '
+            a(href: 'versioning.html', 'version')
+            yield ' of Groovy still in widespread use.'
             yield ' We encourage users to upgrade from this version as we no longer support this version actively.'
             yieldUnescaped ''' Important: Releases before 2.4.4 weren't done under the Apache Software Foundation and are provided as a convenience, without any warranty.'''
         }
