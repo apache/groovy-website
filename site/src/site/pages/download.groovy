@@ -410,6 +410,8 @@ layout 'layouts/main.groovy', true,
                                                 code 'org.codehaus.groovy'
                                                 yield '.'
                                             }
+                                        }
+                                        tr {
                                             td(colspan: 3) {
                                                 yield 'For '
                                                 code 'groovy-all'
