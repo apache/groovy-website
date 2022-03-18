@@ -410,6 +410,15 @@ layout 'layouts/main.groovy', true,
                                                 code 'org.codehaus.groovy'
                                                 yield '.'
                                             }
+                                            td(colspan: 3) {
+                                                yield 'For '
+                                                code 'groovy-all'
+                                                yield ' use '
+                                                code "implementation platform('org.apache.groovy:groovy-all:x.y.z')"
+                                                yield ' instead of '
+                                                code "implementation 'org.codehaus.groovy:groovy-all:x.y.z'"
+                                                yield '.'
+                                            }
                                         }
                                         tr {
                                             td(colspan: 3) {
