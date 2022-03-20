@@ -415,7 +415,7 @@ layout 'layouts/main.groovy', true,
                                             td(colspan: 3) {
                                                 yield 'For '
                                                 code 'groovy-all'
-                                                yield ' use '
+                                                yield ' when using Gradle 6+ use '
                                                 code "implementation platform('org.apache.groovy:groovy-all:x.y.z')"
                                                 yield ' instead of '
                                                 code "implementation 'org.codehaus.groovy:groovy-all:x.y.z'"
