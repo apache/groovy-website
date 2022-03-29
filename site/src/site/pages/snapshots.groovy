@@ -34,7 +34,7 @@ layout 'layouts/main.groovy', true,
                                             }
                                         }
                                         td "${$a(href:'https://repo1.maven.org/maven2/org/codehaus/groovy/','Maven Central')} or ${$a(href:'https://groovy.jfrog.io/artifactory/libs-release-local/org/codehaus/groovy','Groovy artifactory release repository')}"
-                                        td "${$a(href:'https://groovy.jfrog.io/artifactory/libs-snapshot-local/org/codehaus/groovy','Groovy artifactory snapshots repository')}"
+                                        td "${$a(href:'https://groovy.jfrog.io/artifactory/libs-snapshot-local/','Groovy artifactory snapshots repository') $a(href:'https://groovy.jfrog.io/artifactory/libs-snapshot-local/org/codehaus/groovy','(Browse org/codehaus/groovy)')}"
                                     }
                                     tr {
                                         td {
@@ -43,7 +43,7 @@ layout 'layouts/main.groovy', true,
                                             }
                                         }
                                         td "${$a(href:'https://repo1.maven.org/maven2/org/apache/groovy/','Maven Central')} or ${$a(href:'https://groovy.jfrog.io/artifactory/libs-release-local/org/apache/groovy','Groovy artifactory release repository')}"
-                                        td "${$a(href:'https://repository.apache.org/content/repositories/snapshots/org/apache/groovy','ASF Snapshots repository')}"
+                                        td "${$a(href:'https://repository.apache.org/content/repositories/snapshots/','ASF Snapshots repository') $a(href:'https://repository.apache.org/content/repositories/snapshots/org/apache/groovy','(Browse org/apache/groovy)')}"
                                     }
                                 }
                             }
