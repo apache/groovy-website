@@ -30,20 +30,48 @@ layout 'layouts/main.groovy', true,
                                     tr {
                                         td {
                                             strong {
-                                                em 'Groovy versions 1.x to 3.x'
+                                                em 'Groovy 1.x to 3.x'
                                             }
+                                            br()
+                                            em 'org/codehaus/groovy'
                                         }
-                                        td "${$a(href:'https://repo1.maven.org/maven2/org/codehaus/groovy/','Maven Central')} or ${$a(href:'https://groovy.jfrog.io/artifactory/libs-release-local/org/codehaus/groovy','Groovy artifactory release repository')}"
-                                        td "${$a(href:'https://groovy.jfrog.io/artifactory/libs-snapshot-local/','Groovy artifactory snapshots repository') $a(href:'https://groovy.jfrog.io/artifactory/libs-snapshot-local/org/codehaus/groovy','(Browse org/codehaus/groovy)')}"
+                                        td {
+                                            a(href:'https://repo1.maven.org/maven2/','Maven Central')
+                                            yield ' '
+                                            a(href:'https://repo1.maven.org/maven2/org/codehaus/groovy/','(Browse)')
+                                            br()
+                                            a(href:'https://groovy.jfrog.io/artifactory/libs-release-local/','Groovy artifactory release repository')
+                                            yield ' '
+                                            a(href:'https://groovy.jfrog.io/artifactory/libs-release-local/org/codehaus/groovy','(Browse)')
+                                        }
+                                        td {
+                                            a(href:'https://groovy.jfrog.io/artifactory/libs-snapshot-local/','Groovy artifactory snapshots repository')
+                                            yield ' '
+                                            a(href:'https://groovy.jfrog.io/artifactory/libs-snapshot-local/org/codehaus/groovy','(Browse)')
+                                        }
                                     }
                                     tr {
                                         td {
                                             strong {
-                                                em 'Groovy versions 4.x+'
+                                                em 'Groovy 4.x+'
                                             }
+                                            br()
+                                            em 'org/apache/groovy'
                                         }
-                                        td "${$a(href:'https://repo1.maven.org/maven2/org/apache/groovy/','Maven Central')} or ${$a(href:'https://groovy.jfrog.io/artifactory/libs-release-local/org/apache/groovy','Groovy artifactory release repository')}"
-                                        td "${$a(href:'https://repository.apache.org/content/repositories/snapshots/','ASF Snapshots repository') $a(href:'https://repository.apache.org/content/repositories/snapshots/org/apache/groovy','(Browse org/apache/groovy)')}"
+                                        td {
+                                            a(href:'https://repo1.maven.org/maven2/','Maven Central')
+                                            yield ' '
+                                            a(href:'https://repo1.maven.org/maven2/org/apache/groovy/','(Browse)')
+                                            br()
+                                            a(href:'https://groovy.jfrog.io/artifactory/libs-release-local/','Groovy artifactory release repository')
+                                            yield ' '
+                                            a(href:'https://groovy.jfrog.io/artifactory/libs-release-local/org/apache/groovy','(Browse)')
+                                        }
+                                        td {
+                                            a(href:'https://repository.apache.org/content/repositories/snapshots/','ASF Snapshots repository')
+                                            yield ' '
+                                            a(href:'https://repository.apache.org/content/repositories/snapshots/org/apache/groovy','(Browse)')
+                                        }
                                     }
                                 }
                             }

@@ -120,6 +120,7 @@ downloads {
         }
         version('2.5.15') {
             stable true
+            archive true
             windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-2.5.15/'
         }
     }
