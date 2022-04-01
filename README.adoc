@@ -24,10 +24,10 @@ The Groovy development team
 :revdate: 2019-11-05
 :build-icon: http://ci.groovy-lang.org:8111/app/rest/builds/buildType:(id:Groovy_Website)/statusIcon
 :noheader:
-:groovy-www: http://groovy-lang.org/
+:groovy-www: https://groovy-lang.org/
 :groovy-ci: http://ci.groovy-lang.org/viewType.html?buildTypeId=Groovy_Website&guest=1
-:gradle: http://www.gradle.org
-:markupte: http://docs.groovy-lang.org/latest/html/documentation/markup-template-engine.html
+:gradle: https://www.gradle.org
+:markupte: https://groovy-lang.org/templating.html#_the_markuptemplateengine
 
 [.left.text-left]
 image::http://groovy-lang.org/img/groovy-logo.png[]
@@ -129,12 +129,12 @@ build.gradle                    : website weaving logic for dev site
 ----
 
 Additional details (a little dated but mostly relevant) can be found in
-this http://melix.github.io/blog/2014/07/new-groovy-website.html[blog post].
+this https://melix.github.io/blog/2014/07/new-groovy-website.html[blog post].
 
 == Continuous Integration
 
 The official CI server runs {groovy-ci}[here] (login as user guest and leave the password blank)
-and is sponsored by http://www.jetbrains.com[JetBrains].
+and is sponsored by https://www.jetbrains.com[JetBrains].
 
 WARNING: The website is continuously updated from the _asf-site_ branch.
 This means that *every merge on master is immediately published*.
@@ -143,4 +143,4 @@ Changes that need to be applied on a specific date need to be done on a dedicate
 == License
 
 Groovy is licensed under the terms of the
-http://www.apache.org/licenses/LICENSE-2.0.html[Apache License, Version 2.0]
+https://www.apache.org/licenses/LICENSE-2.0.html[Apache License, Version 2.0]
