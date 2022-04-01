@@ -116,12 +116,7 @@ downloads {
         }
         version('2.5.16') {
             stable true
-            //windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-2.5.16/'
-        }
-        version('2.5.15') {
-            stable true
-            archive true
-            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-2.5.15/'
+            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-2.5.16/'
         }
     }
     distribution('Groovy 2.4') {
