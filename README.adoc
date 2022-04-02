@@ -21,16 +21,16 @@
 
 = Groovy website
 The Groovy development team
-:revdate: 2019-11-05
-:build-icon: http://ci.groovy-lang.org:8111/app/rest/builds/buildType:(id:Groovy_Website)/statusIcon
+:revdate: 2022-04-02
+:build-icon: https://ci-builds.apache.org/job/Groovy/job/Groovy%20dev%20website/badge/icon?subject=dev%20website
 :noheader:
 :groovy-www: https://groovy-lang.org/
-:groovy-ci: http://ci.groovy-lang.org/viewType.html?buildTypeId=Groovy_Website&guest=1
+:groovy-ci: https://ci-builds.apache.org/job/Groovy/job/Groovy%20dev%20website/
 :gradle: https://www.gradle.org
 :markupte: https://groovy-lang.org/templating.html#_the_markuptemplateengine
 
 [.left.text-left]
-image::http://groovy-lang.org/img/groovy-logo.png[]
+image::https://groovy-lang.org/img/groovy-logo.png[]
 {groovy-www}[Groovy] is a multi-faceted language for the Java Virtual Machine. It builds
 upon the strengths of Java, but has additional power features inspired by languages like
 Python, Ruby and Smalltalk.
@@ -57,8 +57,6 @@ This project builds two Groovy websites:
 The websites are static once generated. The generation process uses {gradle}[Gradle] and Groovy's templating
 capabilities to generate the sites.
 
-Build is image:{build-icon}[build status, link={groovy-ci}].
-
 == Generating the user site
 
 ----
@@ -76,6 +74,8 @@ site-user/build
   |---- distributions   : zip of the website
 ----
 
+The user site is published as part of the release process.
+
 == Generating the developer site
 
 ----
@@ -92,6 +92,15 @@ site-dev/build
   |---- reports         : deadlinks report
   |---- distributions   : zip of the website
 ----
+
+The dev site is published continuously from the _asf-site_ branch.
+The CI server runs {groovy-ci}[here] (Groovy committers can login
+with Apache credentials and trigger manually if needed).
+Status: image:{build-icon}[build status, link={groovy-ci}]
+
+WARNING: The website is continuously updated from the _asf-site_ branch.
+This means that *every merge on that branch is immediately published*.
+Changes that need to be applied on a specific date need to be done on a dedicated branch.
 
 == Contributing
 
@@ -130,15 +139,6 @@ build.gradle                    : website weaving logic for dev site
 
 Additional details (a little dated but mostly relevant) can be found in
 this https://melix.github.io/blog/2014/07/new-groovy-website.html[blog post].
-
-== Continuous Integration
-
-The official CI server runs {groovy-ci}[here] (login as user guest and leave the password blank)
-and is sponsored by https://www.jetbrains.com[JetBrains].
-
-WARNING: The website is continuously updated from the _asf-site_ branch.
-This means that *every merge on master is immediately published*.
-Changes that need to be applied on a specific date need to be done on a dedicated branch.
 
 == License
 
