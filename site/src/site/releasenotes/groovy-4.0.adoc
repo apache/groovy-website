@@ -1261,3 +1261,22 @@ Groovy has been tested on JDK versions 8 through 17.
 == More information
 
 You can browse all the link:../changelogs/changelog-4.0.0-unreleased.html[tickets closed for Groovy 4.0 in JIRA].
+
+[[Groovy4.0releasenotes-4.0.2]]
+== Addendum for 4.0.2
+
+* Groovy 4 enhanced the metadata stored for its dependencies
+using Gradle's module metadata feature. As part of this change,
+accessing the `groovy-all` dependency changed in a way that was
+confusing for many users. In particular, there was a requirement
+to use `platform` that was not required before.
+The module metadata has been improved and using `platform` is no longer required.
+link:https://issues.apache.org/jira/browse/GROOVY-10543[GROOVY-10543]
+* Preliminary JDK19 support has been added
+* Groovy optionally supports the use of security policy files
+to trigger security exceptions if unpermitted operations are performed
+(e.g. reading properties, exiting the JVM or accessing resources like files).
+With the Java plan to phase out security policy framework (link:https://openjdk.java.net/jeps/411[JEP-411]), future Groovy versions will likely phase
+out this optional support. In the meantime, users could expect warning
+messages if using such features and potentially exceptions in JDK 18 or 19.
+* Of particular note around security exceptions (see previous point), when using `groovysh` on JDK18 or JDK19, users should set `JAVA_OPTS` to `-Djava.security.manager=allow`. The `groovysh` tool uses a security manager to prohibit calls to `System::exit`. Alternative APIs to deal with this scenario are expected to emerge at some point and `groovysh` will move to those when available.
