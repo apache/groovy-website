@@ -154,6 +154,10 @@ layout 'layouts/main.groovy', true,
                                             a(href: u, ext)
                                         }
                                     }
+                                    def apacheDistUrl = { pkg, type ->
+                                        def v = pkg.version
+                                        pkg.archive ? archiveUrl('src', 'sources', v) : "https://www.apache.org/dyn/closer.lua/groovy/${v}/distribution/apache-groovy-$type-${v}.zip?action=download"
+                                    }
                                     def srcUrl = { pkg ->
                                         def v = pkg.version
                                         pkg.archive ? archiveUrl('src', 'sources', v) : "https://www.apache.org/dyn/closer.lua/groovy/${v}/sources/apache-groovy-src-${v}.zip?action=download"
@@ -168,6 +172,10 @@ layout 'layouts/main.groovy', true,
                                                         i(class: 'fa fa-gears fa-4x') {}
                                                         br()
                                                         yield 'binary'
+                                                    }
+                                                    yield ' '
+                                                    a(href: apacheDistUrl(pkg, 'binary')) {
+                                                        yield '(mirror)'
                                                     }
                                                     buildExtras(pkg.archive ? '' : 'dist: ', 'binary', 'distribution', v, pkg.archive)
                                                     if (!pkg.archive) {
@@ -188,6 +196,10 @@ layout 'layouts/main.groovy', true,
                                                         br()
                                                         yield ' documentation'
                                                     }
+                                                    yield ' '
+                                                    a(href: apacheDistUrl(pkg, 'docs')) {
+                                                        yield '(mirror)'
+                                                    }
                                                     buildExtras(pkg.archive ? '' : 'dist: ', 'docs', 'distribution', v, pkg.archive)
                                                     if (!pkg.archive) {
                                                         buildExtras('perm: ', 'docs', 'distribution', v, true)
@@ -198,6 +210,10 @@ layout 'layouts/main.groovy', true,
                                                         i(class: 'fa fa-file-zip-o fa-4x') {}
                                                         br()
                                                         yield ' SDK bundle'
+                                                    }
+                                                    yield ' '
+                                                    a(href: apacheDistUrl(pkg, 'sdk')) {
+                                                        yield '(mirror)'
                                                     }
                                                     buildExtras(pkg.archive ? '' : 'dist: ', 'sdk', 'distribution', v, pkg.archive)
                                                     if (!pkg.archive) {
@@ -414,11 +430,11 @@ layout 'layouts/main.groovy', true,
                                         tr {
                                             td(colspan: 3) {
                                                 yield 'For '
-                                                code 'groovy-all'
+                                                code 'groovy-bom'
                                                 yield ' when using Gradle 6+ use '
-                                                code "implementation platform('org.apache.groovy:groovy-all:x.y.z')"
+                                                code "implementation platform('org.apache.groovy:groovy-bom:x.y.z')"
                                                 yield ' instead of '
-                                                code "implementation 'org.codehaus.groovy:groovy-all:x.y.z'"
+                                                code "implementation 'org.codehaus.groovy:groovy-bom:x.y.z'"
                                                 yield '.'
                                             }
                                         }
