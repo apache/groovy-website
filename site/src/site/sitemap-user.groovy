@@ -216,28 +216,35 @@ ecosystem {
 
 allEvents {
     // Note that the event image should be 257x180 to look nice
+    event('ApacheCon NA') {
+        location 'New Orleans, Louisiana'
+        date 'October 3-6, 2022'
+        url 'https://www.apachecon.com/acna2022/'
+        logo 'img/confs/acna2022.png'
+        description '''
+            <p>
+            The latest innovations from dozens of Apache projects and their communities in a collaborative,
+            vendor-neutral environment.
+            </p>
+            <p>There is a 2-day Groovy track covering latest news, functional programming with Groovy,
+            Spock, Grails, Micronaut, Gradle, DSLs and more. Also, there is Groovy content in other tracks
+            plus some special events like BoF sessions and other surprises.</p>
+        '''
+    }
     event('GR8Conf & JDK IO') {
         location 'Copenhagen, Denmark'
-        date 'May 26-28, 2021'
+        date 'November 16-17, 2022'
         url 'http://gr8conf.eu/'
         logo 'img/confs/gr8conf-jdkio.svg'
         description '''
             <p>
-            For the past 12 years, GR8Conf has provided a high-quality conference experience for the tight-knit Apache Groovy programming language community. This year, we are joining forces with JDK IO - an annual conference run by the Danish Java user group covering technologies relevant to the entire JVM. The combined conference will be known as GR8Conf & JDK IO and will focus on All Things Groovy and Java, with DevOps, Microservices and Frontend Technologies sprinkled in.
+            Since 2009, GR8Conf has provided a high-quality conference experience for the tight-knit
+            Apache Groovy programming language community. This year, we are joining forces with JDK IO - an annual
+            conference run by the Danish Java user group covering technologies relevant to the entire JVM.
+            The combined conference will be known as GR8Conf & JDK IO and will focus on All Things Groovy
+            and Java, with DevOps, Microservices and Frontend Technologies sprinkled in.
             </p>
             <p>We feature the Hackergarten and have an awesome Meet & Greet with craft beers brewed by the crew!</p>
-        '''
-    }
-    event('ApacheCon @Home') {
-        location 'Virtual'
-        date 'Sep 21-23, 2021'
-        url 'https://www.apachecon.com/acah2021/'
-        logo 'img/confs/acah2021.png'
-        description '''
-            <p>
-            The latest innovations from dozens of Apache projects and their communities in a collaborative, vendor-neutral environment.
-            </p>
-            <p>There is a whole track dedicated to Groovy!</p>
         '''
     }
 }
