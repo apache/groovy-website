@@ -17,7 +17,6 @@ footer(id: 'footer') {
             div(class: 'col-right') {
                 p {
                     yield 'The Groovy programming language is supported by the '
-                    br()
                     a href: 'http://www.apache.org', 'Apache Software Foundation'
                     yield " and the Groovy community."
                 }
