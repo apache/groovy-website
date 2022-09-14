@@ -44,7 +44,6 @@ menu {
 
     group('Socialize') {
         item 'Discuss on the mailing-list', "${userSiteBase}mailing-lists.html",                'fa-envelope'
-        item 'Groovy newsletter',           "${userSiteBase}groovy-weekly.html",                'fa-envelope-o'
         item 'Groovy on Twitter',           'https://twitter.com/ApacheGroovy',                 'fa-twitter'
         item 'Events and conferences',      "${userSiteBase}events.html",                       'fa-calendar'
         item 'Source code on GitHub',       'https://github.com/apache/groovy',                 'fa-github'

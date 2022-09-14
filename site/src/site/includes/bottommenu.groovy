@@ -16,14 +16,18 @@ footer(id: 'footer') {
             }
             div(class: 'col-right') {
                 p {
-                    yield "The Groovy programming language is supported by the " 
+                    yield 'The Groovy programming language is supported by the '
+                    br()
                     a href: 'http://www.apache.org', 'Apache Software Foundation'
-                    yield " and the Groovy community"
+                    yield " and the Groovy community."
                 }
-                img(src: relative('img/asf_logo.png'), title: 'The Apache Software Foundation', alt: 'The Apache Software Foundation', class:'img-responsive')
+                div('text-align':'right') {
+                    img(src: relative('img/asf_logo.png'), title: 'The Apache Software Foundation', alt: 'The Apache Software Foundation', style:'width:60%')
+                }
+                p "Apache&reg; and the Apache feather logo are either registered trademarks or trademarks of The Apache Software Foundation."
             }
         }
         div(class: 'clearfix', "&copy; 2003-${Calendar.instance[Calendar.YEAR]} the Apache Groovy project &mdash; " +
-                "Groovy is Open Source, ${$a(href: 'http://www.apache.org/licenses/LICENSE-2.0.html', 'Apache 2 License')}")
+                "Groovy is Open Source, ${$a(href: 'http://www.apache.org/licenses/LICENSE-2.0.html', 'Apache 2 License')}. ${$a(href: 'https://privacy.apache.org/policies/privacy-policy-public.html', 'Privacy policy')}.")
     }
 }

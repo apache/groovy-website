@@ -303,13 +303,18 @@ code, kbd, pre, samp {
     color: #db4800;
 }
 
-.colset-3-footer .col-1, .colset-3-footer .col-2, .colset-3-footer .col-3 {
-    min-width: 180px;
+.colset-3-footer .col-1 {
+    min-width: 140px;
+    float: left;
+}
+
+.colset-3-footer .col-2, .colset-3-footer .col-3 {
+    min-width: 160px;
     float: left;
 }
 
 .colset-3-footer .col-3 {
-    min-width: 220px;
+    min-width: 200px;
 }
 
 .colset-3-article article {
@@ -405,9 +410,9 @@ h8 {
 
 #footer .col-right {
     float: right;
-    width: 300px;
+    width: 450px;
     text-align: right;
-    padding-top: 10px
+    padding-top: 5px
 }
 
 #footer .colset-3-footer {
