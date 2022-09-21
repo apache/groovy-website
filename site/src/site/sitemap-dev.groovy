@@ -30,7 +30,7 @@ menu {
         item 'Support',                     "${userSiteBase}support.html"
         item 'Contribute',                  "${devSiteBase}"
         item 'Ecosystem',                   "${userSiteBase}ecosystem.html"
-        item '',                            "${devSiteBase}events.html" // keep ASF web crawler somewhat happy
+        item '',                            "https://groovy.apache.org/events.html" // keep ASF web crawler somewhat happy
     }
 
     group('About') {
