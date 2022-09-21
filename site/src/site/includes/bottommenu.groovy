@@ -27,6 +27,6 @@ footer(id: 'footer') {
             }
         }
         div(class: 'clearfix', "&copy; 2003-${Calendar.instance[Calendar.YEAR]} the Apache Groovy project &mdash; " +
-                "Groovy is Open Source, ${$a(href: 'http://www.apache.org/licenses/LICENSE-2.0.html', alt: 'Apache 2 License', 'license')}. ${$a(href: 'https://privacy.apache.org/policies/privacy-policy-public.html', 'Privacy policy')}.")
+                "Groovy is Open Source: ${$a(href: 'http://www.apache.org/licenses/LICENSE-2.0.html', alt: 'Apache 2 License', 'license')}, ${$a(href: 'https://privacy.apache.org/policies/privacy-policy-public.html', 'privacy policy')}.")
     }
 }
