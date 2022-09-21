@@ -30,6 +30,7 @@ menu {
         item 'Support',                     "${userSiteBase}support.html"
         item 'Contribute',                  "${devSiteBase}"
         item 'Ecosystem',                   "${userSiteBase}ecosystem.html"
+        item '',                            "${devSiteBase}events.html" // keep ASF web crawler somewhat happy
     }
 
     group('About') {
@@ -64,6 +65,7 @@ pages {
     page 'buildstatus', 'buildstatus', [category: 'Develop']
     page 'faq', 'faq', [category: 'Documentation']
     page '404','404', [:]
+    page 'eventsForwarder','events', [:]
 }
 
 documentation {
