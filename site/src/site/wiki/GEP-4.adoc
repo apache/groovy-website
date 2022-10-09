@@ -19,7 +19,7 @@
 == Abstract
 
 The AstBuilder was introduced in Groovy 1.7 as a way to ease the task of writing AST transformations.
-The "fromCode" approach allows you generate the AST from a piece of code. Currently, the AstBuilder fromCode API
+The "fromCode" approach allows you to generate the AST from a piece of code. Currently, the AstBuilder fromCode API
 accepts a closure as a parameter, and the code within the closure it transformed to AST.
 A limitation of the AstBuilder is that the closure parameter does not allow variables in the surrounding
 context to be referenced: there is no way to pass a parameter into the code block.
@@ -89,11 +89,11 @@ There are many syntax alternatives:
 
 * Lisp uses ´ and ,
 * Template Haskell uses something similar to oxford brackets but with slightly different semantics
-* Boo uses uses GEP 4 - AstBuilder AST Templates and $ but with slightly different semantics
+* Boo uses GEP 4 - AstBuilder AST Templates and $ but with slightly different semantics
 
 A $ was considered but cannot be used as it is already a meaningful identifier.
-Boo Meta Method Comparison
-The Boo Metamethod feature overlaps with the Groovy AST Transformation features. Instead of an @AstTransformation interface with a seperately defined AstTransformation subclass, Boo offers Meta methods, where the AST Transformation is called and generated at compile time.
+Boo Metamethod Comparison
+The Boo Metamethod feature overlaps with the Groovy AST Transformation features. Instead of an @AstTransformation interface with a separately defined AstTransformation subclass, Boo offers Meta methods, where the AST Transformation is called and generated at compile time.
 
 While Groovy offers AstBuilder to turn code into AST, Boo uses the oxford brackets. And while GEP-4 proposed oxford brackets to signify an AST variable templating, Boo uses the $. Consider a simple println AST in Groovy
 ```

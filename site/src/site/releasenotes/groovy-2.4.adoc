@@ -120,7 +120,7 @@ methods have been added like `init()`, `dropRight()`, `takeRight()`
 (link:https://issues.apache.org/jira/browse/GROOVY-6867[GROOVY-6867])
 * `Iterable` gets `disjoin()`, `minus()` and `toSpreadMap()` methods
 (link:https://issues.apache.org/jira/browse/GROOVY-6920[GROOVY-6920])
-* Refinements and concistency for existing collection methods,
+* Refinements and consistency for existing collection methods,
 leveraging iterable approaches for stream-like traversals, consistency
 for mutation in place vs  new collection creation, minor optimizations,
 etc. (link:https://issues.apache.org/jira/browse/GROOVY-6945[GROOVY-6945])

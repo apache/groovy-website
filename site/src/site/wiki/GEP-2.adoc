@@ -99,11 +99,11 @@ def statementBlock = builder.buildFromCode (CompilePhase.CONVERSION, true) {
 ```
 
 * Expressing Groovy source within Groovy source seems the most natural way to write it (as opposed to putting Groovy source into a String).
-* Some IDE support is naturally available (highlighting, etc), but IDE warnings will be misleading for variable scoping rules
+* Some IDE support is naturally available (highlighting, etc.), but IDE warnings will be misleading for variable scoping rules
 * Same issues and rules from "ASTNode from String" for phase and statementsOnly properties apply to this version
 * Provides similar API as builder from String, except the code property accepts any block of code that is legal in the context of a Closure.
 * Converting from a closure into AST is performed through a global compiler transformation.
-This requires that the AstBuilder reference be strongly typed so that the global annotation can be triggered.
+This requires the AstBuilder reference to be strongly typed so that the global annotation can be triggered.
 
 The above example produces the following AST:
 
@@ -119,7 +119,7 @@ BlockStatement
 
 ==== Alternatives
 
-If @ASTSource annotation is used, then it would be very easy to let users reuse that annotation outside of the builder.
+If @ASTSource annotation is used, then it would be very easy to let users reuse that annotation outside the builder.
 Consider the following example:
 
 
@@ -130,7 +130,7 @@ List<ASTNode> source = { println "compiled on: ${new Date()}" }
 
 This option seems helpful; however, annotations on local variables are not yet supported. This approach will not be implemented.
 
-=== ASTNode from psuedo-specification
+=== ASTNode from pseudo-specification
 
 Building AST conditionally, such as inserting an if-statement or looping, is not easily accomplished in the String or code based builders.
 Consider this example:
@@ -203,7 +203,7 @@ https://en.wikipedia.org/wiki/Template_Haskell[Template Haskell]
 
 https://web.archive.org/web/20090213045341/http://blogs.codehaus.org:80/people/bamboo/archives/001593_boo_meta_methods.html[Boo meta methods]
 
-https://github.com/cython/cython/wiki/enhancements-metaprogramming[Cython Metaprogramming Proposal] by Martin C Martin - Contains nice write up of some use cases
+https://github.com/cython/cython/wiki/enhancements-metaprogramming[Cython Metaprogramming Proposal] by Martin C Martin - Contains nice write-up of some use cases
 
 === JIRA issues:
 

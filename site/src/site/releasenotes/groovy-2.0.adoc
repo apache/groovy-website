@@ -13,7 +13,7 @@ features in more detail.
 
 Groovy, by nature, is and will always be a dynamic language. However,
 Groovy is often used as a "Java scripting language", or as a "better
-Java" (ie. a Java with less boilerplate and more power features). A lot
+Java" (i.e. a Java with less boilerplate and more power features). A lot
 of Java developers actually use and embed Groovy in their Java
 applications as an extension language, to author more expressive
 business rules, to further customize the application for different
@@ -141,7 +141,7 @@ complains about it.** +
 [[Groovy20releasenotes-Commontypeconversionsstillallowed]]
 ==== Common type conversions still allowed
 
-The static type checker, however, won’t complain for certain automatic
+The static type checker, however, won’t complain about certain automatic
 type conversions that Groovy supports. For instance, for method
 signatures returning String, boolean or Class, Groovy converts return
 values to these types automatically:
@@ -427,7 +427,7 @@ on the Java platform and bringing some additional performance to
 Groovy’s dynamic calls. However, unfortunately shall I say, JDK 7 is not
 widely deployed in production at the time of this writing, so not
 everybody has the chance to run on the latest version. So developers
-looking for performance improvements would not see much changes in
+looking for performance improvements would not see many changes in
 Groovy 2.0, if they aren’t able to run on JDK 7. Luckily, the Groovy
 development team thought those developers could get interesting
 performance boost, among other advantages, by allowing type checked code
@@ -466,7 +466,7 @@ library code writers to help avoid adverse interactions when dynamic
 metaprogramming is in use in several parts of the codebase. The dynamic
 features available in languages like Groovy are what give developers
 incredible power and flexibility but if care is not taken, different
-assumptions can exist in different parts of the system with regards to
+assumptions can exist in different parts of the system in regard to
 what metaprogramming features are in play and this can have unintended
 consequences. As a slightly contrived example, consider what happens if
 you are using two different libraries, both of which add a similarly
@@ -519,9 +519,9 @@ Since day 1 (that was back in 2003 already!) Groovy has had several
 syntax enhancements and features on top of Java. One can think of
 closures, for example, but also the ability to put more than just
 discrete values in switch / case statements, where Java 7 only allows
-Strings in addition. So some of the Project Coin syntax enhancements,
-like Strings in switch, were already present in Groovy. However, some of
-the enhancements are new, such as binary literals, underscore in number
+Strings in addition. So some Project Coin syntax enhancements,
+like Strings in switch, were already present in Groovy. However, some
+enhancements are new, such as binary literals, underscore in number
 literals, or the multi catch block, and Groovy 2 supports them. The sole
 omission from the Project Coin enhancements is the "try with
 resources" construct, for which Groovy already provides various
@@ -574,7 +574,7 @@ more exceptions as we want to handle them in the same way. A workaround
 is either to factor out the commonalities in its own method, or in a
 more ugly fashion to have a catch-all approach by catching Exception, or
 worse, Throwable. With the multi catch block, we’re able to define
-several exceptions to be catch and treated by the same catch block:
+several exceptions to be caught and treated by the same catch block:
 
 [source,groovy]
 -----------------------------------------------
@@ -768,7 +768,7 @@ categories. +
   +
 Say we want to add a greets() method on String, that would greet the
 name of the person passed in parameters, so that you could that method
-as follow:
+as follows:
 
 [source,groovy]
 -------------------------------------------------------------

@@ -36,7 +36,7 @@ then we risk having JDK7 make an API change, which would force us to support 2 d
 === Todo in Groovy NIO Module:
 
 * Support new Path object
-* All of the GDK File API needs to be on Path
+* All the GDK File API needs to be on Path
 * NIO2 contains a new WatchService API. We need to probably provide a GDK on WatchService to make it easy to work
 with using closures, etc. This is the most interesting piece of work IMO.
 

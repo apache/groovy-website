@@ -591,7 +591,7 @@ assert awesum() == 6
 
 The @PackageScope annotation can be placed on classes, methods or fields
 and is used for turning off Groovy’s visibility conventions and
-reverting back to Java conventions. This ability is usually only needed
+reverting to Java conventions. This ability is usually only needed
 when using 3rd party libraries which rely on the package scope
 visibility. When adding the `@PackageScope` annotation to a field,
 Groovy will assign package scope access to the field rather than
@@ -967,7 +967,7 @@ class CustomException extends Exception {}
 [[Groovy18releasenotes-WithReadLockandWithWriteLock]]
 === @WithReadLock and @WithWriteLock
 
-Those two transformations, combined together, simplify the usage of
+Those two transformations, combined, simplify the usage of
 `java.util.concurrent.locks.ReentrantReadWriteLock`, are safer to use
 than the `synchronized` keyword, and improve upon the `@Synchronized`
 transformation with a more granular locking.
@@ -1212,7 +1212,7 @@ not to be
 assert poem.readLines().size() == 4
 -----------------------------------
 
-This is particularly useful for multi-line regexs when using the regex
+This is particularly useful for multi-line regexes when using the regex
 free-spacing comment style (though you would still need to escape
 slashes):
 
@@ -1258,8 +1258,8 @@ println dollarSlashy
 ------------------------
 
 This form of string is typically used when you wish to embed content
-that may naturally contains slashes or backslashes and you don’t want to
-have to rework the content to include all of the necessary escaping.
+that may naturally contain slashes or backslashes and you don’t want to
+have to rework the content to include all the necessary escaping.
 Some examples are shown below:
 
 * Embedded XML fragments with backslashes:
@@ -1292,7 +1292,7 @@ Previously, triple quote (`'''`) GString required extra escaping, and
 the above sequence was illegal for a normal slashy string. Now, ugly
 workarounds are not needed.
 
-* Embedding multi-line regexs when using the regex free-spacing comment
+* Embedding multi-line regexes when using the regex free-spacing comment
 style (particularly ones which contain slashes):
 
 [source,groovy]
@@ -1310,7 +1310,7 @@ assert '04/04/1988' == '1988-04-04'.find(dateRegex) { all, y, m, d -> [d, m, y].
 assert '10-08-1989' == '1989/08/10'.find(dateRegex) { all, y, m, d -> [d, m, y].join('-') }
 -------------------------------------------------------------------------------------------
 
-So, you can cut and paste most PERL regex examples without further
+So, you can cut-and-paste most PERL regex examples without further
 escaping.
 
 * Or Strings which are themselves Groovy code fragments containing

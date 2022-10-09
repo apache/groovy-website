@@ -152,7 +152,7 @@ scripts, without having to deal with downloading, packaging, or
 specifying the classpath yourself. To use Grape, we had to use the @Grab
 annotation to ``grab'' a dependency from a repository (Maven’s central
 repository, for example). The problem was that annotation had to be
-attached to some allowed elements, ie. the places where annotations can
+attached to some allowed elements, i.e. the places where annotations can
 be put in Java. Now, we can put annotations on imports:
 
 [source,groovy]

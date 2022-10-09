@@ -22,9 +22,9 @@ A SAM type is an abstract class or interface with a single abstract method.
 SAM coercion involves transforming a
 `groovy.lang.Closure` instance into an object suitable for our SAM type.
 The coercion can happen as part of an assignment or as the result of a method call.
-Since this transformation might be outside of the types provided by Closure itself,
+Since this transformation might be outside the types provided by Closure itself,
 it can be more than a simple Java style cast.
-Closure becomes a kind of sub type to all SAM types.
+Closure becomes a kind of subtype to all SAM types.
 Groovy has other such transformations without explicit cast or asType usage,
 which are number object transformations as well as the conversion of GString to String.
 
@@ -87,7 +87,7 @@ abstract class SAM {
 }
 ```
 
-* abstract class with a abstract and a non abstract method:
+* abstract class with an abstract and a non-abstract method:
 
 ```
 abstract class SAM {
@@ -218,7 +218,7 @@ found here: http://cr.openjdk.java.net/~dlsmith/jsr335-0.6.1/F.html
 
 === Reference implementation
 
-* https://github.com/groovy/groovy-core/commits/SAM (feature branch on github)
+* https://github.com/groovy/groovy-core/commits/SAM (feature branch on GitHub)
 
 === JIRA issues
 

@@ -39,9 +39,9 @@ But since this is a confusing feature of limited use, it should be removed.
 === Removing automatic list expansion
 
 A method call done with a list that finds no matching method for that list (a method with one parameter of type List,
-Collection, Object, etc), will cause a second method selection iteration. This time the list is "unpacked" and all
+Collection, Object, etc.), will cause a second method selection iteration. This time the list is "unpacked" and all
 elements of the list are taken as if the method call had been done with the elements rather than the list.
-Groovy also supports spreading of lists by an syntax element, making this automatic feature not needed.
+Groovy also supports spreading of lists by a syntax element, making this automatic feature not needed.
 In fact this can be quite surprising for users and is a problem for performance.
 A spread version might be still not good in performance, but at least the user will have
 to use an extra symbol and thus have the visual indicator. As of why this feature was originally added is unclear.
@@ -50,7 +50,7 @@ Looking at user code you will find barely intended usages of this. Thus it shoul
 === Changing Safe Navigation to stop evaluation
 
 Currently an expression like a?.b.c will fail if a is null. It will not evaluate b, but it will try to evaluate c on null.
-This defies the intend of safe navigation to avoid a NullPointerException. Thus this should be changed to stop the
+This defies the intent of safe navigation to avoid a NullPointerException. Thus this should be changed to stop the
 evaluation of the path expression.
 
 === User Wish List
@@ -61,7 +61,7 @@ use-construct and that then we will use this instance along with its instance me
 * Replacing Introspector by blackdrag +
 Not only because of bugs like GROOVY-5019 there should be a replacement of the Introspector
 
-=== Some of the leading design ideas of this MOP
+=== Some leading design ideas of this MOP
 
 The plan is to orientate us a lot on the open call site caching the JVM provides with invokedynamic.
 For this to work all parts of the MOP should no longer be seen as places that do invoke something,
@@ -76,7 +76,7 @@ missing methods, as well as being able to invalidate a cached version and/or to 
 
 image:img/mop_2.jpg[image]
 
-in meta class of x in pseudo code:
+in metaclass of x in pseudocode:
 
 ```
 cachable = getMethodInterceptor(...)
@@ -91,17 +91,17 @@ as an explanation to the methods:
 
 * getMethodInterceptor +
 Extension point for the user to register an interceptor, that will be used for all method calls.
-This is equal what GroovyInterceptable does using invokeMethod, only that in MOP1 the method is directly called.
+This is equal to what GroovyInterceptable does using invokeMethod, only that in MOP1 the method is directly called.
 In MOP2 we will instead return a handler that then will do whatever is needed. This can for example be a method
 handle to a invokeMethod method if wanted. TODO: define guards
 * getFittingMethod +
-Predefined way to select a method through meta class. This method will return an
+Predefined way to select a method through metaclass. This method will return an
 object which then can be used to invoke the selected method.
 * getMethodMissingHandler +
 Extension point for the user to register a handler for missing methods.
 The then invoked method is comparable to what methodMissing in MOP1 would be doing.
 * MethodMissingException +
-thrown if none of the above methods is bearing a non null result
+thrown if none of the above methods is bearing a non-null result
 * storeInCallSite +
 Predefined method to store the cachable result of the above process in the call site.
 As long as the cached object is valid the above methods will not be called again for this call site.
@@ -110,28 +110,28 @@ Predefined method to do the Initial invocation of the cachable. Subsequent invoc
 
 === Context Meta Class
 
-For the MOP2 Groovy will use a system of meta classes with a context element and an always existing default.
+For the MOP2 Groovy will use a system of metaclasses with a context element and an always existing default.
 At each call site only one such view will be valid and it will be constant.
-Those views can be used to defined "sealed" meta class, which won't get influenced by outside
-meta classes or to allow for example calling private methods and not allowing them in other cases.
-This makes 3 possible meta class variations currently:
+Those views can be used to defined "sealed" metaclass, which won't get influenced by outside
+metaclasses or to allow for example calling private methods and not allowing them in other cases.
+This makes 3 possible metaclass variations currently:
 
-* Default meta class +
-Behaves pretty much like what Java allows in regards of method calls (same class private methods are available)
+* Default metaclass +
+Behaves pretty much like what Java allows in regard to method calls (same class private methods are available)
 and all meta programming changes are visible
-* Sealed meta class +
-Like the default meta class, but meta programming changes from outside the class are not visible.
+* Sealed metaclass +
+Like the default metaclass, but meta programming changes from outside the class are not visible.
 This can be especially useful to library writers.
-* Test meta class (un)sealed +
+* Test metaclass (un)sealed +
 Like the two before but with the addition that private members will always be available.
 
 === Getting a Meta Class
 
-Because of the concept of context a class does not have one direct meta class that can be generated without its context.
+Because of the concept of context a class does not have one direct metaclass that can be generated without its context.
 The call site defines the place of the context. How the context itself is defined is a TODO.
 As an implementation strategy it is possible to for example use ClassValue to store a table with the context being a key.
 The key would probably have to be available as static information, or as easily computable information.
-Since the resulting meta class could be stored later in the call site object context changes are to be avoided,
+Since the resulting metaclass could be stored later in the call site object context changes are to be avoided,
 since it implies the invalidation of the call sites using that context.
 
 === General dispatch rule for methods (and properties)
@@ -149,7 +149,7 @@ Given those two definitions a method call in A will select the set of method to 
 A call m() with the SSC A and done on an instance of B (extends A) will be using the methods defined in A, if A has a private m, otherwise the call is done using B.
 
 Calls to Super: +
-A call to super in B extends A will have the SSC B, but for the method selection process the super class of SSC (super(SSC)) will be used. In super calls mutimethods are not visible. Thus we can directly use the meta class super(SSC), but we will dispatch only on the public methods of that meta class.
+A call to super in B extends A will have the SSC B, but for the method selection process the super class of SSC (super(SSC)) will be used. In super calls multimethods are not visible. Thus we can directly use the metaclass super(SSC), but we will dispatch only on the public methods of that metaclass.
 
 === Module Extension Methods Shadowing Rules
 
@@ -182,29 +182,29 @@ It would be great if this mechanism be made pluggable.
 
 === The Realm concept
 
-In MOP2 a Realm is a tree like structure containing the meta classes.
+In MOP2 a Realm is a tree like structure containing the metaclasses.
 There is a root realm, used as default, but there can be any number of lower realms.
-A meta class change is visible in a realm, if the change is done to the meta class in
-the same realm or to a meta class in a higher realm.
-Script execution engines are able to set a realm for example to prevent them changing meta classes they should not change.
-This can be used for unit tests to isolate meta class changes done during the tests as well.
+A metaclass change is visible in a realm, if the change is done to the metaclass in
+the same realm or to a metaclass in a higher realm.
+Script execution engines are able to set a realm for example to prevent them changing metaclasses they should not change.
+This can be used for unit tests to isolate metaclass changes done during the tests as well.
 A library can have its own realm (defined through an annotation) to prevent other classes to
 leak their changes into that library, while the library can still use a higher realm to make
 changes more public visible, if the realm allows that. Realms can have a setting that prevents
 code executed from there to make changes to higher realms. Calling a method is always done using
-the meta classes from the current realm, even if the called class then calls other classes using
+the metaclasses from the current realm, even if the called class then calls other classes using
 its own realm. A realm is thus not thread local structure, it is more of a lexical scope.
-A realm can also use a different meta class flavor, to for example allow access to private methods and fields.
+A realm can also use a different metaclass flavor, to for example allow access to private methods and fields.
 
 === Work Items
 
 This part is to guide the implementors with the course of action and planning of the subtasks.
 
 * make indy the only compilation target in the build
-* move all non-indy bytecode interfacing code to a module, which may be removed later. This includes ScriptBytecodeAdpater as well as all the custom call site caching classes
+* move all non-indy bytecode interfacing code to a module, which may be removed later. This includes ScriptBytecodeAdapter as well as all the custom call site caching classes
 * make a new module for MOP2
-* turn meta class into an immutable
-* implement meta class views
+* turn metaclass into an immutable
+* implement metaclass views
 
 === Breaking changes trace
 
@@ -262,7 +262,7 @@ Differences to groovy.mop.internal.DefaultMetaProperty:
 === Reference implementation
 
 * https://github.com/groovy/groovy-core/tree/GROOVY_3_FEATURE[GROOVY_3_FEATURE] +
-feature branch on github
+feature branch on GitHub
 
 == Update history
 

@@ -21,7 +21,7 @@ Some features described here as "incubating" may become stable before 5.0.0 fina
 == Other improvements
 
 [[Groovy5.0-ongoing]]
-== On-going work
+== Ongoing work
 
 === Enhanced switch (under investigation)
 

@@ -72,7 +72,7 @@ println builder.toString()
 ```
 
 Valid node values are: `Number`, `String`, `GString`, `Boolean`, `Map`, `List`. `null` is reserved for object references.
-Arrays can not be null but they can be empty. Anything else results in an IAE (or a more specialized exception) being thrown.
+Arrays can not be null, but they can be empty. Anything else results in an IAE (or a more specialized exception) being thrown.
 
 === Special cases
 
