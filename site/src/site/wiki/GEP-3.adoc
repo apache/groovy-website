@@ -111,13 +111,13 @@ commas if multiple arguments are used. A case that is not supported today anyway
 
 * A command-expression is composed of an even number of elements
 * The elements are alternating a method name, and its parameters (can be named and non-named parameters)
-* A parameter element can be any kind of expression (ie. a method call foo(), foo{}, or some expression like x+y)
-* All those pairs of method name and parameters are actually chained method calls (ie. send "hello" to "Guillaume"
+* A parameter element can be any kind of expression (i.e. a method call foo(), foo{}, or some expression like x+y)
+* All those pairs of method name and parameters are actually chained method calls (i.e. send "hello" to "Guillaume"
 is two methods chained one after the other as send("hello").to("Guillaume"))
 
 ==== Interesting benefit of the enhanced command expressions
 
-More and more do we see Java Fluent APIs that chain method calls, returning this, so as to "build" a new object.
+More and more do we see Java Fluent APIs that chain method calls, returning this, to "build" a new object.
 For instance, you can imagine a fluent API for building an Email message, that would look something like this in Java:
 ```
 Email.from("foo@example.com").to("bar@example.com").subject("hello").body("how are you?")
@@ -136,7 +136,7 @@ SELECT "column_name"
 FROM "table_name"
 WHERE "column_name" IN ('value1', 'value2', ...)
 ```
-In current Groovy this could maybe expressed by
+In current Groovy this could be expressed by
 ```
 sql.select(
   "column_name",
@@ -152,13 +152,13 @@ sql.
   where "column_name" \\
   in ['value1','value2',...]
 ```
-It should be noticed, that both cases have quite different semantics. In the second case the writer saves a lot of commas, but of course not all of them. Also the lack of any kind of operator like the comma makes it diifivult to span the DSL across multiple lines. A more extended example would be
+It should be noticed, that both cases have quite different semantics. In the second case the writer saves a lot of commas, but of course not all of them. Also the lack of any kind of operator like the comma makes it difficult to span the DSL across multiple lines. A more extended example would be
 ```
 SELECT COUNT("column_name")
 FROM "table_name"
 sql.select count("column_name") from "table_name"
 ```
-To express this in map style is a bit difficult, because of where to place count... a possible version is mabye
+To express this in map style is a bit difficult, because of where to place count... a possible version is maybe
 ```
 sql.select(sql.count("column_name"), from:"table_name"
 ```
@@ -191,7 +191,7 @@ marinate 30.minutes at roomTemperature
 
 ==== Extension to command expressions in the case of assignments
 
-Currently, command expressions are allowed as standalone top-leval statements or expressions, but you can't assign such an expression to a variable with keeping that nice DSL syntax. For instance, while you can do:
+Currently, command expressions are allowed as standalone top-level statements or expressions, but you can't assign such an expression to a variable with keeping that nice DSL syntax. For instance, while you can do:
 ```
 move left
 ```
@@ -211,7 +211,7 @@ For historic reasons
 ```
 println foo
 ```
-has to be supported. This seems to not to be a valid version in Scala, since that would be interpreted as
+has to be supported. This seems not to be a valid version in Scala, since that would be interpreted as
 ```
 println.foo
 ```
@@ -227,7 +227,7 @@ is interpreted as
 ```
 foo.bar(a1)
 ```
-in Scala and is invalid in current Groovy as well as after this proposal. So it could be stated, that this proposal is less object oriented then Scala, because the DSL usually starts with the method, not the object. On the other hand it is possible to write
+in Scala and is invalid in current Groovy as well as after this proposal. So it could be stated, that this proposal is less object-oriented then Scala, because the DSL usually starts with the method, not the object. On the other hand it is possible to write
 ```
 foo.bar a1
 ```
@@ -236,7 +236,7 @@ So the Groovy notation would be a bit more verbose, but not much.
 ==== To be evaluated: Mixed case with explicit parentheses
 
 A possible supported case is also when mixing method calls with explicit parentheses within that extended command expression.
-The benefit would be to allow the ability to also be able to call methods not taking parameters, as well as allowing an odd number of "elements" (ie. a method name or a parameter).
+The benefit would be to allow the ability to also be able to call methods not taking parameters, as well as allowing an odd number of "elements" (i.e. a method name or a parameter).
 ```
 m1 a m2 b m3()
 m1 a m2() m3 b

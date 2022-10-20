@@ -42,7 +42,7 @@ After modularization, the main Groovy codebase will be packaged into additional 
 
 * groovy.jar or groovy-core.jar (name to be finalized) will contain a smaller set of core classes for Groovy and will retain its dependency on a small handful of critical dependent jars (i.e. asm, antlr, etc.)
 * numerous smaller "module/component" jars (exact names/numbers/contents to be finalized) but possibly things like groovy-bsf.jar, groovy-sql.jar, groovy-swing.jar, groovy-jmx.jar, groovy-xml, groovy-tools etc.
-* groovy-all.jar contains the core classes for Groovy, bundled versions of the critical dependent jars and all of the classes from the module jars
+* groovy-all.jar contains the core classes for Groovy, bundled versions of the critical dependent jars and all the classes from the module jars
 * optionally we may support other "profiles" - profiles being other "fat" jars we bundle together for other environments, e.g. groovy-android.jar might exclude the JMX or Swing modules for instance.
 
 Recommendations/suggestions for jar groupings are welcome. See some more details in the accompanying discussion: Groovy 2.0 modularization.
@@ -109,14 +109,14 @@ m| META-INF/services/groovy/defaultExtensions | allow the module to define suppo
 m| META-INF/services/groovy/defaultAstTransforms | allow the module to define AST transforms | now in `META-INF/services/ +
                                                                                                org.codehaus.groovy.transform.ASTTransformation`
 | ? | provide a way to register builder metadata | deferred
-| ? | should there by a way to 'publish' new commandline level startup scripts e.g. java2groovy | deferred
+| ? | should there be a way to 'publish' new commandline level startup scripts e.g. java2groovy | deferred
 | ? | provide a way to register a runner class, e.g. EasyB - there might also be a need to detect runner types | now in `META-INF/groovy/ +
                                                                                                                  org.apache.groovy.plugin.GroovyRunner`
 | ? | provide a way to register special compiler flags, e.g. '--indy' | deferred
 | ? | provide a way to inject special AST customizations | deferred
 |===
 
-This is also where we could specify additional requirements, e.g. require 'invoke dynamic' - but see later also. Could we declaratively specify our security policy requirements. Or can we disable specific aspects of functionality, e.g. disable some standard global AST transform because we want to provide a better one. (There are obviously security implications for this!)
+This is also where we could specify additional requirements, e.g. require 'invoke dynamic' - but see later also. Could we declaratively specify our security policy requirements? Or can we disable specific aspects of functionality, e.g. disable some standard global AST transform because we want to provide a better one? (There are obviously security implications for this!)
 
 Another question is whether all these features will be available also via an API. Would such an API allow modules to be "unregistered"?
 

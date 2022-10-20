@@ -254,7 +254,7 @@ the link:{DOCS_BASEURL}/html/documentation/#__code_delegatesto_code[@DelegatesT
 Static type checking was introduced in Groovy 2.0, but Groovy 2.1 goes
 beyond built-in type checks and offers a way to *create type checker
 extensions*. This is great news for Groovy scripts, configuration files,
-or Domain-Specific Languages implementations as they can can be "type
+or Domain-Specific Languages implementations as they can be "type
 checked" with more advanced, domain-specific rules. As an example, it
 would be possible to create a custom DSL type checker that throws
 compilation errors when certain verbs of the DSL are not recognized, or
@@ -333,7 +333,7 @@ variable closure is handed over a `VariableExpression`.
 The `VariableExpression` is an object directly from Groovy’s AST
 (Abstract Syntax Tree). It is a representation of the unresolved
 variable expression. The script checks if the variable is named `robot`,
-if this is the case, we lookup a `ClassNode` representing
+if this is the case, we look up a `ClassNode` representing
 the `Robot` class, and store the type of that variable back in the AST.
 At the end, the `handled` property is set to true, to indicate the type
 checker already managed that variable. As a consequence, you won’t get
@@ -388,7 +388,7 @@ a direction which is forbidden and not understood by our robot.
 This second example is also interesting in a way that it shows how you
 can even add compilation checks on things like literal strings on a
 domain-specific level, paving the way for possible checks on sprintf
-strings, on SQL or HQL code in strings, etc, allowing you to go even
+strings, on SQL or HQL code in strings, etc., allowing you to go even
 further that what the Java compiler actually checks.
 
 The extension script can make use of various event oriented extension
@@ -510,7 +510,7 @@ accordingly.
 === Alternate notation
 
 In our example above, we annotated our meta-annotation with the
-annotations that are then combined together. But for annotations for
+annotations that are then combined. But for annotations for
 which you don’t need to specify arguments, you could have also passed
 the names of the annotations to combine as parameters to the annotation
 collector:
@@ -740,7 +740,7 @@ abstract class ExchangeRateBaseScript extends Script {
 }
 --------------------------------------------------------
 
-The `lookupRate()` method used in our script is declared in the the base
+The `lookupRate()` method used in our script is declared in the base
 class, and the two currencies are retrieved via
 the `getProperty()` method.
 
@@ -795,7 +795,7 @@ No such property: PI for class: mathFormula
 -------------------------------------------
 
 We need to use `CompilerConfiguration` to do add an `ImportCustomizer`.
-We’ll create ai `mportConfigurer.groovy` script with the content below:
+We’ll create an `importConfigurer.groovy` script with the content below:
 
 [source,groovy]
 ---------------------------------------------------------------
@@ -827,7 +827,7 @@ groovy --configscript importConfigurer.groovy mathFormula.groovy
 If you use the groovy compiler to compile all your classes, one drawback
 of the approach above is that the customization applies globally to all
 classes that are going to be compiled. You may want to add certain
-default imports only in certain classes (ie. scripts containing math),
+default imports only in certain classes (i.e. scripts containing math),
 but you might want to do something different for other classes, like
 adding a `@ToString` transformation to all the domain classes of your
 application. For that purpose, a new customizer was created,

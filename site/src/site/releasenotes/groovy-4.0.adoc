@@ -137,7 +137,7 @@ def result = switch(i) {
 
 The `\->` and `:` forms cannot be mixed.
 
-All of the normal Groovy case expressions are still catered for, e.g.:
+All the normal Groovy case expressions are still catered for, e.g.:
 
 [source,groovy]
 --------------------------------------
@@ -713,7 +713,7 @@ as a kind of pre-processor similar to https://projectlombok.org/[Lombok] but bac
 |===
 a| NOTE: _WARNING:_
 Not all parts of the compiler and not all AST transforms yet know about `POJO`.
-Your mileage may vary as to whether using this approach will or won't require
+Your mileage may vary whether using this approach will or won't require
 the Groovy jars to be on the classpath. While we anticipate some improvements over time
 allowing more Groovy constructs to work with `@POJO`, we currently make no guarantees that
 all constructs will eventually be supported. Hence the incubating status.
@@ -1099,7 +1099,7 @@ compiler phase remain unchanged.
 === Old parser removal
 
 Groovy 3 introduced the new "Parrot" parser which supports lambdas, method
-references, and numerous other tweaks. In Groovy 3, You could still revert back to the old parser
+references, and numerous other tweaks. In Groovy 3, You could still revert to the old parser
 if you wanted. In Groovy 4, the old Antlr2 based parser is removed.
 Please use older versions of Groovy if you require the old parser.
 
@@ -1238,7 +1238,7 @@ link:https://issues.apache.org/jira/browse/GROOVY-6837[GROOVY-6837].
 +
 [TIP]
 ====
-To mimick the old behavior: If `b` is not an Object array and you desire an Object
+To mimic the old behavior: If `b` is not an Object array and you desire an Object
 array result, then instead of `b + c`, use one of:
 
 * `b.union(c)`

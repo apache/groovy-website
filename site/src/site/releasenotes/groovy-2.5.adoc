@@ -37,7 +37,7 @@ to the included classes referenced by the "all" pom
 * also note that since the current jars don't comply fully
 yet with JDK9+ requirements (e.g. split package requirements)
 you may not be able to place the Groovy jars on your module path.
-Instead, place them on the classpath. On-going work for
+Instead, place them on the classpath. Ongoing work for
 Groovy 3.0 will address split package issues (see https://issues.apache.org/jira/browse/GROOVY-8647). If the
 Groovy "modules" you want to use aren't in the list being rectified for Groovy 3.0, then
 you can probably use them on the module path. The Groovy build currently
@@ -371,7 +371,7 @@ It can be used to override how properties are set within the constructor or acce
 for instance how `@Immutable` classes are generated.
 * `@VisibilityOptions` is a marker annotation used in the context of AST transformations to provide a custom visibility.
 One example of its use would be when you want to create a private constructor
-that might perhaps be called only from within a static factory method of the class:
+that might be called only from within a static factory method of the class:
 [source,groovy]
 ----
 import groovy.transform.*
@@ -387,8 +387,8 @@ class Person {
 }
 ----
 Here using `@TupleConstructor` saves us the effort of writing the typical
-boiler-plate code within the constructor but we don't need to make it public
-but instead use it within our hand-written factory method which can focus
+boilerplate code within the constructor but we don't need to make it public
+but instead use it within our handwritten factory method which can focus
 on our particular business logic relevant to that factory method.
 
 [[Groovy2.5releasenotes-AstTransformImprovements]]
@@ -626,7 +626,7 @@ after the next maintenance release but users should migrate away from that class
 will be removed from the next major version of Groovy.
 * Users of Spock 1.1-groovy-2.4 may find strange ClassCastException errors with some tests, e.g. with `cleanup:`
 clauses. Using Spock 1.2-groovy-2.4-SNAPSHOT from the https://oss.sonatype.org/content/repositories/snapshots/
-repo may help but work is on-going to improve Spock support.
+repo may help but work is ongoing to improve Spock support.
 * Users combining `final` and `@CompileStatic` or `final` and Spock may see errors from
 the final variable analyzer. Work is underway to resolve those error messages.
 You may need to temporarily remove the `final` modifier in the meantime.
@@ -707,7 +707,7 @@ For an example Gradle build that works JDK8 through 11, see
 link:https://github.com/apache/groovy/blob/master/subprojects/groovy-jaxb/build.gradle[build.gradle]
 in the groovy-jaxb subproject.
 |===
-Note: The above above steps aren't our final plan in this space. For 2.5.1, we focused just on making
+Note: The above steps aren't our final plan in this space. For 2.5.1, we focused just on making
 life better for non-JAXB users using Groovy via Gradle or Maven. For 2.5.2, we hope to make much
 of the above details as hidden as possible and certainly hidden for users of the groovy command-line
 tools for JDK9+.

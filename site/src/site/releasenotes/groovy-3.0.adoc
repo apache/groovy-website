@@ -2,7 +2,7 @@
 :pygments-style: emacs
 :icons: font
 
-Groovy 3.0 comes with a brand new parser (code-named Parrot) and host of other new features and capabilities.
+Groovy 3.0 comes with a brand-new parser (code-named Parrot) and host of other new features and capabilities.
 
 [[Groovy3.0releasenotes-Parrot]]
 == Parrot Parser

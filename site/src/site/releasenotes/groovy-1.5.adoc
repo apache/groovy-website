@@ -365,7 +365,7 @@ Groovy 1.5, and we are going to discover them in the following section.
 Apart from the Java 5 features that brought annotations, generics and
 enums into Groovy, a new operator finds its way into the language: ?:
 the Elvis operator. When you see the operator in question, you will
-easily guessed why it was nicknamed that way - if not, think in terms of
+easily guess why it was nicknamed that way - if not, think in terms of
 Smiley. This new operator is, in fact, a shortcut notation for the
 ternary operator. How many times are you using the ternary operator to
 change the value of a variable if its content is null to assign it some
@@ -418,7 +418,7 @@ Groovy syntax comes closer to the Java syntax after each release, and
 more and more Java code is also valid Groovy. The net benefit of this is
 that when you begin with Groovy, you can copy and paste Java code in
 your Groovy classes, and this should just work as expected. Then, over
-time, as you learn the language, you start throwing away the semi-colons
+time, as you learn the language, you start throwing away the semicolons
 which are not mandatory in Groovy, using GStrings (interpolated
 strings), or closures, etc. Groovy offers a rather flat learning curve
 to Java developers.
@@ -431,7 +431,7 @@ which was more readable. But as the Groovy users regularly asked for
 this old construct to be also part of Groovy, the team decided to bring
 it back to Groovy.
 
-With Groovy 1.5, you can either chose the Groovy for / in, or prefer the
+With Groovy 1.5, you can either choose the Groovy for / in, or prefer the
 classical for loop:
 
 [source,groovy]
@@ -450,7 +450,7 @@ in loop instead.
 With its malleable and concise syntax, and its advanced dynamic
 capabilities, *Groovy is an ideal choice for implementing internal
 Domain-Specific Languages*. When you want to share a common metaphor
-between subject matter experts and developers, you can leverage Groovy
+between subject-matter experts and developers, you can leverage Groovy
 to create a dedicated business language which models the key concept and
 business rules of your application. An important aspect of these DSLs is
 to make the code very readable, and also easier to write by
@@ -486,7 +486,7 @@ monster.move left: 3.meters, at: 5.mph
 
 Obviously, this is not a big difference, but each statement becomes
 closer to real plain English sentences, and removes the usual
-boiler-plate technical code of the host language. This little
+boilerplate technical code of the host language. This little
 enhancement of the grammar of the Groovy language gives more options to
 the designers of the business DSL.
 
@@ -513,7 +513,7 @@ classes by cleverly choosing the order of compilation, and when cyclic
 dependencies were spanning both languages, you may have hit a ``chicken
 and egg'' problem. Fortunately with Groovy 1.5, this is not the case
 anymore, and thanks to a contribution from JetBrains, the makers of the
-award winning http://www.jetbrains.com/idea/[Java IDE IntelliJ IDEA], a
+award-winning http://www.jetbrains.com/idea/[Java IDE IntelliJ IDEA], a
 ``joint'' compiler is available with which you can compile both Groovy
 and Java sources together in one go without having to think about
 dependencies between classes.
@@ -649,7 +649,7 @@ website].
 Although I'm only mentioning the plugin for IntelliJ IDEA, for your
 Groovy developments, you don't have to change your habits. You can also
 use the Eclipse plugin which is regularly improved by the IBM Project
-Zero developers, or Sun's brand new support of Groovy and Grails in
+Zero developers, or Sun's brand-new support of Groovy and Grails in
 NetBeans.
 
 [[Groovy15releasenotes-Performanceimprovements]]
@@ -683,18 +683,18 @@ system, called the MOP (stands for Meta-Object Protocol) that is
 responsible for the dispatching logic. Fortunately, this runtime system
 is open enough so that people can hook into the system and change its
 usual behavior. For each Java class and for each Groovy instance, there
-is an associated meta-class which represents this runtime behavior of
+is an associated metaclass which represents this runtime behavior of
 your objects. Groovy offered various ways to interact with the MOP by
-defining custom meta-classes by extending some base class, but thanks to
-the contribution from the Grails project, a groovier kind of meta-class
-is available: the expando meta-class.
+defining custom metaclasses by extending some base class, but thanks to
+the contribution from the Grails project, a groovier kind of metaclass
+is available: the expando metaclass.
 
 Again,code samples are easier to help us understand the concept. In the
-following example, the msg String instance has got a meta-class that we
-can access through the metaClass property. Then we change the meta-class
+following example, the msg String instance has got a metaclass that we
+can access through the metaClass property. Then we change the metaclass
 of the *String* class to add a new method called up to the String class,
 to have a shortcut notation for the *toUpperCase()* method. To do so, we
-assign a closure to the up property of the meta-class which is created
+assign a closure to the up property of the metaclass which is created
 as we assign it the closure. This closure takes no argument (hence why
 it starts with an arrow), and we call the *toUpperCase()* method on the
 delegate of the closure, which is a special closure variable which
@@ -708,7 +708,7 @@ String.metaClass.up = { -> delegate.toUpperCase() }
 assert "HELLO!" == msg.up()
 ----------------------------------------------------------------------------------------------------------------------
 
-Through this meta-class, you can query the methods and/or properties
+Through this metaclass, you can query the methods and/or properties
 which are available:
 
 [source,groovy]
@@ -737,14 +737,14 @@ if (msg.metaClass.hasProperty(msg, 'bytes')) {
 These mechanisms are extensively used in the Grails web framework for
 instance to create dynamic finders: no need for DAOs in most
 circumstances, as you are able to call a *findByTitle()* dynamic method
-on a Book domain class. Through meta-classes, Grails automatically
+on a Book domain class. Through metaclasses, Grails automatically
 decorates the domain classes with such methods. Furthermore, if the
 method doesn't exist yet, it will be created and cached on first use.
 This can be accomplished by other advanced hooks as explained below.
 
-Beyond those examples we've seen so far, expando meta-classes also
+Beyond those examples we've seen so far, expando metaclasses also
 provide some complementary hooks. Four other kind of methods can be
-added to an expando meta-class:
+added to an expando metaclass:
 
 * *invokeMethod()* lets you intercept all methods calls,
 * while *methodMissing()* will be called on last resort only of no other
@@ -752,14 +752,14 @@ method is found.
 * *get/setProperty()* intercepts access to all properties,
 * whereas *propertyMissing()* is called when no property can be found.
 
-With expando meta-classes, customizing the behavior of the types of your
+With expando metaclasses, customizing the behavior of the types of your
 application becomes easier and can save precious time of development
 compared with the previous version of Groovy. Obviously, not everybody
 needs to use those techniques, but they can be handy in a number of
 situations where you want to apply some AOP (Aspect Oriented Techniques)
 to decorate your classes, and when you want to simplify and make more
 readable the business code of your application, by removing some
-unnecessary boiler-plate code.
+unnecessary boilerplate code.
 
 [[Groovy15releasenotes-Swingonsteroids]]
 == Swing on steroids
@@ -792,13 +792,13 @@ frame.pack()
 frame.show()
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-In the novelties, the Swing builder concept has been extend to provide
+In the novelties, the Swing builder concept has been extended to provide
 custom component factories. There are additional modules, not bundled
 with Groovy by default, which integrates the Swing components from JIDE
 or from the SwingX project into the usual Swing builder code.
 
 Although this topic would deserve a full article, I'm only going to list
-some of the other improvements in this release, for instance, the bind()
+some other improvements in this release, for instance, the bind()
 method. Inspired by the beans binding JSR (JSR-295), you can easily bind
 components or beans together to have them react upon changes made on
 each other. In the following example, the size of the insets of the
@@ -852,7 +852,7 @@ with the enhanced dynamic capabilities, Groovy will let you customize
 your business logic by creating embedded Domain-Specific Languages, that
 you can easily integrate at the extension points of your application.
 The developer experience has progressed significantly through the work
-poured in the tooling support, this is no more a show stopper to the
+poured in the tooling support, this is no more a showstopper to the
 adoption of Groovy. Overall, with Groovy 1.5, the goal of simplifying
 the life of developers has never been so well fulfilled, and Groovy
 should definitely be part of all the Java developers' toolbox.

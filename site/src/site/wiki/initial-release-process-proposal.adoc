@@ -16,7 +16,7 @@ If any of the steps in the automated process fail, this documentation might prov
 
 == Background
 
-The goal of this document is to guide the release manager in order to perform a release under the Apache Incubator. This document, reflecting the status of incubation, is work in progress and will be adapted with regards to comments from the community, mentors and IPMC.
+The goal of this document is to guide the release manager in order to perform a release under the Apache Incubator. This document, reflecting the status of incubation, is work in progress and will be adapted in regard to comments from the community, mentors and IPMC.
 
 == Initiating a release
 
@@ -42,7 +42,7 @@ git push origin GROOVY_2_4_X
 
 If you haven't done it already, create a token on https://github.com/settings/tokens[your GitHub profile] so that the CI server can have write access on your fork. Keep the token safe!
 
-== Setup the TeamCity release configuration
+== Set up the TeamCity release configuration
 
 Go to the http://ci.groovy-lang.org/admin/editBuild.html?id=buildType:Groovy_BintrayIntegration_ReleasePlan[TeamCity release plan] configuration and open the VCS settings. If the VCS root attached to the configuration is not your GitHub fork, attach your VCS root, or create a new VCS root if you haven't done it already. The VCS root MUST have write access using the token authentication.
 
@@ -57,7 +57,7 @@ Go to the http://ci.groovy-lang.org/viewType.html?buildTypeId=Groovy_BintrayInte
 * _groovyBundleVersion_
 ** _release version_ must be set to the OSGi bundle version number of Groovy you are releasing. For example `2.4.6`.
 ** _next integration version_ *must* be set to the subsequent OSGi bundle version number of Groovy you are releasing and as it will be a development version, *must* end with `.SNAPSHOT`. For example `2.4.5.SNAPSHOT`.
-* _Checkout branch:_ must be set to the branch your are releasing. For example, if you are releasing a 2.4.x version of Groovy, `GROOVY_2_4_X`.
+* _Checkout branch:_ must be set to the branch you are releasing. For example, if you are releasing a 2.4.x version of Groovy, `GROOVY_2_4_X`.
 * _Use release branch_ must be checked, and it will automate the creation of a release branch. Use a branch name in the form of `REL_BRANCH_2_4_3`
 * _Create VCS tag_ must be checked, and it will automate the creation of a release tag. Use a tag name in the form of `GROOVY_2_4_4`
 * _Tag comment_ must be set to something useful describing the release version
@@ -213,7 +213,7 @@ in the `groovyVersion` parameter. Click on `run build`.
 * if the release is NOT a beta or a release candidate, make it the default version on GVM. Open http://ci.groovy-lang.org/viewType.html?buildTypeId=Groovy_BintrayIntegration_GvmMakeDefault[the GVM make default configuration], click on the 3 dots near `run` then on the _parameters_ tab, fill
 in the `groovyVersion` parameter. Click on `run build`.
 
-== Update the web site
+== Update the website
 
 If you don't have it locally, checkout `https://github.com/groovy/groovy-website`.
 
@@ -224,7 +224,7 @@ If you don't have it locally, checkout `https://github.com/groovy/groovy-website
 == Send an announcement email
 
 You should wait 24h before doing this (in order for `dist.apache.org` to be properly mirrored).
-Send an email to `dev@`, `user@` and `announce@apache.org`.
+Email `dev@`, `user@` and `announce@apache.org`.
 
 You can use this template. Please make sure that the email at least contains the DISCLAIMER:
 

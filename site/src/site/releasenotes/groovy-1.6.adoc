@@ -22,7 +22,7 @@ metaclasses even for POJOs, and runtime mixins
 All those improvements and new features serve one goal: *helping
 developers be more productive and more agile*, by:
 
-* Focusing more on the task at hand than on boiler-plate technical code
+* Focusing more on the task at hand than on boilerplate technical code
 * Leveraging existing Enterprise APIs rather than reinventing the wheel
 * Improving the overall performance and quality of the language
 * Enabling developers to customize the language at will to derive their
@@ -297,7 +297,7 @@ the Swing enhancements, and `@Grab` in the section about Grape).
 [[Groovy16releasenotes-Singleton]]
 === @Singleton
 
-Whether the singleton is pattern or an anti-pattern, there are still
+Whether singleton is a pattern or an antipattern, there are still
 some cases where we need to create singletons. We're used to create a
 private constructor, a `getInstance()` method for a static field or even
 an initialized `public static final` field. So instead of writing code
@@ -374,7 +374,7 @@ e.g. maps
 
 Instead of writing a very long Java or Groovy class mimicking this
 immutability behavior, Groovy lets you just write an immutable class as
-follow:
+follows:
  
 [source,groovy]
 ------------------------------------------------------------------
@@ -388,7 +388,7 @@ def c2 = new Coordinates(48.824068, 2.531733)
 assert c1 == c2
 ------------------------------------------------------------------
 
-All the boiler-plate code is generated at compile-time for you! The
+All the boilerplate code is generated at compile-time for you! The
 example shows that to instantiate such immutable coordinates, you can
 use one of the two constructors created by the transformation, one
 taking a map whose keys are the properties to set to the values
@@ -453,7 +453,7 @@ assert p.pets.contains('Cat')
 
 The internal field created by the compiler for `pets` will actually be a
 Soft reference, but accessing `p.pets` directly will return the value
-(ie. the list of pets) held by that reference, making the use of the
+(i.e. the list of pets) held by that reference, making the use of the
 soft reference transparent to the user of that class.
 
 [[Groovy16releasenotes-Delegate]]
@@ -665,7 +665,7 @@ use(NumberCategory) {
 --------------------------------------------
 
 We have a simplistic and fictive `Distance` class which may have been
-provided by a third-party, who had the bad idea of making the
+provided by a third party, who had the bad idea of making the
 class`final` so that nobody could ever extend it in any way. But thanks
 to a Groovy Category, we are able to decorate the `Distance` type with
 additional methods. Here, we're going to add a `getMeters()` method to
@@ -872,7 +872,7 @@ often interested in monitoring the changes of value of certain UI
 elements. For this purpose, the usual approach is to use
 JavaBeans `PropertyChangeListener`s to be notified when the value of a
 class field changes. You then end up writing this very common
-boiler-plate code in your Java beans:
+boilerplate code in your Java beans:
 
 [source,groovy]
 ------------------------------------------------------------------------
@@ -1103,7 +1103,7 @@ runtime system, bringing several new capabilities into the mix.
 
 So far, Groovy POGOs (Plain Old Groovy Objects) could have a
 per-instance metaclass, but POJOs could only have one metaclass for all
-instances (ie. a per-class metaclass). This is now not the case anymore,
+instances (i.e. a per-class metaclass). This is now not the case anymore,
 as POJOs can have a per-instance metaclass too. Also, setting the
 metaclass property to null will restore the default metaclass.
 

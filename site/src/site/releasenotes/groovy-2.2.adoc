@@ -179,7 +179,7 @@ The @DelegatesTo annotation, introduced in Groovy 2.1 that helps the
 type checker, IDEs, tools, to provide better support for DSLs using
 closure delegation
 strategies, link:https://issues.apache.org/jira/browse/GROOVY-6134[works with generics token types] as well.
-You can tell Groovy that the delegatee is
+You can tell Groovy that the delegate is
 of the type of the generics component:
 
 [source,groovy]

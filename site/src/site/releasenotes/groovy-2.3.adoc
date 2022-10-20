@@ -24,7 +24,7 @@ to the shiniest version of Groovy!
 
 Groovy 2.3 doesn’t support the new syntax constructs offered by Java 8
 (such as lambdas, method references, default methods in interfaces,
-etc), but you can very well already *use the new APIs offered by JDK
+etc.), but you can very well already *use the new APIs offered by JDK
 8*, and even *use Groovy closures in lieu of Java 8 lambdas*.
 
 For reference, here are a couple of examples which use Java 8 streams,
@@ -165,7 +165,7 @@ assert b.fly() == "I'm a flying Colibri!"
 
 Traits are compatible with static type checking and compilation, as well
 as our usual dynamic behavior. Trait mixed-in methods are actually
-"real" methods (ie. visible from Java as well) and not just dynamic.
+"real" methods (i.e. visible from Java as well) and not just dynamic.
 Note however, that not all existing AST transformations are compatible
 with traits.
 
@@ -239,7 +239,7 @@ that you can choose from:
 
 * a simple strategy for creating chained setters
 * an external strategy where you annotate an explicit builder class
-while leaving some buildee class being built untouched
+while leaving some _buildee class_ being built untouched
 * a default strategy which creates a nested helper class for instance
 creation
 * and an initializer strategy which creates a nested helper class for
@@ -425,7 +425,7 @@ the link:https://github.com/groovy/groovy-core/pull/260/files[pull request]
 for some further hints of the new methods.
 
 You’ll find familiar methods of the Groovy GDK on `File` also available on
-`Path` like these ones:
+`Path` like these:
 
 [source,groovy]
 ----
@@ -441,7 +441,7 @@ path.readLines()
 == Performance improvements
 
 [[Groovy2.3releasenotes-Miscellanousimprovements]]
-=== Miscellanous improvements
+=== Miscellaneous improvements
 
 Various minor *performance improvements across the board*, for static
 compilation, the `invokedynamic` backend, as well as "normal"
@@ -455,9 +455,9 @@ performance, making Groovy 2.3’s JSON support usually
 *faster than all the JSON libraries* available in the Java ecosystem.
 
 Rick Hightower and Andrey Bleschestov covered the performance gains,
-both in parsing and seralization, in
+both in parsing and serialization, in
 a link:http://rick-hightower.blogspot.fr/2014/04/groovy-and-boon-provide-fastest-json.html[benchmarks on Rick’s blog]
-and on link:https://github.com/bura/json-benchmarks[Andrey’s JSON benchmark project on Github].
+and on link:https://github.com/bura/json-benchmarks[Andrey’s JSON benchmark project on GitHub].
 The results are impressive, as the *parsing is generally roughly 2x to 4x faster* with Groovy’s new
 parsers compared to existing libraries, and *~21x faster than pre-Groovy 2.3 parsing*.
 On the serialization front, Groovy’s
@@ -696,7 +696,7 @@ assert config.a.b.c == 2
 
 In addition, the `isSet()` / `hasSet()` combo methods
 (link:https://issues.apache.org/jira/browse/GROOVY-4639[GROOVY-4639]) have been
-added so you can double check if a given node of your configuration has
+added so you can double-check if a given node of your configuration has
 been defined. Before, whether the node wasn’t defined or containing
 `null`, you couldn’t differentiate either case easily.
 
@@ -824,7 +824,7 @@ particularly one,
 a link:https://issues.apache.org/jira/browse/GROOVY-6465[List#sort(Comparable) method], which *conflicted with one of the GDK*,
 so we had to remove ours to stay compliant with JDK 8.
 
-We fixed a link:https://issues.apache.org/jira/browse/GROOVY-6456[race condition in AbstractHttpServler#applyResourceNameMatcher]
+We fixed a link:https://issues.apache.org/jira/browse/GROOVY-6456[race condition in AbstractHttpServlet#applyResourceNameMatcher]
 which incurred a small change in behavior. This feature is seldomly used and doesn’t seem to
 have impacted users of the Groovy servlet machinery so far.
 
