@@ -7,7 +7,7 @@
 A recent tweet showed some C# code for producing a String of stars that might
 be used when displaying ratings on a website:
 
-image:img/star_ratings_csharp.png[image]
+image:img/star_ratings_csharp.png[Image of original tweet,366]
 
 Let's have a look at several ways to do the same thing in Groovy.
 
