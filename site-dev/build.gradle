@@ -172,7 +172,7 @@ task commitWebsite(dependsOn: webzip) {
             into stagingDevSite
         }
         assert file("${stagingDevSite}/index.html").exists()
-        gitout.add(patterns: ['.'], update: true)
+        gitout.add(patterns: ['.'])
 
         if (!gitout.status().staged.getAllChanges()) {
             println 'No changes to commit'
