@@ -24,13 +24,13 @@ repositories {
 }
 
 dependencies {
-    ext.groovyVersion = '2.5.9'
+    ext.groovyVersion = '3.0.14'
     ext.asciidocVersion = '2.2.0'
-    compile "org.codehaus.groovy:groovy:$groovyVersion"
-    compile "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
-    compile "org.codehaus.groovy:groovy-json:$groovyVersion"
-    compile "org.codehaus.groovy:groovy-templates:$groovyVersion"
-    compile("org.asciidoctor:asciidoctorj:$asciidocVersion") {
+    implementation "org.codehaus.groovy:groovy:$groovyVersion"
+    implementation "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
+    implementation "org.codehaus.groovy:groovy-json:$groovyVersion"
+    implementation "org.codehaus.groovy:groovy-templates:$groovyVersion"
+    implementation("org.asciidoctor:asciidoctorj:$asciidocVersion") {
         // to fix intermittent errors, e.g. as described here:
         // https://github.com/asciidoctor/asciidoctorj/issues/680
         // you might need to use a custom jruby version
