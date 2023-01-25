@@ -246,7 +246,7 @@ class SiteGenerator {
                 blogList[bn] = bn
             }
         }
-        render 'blogs', "blogs", [list: blogList], 'blog'
+        render 'blogs', "index", [list: blogList], 'blog'
     }
 
     static void main(String... args) {
