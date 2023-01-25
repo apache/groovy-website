@@ -226,7 +226,7 @@ class SiteGenerator {
 
     private void renderBlog() {
         def asciidoctor = AsciidoctorFactory.instance
-        println "Rendering blog"
+        println "Rendering blogs"
 
         def blogDir = new File(sourcesDir, "blog")
         def blogList = [:]
