@@ -18,6 +18,7 @@
  */
 
 wiki = false
+blog = false
 def devSiteBase = 'https://groovy.apache.org/'
 
 menu {

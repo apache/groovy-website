@@ -41,6 +41,7 @@ class SiteMap {
     boolean changelogs = true
     boolean releaseNotes = true
     boolean wiki = true
+    boolean blog = true
 
     private SiteMap() {}
 

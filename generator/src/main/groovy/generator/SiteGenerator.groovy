@@ -137,6 +137,10 @@ class SiteGenerator {
             renderWiki()
         }
 
+        if (siteMap.blog) {
+            renderBlog()
+        }
+
         long dur = System.currentTimeMillis() - sd
         println "Generated site into $outputDir in ${dur}ms"
     }
@@ -218,6 +222,31 @@ class SiteGenerator {
             }
         }
         render 'geps', "geps", [list: gepList], 'wiki'
+    }
+
+    private void renderBlog() {
+        def asciidoctor = AsciidoctorFactory.instance
+        println "Rendering blog"
+
+        def blogDir = new File(sourcesDir, "blog")
+        def blogList = [:]
+        blogDir.eachFileRecurse { f->
+            if (f.name.endsWith('.adoc')) {
+                def bn = f.name.substring(0, f.name.lastIndexOf('.adoc'))
+                def header = asciidoctor.readDocumentHeader(f)
+                println "Rendering $bn"
+                def relativePath = []
+                def p = f.parentFile
+                while (p != blogDir) {
+                    relativePath << p.name
+                    p = p.parentFile
+                }
+                String baseDir = relativePath ? "blog${File.separator}${relativePath.join(File.separator)}" : 'blog'
+                render 'blog', bn, [notes:f.getText('utf-8'), header: header], baseDir
+                blogList[bn] = bn
+            }
+        }
+        render 'blogs', "blogs", [list: blogList], 'blog'
     }
 
     static void main(String... args) {
