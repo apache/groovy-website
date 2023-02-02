@@ -1,12 +1,12 @@
 = Groovy 2.5.6 Released
 Remko Popma
+:keywords: groovy, release
+:description: Groovy 2.5.6 Release Announcement
 
 ****
 [horizontal,options="compact"]
-Published:: 2019-02-04T22:19:07+00:00
+*Published*&#160;:: 2019-02-04T22:19:07+00:00
 ****
-:keywords: groovy
-:description: Groovy 2.5.6 Release
 
 The Apache Groovy team is pleased to announce version 2.5.6 of Apache Groovy.
 Apache Groovy is a multi-faceted programming language for the JVM.
