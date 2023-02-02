@@ -1,12 +1,16 @@
-—
-layout: post
-title: Adventures with GroovyFX
-date: '2022-12-12T14:22:57+00:00'
+= Adventures with GroovyFX
 
-== permalink: adventures-with-groovyfx
+.Metadata
+****
+[horizontal,options="compact"]
+Title:: Adventures with GroovyFX
+Date:: 2022-12-12T14:22:57+00:00
+Permalink:: adventures-with-groovyfx
+Author:: Paul King
+****
 
 This blog looks at a http://groovyfx.org/[GroovyFX] version of a https://donraab.medium.com/my-weird-and-wonderful-first-adventures-with-javafx-6efe3b1923c8[ToDo application originally written in JavaFX].
-First we start with a <code>ToDoCategory</code> enum of our ToDo categories:
+First we start with a `ToDoCategory` enum of our ToDo categories:
 
 [source,groovy]
 ----
@@ -32,7 +36,7 @@ enum ToDoCategory {
 
 ----
 
-We will have a <code>ToDoItem</code> class containing the todo task, the previously mentioned category and the due date.
+We will have a `ToDoItem` class containing the todo task, the previously mentioned category and the due date.
 
 [source,groovy]
 ----
@@ -47,7 +51,7 @@ class ToDoItem {
 
 ----
 
-It's annotated with <code>@JsonIncludeProperties</code> to allow easy serialization to/from JSON format, to provide easy persistence, and <code>@FXBindable</code>&nbsp;which eliminates the boilerplate required to define JavaFX properties.
+It's annotated with `@JsonIncludeProperties` to allow easy serialization to/from JSON format, to provide easy persistence, and `@FXBindable` which eliminates the boilerplate required to define JavaFX properties.
 
 Next, we'll define some helper variables:
 
@@ -66,11 +70,12 @@ var urls = ToDoCategory.values().collectEntries {
 
 ----
 
-Here, <code>mapper</code> serializes and deserializes our top-level domain object (the ToDo list) into JSON using the https://github.com/FasterXML/jackson[Jackson library]. The&nbsp;<code>open</code> and <code>close</code>&nbsp;Closures do the reading and writing respectively.
+Here, `mapper` serializes and deserializes our top-level domain object (the ToDo list) into JSON using the https://github.com/FasterXML/jackson[Jackson library]. The `open` and `close` Closures do the reading and writing respectively.
 
-For a bit of fun and only slightly more complexity, we have included some slightly nicer images in our application. JavaFX's default emoji font rendering is a little sketchy on some platforms and it's not much work to have nice multi-colored images. This is achieved using the icons from&nbsp; https://github.com/pavlobu/emoji-text-flow-javafx.
-The application is perfectly functional without them (and the approximately 20 lines for the&nbsp;<code>cellFactory</code> and <code>cellValueFactory</code> definitions could be elided) but is prettier with the nicer images. We shrunk them to 1/3 their original size but we could certainly make them larger if we felt inclined.</p>
-<p>Our application will have a combo box for selecting a ToDo item's category. We'll create a factory for the combo box so that each selection will be a label with both graphic and text components.</p>
+For a bit of fun and only slightly more complexity, we have included some slightly nicer images in our application. JavaFX's default emoji font rendering is a little sketchy on some platforms, and it's not much work to have nice multicolored images. This is achieved using the icons from https://github.com/pavlobu/emoji-text-flow-javafx.
+The application is perfectly functional without them (and the approximately 20 lines for the `cellFactory` and `cellValueFactory` definitions could be elided) but is prettier with the nicer images. We shrunk them to 1/3 their original size but we could certainly make them larger if we felt inclined.
+
+Our application will have a combo box for selecting a ToDo item's category. We'll create a factory for the combo box so that each selection will be a label with both graphic and text components.
 
 [source,groovy]
 ----
@@ -162,12 +167,12 @@ start {
 }
 ----
 
-We could have somewhat separated the concerns of application logic and display logic by placing the GUI part of this app in an&nbsp;<code>fxml</code> file. For our purposes however, we'll keep the whole application in one source file and use Groovy's declarative builder style.
+We could have somewhat separated the concerns of application logic and display logic by placing the GUI part of this app in an `fxml` file. For our purposes however, we'll keep the whole application in one source file and use Groovy's declarative builder style.
 
 Here is the application in use:
 image:img/TodoScreenshot.png[TodoScreenshot]
 
-=== Further information
+== Further information
 
 The code for this application can be found here:
 

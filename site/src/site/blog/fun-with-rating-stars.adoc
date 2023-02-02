@@ -1,7 +1,13 @@
 = Fun with rating stars
 
-:author: paulk
-:category: blog
+.Metadata
+****
+[horizontal,options="compact"]
+Title:: Fun with rating stars
+Author:: Paul King
+Date:: 2023-01-28T22:00:45+00:00
+Permalink:: fun-with-rating-stars
+****
 
 == Star Ratings
 
