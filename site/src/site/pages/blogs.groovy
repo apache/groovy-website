@@ -22,7 +22,7 @@ layout 'layouts/main.groovy', true,
                             ul {
                                 sorted.each { blog ->
                                     li {
-                                        a(href: "${blog.key}.html", "$blog.key: $blog.value")
+                                        a(href: "${blog.key}", "$blog.key: $blog.value")
                                     }
                                 }
                             }

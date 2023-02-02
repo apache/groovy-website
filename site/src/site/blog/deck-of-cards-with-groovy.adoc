@@ -4,7 +4,9 @@ Paul King
 Published:: 2022-09-23T10:18:36+00:00
 :keywords: Eclipse Collections, Groovy
 
-Once again, https://twitter.com/TheDonRaab[Donald Raab] has produced an interesting https://donraab.medium.com/how-to-create-a-deck-of-cards-using-eclipse-collections-d9838ac430b7[blog post] on https://github.com/eclipse/eclipse-collections[Eclipse Collections] this one shows some code for modelling and manipulating cards with Java 17 and Eclipse Collections. His related katas are highly recommended.
+Once again, https://twitter.com/TheDonRaab[Donald Raab] has produced an interesting
+https://donraab.medium.com/how-to-create-a-deck-of-cards-using-eclipse-collections-d9838ac430b7[blog post] on
+https://github.com/eclipse/eclipse-collections[Eclipse Collections] this one shows some code for modelling and manipulating cards with Java 17 and Eclipse Collections. His related katas are highly recommended.
 Here is the same example in Groovy (4.0.5 was used here) with just a few tweaks:
 
 [source,groovy]
@@ -70,7 +72,7 @@ println "Remaining cards sorted:\n${deck.sort()}"
 
 Which has this output:
 
-image:https://blogs.apache.org/groovy/mediaresource/f519b2c3-c303-429e-b34e-97e6eac94253[Cards]
+image:img/CardsConsole.png[Cards,740]
 
 Both these Groovy examples run on JDK versions from 8 to 19<br>(emulated records are used in JDK versions 8 to 15).
 
