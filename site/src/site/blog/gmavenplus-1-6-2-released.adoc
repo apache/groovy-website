@@ -1,0 +1,19 @@
+—
+layout: post
+title: GMavenPlus 1.6.2 Released (Community Artifact)
+date: '2018-10-14T22:00:45+00:00'
+
+== permalink: gmavenplus-1-6-2-released
+
+=== GMavenPlus 1.6.2 has been released.
+
+GMavenPlus Plugin is a rewrite of https://github.com/groovy/gmaven[GMaven],
+a http://maven.apache.org/[Maven] plugin that allows you to
+integrate http://groovy-lang.org/[Groovy] into your Maven projects.
+
+Basic usage can be found on the
+https://github.com/groovy/GMavenPlus/wiki/Usage[usage] page,
+with additional usages on the
+https://github.com/groovy/GMavenPlus/wiki/Examples[examples page].
+
+For more information, consult the https://github.com/groovy/GMavenPlus/wiki[wiki].

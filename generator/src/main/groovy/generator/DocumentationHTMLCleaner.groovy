@@ -23,8 +23,6 @@ import groovy.transform.CompileStatic
 /**
  * This class is responsible for downloading a documentation page as generated through the Asciidoctor task
  * of the Groovy build, then filter its contents in order to return only the body of the documentation, as HTML.
- *
- * @author Cédric Champeau
  */
 @CompileStatic
 class DocumentationHTMLCleaner {

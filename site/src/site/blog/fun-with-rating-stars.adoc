@@ -12,26 +12,32 @@ image:img/star_ratings_csharp.png[Image of original tweet,366]
 
 Let's have a look at several ways to do the same thing in Groovy.
 
-```
+[source]
+----
 def rating0(percentage) {
     int stars = Math.ceil(percentage * 10)
     ("🔵" * stars).padRight(10, "⚪")
 }
-```
-```
+----
+
+[source]
+----
 def rating1(percentage) {
     int stars = Math.ceil(percentage * 10)
     "🔵" * stars + "⚪" * (10-stars)
 }
-```
-```
+----
+
+[source]
+----
 def rating2(percentage) {
     int skip = 10 - Math.ceil(percentage * 10)
     "🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪"[skip..<10+skip]
 }
-```
+----
 
-```
+[source]
+----
 def rating3(percentage) {
     switch(percentage) {
         case 0             -> "⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪"
@@ -47,16 +53,17 @@ def rating3(percentage) {
         default            -> "🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵"
     }
 }
-```
+----
 
 If you want you can test the various edge cases:
 
-```
+[source]
+----
 for (i in 0..3)
     for (j in [0, 0.09, 0.1, 0.11, 0.9, 1])
         println "rating$i"(j)
 
-```
+----
 
 == Increasing Robustness
 
@@ -64,19 +71,22 @@ The code examples here assume that the input is in the range `0 \<= percentage \
 
 We could simply add an assert, e.g.:
 
-```
+[source]
+----
 def rating0b(percentage) {
     assert percentage >= 0 && percentage <= 1
     int stars = Math.ceil(percentage * 10)
     ("🔵" * stars).padRight(10, "⚪")
 }
-```
+----
 
 Or, if we wanted to not fail, tweak some of our conditions, e.g.
 for `rating3`, instead of `case 0`, we could use `case { it <= 0 }`.
 
 We could push the checks into our types by making a special class, `Percent` say, which only permitted the allowed values:
-```
+
+[source]
+----
 final class Percent {
     final Double value
     Percent(Double value) {
@@ -84,13 +94,17 @@ final class Percent {
         this.value = value
     }
 }
-```
+----
 And we could optionally also use some metaprogramming to provide a custom `isCase` method:
-```
+
+[source]
+----
 Double.metaClass.isCase = { Percent p -> delegate >= p.value }
-```
+----
 Which means we could tweak the rating method to be:
-```
+
+[source]
+----
 def rating3b(Percent p) {
     switch(p) {
         case 0.0d -> "⚪⚪⚪⚪⚪⚪⚪⚪⚪⚪"
@@ -106,20 +120,21 @@ def rating3b(Percent p) {
         default   -> "🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵"
     }
 }
-```
+----
 
 We can be fancier here using `@EqualsAndHashCode` on the `Percent` class and/or using `@Delegate` on the `value` property, depending on how rich in
 functionality we wanted the `Percent` instances to be.
 
 Alternatively, we could use a design-by-contract approach:
 
-```
+[source]
+----
 @Requires({ percentage >= 0 && percentage <= 1 })
 def rating1b(percentage) {
     int stars = Math.ceil(percentage * 10)
     "🔵" * stars + "⚪" * (10-stars)
 }
-```
+----
 
 == References
 
