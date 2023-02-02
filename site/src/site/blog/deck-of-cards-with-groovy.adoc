@@ -77,7 +77,8 @@ Which has this output:
 
 image:img/CardsConsole.png[Cards,740]
 
-Both these Groovy examples run on JDK versions from 8 to 19<br>(emulated records are used in JDK versions 8 to 15).
+Both these Groovy examples run on JDK versions from 8 to 19 +
+(emulated records are used in JDK versions 8 to 15).
 
 ****
 [horizontal,options="compact"]
