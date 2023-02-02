@@ -5,7 +5,7 @@
 [horizontal,options="compact"]
 Title:: Adventures with GroovyFX
 Date:: 2022-12-12T14:22:57+00:00
-Permalink:: adventures-with-groovyfx
+Permalink&#160;:: adventures-with-groovyfx
 Author:: Paul King
 ****
 

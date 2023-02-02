@@ -1,12 +1,15 @@
 = Fun with rating stars
+:keywords: groovy
+:description: Inspired by a recent tweet, this blog \
+looks at producing a string of stars corresponding to a rating.
 
 .Metadata
 ****
 [horizontal,options="compact"]
 Title:: Fun with rating stars
 Author:: Paul King
-Date:: 2023-01-28T22:00:45+00:00
-Permalink:: fun-with-rating-stars
+Date:: 2023-01-25T22:00:45+00:00
+Permalink&#160;:: fun-with-rating-stars
 ****
 
 == Star Ratings
@@ -145,7 +148,3 @@ def rating1b(percentage) {
 == References
 
 https://twitter.com/JeroenFrijters/status/1615204074588180481[Original tweet]
-
-== Update history
-
-1.0 (2023-01-25):: Initial version
