@@ -1,8 +1,11 @@
 = Deck of cards with Groovy, JDK collections and Eclipse Collections
 Paul King
+:keywords: eclipse collections, groovy
 
-Published:: 2022-09-23T10:18:36+00:00
-:keywords: Eclipse Collections, Groovy
+****
+[horizontal,options="compact"]
+*Published*&#160;:: 2022-09-23T10:18:36+00:00
+****
 
 Once again, https://twitter.com/TheDonRaab[Donald Raab] has produced an interesting
 https://donraab.medium.com/how-to-create-a-deck-of-cards-using-eclipse-collections-d9838ac430b7[blog post] on
@@ -76,4 +79,7 @@ image:img/CardsConsole.png[Cards,740]
 
 Both these Groovy examples run on JDK versions from 8 to 19<br>(emulated records are used in JDK versions 8 to 15).
 
-*Updated 25/Sep/2022*: Use same ordering for the JDK collections version.
+****
+[horizontal,options="compact"]
+*Updated 25/Sep/2022*: Tweaked to use the same ordering for the JDK collections version.
+****
