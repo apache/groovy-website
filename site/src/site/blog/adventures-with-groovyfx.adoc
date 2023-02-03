@@ -1,6 +1,7 @@
 = Adventures with GroovyFX
 Paul King
 :revdate: 2022-12-12
+:revremark:
 :keywords: groovy, groovyfx, javafx
 :description: This blog looks at a GroovyFX TODO application
 
