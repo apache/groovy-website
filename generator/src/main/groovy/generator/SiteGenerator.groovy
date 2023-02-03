@@ -234,7 +234,8 @@ class SiteGenerator {
             if (f.name.endsWith('.adoc')) {
                 def bn = f.name.substring(0, f.name.lastIndexOf('.adoc'))
                 def header = asciidoctor.readDocumentHeader(f)
-                println "Rendering $bn"
+                println "Rendering $bn\n${header.dump()}\n\n"
+                println header.revisionInfo.dump()
                 def relativePath = []
                 def p = f.parentFile
                 while (p != blogDir) {
