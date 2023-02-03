@@ -1,12 +1,8 @@
 = Groundhog Day
 Paul King
+1.0, 2023-02-02
 :keywords: groovy, datetime
 :description: This blog looks at some date manipulations
-
-****
-[horizontal,options="compact"]
-*Published*&#160;:: 2023-02-02T23:22:57+00:00
-****
 
 https://twitter.com/kenkousen[Ken Kousen] posted a
 https://twitter.com/kenkousen/status/1621272529481367554[tweet]
@@ -22,7 +18,7 @@ will continue for 6 weeks, but otherwise Spring will come early.
 Looking at the dates for 2023 (it differs slightly each year) we can see that
 Spring isn't due for 6 weeks and 4 days, so if Spring starts in 6 weeks,
 it is early anyway! While it certainly falls into the category of
-nerds having fun, it is a good simple example of using date library functionality.
+nerds having fun, it's a good simple example of using date library functionality.
 
 This blog looks at a similar Groovy solution:
 
