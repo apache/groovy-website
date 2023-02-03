@@ -2,10 +2,11 @@
  * This layout accepts the following parameters:
  *
  * @param pageTitle the page title
- * @param extraStyles , a list of CSS files to be added in the header
- * @param scripts , a list of scripts to be imported
+ * @param extraStyles a list of CSS files to be added in the header
+ * @param extraMeta a list of additional key, value pairs to be added in the header as meta tags
+ * @param scripts a list of scripts to be imported
  * @param contents the main page contents
- * @param extraFooter, a section to be added before closing body
+ * @param extraFooter a section to be added before closing body
  */
 
 // main layout
@@ -19,6 +20,10 @@ head {
     meta charset: 'utf-8'
     meta 'http-equiv': 'X-UA-Compatible', content: 'IE=edge'
     meta name: 'viewport', content: "width=device-width, initial-scale=1"
+    def metas = extraMeta ?: [:]
+    metas.each { k, v ->
+        meta name: k, content: v
+    }
     title(pageTitle)
     link(href: relative("img/favicon.ico"), type: "image/x-ico", rel: "icon")
     def styles = extraStyles ?: []

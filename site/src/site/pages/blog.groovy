@@ -12,6 +12,14 @@ title = header.documentTitle.main
 layout 'layouts/main.groovy', true,
         pageTitle: "The Apache Groovy programming language - Blogs - $title",
         extraStyles: ['https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css'],
+        metas = [:]
+        if (header.attributes.keywords) {
+            metas.keywords = header.attributes.keywords
+        }
+        if (header.attributes.description) {
+            metas.description = header.attributes.description
+        }
+        extraMeta: metas
         extraFooter: contents {
             script(src:'https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js') { }
             script { yieldUnescaped "document.addEventListener('DOMContentLoaded',prettyPrint)" }
@@ -35,7 +43,7 @@ layout 'layouts/main.groovy', true,
                                 }
                                 sections.each { k,v ->
                                     li {
-                                        a(href:k, class: 'anchor-link', v)
+                                        a(href:"#$k", class: 'anchor-link', v)
                                     }
                                 }
                             }
