@@ -3,7 +3,6 @@ Paul King
 :revdate: 2022-08-01
 :keywords: datascience, deeplearning, groovy, neuralnets
 :description: This post looks at using Apache Groovy, DLJ and Apache MXNet to detect objects within an image
-:source-highlighter: coderay
 
 This blog posts looks at using https://groovy-lang.org/[Apache Groovy] with the
 https://djl.ai/[Deep Java Library (DJL)] and backed by the
