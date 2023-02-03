@@ -24,7 +24,7 @@ Spring isn't due for 6 weeks and 4 days, so if Spring starts in 6 weeks,
 it is early anyway! While it certainly falls into the category of
 nerds having fun, it is a good simple example of using date library functionality.
 
-This blog looks at a similar Groovy solution.
+This blog looks at a similar Groovy solution:
 
 [source,groovy]
 ----
