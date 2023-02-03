@@ -10,7 +10,7 @@ modelTypes = {
 title = header.documentTitle.main
 
 layout 'layouts/main.groovy', true,
-        pageTitle: "The Apache Groovy programming language - Developer docs - $title",
+        pageTitle: "The Apache Groovy programming language - Blogs - $title",
         extraStyles: ['https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css'],
         extraFooter: contents {
             script(src:'https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js') { }
@@ -35,7 +35,7 @@ layout 'layouts/main.groovy', true,
                                 }
                                 sections.each { k,v ->
                                     li {
-                                        a(href:"#$k", class: 'anchor-link', v)
+                                        a(href:k, class: 'anchor-link', v)
                                     }
                                 }
                             }
@@ -57,7 +57,7 @@ layout 'layouts/main.groovy', true,
 
                             }
                             if (header.revisionInfo?.date) {
-                                p("Last update: ${header.revisionInfo.date} (${header.revisionInfo.remark?:'no comment'})")
+                                p("Last update: ${header.revisionInfo.date} ${header.revisionInfo.remark? '(' + header.revisionInfo.remark + ')' :''}")
                             }
                             hr()
                             yieldUnescaped notesAsHTML
