@@ -1,0 +1,24 @@
+= Groundhog Day
+Paul King
+:keywords: groovy, datetime
+:description: This blog looks at some date manipulations
+
+****
+[horizontal,options="compact"]
+*Published*&#160;:: 2023-02-02T23:22:57+00:00
+****
+
+https://twitter.com/kenkousen[Ken Kousen] posted a
+https://twitter.com/kenkousen/status/1621272529481367554[tweet]
+in honor of https://en.wikipedia.org/wiki/Groundhog_Day[Groundhog Day]
+looking at the kotlinx-datetime library.
+
+This blog looks at a similar Groovy solution.
+
+[source,groovy]
+----
+var groundHogDay = LocalDate.of(2023, FEBRUARY, 2)
+var springEquinoxNorthernHemisphere = LocalDate.of(2023, MARCH, 20)
+var expectedDays = use(TimeCategory) { 6.weeks + 4.days }.days
+assert springEquinoxNorthernHemisphere - groundHogDay == expectedDays
+----
