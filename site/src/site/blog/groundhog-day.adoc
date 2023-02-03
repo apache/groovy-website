@@ -1,6 +1,6 @@
 = Groundhog Day
 Paul King
-1.0, 2023-02-02
+1.0, 2023-02-02 : Initial Version
 :keywords: groovy, datetime
 :description: This blog looks at some date manipulations
 
