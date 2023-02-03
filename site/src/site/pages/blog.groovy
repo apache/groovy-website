@@ -8,18 +8,18 @@ modelTypes = {
 }
 
 title = header.documentTitle.main
+def metas = [:]
+if (header.attributes.keywords) {
+    metas.keywords = header.attributes.keywords
+}
+if (header.attributes.description) {
+    metas.description = header.attributes.description
+}
 
 layout 'layouts/main.groovy', true,
         pageTitle: "The Apache Groovy programming language - Blogs - $title",
         extraStyles: ['https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css'],
-        metas = [:]
-        if (header.attributes.keywords) {
-            metas.keywords = header.attributes.keywords
-        }
-        if (header.attributes.description) {
-            metas.description = header.attributes.description
-        }
-        extraMeta: metas
+        extraMeta: metas,
         extraFooter: contents {
             script(src:'https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js') { }
             script { yieldUnescaped "document.addEventListener('DOMContentLoaded',prettyPrint)" }

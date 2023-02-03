@@ -3,10 +3,10 @@
  *
  * @param menu the navigation menu
  * @param pageTitle the page title
- * @param extraStyles , a list of CSS files to be added in the header
+ * @param extraStyles a list of CSS files to be added in the header
  * @param extraMeta a list of additional key, value pairs to be added in the header as meta tags
- * @param scripts , a list of scripts to be imported
- * @param extraFooter , a section to be added before closing body
+ * @param scripts a list of scripts to be imported
+ * @param extraFooter a section to be added before closing body
  */
 layout 'layouts/page.groovy', true,
         mainContent: contents {
