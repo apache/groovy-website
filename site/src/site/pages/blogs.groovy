@@ -11,7 +11,7 @@ layout 'layouts/main.groovy', true,
                                     a(href: '#gep', "Blogs")
                                 }
                                 sorted.each { blog ->
-                                    li { a(href: "#$blog.key", class: 'anchor-link', "$blog.key") }
+                                    li { a(href: blog.key, class: 'anchor-link', blog.key) }
                                 }
                             }
                         }
@@ -22,7 +22,7 @@ layout 'layouts/main.groovy', true,
                             ul {
                                 sorted.each { blog ->
                                     li {
-                                        a(href: "${blog.key}", "$blog.key: $blog.value")
+                                        a(href: blog.key, blog.value)
                                     }
                                 }
                             }
