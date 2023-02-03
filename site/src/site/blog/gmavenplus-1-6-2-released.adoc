@@ -1,12 +1,8 @@
 = GMavenPlus 1.6.2 Released (Community Artifact)
 Remko Popma
+:revdate: 2018-10-14
 :keywords: maven, gmaven, groovy, release
 :description: GMaven 1.6.2 Release Announcement
-
-****
-[horizontal,options="compact"]
-*Published*&#160;:: 2018-10-14T22:00:45+00:00
-****
 
 == GMavenPlus 1.6.2 has been released.
 

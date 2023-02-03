@@ -8,10 +8,10 @@ layout 'layouts/main.groovy', true,
                         div(class: 'col-lg-3') {
                             ul(class: 'nav-sidebar') {
                                 li(class:'active') {
-                                    a(href: '#gep', "Blogs")
+                                    a(href: '/blog/', "Blogs")
                                 }
                                 sorted.each { blog ->
-                                    li { a(href: blog.key, class: 'anchor-link', blog.key) }
+                                    li { a(href: blog.key, blog.key) }
                                 }
                             }
                         }

@@ -1,11 +1,7 @@
 = Deck of cards with Groovy, JDK collections and Eclipse Collections
 Paul King
+:revdate: 2022-09-23
 :keywords: eclipse collections, groovy
-
-****
-[horizontal,options="compact"]
-*Published*&#160;:: 2022-09-23T10:18:36+00:00
-****
 
 Once again, https://twitter.com/TheDonRaab[Donald Raab] has produced an interesting
 https://donraab.medium.com/how-to-create-a-deck-of-cards-using-eclipse-collections-d9838ac430b7[blog post] on

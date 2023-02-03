@@ -1,12 +1,8 @@
 = Whiskey Clustering with Groovy and Apache Ignite
 Paul King
+:revdate: 2022-10-27
 :keywords: datascience, groovy, ignite, kmeans
 :description: Using Apache Ignite with Apache Groovy
-
-****
-[horizontal,options="compact"]
-Published:: 2022-10-27T11:13:37+00:00
-****
 
 In a previous https://blogs.apache.org/groovy/entry/using-groovy-with-apache-wayang[blog post],
 image:https://ignite.apache.org/img/logo.svg[Ignite logo,150,float="right"] we looked at using https://wayang.apache.org/[Apache Wayang] (incubating) and https://spark.apache.org/[Apache Spark] to scale up the https://en.wikipedia.org/wiki/K-means_clustering[k-means] clustering algorithm. Let's look at another useful technology for scaling up this problem, https://ignite.apache.org/[Apache Ignite]. They recently released a https://ignite.apache.org/releases/2.14.0/release_notes.html[new version], but earlier versions are also fine for our example. Before we start, a quick reminder of the problem.
