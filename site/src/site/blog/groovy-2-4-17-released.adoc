@@ -1,22 +1,24 @@
-= Groovy 2.5.6 Released
+= Groovy 2.4.17 Released
 Remko Popma
-:revdate: 2019-02-04
+:revdate: 2019-05-12
 :keywords: groovy, release
-:description: Groovy 2.5.6 Release Announcement.
+:description: Groovy 2.4.17 Release Announcement.
 
-The Apache Groovy team is pleased to announce version 2.5.6 of Apache Groovy.
+Dear community,
+
+The Apache Groovy team is pleased to announce version 2.4.17 of Apache Groovy.
 Apache Groovy is a multi-faceted programming language for the JVM.
-Further details can be found at the http://groovy.apache.org website.
+Further details can be found at the https://groovy.apache.org website.
 
-This release is a maintenance release of the GROOVY_2_5_X branch.
+This release is a maintenance release of the GROOVY_2_4_X branch.
 It is strongly encouraged that all users using prior
 versions on this branch upgrade to this version.
 
-This release includes 24 bug fixes/improvements as outlined in the changelog:
-https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12318123&version=12344751
+This release includes 5 bug fixes/improvements as outlined in the changelog:
+https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12318123&version=12345028
 
 Sources, convenience binaries, downloadable documentation and an SDK
-bundle can be found at: http://www.groovy-lang.org/download.html
+bundle can be found at: https://groovy.apache.org/download.html
 We recommend you verify your installation using the information on that page.
 
 Jars are also available within the major binary repositories.

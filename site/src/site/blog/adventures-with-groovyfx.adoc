@@ -1,8 +1,8 @@
 = Adventures with GroovyFX
 Paul King
 :revdate: 2022-12-12
-:keywords: groovy, groovyfx, javafx
-:description: This blog looks at a GroovyFX TODO application
+:keywords: groovy, groovyfx, javafx, jackson databind
+:description: This blog looks at a GroovyFX TODO application.
 
 This blog looks at a http://groovyfx.org/[GroovyFX] version of a https://donraab.medium.com/my-weird-and-wonderful-first-adventures-with-javafx-6efe3b1923c8[ToDo application originally written in JavaFX].
 First we start with a `ToDoCategory` enum of our ToDo categories:

@@ -1,0 +1,30 @@
+= Groovy 2.5.5 released
+Remko Popma
+:revdate: 2018-12-24
+:keywords: groovy, release
+:description: Groovy 2.5.5 Release Announcement.
+
+Dear community,
+
+The Apache Groovy team is pleased to announce version 2.5.5 of Apache Groovy.
+Apache Groovy is a multi-faceted programming language for the JVM.
+Further details can be found at the http://groovy.apache.org website.
+
+This release is a maintenance release of the GROOVY_2_5_X branch.
+It is strongly encouraged that all users using prior versions on this branch upgrade to this version.
+
+This release includes 20 bug fixes/improvements as outlined in the changelog:
+https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12318123&version=12344435
+
+Sources, convenience binaries, downloadable documentation and an SDK bundle can be found at: http://www.groovy-lang.org/download.html
+We recommend you verify your installation using the information on that page.
+
+Jars are also available within the major binary repositories.
+
+We welcome your help and feedback and in particular want to thank everyone who contributed to this release.
+
+For more information on how to report problems, and to get involved, visit the project website at https://groovy.apache.org/
+
+Best regards,
+
+The Apache Groovy team.

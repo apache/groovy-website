@@ -2,7 +2,7 @@
 Paul King
 :revdate: 2022-09-23
 :keywords: eclipse collections, groovy, @Sortable, records
-:description: This post highlights some code for modelling and manipulating cards with records and Eclipse Collections.
+:description: This post highlights some code for modelling and manipulating cards with records, JDK collections, and Eclipse Collections.
 
 Once again, https://twitter.com/TheDonRaab[Donald Raab] has produced an interesting
 https://donraab.medium.com/how-to-create-a-deck-of-cards-using-eclipse-collections-d9838ac430b7[blog post] on

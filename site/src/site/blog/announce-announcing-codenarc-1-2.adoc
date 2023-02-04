@@ -2,7 +2,7 @@
 Remko Popma
 :revdate: 2018-07-10
 :keywords: codenarc, groovy, grails
-:description: CodeNarc 1.2 Release Announcement
+:description: CodeNarc 1.2 Release Announcement.
 
 The CodeNarc Team is proud to announce the release of version 1.2.
 
