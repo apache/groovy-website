@@ -1,8 +1,8 @@
 = Groundhog Day
 Paul King
 :revdate: 2023-02-02
-:keywords: groovy, datetime
-:description: This blog looks at some date manipulations
+:keywords: groovy, datetime, timecategory, date
+:description: Inspired by a recent tweet, this blog looks at some datetime manipulations to calculate the period between Groundhog day and the start of Spring.
 
 https://twitter.com/kenkousen[Ken Kousen] posted a
 https://twitter.com/kenkousen/status/1621272529481367554[tweet]
