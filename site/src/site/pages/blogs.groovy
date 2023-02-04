@@ -1,3 +1,7 @@
+def keywords = [:].withDefault{ 0 }
+list.each { k, v ->
+    v.attributes.keywords?.split(',')*.trim().each{ keywords[it]++ }
+}
 layout 'layouts/main.groovy', true,
         pageTitle: "The Apache Groovy programming language - Blogs",
         extraFooter: contents {
@@ -10,6 +14,28 @@ layout 'layouts/main.groovy', true,
                     pagination: true
                 });
                 '''
+            }
+            script(src: 'https://cdn.amcharts.com/lib/5/index.js') { }
+            script(src: 'https://cdn.amcharts.com/lib/5/wc.js') { }
+            script {
+                yieldUnescaped """
+                var root = am5.Root.new("chartdiv");
+                var wc = root.container.children.push(am5wc.WordCloud.new(root, {
+                    colors: am5.ColorSet.new(root, {})
+                }));
+                wc.data.setAll([
+                ${keywords.collect{ keyword, count ->
+                    /{ category: "$keyword", value: $count }/
+                }.join(', ')}
+                ]);
+                wc.labels.template.setAll({
+                    paddingTop: 5,
+                    paddingBottom: 5,
+                    paddingLeft: 5,
+                    paddingRight: 5,
+                    fontFamily: "Courier New"
+                });
+                """
             }
         },
         mainContent: contents {
@@ -30,6 +56,7 @@ layout 'layouts/main.groovy', true,
 
                         div(class: 'col-lg-8 col-lg-pull-0') {
                             h1('Blogs for Groovy')
+                            div(id: 'chartdiv') { }
                             p 'Here you can find the Blogs for the Groovy programming language:'
                             div(id: 'blog-list') {
                                 div {

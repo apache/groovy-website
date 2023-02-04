@@ -1150,3 +1150,8 @@ html.noScroll body, html.noScroll .st-container, html.noScroll .st-pusher, html.
     list-style-type: none;
     padding-left: 0.2em;
 }
+
+#chartdiv {
+    width: 100%;
+    height: 400px;
+}
