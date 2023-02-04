@@ -1,0 +1,23 @@
+= [ANNOUNCE] Announcing CodeNarc 1.2
+Remko Popma
+:revdate: 2018-07-10
+:keywords: codenarc, groovy, grails
+:description: CodeNarc 1.2 Release Announcement
+
+The CodeNarc Team is proud to announce the release of version 1.2.
+
+http://codenarc.org/[CodeNarc] is a static analysis tool for Groovy source code.
+
+Version 1.2 includes 5 new rules and several enhancements and bug fixes. See the full details in the https://github.com/CodeNarc/CodeNarc/blob/master/CHANGELOG.md[release notes].
+
+== New Rules
+
+* `StaticFieldsBeforeInstanceFields` rule (convention) - Enforce that all static fields are above all instance fields within a class.
+* `StaticMethodsBeforeInstanceMethods` rule (convention) - Enforce that all static methods within each visibility level (public, protected, private) are above all instance methods within that same visibility level.
+* `PublicMethodsBeforeNonPublicMethods` rule (convention) - Enforce that all public methods are above protected and private methods.
+* `GrailsDomainStringPropertyMaxSize` rule (grails) - String properties in Grails domain classes have to define maximum size otherwise the property is mapped to VARCHAR(255) causing runtime exceptions to occur.
+* `NoJavaUtilDate` rule (convention) - Do not use java.util.Date. Prefer the classes in the java.time.* packages. Checks for construction of new java.util.Date objects.
+
+Check out the https://github.com/CodeNarc/CodeNarc[project on GitHub]!
+
+The http://grails.org/plugin/codenarc[Grails CodeNarc Plugin] has been updated to version 1.2 as well.
