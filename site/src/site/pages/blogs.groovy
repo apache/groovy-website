@@ -1,7 +1,7 @@
 layout 'layouts/main.groovy', true,
         pageTitle: "The Apache Groovy programming language - Blogs",
         mainContent: contents {
-            def sorted = list.sort()
+            def sorted = list.sort { e -> e.value.revisionInfo.date }
             div(id: 'content', class: 'page-1') {
                 div(class: 'row') {
                     div(class: 'row-fluid') {
@@ -10,7 +10,7 @@ layout 'layouts/main.groovy', true,
                                 li(class:'active') {
                                     a(href: '/blog/', "Blogs")
                                 }
-                                sorted.each { blog ->
+                                sorted.reverseEach { blog ->
                                     li { a(href: blog.key, blog.key) }
                                 }
                             }
@@ -20,9 +20,13 @@ layout 'layouts/main.groovy', true,
                             h1('Blogs for Groovy')
                             p 'Here you can find the Blogs for the Groovy programming language:'
                             ul {
-                                sorted.each { blog ->
+                                sorted.reverseEach { k, v ->
                                     li {
-                                        a(href: blog.key, blog.value)
+                                        div(class: 'name') {
+                                            a(href: k, v.documentTitle.main)
+                                            p("Posted by $v.author on $v.revisionInfo.date")
+                                            p(v.attributes.description)
+                                        }
                                     }
                                 }
                             }

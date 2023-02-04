@@ -243,7 +243,7 @@ class SiteGenerator {
                 }
                 String baseDir = relativePath ? "blog${File.separator}${relativePath.join(File.separator)}" : 'blog'
                 render 'blog', bn, [notes:f.getText('utf-8'), header: header], baseDir
-                blogList[bn] = header.documentTitle.main
+                blogList[bn] = header
             }
         }
         render 'blogs', "index", [list: blogList], 'blog'
