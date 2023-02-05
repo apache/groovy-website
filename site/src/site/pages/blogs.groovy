@@ -69,10 +69,14 @@ layout 'layouts/main.groovy', true,
                                             p(class: 'name') {
                                                 a(href: k, v.documentTitle.main)
                                                 br()
-                                                yieldUnescaped "Posted by $v.author on $v.revisionInfo.date"
+                                                yield "Published by $v.author on $v.revisionInfo.date"
+                                                if (v.attributes.updated) {
+                                                    br()
+                                                    yield "Last updated: $v.attributes.updated"
+                                                }
                                                 if (v.attributes.description) {
                                                     br()
-                                                    yieldUnescaped v.attributes.description
+                                                    yield v.attributes.description
                                                 }
                                             }
                                         }

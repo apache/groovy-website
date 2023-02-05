@@ -65,7 +65,10 @@ layout 'layouts/main.groovy', true,
 
                             }
                             if (header.revisionInfo?.date) {
-                                p("Last update: ${header.revisionInfo.date} ${header.revisionInfo.remark? '(' + header.revisionInfo.remark + ')' :''}")
+                                p("Published: ${header.revisionInfo.date}")
+                            }
+                            if (header.attributes.updated) {
+                                p("Updated: ${header.attributes.updated}")
                             }
                             hr()
                             yieldUnescaped notesAsHTML

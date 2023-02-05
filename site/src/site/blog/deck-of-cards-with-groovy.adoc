@@ -1,6 +1,7 @@
 = Deck of cards with Groovy, JDK collections and Eclipse Collections
 Paul King
 :revdate: 2022-09-23
+:updated: 2022-09-25
 :keywords: eclipse collections, groovy, @Sortable, records
 :description: This post highlights some code for modelling and manipulating cards with records, JDK collections, and Eclipse Collections.
 
@@ -81,6 +82,7 @@ image:img/CardsConsole.png[Cards,740]
 Both these Groovy examples run on JDK versions from 8 to 19 +
 (emulated records are used in JDK versions 8 to 15).
 
+.Update history
 ****
-*Updated 25/Sep/2022*: Tweaked to use the same ordering for the JDK collections version.
+*25/Sep/2022*: Tweaked to use the same ordering for the JDK collections version.
 ****
