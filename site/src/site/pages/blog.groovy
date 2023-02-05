@@ -38,6 +38,9 @@ layout 'layouts/main.groovy', true,
                     div(class: 'row-fluid') {
                         div(class: 'col-lg-3') {
                             ul(class: 'nav-sidebar') {
+                                li {
+                                    a(href: '..', 'Blog index')
+                                }
                                 li(class:'active') {
                                     a(href: '#doc', title)
                                 }
@@ -65,10 +68,7 @@ layout 'layouts/main.groovy', true,
 
                             }
                             if (header.revisionInfo?.date) {
-                                p("Published: ${header.revisionInfo.date}")
-                            }
-                            if (header.attributes.updated) {
-                                p("Updated: ${header.attributes.updated}")
+                                p("Published: $header.revisionInfo.date${header.attributes.updated ? / (Last updated: $header.attributes.updated)/ : ''}")
                             }
                             hr()
                             yieldUnescaped notesAsHTML
