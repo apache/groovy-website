@@ -1,0 +1,33 @@
+= Groovy 3.0.0-beta-2 Released
+Remko Popma
+:revdate: 2019-07-15
+:keywords: groovy, release
+:description: Groovy 3.0.0-beta-2 Release Announcement.
+
+The Apache Groovy team is pleased to announce version 3.0.0-beta-2 of Apache Groovy.
+Apache Groovy is a multi-faceted programming language for the JVM.
+Further details can be found at the https://groovy.apache.org website.
+
+This is a pre-release of a new version of Groovy.
+We greatly appreciate any feedback you can give us when using this version.
+
+This release includes 40 bug fixes/improvements as outlined in the changelog:
+https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12318123&version=12345498
+
+Sources, convenience binaries, downloadable documentation and an SDK
+bundle can be found at: https://groovy.apache.org/download.html
+We recommend you verify your installation using the information on that page.
+
+Jars are also available within the major binary repositories.
+
+We welcome your help and feedback and in particular want
+to thank everyone who contributed to this release.
+
+For more information on how to report problems, and to get involved,
+visit the project website at https://groovy.apache.org/
+
+Note: Apache Groovy 3.0.0-beta-2 was compiled with JDK8, so the illegal access warnings will come back if you use JDK9+. But don't worry, we will do another release in a week or two. Please verify the issues you reported first and give us feedback, which will help us improve the quality of next release.
+
+Best regards,
+
+The Apache Groovy team.
