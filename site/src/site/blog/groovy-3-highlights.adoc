@@ -1,0 +1,266 @@
+= Groovy 3 Highlights
+:revdate: 2020-02-13
+:description: A summary of the highlights for Groovy 3.
+:keywords: groovy, parrot
+
+== General Improvements
+
+Groovy has both a dynamic nature (supporting code styles similar to Ruby and Python) as well as a static nature (supporting styles similar to Java, Kotlin and Scala). Groovy continues to improve both those natures - filling in any feature gaps. As just one example, Groovy has numerous facilities for better managing null values. You can use Groovy's null-safe navigation operator, piggy back on Java's `Optional` or provide a null-checking extension to the type checker. These are augmented in Groovy 3 with null-safe indexing for arrays, lists and maps and a new AST transformation `@NullCheck` for automatically instrumenting code with null checks.
+
+In general, the language design borrows heavily from Java, so careful attention is paid to changes in Java and acted on accordingly if appropriate. A lot of work has been done getting Groovy ready for Java modules and for making it work well with JDK versions 9-15. Other work has dramatically improved the performance of bytecode generation which makes use of the JVMs invoke dynamic capabilities. Additional changes are already underway for further improvements in these areas in Groovy 4.
+
+There are also many other performance improvements under the covers. More efficient type resolution occurs during compilation and more efficient bytecode is generated for numerous scenarios. The addition of a Maven BOM allows more flexible usage of Groovy from other projects.
+
+Groovy also has particular strengths for scripting, testing, writing Domain Specific Languages (DSLs) and in domains like financial calculations and data science. On-going work has been made to ensure those strengths are maintained. The accuracy used for high-precision numbers has been improved and is configurable. Much of the tooling such as Groovy Console and groovysh have also been improved.
+
+Other key strengths of Groovy such as its runtime and compile-time meta-programming capabilities have also seen many minor enhancements. All in all, this release represents the culmination of several years of activity. Over 500 new features, improvements and bug fixes have been added since Groovy 2.5. Just a few highlights are discussed below.
+
+## Parrot parser
+
+Groovy has a new parser. While mostly an internal change within Groovy, the good news for users is that the new parser is more flexible and will allow the language to more rapidly change should the need arise.
+
+=== New syntax
+
+The new parser gave us the opportunity to add some new syntax features:
+
+* !in and !instanceof operators
++
+[source,groovy]
+----
+assert 45 !instanceof Date
+assert 4 !in [1, 3, 5, 7]
+----
+
+* Elvis assignment operator
++
+[source,groovy]
+----
+def first = 'Jane'
+def last = null
+first ?= 'John'
+last ?= 'Doe'
+assert [first, last] == ['Jane', 'Doe']
+----
+
+* Identity comparison operators
++
+[source,groovy]
+----
+assert cat === copyCat  // operator shorthand for "is" method
+assert cat !== lion     // negated operator shorthand
+----
+
+* Safe indexing (for maps, lists and arrays)
++
+[source,groovy]
+----
+println map?['someKey'] // return null if map is null instead of throwing NPE
+----
+
+=== Java compatibility
+
+The Groovy syntax can be thought of as a superset of Java syntax.
+It's considered good style to use the enhancements that Groovy provides when appropriate,
+but Groovy's aim is to still support as much of the Java syntax as possible to allow
+easy migration from Java or easy switching for folks working with both Java and Groovy.
+
+The flexibility provided by the new parser allowed several syntax compatibility holes to be closed including:
+
+* do/while loop
++
+[source,groovy]
+----
+def count = 5
+def factorial = 1
+do {
+    factorial *= count--
+} while(count > 1)
+assert factorial == 120
+----
+
+* Enhanced classic Java-style for loop (see multi-assignment for-loop example; note the comma in the last clause of the for statement)
+* Multi-assignment in combination with for loop
++
+[source,groovy]
+----
+def count = 3
+println 'The next three months are:'
+for (def (era, yr, mo) = new Date(); count--; yr = mo == 11 ? yr + 1 : yr, mo = mo == 11 ? 0 : mo + 1) {
+    println "$yr/$mo"
+}
+----
+
+* Java-style array initialization (but you might prefer Groovy's literal list notation)
++
+[source,groovy]
+----
+def primes = new int[] {2, 3, 5, 7, 11}
+----
+
+* Lambda expressions (but you might often prefer Groovy's Closures which support trampoline/tail recursion, partial application/currying, memoization/auto caching)
++
+[source,groovy]
+----
+(1..10).forEach(e -> { println e })
+----
++
+[source,groovy]
+----
+assert (1..10).stream()
+    .filter(e -> e % 2 == 0)
+    .map(e -> e * 2)
+    .toList() == [4, 8, 12, 16, 20]
+----
++
+[source,groovy]
+----
+def add = (int x, int y) -> { def z = y; return x + z }
+assert add(3, 4) == 7
+----
+
+* Method references (but you might often prefer Groovy's Method pointers which are Closures with the previously mentioned benefits)
++
+[source,groovy]
+----
+assert ['1', '2', '3'] == Stream.of(1, 2, 3)
+        .map(String::valueOf)
+        .toList()
+----
+
+* "var" reserved type (allows Java 10/11 features even when using JDK 8)
++
+[source,groovy]
+----
+var two = 2                                                      // Java 10
+IntFunction<Integer> twice = (final var x) -> x * two            // Java 11
+assert [1, 2, 3].collect{ twice.apply(it) } == [2, 4, 6]
+----
+
+* ARM Try with resources (Java 7 and 9 variations work on JDK 8 - but you might prefer Groovy's internal iteration methods for resources)
++
+[source,groovy]
+----
+def file = new File('/path/to/file.ext')
+def reader = file.newReader()
+try(reader) {
+    String line = null
+    while (line = reader.readLine()) {
+        println line
+    }
+}
+----
+
+* Nested code blocks
+
+* Java-style non-static inner class instantiation
+
+* Interface default methods (but you might prefer Groovy's traits)
++
+[source,groovy]
+----
+interface Greetable {
+    String target()
+    default String salutation() {
+        'Greetings'
+    }
+    default String greet() {
+        "${salutation()}, ${target()}"
+    }
+}
+----
+
+== Split package changes
+
+In preparation for Groovy's modular jars to be first class modules, several classes have moved packages.
+Some examples:
+
+[source]
+----
+groovy.util.XmlParser => groovy.xml.XmlParser
+groovy.util.XmlSlurper => groovy.xml.XmlSlurper
+groovy.util.GroovyTestCase => groovy.test.GroovyTestCase
+----
+
+In most cases, both the old and new class are available in Groovy 3.
+But by Groovy 4, the old classes will be removed.
+See the http://groovy-lang.org/releasenotes/groovy-3.0.html[release notes]
+for a complete list of these changes.
+
+== DGM improvements
+
+Groovy adds many extension methods to existing Java classes.
+In Groovy 3, about 80 new such extension methods were added.
+We highlight just a few here:
+
+* `average()` on arrays and iterables
++
+[source,groovy]
+----
+assert 3 == [1, 2, 6].average()
+----
+
+* `takeBetween()` on String, CharSequence and GString
++
+[source,groovy]
+----
+assert 'Groovy'.takeBetween( 'r', 'v' ) == 'oo'
+----
+
+* `shuffle()` and `shuffled()` on arrays and iterables
++
+[source,groovy]
+----
+def orig = [1, 3, 5, 7]
+def mixed = orig.shuffled()
+assert mixed.size() == orig.size()
+assert mixed.toString() ==~ /\[(\d, ){3}\d\]/
+----
+
+* `collect{ }` on Future
++
+[source,groovy]
+----
+Future<String> foobar = executor.submit{ "foobar" }
+Future<Integer> foobarSize = foobar.collect{ it.size() } // async
+assert foobarSize.get() == 6
+----
+
+* `minus()` on LocalDate
++
+[source,groovy]
+----
+def xmas = LocalDate.of(2019, Month.DECEMBER, 25)
+def newYear = LocalDate.of(2020, Month.JANUARY, 1)
+assert newYear - xmas == 7 // a week apart
+----
+
+== Other Improvements
+
+=== Improved Annotation Support
+
+Recent version of Java allow annotations in more places (JSR308). Groovy now also supports such use cases. This is important for frameworks like Spock, Micronaut, Grails, Jqwik and others, and also opens up the possibility for additional AST transformations (a key meta-programming feature of Groovy).
+
+=== Groovydoc Enhancements
+
+In addition to Groovydoc supporting the new parser, you can now embed Groovydoc comments in various ways:
+
+* They can be made available within the AST for use by AST transformations and other tools.
+* Groovydoc comments starting with a special `/**@` opening comment delimiter can also be embedded into the class file. This provides a capability in Groovy inspired by languages like Ruby which can embed documentation into the standard binary jar and is thus always available rather than relying on a separate javadoc jar.
+
+== Getting Groovy
+
+The official source release are on the https://groovy.apache.org/download.html[download page].
+Convenience binaries, downloadable documentation, an SDK bundle and pointers to various community
+artifacts can be found on that page along with information to allow you to verify your installation.
+You can use the zip installation on any platform with Java support, or consider using an installer
+for your platform or IDE.
+
+The Windows installer for the latest versions of Groovy 3 are available from https://bintray.com/groovy/Distributions/Windows-Installer[bintray]. (community artifact)
+
+For Linux users, the latest versions of Groovy 3 are also available in the
+https://snapcraft.io/groovy[Snap Store]. (community artifact)
+
+For Eclipse users, the latest versions of the Groovy 3 groovy-eclipse-batch plugin are available from https://bintray.com/groovy/maven/groovy-eclipse-batch/[bintray]. (community artifact)
+
+For Intellij users, the latest community editions of
+https://www.jetbrains.com/idea/[IDEA] have Groovy 3 support.
