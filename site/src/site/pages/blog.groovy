@@ -39,7 +39,7 @@ layout 'layouts/main.groovy', true,
                         div(class: 'col-lg-3') {
                             ul(class: 'nav-sidebar') {
                                 li {
-                                    a(href: '..', 'Blog index')
+                                    a(href: '/blog/', 'Blog index')
                                 }
                                 li(class:'active') {
                                     a(href: '#doc', title)
