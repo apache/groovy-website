@@ -192,7 +192,7 @@ assert ["3:[cat, dog]", "4:[fish]", "6:[canary, gerbil]"] == GQL {
 
 == Stream methods
 
-Useful stream methods (it is worthwhile comparing some of the examples to earlier non-stream variants):
+Useful stream methods (it is worthwhile comparing these examples to earlier non-stream variants):
 
 [source,groovy]
 ----
