@@ -1,7 +1,7 @@
 = Apache Groovy 2022 Year In Review
 :revdate: 2022-12-29
 :keywords: groovy, 2022, apachecon
-:description: Groovy 2.4.16 Windows Installer Release Announcement.
+:description: This post looks back at some highlights for Groovy in 2022.
 
 The year 2022 has been a reasonably good one for the Groovy Programming Language. Here are just a few of the highlights.
 
@@ -24,10 +24,10 @@ Groovy is bundled within other products, so the stats are no doubt much higher.
 Well, the good news is that the rate of downloads is still increasing, so interest in Groovy remains high.
 While the figures for December are not yet finalised, it looks like
 *_2022 will be the first year Groovy surpasses 1 Billion downloads in a single calendar year_*!
-image:https://blogs.apache.org/groovy/mediaresource/23ee32e9-1fc7-46e2-adf7-9136f9d89185[Groovy download stats]
+image:img/downloads_until_2022.png[Groovy download stats]
 
 We also started increasing the number of posts in the https://groovy.apache.org/blog[Groovy project blog].
 There were nearly 30 posts for you to peruse from this year. We try to show off Groovy features and also have some fun.
-image:https://blogs.apache.org/groovy/mediaresource/15c5a15d-84fd-416e-83c1-071ff9c8dcd3[collage of blog post images]
+image:img/blog_collage_2022.jpg[collage of blog post images]
 You might also like to check out the https://www.javaadvent.com/2022/12/groovy-and-data-science.html[Groovy and Data Science blog post] from
 the https://www.javaadvent.com/[JVM Advent] folks. It summarises a handful of the above-mentioned blog posts.

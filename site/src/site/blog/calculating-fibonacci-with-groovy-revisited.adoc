@@ -1,0 +1,195 @@
+= Calculating Fibonacci with Groovy revisited
+:revdate: 2022-09-08
+:description: This post looks at various ways to calculate Fibonacci numbers such as recursion and iteration \
+including optimisations like tail recursion and memoization.
+:keywords: fibonacci, groovy, recursion, streams
+
+In an earlier post,
+we looked at using https://blogs.apache.org/groovy/entry/matrix-calculations-with-groovy-apache[Matrices with Groovy] including using matrices to calculate Fibonacci terms. But do you need that complexity to calculate Fibonacci? Not, not at all. You can do various one-liners for that scenario (to repeat the calculation from that post):
+
+[source,groovy]
+----
+Stream.iterate([1, 1], f -> [f[1], f.sum()]).limit(8).toList()*.head()
+----
+
+The previous post was more about using _matrices_ than Fibonacci per se, though hopefully learning
+that the Fibonacci matrix was a specialisation of the Leslie matrix was an added bonus.
+
+Let's have a look at a few other options to write Fibonacci methods in Groovy.
+
+== Iterative style
+
+Unless you learned a functional programming language as your first language, you may have written an iterative Factorial or
+Fibonacci as one of your first programming learning exercises. Such an algorithm for Fibonacci could look something like this:
+
+[source,groovy]
+----
+def fib(n) {
+    if (n <= 1) return n
+
+    def previous = n.valueOf(1), next = previous, sum
+    (n-2).times {
+        sum = previous
+        previous = next
+        next = sum + previous
+    }
+    next
+}
+
+assert fib(10) == 55
+assert fib(50L) == 12586269025L
+assert fib(100G) == 354224848179261915075G
+----
+
+The only interesting part to this solution is the use of dynamic idioms. We didn't provide an explicit type for `n`,
+so duck-typing means the method works fine for `Integer`, `Long` and `BigInteger` values.
+This implementation does all calculations using the type of the supplied `n`,
+so the user of the method controls that aspect.
+
+Groovy gives the option to also specify an explicit type like `Number` or use `TypeChecked` or `CompileStatic`
+for type inference if you wanted. We'll see an example of those options later.
+
+== Recursive
+
+Once you mastered iterative programming, your next programming learning exercise may have been the recursive version of Factorial or Fibonacci. For Fibonacci, you may have coded something like this:
+
+[source,groovy]
+----
+def fib(n) {
+    if (n <= 1) return n
+    fib(n - 1) + fib(n - 2)
+}
+
+assert fib(10) == 55
+assert fib(50L) == 12586269025L
+assert fib(100G) == 354224848179261915075G
+----
+
+This naïve version is incredibly inefficient. Calling fib(6) ends up calculating fib(2) five times for instance:
+
+image:https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Call_Tree_for_Fibonacci_Number_F6.svg/750px-Call_Tree_for_Fibonacci_Number_F6.svg.png[Call tree for Fibonacci(6),400]
+
+There are several ways to avoid that repetition. One option is to use the `@Memoized` annotation.
+Adding this annotation on a method causes the compiler to inject appropriate code for caching results into the method.
+This is ideal for pure functions like Fibonacci since they always return the same output for a given input.
+There are annotation attributes to adjust how big such a cache might be, but that sophistication isn't needed here.
+
+[source,groovy]
+----
+@Memoized
+def fib(n) {
+    if (n <= 1) return n
+    fib(n - 1) + fib(n - 2)
+}
+
+assert fib(10) == 55
+assert fib(50L) == 12586269025L
+assert fib(100G) == 354224848179261915075G
+----
+
+This now runs just as quickly as the iterative method. If you happened to use a `Closure` instead of a method,
+you can call one of the `memoize` methods on `Closure`.
+
+A problem with this approach (in fact recursion in general) is that you hit a stack overflow exception for larger values of `n`,
+e.g. `fib(500G)`. Groovy supports tail call elimination with the inclusion of the `TailRecursive` annotation.
+In this case the compiler injects an "unrolled" non-recursive version of the algorithm.
+In order for the "unrolling" to succeed, the algorithm needs to be re-worked so that at most one call to
+fib occurs in any return statement. Here is a version of the algorithm re-worked in this way:
+
+[source,groovy]
+----
+@TailRecursive
+static fib(n, a, b) {
+    if (n == 0) return a
+    if (n == 1) return b
+    fib(n - 1, b, a + b)
+}
+
+assert fib(10, 0, 1) == 55
+assert fib(50L, 0L, 1L) == 12586269025L
+assert fib(100G, 0G, 1G) == 354224848179261915075G
+assert fib(500G, 0G, 1G) == 139423224561697880139724382870407283950070256587697307264108962948325571622863290691557658876222521294125G
+----
+
+This is slightly more complicated to understand than the original if you haven't seen it before
+but now is both efficient and handles large values of `n`.
+We can compile statically for even faster speed like this:
+
+[source,groovy]
+----
+@TailRecursive
+@CompileStatic
+static fib(Number n, Number a, Number b) {
+    if (n == 0) return a
+    if (n == 1) return b
+    fib(n - 1, b, a + b)
+}
+
+assert fib(10, 0, 1) == 55
+assert fib(50L, 0L, 1L) == 12586269025L
+assert fib(100G, 0G, 1G) == 354224848179261915075G
+assert fib(500G, 0G, 1G) == 139423224561697880139724382870407283950070256587697307264108962948325571622863290691557658876222521294125G
+----
+
+If you are using a `Closure`, you would look at using the `trampoline` method on `Closure` to achieve a similar result.</p>
+
+== Streams
+
+We saw the Stream based "one-liner" solution at the start of this blog post. Let's adopt the duck-typing idioms we have used so far and define a fib method. It could look like this:
+
+[source,groovy]
+----
+def fib(n) {
+    def zero = n.valueOf(0)
+    def one = n.valueOf(1)
+    Stream.iterate([zero, one], t -> [t[1], t.sum()])
+    .skip(n.longValue())
+    .findFirst().get()[0]
+}
+
+assert fib(10) == 55
+assert fib(50L) == 12586269025L
+assert fib(100G) == 354224848179261915075G
+----
+
+== Bytecode and AST transforms
+
+Finally, just so you know all your options, here is a version using the https://github.com/melix/groovy-bytecode-ast[@Bytecode AST transform]
+which lets you write JVM bytecode directly in your Groovy! Note well that this falls into the category of
+"_don't ever ever do this_" but just so you know you can, it is included here:
+
+[source,groovy]
+----
+@Bytecode
+int fib(int i) {
+    l0
+    iload 1
+    iconst_2
+    if_icmpgt l1
+    iconst_1
+    _goto l2
+    l1
+    frame SAME
+    aload 0
+    iload 1
+    iconst_2
+    isub
+    invokevirtual '.fib','(I)I'
+    aload 0
+    iload 1
+    iconst_1
+    isub
+    invokevirtual '.fib', '(I)I'
+    iadd
+    l2
+    frame same1,'I'
+    ireturn
+}
+
+assert fib(10) == 55
+----
+
+Please read the caveats for that transform before considering using it for anything but extreme situations.
+It's meant more as a fun thing to try than something anyone would want to do in production.
+
+Have fun writing your own algorithms!
