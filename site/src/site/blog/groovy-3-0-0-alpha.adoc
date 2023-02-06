@@ -1,0 +1,43 @@
+= Groovy 3.0.0-alpha-4 Released
+Remko Popma
+:revdate: 2019-01-01
+:keywords: groovy, release
+:description: Groovy 3.0.0-alpha-4 Release Announcement.
+
+Dear community,
+
+image:img/groovy_logo.png[Groovy logo,200,float="right"]
+The Apache Groovy team is pleased to announce version 3.0.0-alpha-4 of
+Apache Groovy. We expect this to be the last "alpha" release of Groovy
+3.0.0 as we shift our focus to releasing this next version of Groovy.
+
+2018 was an exciting year for Groovy with download numbers going over
+100M in 2018 for the first time. We also had 18 releases and over 30
+new contributors. Thanks to you all! We expect 2019 to be even more
+exciting as we bring to fruition the hard work (including hundreds of
+improvements and fixes) that have already gone into 3.0.0.
+
+Apache Groovy is a multi-faceted programming language for the JVM.
+Further details can be found at the http://groovy.apache.org website.
+
+This is a pre-release of a new version of Groovy.
+We greatly appreciate any feedback you can give us when using this version.
+
+This release includes 138 bug fixes/improvements as outlined in the changelog:
+https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12318123&version=12343541
+
+Sources, convenience binaries, downloadable documentation and an SDK
+bundle can be found at: http://www.groovy-lang.org/download.html
+We recommend you verify your installation using the information on that page.
+
+Jars are also available within the major binary repositories.
+
+We welcome your help and feedback and in particular want
+to thank everyone who contributed to this release.
+
+For more information on how to report problems, and to get involved,
+visit the project website at https://groovy.apache.org/
+
+Best regards,
+
+The Apache Groovy team.

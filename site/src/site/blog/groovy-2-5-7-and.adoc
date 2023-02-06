@@ -1,0 +1,19 @@
+= Groovy 2.5.7 and 3.0.0-beta-1 Windows Installers Released (Community Artifacts)
+Remko Popma
+:revdate: 2019-05-12
+:keywords: groovy, windows installer, release
+:description: Groovy 2.5.7 and 3.0.0-beta-1 Windows Installer Release Announcement.
+
+The Windows installer for Groovy 2.5.7 (Community Artifact) is now available from Bintray:
+https://bintray.com/groovy/Distributions/Windows-Installer/groovy-2.5.7-installer.
+
+The Windows installer for Groovy 3.0.0-beta-1 (Community Artifact) is now available from Bintray:
+https://bintray.com/groovy/Distributions/download_file?file_path=groovy-3.0.0-beta-1-installer.exe
+
+These are also the first releases where a preview of the Windows Installers is created with the WiX Toolset.  You are invited to try them out and provide any feedback you might have.  The intention is to eventually replace the current NSIS-based installer with this installer.  It is believed to be reasonably stable.  The maintainer of these installer has personally been using these instead of the NSIS based installer for a while now.  Here are the links to those installers:
+
+3.0.0-beta-1: https://bintray.com/groovy/Distributions/download_file?file_path=groovy-3.0.0-beta-1+%28preview+installer%29.msi
+
+2.5.7: https://bintray.com/groovy/Distributions/download_file?file_path=groovy-2.5.7+%28preview+installer%29.msi
+
+Be aware that you need to fully uninstall the NSIS based Groovy installation before installing with an MSI installer.

@@ -1,0 +1,8 @@
+= Groovy 2.5.4 Windows Installer Released (Community Artifact)
+Remko Popma
+:revdate: 2018-11-12
+:keywords: groovy, windows installer, release
+:description: Groovy 2.5.4 Windows Installer Release Announcement.
+
+The Windows installer for Groovy 2.5.4 (community artifact) is available from:
+https://bintray.com/groovy/Distributions/Windows-Installer/groovy-2.5.4-installer
