@@ -49,7 +49,7 @@ layout 'layouts/main.groovy', true,
                                     a(href: '/blog/', "Blogs")
                                 }
                                 sorted.reverseEach { blog ->
-                                    li { a(href: blog.key, blog.key) }
+                                    li { a(href: blog.key, blog.value.documentTitle.main) }
                                 }
                             }
                         }
