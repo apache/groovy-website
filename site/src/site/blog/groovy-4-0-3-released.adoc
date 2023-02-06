@@ -6,6 +6,7 @@ Paul King
 
 Dear community,
 
+image:img/groovy_logo.png[Groovy logo,200,float="right"]
 The Apache Groovy team is pleased to announce version 4.0.3 of Apache Groovy.
 Apache Groovy is a multi-faceted programming language for the JVM.
 Further details can be found at the https://groovy.apache.org website.
