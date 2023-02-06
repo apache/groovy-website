@@ -3,7 +3,7 @@ Paul King
 :revdate: 2022-07-21
 :keywords: comparators, functional, gquery, ginq, groovy, lambdas, record, sorting
 
-image:https://blogs.apache.org/groovy/mediaresource/2eb621f3-0419-437e-950b-0c9e5e15804e[Cher,200,align="right"]
+image:https://blogs.apache.org/groovy/mediaresource/2eb621f3-0419-437e-950b-0c9e5e15804e[Cher,179,179,float="right"]
 This blog post is inspired by the Comparator examples in the excellent _Collections Refuelled_ https://www.youtube.com/watch?v=q6zF3vf114M&amp;t=13s[talk] and https://blogs.oracle.com/java/post/collections-refueled[blog] by Stuart Marks. That blog, from 2017, highlights improvements in the Java collections library in Java 8 and 9 including numerous Comparator improvements. It is now 5 years old but still highly recommended for anyone using the Java collections library.
 
 Rather than have a `Student` class as per the original blog example, we'll have a `Celebrity` class (and later record) which has the same `first` and `last` name fields and an additional `age` field. We'll compare initially by `last` name with nulls before non-nulls and then by `first` name and lastly by `age`.
@@ -12,7 +12,7 @@ As with the original blog, we'll cater for nulls, e.g. a celebrity known by a si
 
 == The Java comparator story recap
 
-image:img/JavaLogo.png[Java logo, 120,float="right"]
+image:img/JavaLogo.png[Java logo,95,128,float="right"]
 Our `Celebrity` class if we wrote it in Java would look something like:
 
 [source,java]
@@ -164,7 +164,7 @@ is the same as previously.
 
 == The Groovy comparator story
 
-image:img/groovy_logo.png[Groovy logo,150,float="right"]
+image:img/groovy_logo.png[Groovy logo,180,90,float="right"]
 At about the same time that Java was evolving its comparator story Groovy added some complementary features to tackle many of the same problems. We'll look at some of those features and also how the JDK improvements we saw above features can be used instead if preferred.
 
 First off, let's create a Groovy `Celebrity` record:
