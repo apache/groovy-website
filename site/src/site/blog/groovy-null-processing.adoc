@@ -1,0 +1,153 @@
+= Groovy Processing Nulls In Lists
+Paul King
+:revdate: 2023-02-06
+:keywords: groovy, list, collection, guava, eclipse collections, commons collections, apache, null, Groovy truth
+
+This https://www.programmergirl.com/java-remove-nulls-from-list/[article] by https://www.programmergirl.com/about-me/[Shubhra Srivastava]
+looks at processing lists containing nulls in Java. Let's look at doing the same in Groovy.
+Shubhra's article covered both mutating the list in place and producing a new list,
+so we'll cover both cases.
+
+== Libraries covered
+
+Shubhra's article examined _"out-of-the-box"_ Java and some other collections libraries.
+We'll look at using those same libraries with Groovy, but we'll cover Eclipse Collections too.
+
+In summary, we'll cover:
+
+* _"Out-of-the-box"_ https://groovy-lang.org/[Groovy] (which includes JDK functionality)
+
+* https://github.com/google/guava/wiki[Guava] which provides a number of extensions to the JDK collections ecosystem. In particular, it has immutable collections, new collection types like multisets and bidirectional maps and various powerful extensions and utilities.
+
+* https://commons.apache.org/proper/commons-collections/[Apache Commons Collections] which extends upon the JDK collections framework adding some new types like bidirectional maps and bags
+as well as providing many comparator and iterator implementations. The library was designed to fill
+gaps in the JDK offerings and while some of those gaps in the JDK have now been filled by the JDK
+itself, Commons Collections still contains much useful functionality.
+
+* https://www.eclipse.org/collections/[Eclipse Collections] which comes with many container types including
+immutable collections, primitive collections, bimaps, multimaps and bags as well as numerous utility
+methods. It focuses on reduced memory footprint and efficient containers. It might be particularly
+of interest if you need primitive collections, immutable collections or some more exotic collection
+types like bag or bidirectional maps.
+
+== Mutating a list to remove its nulls
+
+=== Groovy
+
+With Groovy, we can follow Java's lead and use `removeIf` or use Groovy's `removeAll`.
+In either case, we can use a method reference, closure syntax or lambda syntax
+to capture the desired non-null constraint.
+
+[source,groovy]
+----
+var list = ['A', null, 'B', null, 'C']
+list.removeIf(Objects::isNull)
+assert list.size() == 3
+----
+
+[source,groovy]
+----
+var list = ['A', null, 'B', null, 'C']
+list.removeAll(s -> s == null)
+assert list.size() == 3
+----
+
+=== Guava
+
+[source,groovy]
+----
+var list = ['A', null, 'B', null, 'C']
+Iterables.removeIf(list, Predicates.isNull())
+assert list.size() == 3
+----
+
+=== Apache Commons Collections
+
+[source,groovy]
+----
+var list = ['A', null, 'B', null, 'C']
+CollectionUtils.filter(list, PredicateUtils.notNullPredicate())
+assert list.size() == 3
+----
+
+=== Eclipse Collections
+
+[source,groovy]
+----
+var list = Lists.mutable.of('A', null, 'B', null, 'C')
+list.withoutAll([null])
+assert list.size() == 3
+----
+
+== Producing a new list without nulls
+
+=== Groovy
+
+We can use Java streams as per the original article or avoid streams and use Groovy's `findAll` method:
+
+[source,groovy]
+----
+assert ['A', null, 'B'].stream().filter(Objects::nonNull).toList().size() == 2
+assert ['A', null, 'B'].findAll(Objects::nonNull).size() == 2
+----
+
+In this case, we can also use `findAll` and `grep` no-arg shortcuts.
+These shortcuts follow https://groovy-lang.org/semantics.html#the-groovy-truth[Groovy truth]
+which will remove nulls but also empty Strings and zeros. This may or may not be what we want.
+
+[source,groovy]
+----
+assert ['A', null, 'B'].findAll().size() == 2
+assert ['A', null, 'B'].grep().size() == 2
+
+assert ['A', null, 'B', '', 0].findAll().size() == 2
+assert ['A', null, 'B', '', 0].grep().size() == 2
+----
+
+Groovy also has the `findResults` method which specifically looks
+for non-null results rather than applying Groovy truth:
+
+[source,groovy]
+----
+assert ['A', null, 'B'].findResults{ it }.size() == 2
+assert ['A', null, 'B'].findResults().size() == 2             // <1>
+assert ['A', null, 'B', '', 0].findResults().size() == 4      // <1>
+----
+<1> The no-arg shortcut variants are available from Groovy 4.0.9 onwards.
+
+=== Guava
+
+[source,groovy]
+----
+assert Iterables.filter(['A', null, 'B'], Predicates.notNull()).size() == 2
+----
+
+=== Apache Commons Collections
+
+[source,groovy]
+----
+assert CollectionUtils.select(['A', null, 'B'], PredicateUtils.notNullPredicate()).size() == 2
+----
+
+=== Eclipse Collections
+
+[source,groovy]
+----
+assert Lists.mutable.of('A', null, 'B').select(Predicates.notNull()).size() == 2
+----
+
+== Other null related functionality
+
+Before concluding, we should mention some other Groovy functionality related to null.
+Although not related to list processing, Groovy's `@NullCheck` AST transform is useful
+to automatically add null checking into your own classes, methods, and constructors. For further details,
+see the https://docs.groovy-lang.org/latest/html/documentation/#xform-NullCheck[documentation].
+
+== Further Information
+
+* Java – Remove all nulls from a List (https://www.programmergirl.com/java-remove-nulls-from-list/[original] and https://www.javacodegeeks.com/2019/03/java-remove-nulls-from-list.html[javacodegeeks])
+* Eclipse Collections (https://www.eclipse.org/collections/[website] and https://github.com/eclipse/eclipse-collections[github site])
+* Guava (https://github.com/google/guava/wiki[user guide])
+* Apache Commons Collections (https://commons.apache.org/proper/commons-collections/[website])
+
+Have fun processing nulls with Groovy!
