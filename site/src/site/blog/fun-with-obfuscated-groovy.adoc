@@ -1,5 +1,6 @@
 = Fun with obfuscated Groovy
-:revdate: '2022-12-08T00:40:23+00:00'
+Paul King
+:revdate: 2022-12-08
 :keywords: groovy, java, obfuscated, commons math
 :description: This post looks at some Obfuscated code for outputting some well-known text.
 
