@@ -4,6 +4,8 @@ Paul King
 :keywords: groovy, collections, zip, eclipse collections, guava, vavr, streamex, jOOλ, ginq, gquery, emoji
 :description: This post looks at zipping collections.
 
+== What is zipping?
+
 In computer science, https://en.wikipedia.org/wiki/Zipping_(computer_science)[zipping] translates sequences into sequences where, if visualized in two dimensions, the rows and columns are swapped. So the zip of:
 
 [source,groovy]
