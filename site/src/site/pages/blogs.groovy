@@ -10,7 +10,11 @@ layout 'layouts/main.groovy', true,
                 yieldUnescaped '''
                 var blogList = new List('blog-list', {
                     valueNames: ['name'],
-                    page: 5,
+                    page: 7,
+                    pagination: true
+                });
+                var blogIndex = new List('blog-index', {
+                    page: 30,
                     pagination: true
                 });
                 '''
@@ -43,8 +47,8 @@ layout 'layouts/main.groovy', true,
             div(id: 'content', class: 'page-1') {
                 div(class: 'row') {
                     div(class: 'row-fluid') {
-                        div(class: 'col-lg-3') {
-                            ul(class: 'nav-sidebar') {
+                        div(class: 'col-lg-3', id: 'blog-index') {
+                            ul(class: 'nav-sidebar list') {
                                 li(class:'active') {
                                     a(href: '/blog/', "Blogs")
                                 }
@@ -52,6 +56,7 @@ layout 'layouts/main.groovy', true,
                                     li { a(href: blog.key, blog.value.documentTitle.main) }
                                 }
                             }
+                            ul(class: 'pagination')
                         }
 
                         div(class: 'col-lg-8 col-lg-pull-0') {
