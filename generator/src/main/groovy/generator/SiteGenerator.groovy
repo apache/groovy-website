@@ -256,6 +256,7 @@ class SiteGenerator {
     @CompileDynamic
     private void renderBlogFeed(Map blogList, String baseDir) {
         def sorted = blogList.sort { e -> e.value.revisionInfo.date }
+        def rfc3339 = "yyyy-MM-dd'T'HH:mm:ssXXX"
         def base = "http://groovy.apache.org/$baseDir"
         def feedDir = new File(outputDir, baseDir)
         feedDir.mkdirs()
@@ -264,7 +265,7 @@ class SiteGenerator {
         builder.encoding = 'UTF-8'
         def blogs = builder.bind {
             mkp.xmlDeclaration()
-            namespaces << [meta:'http://www.w3.org/2005/Atom']
+            namespaces << ['':'http://www.w3.org/2005/Atom']
             feed {
                 title('Groovy Blogs')
                 subtitle('News and stories from the Groovy Ecosystem')
@@ -272,13 +273,27 @@ class SiteGenerator {
                 link(href: "$base/feed.atom", rel: 'self')
                 id(base)
                 sorted.each { k, v ->
-                    def publishDate = v.revisionInfo.date
-                    def updateDate = v.attributes.updated ?: v.revisionInfo.date
+                    def publishDate = Date.parse('yyyy-MM-dd', v.revisionInfo.date)
+                    def updateDate = Date.parse('yyyy-MM-dd', v.attributes.updated ?: v.revisionInfo.date)
+                    // Atom standard is a little vague on author tag.
+                    // Multiple are allowed but many atom readers just display
+                    // first or last, so we'll have one combined one.
+                    def authorName = null
+                    if (v.author) {
+                        authorName = v.author.fullName
+                    } else if (v.authors) {
+                        authorName = v.authors*.fullName.join(', ')
+                    }
                     entry {
+                        if (authorName) {
+                            author {
+                                name(authorName)
+                            }
+                        }
                         title(v.documentTitle.main)
                         link(href: "$base/$k")
-                        updated(updateDate)
-                        published(publishDate)
+                        updated(updateDate.format(rfc3339))
+                        published(publishDate.format(rfc3339))
                         summary(v.attributes.description ?: '')
                     }
                 }
