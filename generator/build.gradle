@@ -25,11 +25,12 @@ repositories {
 
 dependencies {
     ext.groovyVersion = '3.0.14'
-    ext.asciidocVersion = '2.2.0'
+    ext.asciidocVersion = '2.5.7'
     implementation "org.codehaus.groovy:groovy:$groovyVersion"
     implementation "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
     implementation "org.codehaus.groovy:groovy-json:$groovyVersion"
     implementation "org.codehaus.groovy:groovy-templates:$groovyVersion"
+    implementation "org.codehaus.groovy:groovy-xml:$groovyVersion"
     implementation("org.asciidoctor:asciidoctorj:$asciidocVersion") {
         // to fix intermittent errors, e.g. as described here:
         // https://github.com/asciidoctor/asciidoctorj/issues/680

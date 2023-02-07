@@ -22,9 +22,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.apache.ant:ant:1.10.11'
-        classpath 'com.yahoo.platform.yui:yuicompressor:2.4.7'
+        classpath 'org.apache.ant:ant:1.10.13'
+        classpath 'com.yahoo.platform.yui:yuicompressor:2.4.8'
     }
+}
+
+plugins {
+    id 'com.github.ben-manes.versions' version '0.45.0'
 }
 
 allprojects {

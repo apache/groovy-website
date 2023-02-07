@@ -21,7 +21,10 @@ package generator
 import groovy.io.FileType
 import groovy.text.markup.MarkupTemplateEngine
 import groovy.text.markup.TemplateConfiguration
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import groovy.xml.StreamingMarkupBuilder
+import groovy.xml.XmlUtil
 import model.Changelog
 import model.Page
 import model.Section
@@ -247,6 +250,41 @@ class SiteGenerator {
             }
         }
         render 'blogs', "index", [list: blogList], 'blog'
+        renderBlogFeed blogList, 'blog'
+    }
+
+    @CompileDynamic
+    private void renderBlogFeed(Map blogList, String baseDir) {
+        def sorted = blogList.sort { e -> e.value.revisionInfo.date }
+        def base = "http://groovy.apache.org/$baseDir"
+        def feedDir = new File(outputDir, baseDir)
+        feedDir.mkdirs()
+        def feedFile = new File(feedDir, 'feed.atom')
+        def builder = new StreamingMarkupBuilder()
+        builder.encoding = 'UTF-8'
+        def blogs = builder.bind {
+            mkp.xmlDeclaration()
+            namespaces << [meta:'http://www.w3.org/2005/Atom']
+            feed {
+                title('Groovy Blogs')
+                subtitle('News and stories from the Groovy Ecosystem')
+                link(href: base)
+                link(href: "$base/feed.atom", rel: 'self')
+                id(base)
+                sorted.each { k, v ->
+                    def publishDate = v.revisionInfo.date
+                    def updateDate = v.attributes.updated ?: v.revisionInfo.date
+                    entry {
+                        title(v.documentTitle.main)
+                        link(href: "$base/$k")
+                        updated(updateDate)
+                        published(publishDate)
+                        summary(v.attributes.description ?: '')
+                    }
+                }
+            }
+        }
+        feedFile.text = XmlUtil.serialize(blogs)
     }
 
     static void main(String... args) {
