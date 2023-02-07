@@ -1075,6 +1075,48 @@ html.noScroll body, html.noScroll .st-container, html.noScroll .st-pusher, html.
     padding-left: 0.125em;
 }
 
+img,
+object[type^="image/"],
+svg {
+  display: inline-block;
+  height: auto;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+img {
+  border: 0;
+  -ms-interpolation-mode: bicubic;
+}
+
+.left {
+  float: left !important;
+}
+
+.right {
+  float: right !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-justify {
+  text-align: justify !important;
+}
+
+.hide {
+  display: none;
+}
+
 .imageblock.left {
   margin: 0.25em 0.625em 1.25em 0;
 }
