@@ -1,0 +1,80 @@
+= Checking Wordle with Groovy
+Paul King
+:revdate: 2023-02-08
+:description: This post looks at writing a Wordle checker in Groovy.
+:keywords: groovy, collections, zipping, eclipse collections, wordle
+
+This https://donraab.medium.com/comparing-my-smalltalk-and-eclipse-collections-wordle-kata-solutions-4058ac7d8ca0[article] by https://twitter.com/TheDonRaab[Donald Raab]
+looks at writing a Wordle checker in Smalltalk and Java using https://github.com/eclipse/eclipse-collections[Eclipse Collections]. Let's look at doing the same in Groovy.
+We could easily use Eclipse Collections with Groovy
+but let's just use JDK collections in this blog.
+
+In Wordle, we have to try to guess a hidden word.
+For each guess we make, we are given a result.
+For each letter in the correct place, the capital
+letter is returned. Sometimes we'll guess the
+correct letter but in the wrong place. In such
+cases, a lowercase letter appears in our result.
+A letter never appears more times in the result
+than what occurs in the hidden word.
+
+First, our test cases (from the original article):
+
+[source,groovy]
+----
+def triples = [
+    [".....", "aaaaa", "bbbbb"],
+    ["A....", "aaaaa", "abbbb"],
+    [".A...", "aaaaa", "babbb"],
+    ["..A..", "aaaaa", "bbabb"],
+    ["...A.", "aaaaa", "bbbab"],
+    ["....A", "aaaaa", "bbbba"],
+    [".a...", "abbbb", "caccc"],
+    ["..a..", "abbbb", "ccacc"],
+    ["...a.", "abbbb", "cccac"],
+    ["....a", "abbbb", "cccca"],
+    ["A....", "abbbb", "accca"],
+    ["A....", "abbbb", "accaa"],
+    ["A..a.", "aabbb", "accaa"],
+    ["AA...", "aabbb", "aacaa"],
+    ["...aa", "aabbb", "cccaa"],
+    ["..A..", "bbabb", "aaaaa"],
+    ["AAAAA", "aaaaa", "aaaaa"],
+    ["BRAVO", "bravo", "bravo"]]
+
+----
+
+Now we'll write our method for checking the list
+of letters from the hidden word with the list of
+letters in our guess. Comparing this to the original article, it has similarities
+to some of the Smalltalk solutions and a couple of the Java solutions.
+
+[source,groovy]
+----
+def checkGuess(hs, gs) {
+    def remaining = hs.groupBy()                                // <1>
+    def matches = [hs, gs].transpose().collect{ h, g ->         // <2>
+        if (h == g) { remaining[g].pop(); g.toUpperCase() }
+        else '.'
+    }
+    gs.eachWithIndex { g, i ->                                  // <3>
+        if (matches[i] == '.' && remaining[g]?.remove(g)) {
+            matches[i] = g
+        }
+    }
+    matches.join()
+}
+----
+<1> We group the hidden letters by themselves. Our bag equivalent.
+<2> In the first pass, we collect exact matches using a zip
+operator, called `transpose` in Groovy.
+<3> In the second pass, we collect letters which match but in a different position.
+
+Finally, we check our method against the test cases:
+
+[source,groovy]
+----
+triples.each { result, hidden, guess ->
+    assert result == checkGuess(hidden.toList(), guess.toList())
+}
+----

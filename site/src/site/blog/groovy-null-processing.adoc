@@ -2,7 +2,7 @@
 Paul King
 :revdate: 2023-02-06
 :description: This post looks at processing lists containing nulls in Groovy.
-:keywords: groovy, list, collection, guava, eclipse collections, commons collections, apache, null, Groovy truth
+:keywords: groovy, lists, collections, guava, eclipse collections, commons collections, apache, null, Groovy truth
 
 This https://www.programmergirl.com/java-remove-nulls-from-list/[article] by https://www.programmergirl.com/about-me/[Shubhra Srivastava]
 looks at processing lists containing nulls in Java. Let's look at doing the same in Groovy.

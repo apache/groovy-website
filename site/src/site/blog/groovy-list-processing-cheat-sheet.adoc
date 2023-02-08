@@ -1,7 +1,7 @@
 = Groovy List Processing Cheat Sheet
 Paul King
 :revdate: 2022-08-28
-:keywords: groovy, list, collection, guava, eclipse collections, commons collections, ginq, gquery, gpars, virtual threads, apache
+:keywords: groovy, lists, collections, guava, eclipse collections, commons collections, ginq, gquery, gpars, virtual threads, apache
 
 == Declaring lists
 
