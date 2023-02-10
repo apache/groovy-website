@@ -1,7 +1,7 @@
 = Fruity Eclipse Collections
 Paul King
 :revdate: 2022-10-13T11:05:54+00:00
-:keywords: datascience, eclipse collections, groovy, kmeans, emoji, virtual threads, scala integration
+:keywords: data science, eclipse collections, groovy, kmeans, emoji, virtual threads, scala integration, clustering
 :description: This post looks at using KMeans to compare fruit nominated color with the colors used in its emoji.
 
 This blog post continues on the theme of using fruit emoji from the

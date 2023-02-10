@@ -1,7 +1,7 @@
 = Classifying Iris Flowers with Deep Learning, Groovy and GraalVM
 Paul King
 :revdate: 2022-06-25
-:keywords: groovy, machine learning, artificial intelligence, neural networks, tribuo, deep netts, encog, eclipse deepLearning4j, datascience, deeplearning
+:keywords: groovy, machine learning, artificial intelligence, neural networks, tribuo, deep netts, encog, eclipse deepLearning4j, data science, deep learning
 :description: This post looks at classifying Iris flowers using traditional and neural net based approaches \
 using Eclipse DeepLearning4j, Encog, Deep Netts and GraalVM.
 
