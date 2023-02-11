@@ -1,6 +1,6 @@
 = Adventures with GroovyFX
 Paul King
-:revdate: 2022-12-12
+:revdate: 2022-12-12T14:22:57+00:00
 :keywords: groovy, groovyfx, javafx, jackson databind
 :description: This blog looks at a GroovyFX TODO application.
 

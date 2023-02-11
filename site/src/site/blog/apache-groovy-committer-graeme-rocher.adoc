@@ -1,6 +1,6 @@
 = Apache Groovy committer Graeme Rocher receives Oracle Groundbreaker award
 Paul King
-:revdate: 2018-10-24
+:revdate: 2018-10-24T23:33:37+00:00
 :keywords: groovy, award
 :description: Congratulations to Graeme Rocher for receiving the Oracle Groundbreaker award.
 

@@ -1,6 +1,6 @@
 = Groovy 2.5.2 Windows Installer Released (Community Artifact)
 Remko Popma
-:revdate: 2018-08-19
+:revdate: 2018-08-19T09:50:27+00:00
 :keywords: groovy, windows installer, release
 :description: Groovy 2.5.2 Windows Installer Release Announcement.
 

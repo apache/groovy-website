@@ -1,6 +1,6 @@
 = Whiskey Clustering with Groovy and Apache Ignite
 Paul King
-:revdate: 2022-10-27
+:revdate: 2022-10-27T11:13:37+00:00
 :keywords: data science, groovy, ignite, kmeans, clustering
 :description: This post looks at using Apache Ignite with Apache Groovy and the K-Means algorithm to cluster scotch whiskeys.
 

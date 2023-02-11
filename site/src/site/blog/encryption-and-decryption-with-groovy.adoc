@@ -1,6 +1,6 @@
 = Encryption and decryption with Groovy
 Paul King
-:revdate: 2022-09-19
+:revdate: 2022-09-19T14:34:39+00:00
 :keywords: decryption, encryption, groovy, security, bouncy castle
 :description: This post looks at encrypting and decrypting data using Groovy with the \
 AES and CAST5 algorithms.

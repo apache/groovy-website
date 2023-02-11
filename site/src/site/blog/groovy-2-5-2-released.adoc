@@ -1,6 +1,6 @@
 = Groovy 2.5.2 released
 Remko Popma
-:revdate: 2018-08-16
+:revdate: 2018-08-16T02:52:30+00:00
 :keywords: groovy, release
 :description: Groovy 2.5.2 Release Announcement.
 

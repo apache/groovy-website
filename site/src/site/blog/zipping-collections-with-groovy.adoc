@@ -1,6 +1,6 @@
 = Zipping Collections with Groovy
 Paul King
-:revdate: 2022-11-17
+:revdate: 2022-11-17T12:50:08+00:00
 :keywords: groovy, collections, zip, eclipse collections, guava, vavr, streamex, jOOλ, ginq, gquery, emoji
 :description: This post looks at zipping collections.
 

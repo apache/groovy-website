@@ -1,5 +1,5 @@
 = Groovy release train: 4.0.4, 3.0.12, 2.5.18
-:revdate: 2022-07-24
+:revdate: 2022-07-24T12:55:23+00:00
 :keywords: groovy, release, groovyConsole, hephaestus
 :description: Groovy 4.0.4, 3.0.12 and 2.5.18 Release Announcement.
 

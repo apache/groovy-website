@@ -1,6 +1,6 @@
 = Groovy 3.0.0-beta-2 Windows Installer Released (Community Release)
 Remko Popma
-:revdate: 2019-07-15
+:revdate: 2019-07-15T10:30:34+00:00
 :keywords: groovy, windows installer, release
 :description: Groovy 3.0.0-beta-2 Windows Installer Release Announcement.
 

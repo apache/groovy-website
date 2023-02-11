@@ -1,6 +1,6 @@
 = Groovy 2.4.17 Released
 Remko Popma
-:revdate: 2019-05-12
+:revdate: 2019-05-12T22:32:57+00:00
 :keywords: groovy, release
 :description: Groovy 2.4.17 Release Announcement.
 

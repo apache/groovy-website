@@ -1,6 +1,6 @@
 = Groovy 3.0.0-alpha-4 Released
 Remko Popma
-:revdate: 2019-01-01
+:revdate: 2019-01-01T09:24:28+00:00
 :keywords: groovy, release
 :description: Groovy 3.0.0-alpha-4 Release Announcement.
 

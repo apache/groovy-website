@@ -1,6 +1,6 @@
 = Detecting objects with Groovy, the Deep Java Library (DJL), and Apache MXNet
 Paul King
-:revdate: 2022-08-01
+:revdate: 2022-08-01T11:52:26+00:00
 :keywords: data science, deep learning, groovy, neural networks, apache mxnet, DJL, artifical intelligence, machine learning, gradle
 :description: This post looks at using Apache Groovy, DLJ and Apache MXNet to use neural networks to detect objects within an image.
 

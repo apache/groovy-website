@@ -1,6 +1,6 @@
 = Comparators and Sorting in Groovy
 Paul King
-:revdate: 2022-07-21
+:revdate: 2022-07-21T15:51:31+00:00
 :keywords: comparators, functional, gquery, ginq, groovy, lambdas, record, sorting
 
 image:https://blogs.apache.org/groovy/mediaresource/2eb621f3-0419-437e-950b-0c9e5e15804e[Cher,179,179,float="right"]

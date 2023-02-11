@@ -1,6 +1,6 @@
 = Groovy 2.5.6 Released
 Remko Popma
-:revdate: 2019-02-04
+:revdate: 2019-02-04T22:19:07+00:00
 :keywords: groovy, release
 :description: Groovy 2.5.6 Release Announcement.
 

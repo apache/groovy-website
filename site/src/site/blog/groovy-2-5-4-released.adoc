@@ -1,6 +1,6 @@
 = Groovy 2.5.4 Released
 Remko Popma
-:revdate: 2018-11-12
+:revdate: 2018-11-12T11:42:45+00:00
 :keywords: groovy, release
 :description: Groovy 2.5.4 Release Announcement.
 

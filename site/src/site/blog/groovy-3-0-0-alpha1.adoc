@@ -1,6 +1,6 @@
 = Groovy 3.0.0-alpha-4 Windows Installer Released (Community Artifact)
 Remko Popma
-:revdate: 2019-01-01
+:revdate: 2019-01-01T09:28:58+00:00
 :keywords: groovy, windows installer, release
 :description: Groovy 2.4.16 Windows Installer Release Announcement.
 
