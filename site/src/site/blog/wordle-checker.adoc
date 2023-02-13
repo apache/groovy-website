@@ -1,6 +1,6 @@
 = Checking Wordle with Groovy
 Paul King
-:revdate: 2023-02-08
+:revdate: 2023-02-08T00:00:00+00:00
 :description: This post looks at writing a Wordle checker in Groovy.
 :keywords: groovy, collections, zipping, eclipse collections, wordle
 

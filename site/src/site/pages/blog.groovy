@@ -1,19 +1,19 @@
 import generator.DocUtils
-import org.asciidoctor.ast.DocumentHeader
+import org.asciidoctor.ast.Document
 
 modelTypes = {
-    DocumentHeader header
+    Document doc
     String title
     String notes
 }
 
-title = header.documentTitle.main
+title = doc.structuredDoctitle.main
 def metas = [:]
-if (header.attributes.keywords) {
-    metas.keywords = header.attributes.keywords
+if (doc.attributes.keywords) {
+    metas.keywords = doc.attributes.keywords
 }
-if (header.attributes.description) {
-    metas.description = header.attributes.description
+if (doc.attributes.description) {
+    metas.description = doc.attributes.description
 }
 
 layout 'layouts/main.groovy', true,
@@ -55,20 +55,18 @@ layout 'layouts/main.groovy', true,
                         div(class: 'col-lg-8 col-lg-pull-0') {
                             a(name:"doc"){}
                             h1(title)
-                            if (header.author) {
+                            if (doc.authors) {
+                                def multiple = doc.authors.size() > 1
                                 p {
-                                    yield 'Author: '
-                                    i(header.author.fullName)
-                                }
-                            } else if (header.authors) {
-                                p {
-                                    yield 'Authors: '
-                                    i(header.authors*.fullName.join(', '))
+                                    yield "Author${multiple ? 's' : ''}: "
+                                    i(doc.authors*.fullName.join(', '))
                                 }
 
                             }
-                            if (header.revisionInfo?.date) {
-                                p("Published: $header.revisionInfo.date${header.attributes.updated ? / (Last updated: $header.attributes.updated)/ : ''}")
+                            if (doc.revisionInfo?.date) {
+                                def publishDate = DocUtils.prettyDate(doc.revisionInfo.date)
+                                def updateDate = doc.attributes.updated ? DocUtils.prettyDate(doc.attributes.updated?.toString()) : null
+                                p("Published: $publishDate${updateDate ? / (Last updated: $updateDate)/ : ''}")
                             }
                             hr()
                             yieldUnescaped notesAsHTML

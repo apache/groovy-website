@@ -1,6 +1,6 @@
 = Groovy 3.0.0-beta-2 Released
 Remko Popma
-:revdate: 2019-07-15
+:revdate: 2019-07-15T10:25:28+00:00
 :keywords: groovy, release
 :description: Groovy 3.0.0-beta-2 Release Announcement.
 

@@ -30,6 +30,9 @@ import model.Page
 import model.Section
 import model.SectionItem
 import model.SiteMap
+import org.asciidoctor.Options
+import org.asciidoctor.ast.Document
+import org.asciidoctor.ast.DocumentHeader
 
 import java.nio.file.FileSystems
 import java.nio.file.Path
@@ -232,11 +235,12 @@ class SiteGenerator {
         println "Rendering blogs"
 
         def blogDir = new File(sourcesDir, "blog")
-        def blogList = [:]
+        Map<String, Document> blogList = [:]
         blogDir.eachFileRecurse { f->
             if (f.name.endsWith('.adoc')) {
                 def bn = f.name.substring(0, f.name.lastIndexOf('.adoc'))
-                def header = asciidoctor.readDocumentHeader(f)
+                def options = Options.builder().build()
+                def doc = asciidoctor.loadFile(f, options)
                 println "Rendering $bn"
                 def relativePath = []
                 def p = f.parentFile
@@ -245,8 +249,8 @@ class SiteGenerator {
                     p = p.parentFile
                 }
                 String baseDir = relativePath ? "blog${File.separator}${relativePath.join(File.separator)}" : 'blog'
-                render 'blog', bn, [notes:f.getText('utf-8'), header: header], baseDir
-                blogList[bn] = header
+                render 'blog', bn, [notes:f.getText('utf-8'), doc: doc], baseDir
+                blogList[bn] = doc
             }
         }
         render 'blogs', "index", [list: blogList], 'blog'
@@ -254,9 +258,8 @@ class SiteGenerator {
     }
 
     @CompileDynamic
-    private void renderBlogFeed(Map blogList, String baseDir) {
+    private void renderBlogFeed(Map<String, Document> blogList, String baseDir) {
         def sorted = blogList.sort { e -> e.value.revisionInfo.date }
-        def rfc3339 = "yyyy-MM-dd'T'HH:mm:ssXXX"
         def base = "http://groovy.apache.org/$baseDir"
         def feedDir = new File(outputDir, baseDir)
         feedDir.mkdirs()
@@ -273,15 +276,13 @@ class SiteGenerator {
                 link(href: "$base/feed.atom", rel: 'self')
                 id(base)
                 sorted.each { k, v ->
-                    def publishDate = Date.parse('yyyy-MM-dd', v.revisionInfo.date)
-                    def updateDate = Date.parse('yyyy-MM-dd', v.attributes.updated ?: v.revisionInfo.date)
+                    def publishDate = v.revisionInfo.date
+                    def updateDate = v.attributes.updated ?: v.revisionInfo.date
                     // Atom standard is a little vague on author tag.
                     // Multiple are allowed but many atom readers just display
                     // first or last, so we'll have one combined one.
                     def authorName = null
-                    if (v.author) {
-                        authorName = v.author.fullName
-                    } else if (v.authors) {
+                    if (v.authors) {
                         authorName = v.authors*.fullName.join(', ')
                     }
                     entry {
@@ -290,10 +291,10 @@ class SiteGenerator {
                                 name(authorName)
                             }
                         }
-                        title(v.documentTitle.main)
+                        title(v.structuredDoctitle.main)
                         link(href: "$base/$k")
-                        updated(updateDate.format(rfc3339))
-                        published(publishDate.format(rfc3339))
+                        updated(updateDate)
+                        published(publishDate)
                         summary(v.attributes.description ?: '')
                     }
                 }

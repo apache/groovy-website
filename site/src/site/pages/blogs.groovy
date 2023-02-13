@@ -1,3 +1,5 @@
+import generator.DocUtils
+
 def keywords = [:].withDefault{ 0 }
 list.each { k, v ->
     v.attributes.keywords?.split(',')*.trim().each{ keywords[it]++ }
@@ -53,7 +55,7 @@ layout 'layouts/main.groovy', true,
                                     a(href: '/blog/', "Blogs")
                                 }
                                 sorted.reverseEach { blog ->
-                                    li { a(href: blog.key, blog.value.documentTitle.main) }
+                                    li { a(href: blog.key, blog.value.structuredDoctitle.main) }
                                 }
                             }
                             ul(class: 'pagination')
@@ -72,12 +74,13 @@ layout 'layouts/main.groovy', true,
                                     sorted.reverseEach { k, v ->
                                         li {
                                             p(class: 'name') {
-                                                a(href: k, v.documentTitle.main)
+                                                a(href: k, v.structuredDoctitle.main)
                                                 br()
-                                                yield "Published by $v.author on $v.revisionInfo.date"
+                                                def author = v.authors.join(', ')
+                                                yield "Published by $author on ${DocUtils.prettyDate(v.revisionInfo.date)}"
                                                 if (v.attributes.updated) {
                                                     br()
-                                                    yield "Last updated: $v.attributes.updated"
+                                                    yield "Last updated: ${DocUtils.prettyDate(v.attributes.updated)}"
                                                 }
                                                 if (v.attributes.description) {
                                                     br()

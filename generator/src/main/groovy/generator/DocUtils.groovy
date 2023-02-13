@@ -20,4 +20,10 @@ package generator
 
 class DocUtils {
     @Lazy public static final String DOCS_BASEURL = System.getProperty('docs_baseurl')
+    private static final RFC3339 = "yyyy-MM-dd'T'HH:mm:ssXXX"
+    private static final PRETTY = "yyyy-MM-dd hh:mmaa"
+
+    static String prettyDate(String s) {
+        Date.parse(RFC3339, s).format(PRETTY)
+    }
 }

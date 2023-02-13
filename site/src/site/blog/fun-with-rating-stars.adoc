@@ -1,6 +1,6 @@
 = Fun with rating stars
 Paul King
-:revdate: 2023-01-25
+:revdate: 2023-01-25T00:00:00+00:00
 :keywords: groovy
 :description: Inspired by a recent tweet, this blog \
 looks at producing a string of stars corresponding to a rating.
