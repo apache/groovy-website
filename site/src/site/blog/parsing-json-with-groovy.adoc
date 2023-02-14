@@ -242,11 +242,12 @@ several internal implementation classes. You don't access these
 classes directly but rather set a parser _type_ when
 instantiating your slurper.
 
+[cols="2,7"]
 |===
 |Type |When to use
 
 |CHAR_BUFFER
-|Default, least surprise parser with eager parsing of ints, dates, etc.
+|Default, least-surprise parser with eager parsing of ints, dates, etc.
 
 |INDEX_OVERLAY
 |For REST calls, WebSocket messages, AJAX, inter process communication. Fastest parser which uses indexes to some existing char buffer.
@@ -274,7 +275,7 @@ Note the missing quotes for the _person_ key, the single quotes
 for the _name_ key and _"cat"_ has been commented out.
 These changes wouldn't be allowed by a strict JSON parser.
 
-Other JSON libraries
+== Other JSON libraries
 
 Groovy doesn't require you to use the `groovy-json` classes.
 You can use your favourite Java library with Groovy.
@@ -304,7 +305,7 @@ def json = new ObjectMapper().readTree(text)
 assert json.person.pets*.asText() == ['dog', 'cat']
 ----
 
-Integrated query
+== Integrated query
 
 Groovy 4 also supports language integrated query syntax, known as
 GINQ or GQuery. We can use that with JSON too.
