@@ -2,6 +2,7 @@
 Paul King
 :revdate: 2022-12-22T14:24:07+00:00
 :keywords: groovy, bytecode, byte buddy, proguardcore, asm, jvmadvent
+:description: This post looks at using bytecode libraries to generate class files. It's a deep dive into how compilers and other tools work behind the scenes.
 
 For those that haven't seen it yet, the https://www.javaadvent.com/[JVM Advent] https://twitter.com/JavaAdvent[folks] posted a great https://www.javaadvent.com/2022/12/groovy-and-data-science.html[Groovy and Data Science blog post]
 several days ago as part of the 2022 JVM Advent series. If you have an interest
