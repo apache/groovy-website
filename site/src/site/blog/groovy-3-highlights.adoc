@@ -1,4 +1,5 @@
 = Groovy 3 Highlights
+Paul King
 :revdate: 2020-02-13T02:28:07+00:00
 :description: A summary of the highlights for Groovy 3.
 :keywords: groovy, parrot

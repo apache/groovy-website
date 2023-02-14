@@ -55,7 +55,7 @@ layout 'layouts/main.groovy', true,
                                     a(href: '/blog/', "Blogs")
                                 }
                                 sorted.reverseEach { blog ->
-                                    li { a(href: blog.key, blog.value.structuredDoctitle.main) }
+                                    li { a(href: blog.key, blog.value.structuredDoctitle.combined) }
                                 }
                             }
                             ul(class: 'pagination')
@@ -74,7 +74,7 @@ layout 'layouts/main.groovy', true,
                                     sorted.reverseEach { k, v ->
                                         li {
                                             p(class: 'name') {
-                                                a(href: k, v.structuredDoctitle.main)
+                                                a(href: k, v.structuredDoctitle.combined)
                                                 br()
                                                 def author = v.authors.join(', ')
                                                 yield "Published by $author on ${DocUtils.prettyDate(v.revisionInfo.date)}"

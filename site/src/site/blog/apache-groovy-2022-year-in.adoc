@@ -1,4 +1,5 @@
 = Apache Groovy 2022 Year In Review
+Paul King
 :revdate: 2022-12-29T14:28:20+00:00
 :keywords: groovy, 2022, apachecon
 :description: This post looks back at some highlights for Groovy in 2022.

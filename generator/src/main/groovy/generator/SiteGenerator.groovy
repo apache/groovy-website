@@ -236,6 +236,8 @@ class SiteGenerator {
 
         def blogDir = new File(sourcesDir, "blog")
         Map<String, Document> blogList = [:]
+        Map<String, String> contents = [:]
+        Map<String, String> baseDirs = [:]
         blogDir.eachFileRecurse { f->
             if (f.name.endsWith('.adoc')) {
                 def bn = f.name.substring(0, f.name.lastIndexOf('.adoc'))
@@ -249,9 +251,29 @@ class SiteGenerator {
                     p = p.parentFile
                 }
                 String baseDir = relativePath ? "blog${File.separator}${relativePath.join(File.separator)}" : 'blog'
-                render 'blog', bn, [notes:f.getText('utf-8'), doc: doc], baseDir
                 blogList[bn] = doc
+                contents[bn] = f.getText('utf-8')
+                baseDirs[bn] = baseDir
             }
+        }
+        Map<String, Set> keywords = [:]
+        blogList.each { k, v ->
+            String kw = v.attributes.keywords.toString()
+            keywords[k] = kw?.split(',')*.trim().toSet()
+            def groovyVersionInTitle = v.structuredDoctitle.combined.findAll(/(?i)(groovy \d[.]\d+[.]\d+[-\S]*)/)
+            groovyVersionInTitle?.each {keywords[k] << it }
+            def groovyMinorVersionInTitle = v.structuredDoctitle.combined.findAll(/(?i)(groovy \d[.]\d+)/)
+            groovyMinorVersionInTitle?.each {keywords[k] << it }
+        }
+        def related = [:].withDefault{ [:] }
+        [blogList.keySet(), blogList.keySet()].combinations { one, two ->
+            if (one != two) {
+                related[one][two] = keywords[one].intersect(keywords[two]).size()
+            }
+        }
+        blogList.keySet().each {bn ->
+            def sorted = related[bn].findAll { it.value as int > 1 }.sort { it.value }.keySet().toList().reverse()
+            render 'blog', bn, [notes:contents[bn], doc: blogList[bn], related: sorted.collectEntries{ [it, blogList[it].structuredDoctitle.combined]}], baseDirs[bn]
         }
         render 'blogs', "index", [list: blogList], 'blog'
         renderBlogFeed blogList, 'blog'
@@ -291,7 +313,7 @@ class SiteGenerator {
                                 name(authorName)
                             }
                         }
-                        title(v.structuredDoctitle.main)
+                        title(v.structuredDoctitle.combined)
                         link(href: "$base/$k")
                         updated(updateDate)
                         published(publishDate)

@@ -5,9 +5,10 @@ modelTypes = {
     Document doc
     String title
     String notes
+    Map<String, String> related
 }
 
-title = doc.structuredDoctitle.main
+title = doc.structuredDoctitle.combined
 def metas = [:]
 if (doc.attributes.keywords) {
     metas.keywords = doc.attributes.keywords
@@ -50,23 +51,38 @@ layout 'layouts/main.groovy', true,
                                     }
                                 }
                             }
+                            if (related) {
+                                br()
+                                ul(class: 'nav-sidebar') {
+                                    li(style: 'padding: 0.35em 0.625em; background-color: #eee') {
+                                        span('Related posts')
+                                    }
+                                    related.each { bn, title ->
+                                        li {
+                                            a(href:"../$bn", title)
+                                        }
+                                    }
+                                }
+                            }
                         }
 
                         div(class: 'col-lg-8 col-lg-pull-0') {
                             a(name:"doc"){}
                             h1(title)
-                            if (doc.authors) {
-                                def multiple = doc.authors.size() > 1
-                                p {
-                                    yield "Author${multiple ? 's' : ''}: "
-                                    i(doc.authors*.fullName.join(', '))
+                            p {
+                                if (doc.authors) {
+                                    def multiple = doc.authors.size() > 1
+                                    span {
+                                        yield "Author${multiple ? 's' : ''}: "
+                                        i(doc.authors*.fullName.join(', '))
+                                    }
                                 }
-
-                            }
-                            if (doc.revisionInfo?.date) {
-                                def publishDate = DocUtils.prettyDate(doc.revisionInfo.date)
-                                def updateDate = doc.attributes.updated ? DocUtils.prettyDate(doc.attributes.updated?.toString()) : null
-                                p("Published: $publishDate${updateDate ? / (Last updated: $updateDate)/ : ''}")
+                                if (doc.revisionInfo?.date) {
+                                    br()
+                                    def publishDate = DocUtils.prettyDate(doc.revisionInfo.date)
+                                    def updateDate = doc.attributes.updated ? DocUtils.prettyDate(doc.attributes.updated?.toString()) : null
+                                    span("Published: $publishDate${updateDate ? / (Last updated: $updateDate)/ : ''}")
+                                }
                             }
                             hr()
                             yieldUnescaped notesAsHTML
