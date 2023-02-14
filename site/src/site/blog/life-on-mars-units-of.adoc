@@ -275,7 +275,7 @@ little nicer to type.
 Let's now look at how you could write a little
 Domain-Specific-Language (DSL) to control a Mars rover robot.
 
-image:img/mars_rover_selfie.jpg[Mars rover selfie,1000]
+image:img/mars_rover_selfie.jpg[Mars rover selfie,500]
 
 First, we'll write a `Direction` enum as part of
 our robot domain model:
