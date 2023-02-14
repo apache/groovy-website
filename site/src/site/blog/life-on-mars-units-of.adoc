@@ -8,10 +8,10 @@ image:img/duke_measure.png[duke_measuring,float="right"]
 The Mars Climate Orbiter was launched in 1998 as part
 of a multi-faceted Mars exploration program.
 It was lost due to a trajectory calculation error when
-nearing Mars. An http://scholar.google.com/scholar?hl=en&q=Stephenson+A%2C+LaPiana+L%2C+Mulville+D%2C+et+al.+Mars+climate+orbiter+mishap+investigation+board+phase+1+report%3B+1999[investigation,500] attributed the
+nearing Mars. An http://scholar.google.com/scholar?hl=en&q=Stephenson+A%2C+LaPiana+L%2C+Mulville+D%2C+et+al.+Mars+climate+orbiter+mishap+investigation+board+phase+1+report%3B+1999[investigation] attributed the
 failure to a measurement mismatch between two software systems:
 metric units were used by NASA and https://en.wikipedia.org/wiki/United_States_customary_units[US customary] units were used by spacecraft builder Lockheed Martin.
-image:https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Mars_Climate_Orbiter_2.jpg/1280px-Mars_Climate_Orbiter_2.jpg[Mars Climate Orbiter - image credit: wikipedia]
+image:https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Mars_Climate_Orbiter_2.jpg/1280px-Mars_Climate_Orbiter_2.jpg[Mars Climate Orbiter - image credit: wikipedia,500]
 
 If the system in question had been developed using a units of
 measurement system, perhaps the failure could have been avoided.
