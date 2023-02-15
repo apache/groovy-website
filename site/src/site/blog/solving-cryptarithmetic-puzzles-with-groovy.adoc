@@ -1,6 +1,8 @@
 = Solving cryptarithmetic puzzles with Groovy and constraint programming using Choco, JaCoP, and OR-Tools
+Paul King
 :revdate: 2022-09-05T13:43:31+00:00
 :keywords: groovy, constraint programming, jacop, or-tools, choco, jsr331
+:description: This post looks at solving cryptarithmetic puzzles using Groovy.
 
 == Introduction
 

@@ -2,6 +2,7 @@
 Paul King
 :revdate: 2022-08-28T08:46:29+00:00
 :keywords: groovy, lists, collections, guava, eclipse collections, commons collections, ginq, gquery, gpars, virtual threads, apache
+:description: This post looks at the common Groovy features for processing lists.
 
 == Declaring lists
 

@@ -92,7 +92,7 @@ This now runs just as quickly as the iterative method. If you happened to use a 
 you can call one of the `memoize` methods on `Closure`.
 
 A problem with this approach (in fact recursion in general) is that you hit a stack overflow exception for larger values of `n`,
-e.g. `fib(500G)`. Groovy supports tail call elimination with the inclusion of the `TailRecursive` annotation.
+e.g.&nbsp;`fib(500G)`. Groovy supports tail call elimination with the inclusion of the `TailRecursive` annotation.
 In this case the compiler injects an "unrolled" non-recursive version of the algorithm.
 In order for the "unrolling" to succeed, the algorithm needs to be re-worked so that at most one call to
 fib occurs in any return statement. Here is a version of the algorithm re-worked in this way:
@@ -132,7 +132,7 @@ assert fib(100G, 0G, 1G) == 354224848179261915075G
 assert fib(500G, 0G, 1G) == 139423224561697880139724382870407283950070256587697307264108962948325571622863290691557658876222521294125G
 ----
 
-If you are using a `Closure`, you would look at using the `trampoline` method on `Closure` to achieve a similar result.</p>
+If you are using a `Closure`, you would look at using the `trampoline` method on `Closure` to achieve a similar result.
 
 == Streams
 

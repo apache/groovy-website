@@ -2,6 +2,7 @@
 Paul King
 :revdate: 2022-08-18T13:41:03+00:00
 :keywords: data science, groovy, matrices, ojalgo, commons math, nd4j, ejml, vector api, eclipse deeplearning4j
+:description: This post looks at using Groovy to write a number of applications involving matrices. It uses a number of open source matrix libraries.
 
 This blogs looks at performing matrix calculations with Groovy
 using various libraries:
@@ -229,7 +230,7 @@ multiplication method as a first pass from its definition without
 any attempts at optimisation, `mult_ikj` is coded in a
 highly-optimised fashion and corresponds to the code EJML would
 normally use, and `mult_ikj_vector` uses the Vector API. Note, you can think of these methods as "one layer down" from the `mult`
-method we called in the previous example, i.e. the `mult` method
+method we called in the previous example, i.e.&nbsp;the `mult` method
 we used previously would be calling one of these under the covers.
 That's why we pass the internal "matrix" representation instead
 of our `SimpleMatrix` instance.
@@ -396,7 +397,7 @@ In fact, overpopulation might become a problem.
 An early technique to encrypt a message was the
 https://en.wikipedia.org/wiki/Caesar_cipher[Caesar cipher].
 It substitutes letters in the alphabet by the letter shifted a
-certain amount along in the alphabet, e.g. "IBM" becomes "HAL"
+certain amount along in the alphabet, e.g.&nbsp;"IBM" becomes "HAL"
 if shifting to the previous letter and "VMS" becomes "WNT" if
 shifting one letter forward in the alphabet. This kind of cipher
 can be broken by looking at frequency analysis of letters or

@@ -82,8 +82,8 @@ def rating0b(percentage) {
 }
 ----
 
-Or, if we wanted to not fail, tweak some of our conditions, e.g.
-for `rating3`, instead of `case 0`, we could use `case { it <= 0 }`.
+Or, if we wanted to not fail, tweak some of our conditions, e.g.&nbsp;for
+`rating3`, instead of `case 0`, we could use `case { it <= 0 }`.
 
 We could push the checks into our types by making a special class, `Percent` say, which only permitted the allowed values:
 

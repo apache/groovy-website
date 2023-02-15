@@ -106,8 +106,8 @@ Here is the output:
 [18:13:11]   ^-- ml-inference-plugin 1.0.0
 [18:13:14] Ignite node started OK (id=f731e4ab)
 ...
-&gt;&gt;&gt; Ignite grid started for data: 86 rows X 13 cols
-&gt;&gt;&gt; KMeans centroids
+>>> Ignite grid started for data: 86 rows X 13 cols
+>>> KMeans centroids
 Body, Sweetness, Smoky, Medicinal, Tobacco, Honey, Spicy, Winey, Nutty, Malty, Fruity, Floral
 2.7037, 2.4444, 1.4074, 0.0370, 0.0000, 1.8519, 1.6667, 1.8519, 1.8889, 2.0370, 2.1481, 1.6667
 1.8500, 1.9000, 2.0000, 0.9500, 0.1500, 1.1000, 1.5000, 0.6000, 1.5500, 1.7000, 1.3000, 1.5000

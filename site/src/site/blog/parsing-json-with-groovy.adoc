@@ -2,6 +2,7 @@
 Paul King
 :revdate: 2022-07-10T14:00:51+00:00
 :keywords: groovy, json, scripting, ginq, gquery, gradle, graalvm, native
+:description: This post looks at parsing JSON using Groovy's in-built capabilities as well as some other libraries.
 
 image:https://blogs.apache.org/groovy/mediaresource/e02078e2-6b0f-4086-a60c-e5f750910091[json logo,float="right"]
 Groovy has excellent support for processing a range of structured
@@ -112,7 +113,8 @@ dependencies {
 This artifact contains no jars but has all of the common
 Groovy modules as transitive dependencies.
 
-[*Note*: In early Groovy 4 versions you may have needed to reference Groovy as a platform, e.g.: `testImplementation platform("org.apache.groovy:groovy-all:4.0.1")`. This is now only required when using the `groovy-bom` artifact.]
+[*Note*: In early Groovy 4 versions you may have needed to reference Groovy as a platform, e.g.:
+`testImplementation platform("org.apache.groovy:groovy-all:4.0.1")`. This is now only required when using the `groovy-bom` artifact.]
 
 == Maven
 

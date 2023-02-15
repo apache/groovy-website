@@ -78,7 +78,9 @@ assert counts == expected
 
 As we expect, it passes.
 
-Now, for a bit of fun, we will use a neural network trained to detect cat and dog images and apply it to our emojis. We'll follow the process described http://ramok.tech/2018/01/03/java-image-cat-vs-dog-recognizer-with-deep-neural-networks/[here]. It uses DeepLearning4J to train and then use a model. The images used to train the model were real cat and dog images, not emojis, so we aren't expecting our model to be super accurate.</p><p>The first attempt was to write the emojis into swing JLabel components and then save using a buffered image. This lead to poor looking images:
+Now, for a bit of fun, we will use a neural network trained to detect cat and dog images and apply it to our emojis. We'll follow the process described http://ramok.tech/2018/01/03/java-image-cat-vs-dog-recognizer-with-deep-neural-networks/[here]. It uses DeepLearning4J to train and then use a model. The images used to train the model were real cat and dog images, not emojis, so we aren't expecting our model to be super accurate.
+
+The first attempt was to write the emojis into swing JLabel components and then save using a buffered image. This lead to poor looking images:
 
 image:img/pet_emoji_fonts.jpg[PetAsFonts]
 
