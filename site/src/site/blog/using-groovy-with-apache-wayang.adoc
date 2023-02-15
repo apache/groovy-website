@@ -35,7 +35,7 @@ it is illustrative of typical data science and machine learning
 algorithms involving iteration (the typical map, filter, reduce
 style of processing).
 
-image:https://blogs.apache.org/groovy/mediaresource/8d458e7c-8993-470a-8afd-44a46cd2b500[whiskey_bottles]
+image:img/whiskey_bottles.jpg[whiskey_bottles]
 
 KMeans is a standard data-science clustering technique. In our
 case, it groups whiskies with similar characteristics (according
