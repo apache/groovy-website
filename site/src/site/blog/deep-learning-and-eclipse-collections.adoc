@@ -1,11 +1,15 @@
 = Deep Learning and Eclipse Collections
 Paul King
 :revdate: 2022-10-11T10:41:58+00:00
-:keywords: deep learning, eclipse collections, groovy, emoji, eclipse deeplearning4j
+:keywords: deep learning, eclipse collections, groovy, emoji, records, eclipse deeplearning4j
 :description: This post uses Emojis and Eclipse Collections to process pet records. We then use deep learning to predict whether each emoji looks like a dog or cat.
 
-In previous blogs, we've covered https://blogs.apache.org/groovy/entry/deck-of-cards-with-groovy[Eclipse Collections] and https://blogs.apache.org/groovy/entry/detecting-objects-with-groovy-the[Deep Learning]. Recently, a couple of the highly recommended katas for Eclipse Collections have been revamped to include "pet" and "fruit" emojis for a bit of extra fun. What could be better than _Learning_ Eclipse Collections?
-_Deep Learning_ and Eclipse Collections of course!
+In previous blogs, we've covered
+https://groovy.apache.org/blog/deck-of-cards-with-groovy[Eclipse Collections] and
+https://groovy.apache.org/blog/detecting-objects-with-groovy-the[Deep Learning].
+Recently, a couple of the highly recommended katas for Eclipse Collections have been
+revamped to include "pet" and "fruit" emojis for a bit of extra fun. What could be better
+than _Learning_ Eclipse Collections?_Deep Learning_ and Eclipse Collections of course!
 
 First, we create a `PetType` enum with the emoji as `toString`:
 

@@ -5,8 +5,10 @@ Paul King
 :description: This post looks at using KMeans to compare fruit nominated color with the colors used in its emoji.
 
 This blog post continues on the theme of using fruit emoji from the
-https://blogs.apache.org/groovy/entry/deep-learning-and-eclipse-collections[previous post],
-but instead of deep learning, we'll look at clustering using k-means after first exploring some top methods of https://www.eclipse.org/collections/[Eclipse Collections] with fruit emoji examples.
+https://groovy.apache.org/blog/deep-learning-and-eclipse-collections[previous post],
+but instead of deep learning, we'll look at clustering using k-means after first
+exploring some top methods of
+https://www.eclipse.org/collections/[Eclipse Collections] with fruit emoji examples.
 
 == Eclipse Collections Fruit Salad
 

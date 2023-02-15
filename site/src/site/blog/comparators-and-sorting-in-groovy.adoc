@@ -2,7 +2,7 @@
 Paul King
 :revdate: 2022-07-21T15:51:31+00:00
 :description: This post looks at Groovy functionality for making your classes comparable and/or sortable.
-:keywords: comparators, functional, gquery, ginq, groovy, lambdas, record, sorting
+:keywords: comparators, functional, gquery, ginq, groovy, lambdas, records, sorting
 
 image:https://blogs.apache.org/groovy/mediaresource/2eb621f3-0419-437e-950b-0c9e5e15804e[Cher,179,179,float="right"]
 This blog post is inspired by the Comparator examples in the excellent

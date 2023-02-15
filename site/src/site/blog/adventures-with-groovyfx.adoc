@@ -174,7 +174,7 @@ The code for this application can be found here:
 https://github.com/paulk-asert/groovyfx-todo
 
 It's a Groovy 3 and JDK 8 application but see this
-https://blogs.apache.org/groovy/entry/reading-and-writing-csv-files[blog]
+https://groovy.apache.org/blog/reading-and-writing-csv-files[blog post]
 if you want to see Jackson deserialization of classes and records
-(and Groovy's emulated records) from CSV files using the most recent
+(and Groovy's emulated records) from CSV files using recent
 Groovy and JDK versions.

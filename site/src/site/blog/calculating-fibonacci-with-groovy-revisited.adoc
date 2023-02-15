@@ -5,23 +5,29 @@ Paul King
 including optimisations like tail recursion and memoization.
 :keywords: fibonacci, groovy, recursion, streams
 
-In an earlier post,
-we looked at using https://blogs.apache.org/groovy/entry/matrix-calculations-with-groovy-apache[Matrices with Groovy] including using matrices to calculate Fibonacci terms. But do you need that complexity to calculate Fibonacci? Not, not at all. You can do various one-liners for that scenario (to repeat the calculation from that post):
+In an https://groovy.apache.org/blog/matrix-calculations-with-groovy-apache[earlier post], we looked at using
+Matrices with Groovy including using matrices to calculate Fibonacci terms.
+But do you need that complexity to calculate Fibonacci? Not, not at all.
+You can do various one-liners for that scenario (to repeat the calculation from that
+https://groovy.apache.org/blog/matrix-calculations-with-groovy-apache[post]):
 
 [source,groovy]
 ----
 Stream.iterate([1, 1], f -> [f[1], f.sum()]).limit(8).toList()*.head()
 ----
 
-The previous post was more about using _matrices_ than Fibonacci per se, though hopefully learning
-that the Fibonacci matrix was a specialisation of the Leslie matrix was an added bonus.
+The previous post was more about using _matrices_ than Fibonacci per se,
+though hopefully learning that the Fibonacci matrix was a specialisation
+of the Leslie matrix was an added bonus.
 
 Let's have a look at a few other options to write Fibonacci methods in Groovy.
 
 == Iterative style
 
-Unless you learned a functional programming language as your first language, you may have written an iterative Factorial or
-Fibonacci as one of your first programming learning exercises. Such an algorithm for Fibonacci could look something like this:
+Unless you learned a functional programming language as your first language,
+you may have written an iterative Factorial or Fibonacci as one of your first
+programming learning exercises. Such an algorithm for Fibonacci could look
+something like this:
 
 [source,groovy]
 ----
