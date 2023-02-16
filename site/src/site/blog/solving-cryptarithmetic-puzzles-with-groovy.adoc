@@ -432,33 +432,33 @@ To start with, we have nearly 90 light green squares which
 represents our problem search space. We walk our way through
 the rules looking for ways to prune the search space:
 
-image:https://blogs.apache.org/groovy/mediaresource/bdb17727-caee-473c-b450-3ec60e74e13b[choco_step1]
+image:img/choco_step1.png[choco_step1]
 
-image:https://blogs.apache.org/groovy/mediaresource/171a4583-806a-4c1b-9557-892d87e5670c[choco_step2]
+image:img/choco_step2.png[choco_step2]
 
-image:https://blogs.apache.org/groovy/mediaresource/6807b9ad-8390-45ec-ad58-10dd1346bf45[choco_step3]
+image:img/choco_step3.png[choco_step3]
 
-image:https://blogs.apache.org/groovy/mediaresource/b2b2221a-60fa-4d9a-9fa1-16ddb213fcce[choco_step4]
+image:img/choco_step4.png[choco_step4]
 
-image:https://blogs.apache.org/groovy/mediaresource/6303ed53-ff6c-4572-b70d-52b299d4fff7[choco_step5.png]
+image:img/choco_step5.png[choco_step5]
 
-image:https://blogs.apache.org/groovy/mediaresource/658ff512-433f-452a-9a81-904449dfb623[choco_step6]
+image:img/choco_step6.png[choco_step6]
 
-image:https://blogs.apache.org/groovy/mediaresource/f81d5630-ede4-4b75-9e74-b73b81be0b21[choco_step7]
+image:img/choco_step7.png[choco_step7]
 
-image:https://blogs.apache.org/groovy/mediaresource/8de231cc-c0da-4170-845a-6653b84779b9[choco_step8]
+image:img/choco_step8.png[choco_step8]
 
-image:https://blogs.apache.org/groovy/mediaresource/46227911-c406-4234-88d1-fe1f9ac9c517[choco_step9]
+image:img/choco_step9.png[choco_step9]
 
-image:https://blogs.apache.org/groovy/mediaresource/31060d5c-6716-4efe-8f99-910c1771ef28[choco_step10]
+image:img/choco_step10.png[choco_step10]
 
-image:https://blogs.apache.org/groovy/mediaresource/4b9324d7-2bf3-48c9-af8b-b35872aaf5cf[choco_step11]
+image:img/choco_step11.png[choco_step11]
 
-image:https://blogs.apache.org/groovy/mediaresource/71197695-f379-4777-9ed5-ddae1577ee3d[choco_step12]
+image:img/choco_step12.png[choco_step12]
 
-image:https://blogs.apache.org/groovy/mediaresource/6ff23a4e-b444-4794-bc79-e6591582bff9[choco_step13]
+image:img/choco_step13.png[choco_step13]
 
-image:https://blogs.apache.org/groovy/mediaresource/6262d9bc-7f14-4b8f-a952-18668c6f1340[choco_step14.png]
+image:img/choco_step14.png[choco_step14]
 
 As we are locking in the value of variables, we can substitute
 them into and simplify our constraints. When we reapply them,
@@ -485,7 +485,7 @@ Lua (https://github.com/luaj/luaj[Luaj]),
 Prolog (http://apice.unibo.it/xwiki/bin/view/Tuprolog/[tuprolog]),
 and https://www.scala-lang.org/[Scala].
 
-image:https://blogs.apache.org/groovy/mediaresource/a1fc3f0b-3997-4e91-987a-51a5423581e4[slides]
+image:img/sendmoremoney_polyglot.png[slides]
 
 To wrap up, let's look at solving a few more examples (using
 Choco). We'll solve some of the examples from an interesting
