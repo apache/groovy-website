@@ -1,10 +1,13 @@
 = Using Groovy with Apache Wayang and Apache Spark
 Paul King
+:source-highlighter: pygments
+:pygments-style: emacs
+:icons: font
 :revdate: 2022-06-19T13:01:07+00:00
 :keywords: centroids, data science, groovy, kmeans, records, apache spark, apache wayang
 :description: This post looks at using Apache Wayang and Apache Spark with Apache Groovy to cluster various Whiskies.
 
-image:https://blogs.apache.org/groovy/mediaresource/870eadc0-670a-4b58-86d0-0007c3f2f4b1[wayang logo,100,float="right"]
+image:https://www.apache.org/logos/res/wayang/default.png[wayang logo,100,float="right"]
 https://wayang.apache.org/[Apache Wayang] (incubating) is an API
 for big data cross-platform processing. It provides an abstraction
 over other platforms like https://spark.apache.org/[Apache Spark]
@@ -229,7 +232,7 @@ Cluster4: 1.684, 1.842, 1.211, 0.421, 0.053, 1.316, 0.632, 0.737, 1.895, 2.000, 
 
 Which, if plotted looks like this:
 
-image:https://blogs.apache.org/groovy/mediaresource/a74aff16-03f8-4aec-b7a8-e1ce7133efef[WhiskeyWayang Centroid Spider Plot]
+image:img/whiskey_wayang_kmeans_spiderplot.png[WhiskeyWayang Centroid Spider Plot]
 
 If you are interested, check out the examples in the repo links
 at the end of this article to see the code for producing this
@@ -238,7 +241,7 @@ project's GitHub repo.
 
 == Running with Apache Spark
 
-image:https://blogs.apache.org/groovy/mediaresource/ab92d040-080c-414b-b33f-193772a341fc[spark logo,100,float="right"]
+image:https://www.apache.org/logos/res/spark/default.png[spark logo,100,float="right"]
 Given our small dataset size and no other customization, Wayang
 will choose the Java streams based solution. We could use Wayang
 optimization features to influence which processing platform it
@@ -246,7 +249,17 @@ chooses, but to keep things simple, we'll just disable the Java
 streams platform in our configuration by making the following
 change in our code:
 
-image:https://blogs.apache.org/groovy/mediaresource/c26f8929-215b-423b-9870-7bc8f18ff874[WhiskeyWayang_DisableJava]
+[source,groovy,highlight=4]
+----
+...
+def configuration = new Configuration()
+def context = new WayangContext(configuration)
+//    .withPlugin(Java.basicPlugin())                <1>
+    .withPlugin(Spark.basicPlugin())
+def planBuilder = new JavaPlanBuilder(context, "KMeans ($url, k=$k, iterations=$iterations)")
+...
+----
+<1> Disabled
 
 Now when we run the application, the output will be something like
 this (a solution similar to before but with 1000+ extra lines of
