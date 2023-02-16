@@ -37,7 +37,7 @@ be in one year? The sequence goes like this:
 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233
 ----
 
-We can solve this problem using matrices. If we multiply the matrix image:https://blogs.apache.org/groovy/mediaresource/473d4a77-a5ea-4ccb-9d55-4936decf74f0[fibonacci matrix] by itself n times we get image:https://blogs.apache.org/groovy/mediaresource/3aa6c41b-4458-400a-9350-b0b2fce0ca99[fib n matrix].
+We can solve this problem using matrices. If we multiply the matrix image:img/FibMatrix.png[fibonacci matrix] by itself n times we get image:img/FibMatrixN.png[fib n matrix].
 This is an operation known as matrix exponentiation.
 Let's explore this problem using four of the most popular
 and maintained matrix libraries.
@@ -547,7 +547,7 @@ class CustomPaintComponent extends Component {
 
 When we run this code we see our three shapes:
 
-image:https://blogs.apache.org/groovy/mediaresource/2050e66e-86ef-4307-a1bf-dde13b786bdc[Shapes]
+image:img/MatrixShapes.png[Shapes]
 
 We can now add our transforms. We'll have one which rotate by 90
 degrees anti-clockwise. Another which enlarges a shape by 25% and
@@ -606,7 +606,7 @@ def trapezoid_
 When we run the entire example, here is what the output looks
 like:
 
-image:https://blogs.apache.org/groovy/mediaresource/7770e9bb-3c93-4288-ae5d-b2a449cfcd47[Shapes]
+image:img/MatrixShapesTransformed.png[Shapes transformed]
 
 We can see here that matrix transforms give us powerful ways to
 manipulate images. We have used 2D images here, but the same
@@ -703,7 +703,7 @@ jlatexmath library. So instead of seeing
 `Array2DRowRealMatrix{{13.0,8.0},{8.0,5.0}}`, they will see
 a graphical rendition of the matrix. So, the final end-user
 experience when using the GroovyConsole looks like this:
-image:https://blogs.apache.org/groovy/mediaresource/fbe0190b-f598-41e7-8673-6208c978dd5d[matrix]
+image:img/GroovyConsoleOutputTransformsMatrix.png[matrix output transforms in groovy console]
 
 When using in Jupyter style environments, other pretty outpu
 styles may be supported.

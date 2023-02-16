@@ -5,7 +5,7 @@ Paul King
 :description: This post looks at classifying Iris flowers using traditional and neural net based approaches \
 using Eclipse DeepLearning4j, Encog, Deep Netts and GraalVM.
 
-image:https://blogs.apache.org/groovy/mediaresource/80b1adc8-7234-4046-a279-e272b0a0edd4[iris flowers,200,float="right"]
+image:img/iris_flowers.png[iris flowers,200,float="right"]
 A classic data science https://en.wikipedia.org/wiki/Iris_flower_data_set[dataset] captures flower characteristics of Iris flowers.
 It captures the _width_ and _length_ of the _sepals_ and _petals_ for three _species_ (https://en.wikipedia.org/wiki/Iris_setosa[Setosa], https://en.wikipedia.org/wiki/Iris_versicolor[Versicolor], and https://en.wikipedia.org/wiki/Iris_virginica[Virginica]).
 

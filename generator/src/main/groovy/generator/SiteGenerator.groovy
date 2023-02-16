@@ -32,7 +32,6 @@ import model.SectionItem
 import model.SiteMap
 import org.asciidoctor.Options
 import org.asciidoctor.ast.Document
-import org.asciidoctor.ast.DocumentHeader
 
 import java.nio.file.FileSystems
 import java.nio.file.Path

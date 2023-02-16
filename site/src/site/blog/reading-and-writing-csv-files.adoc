@@ -59,7 +59,7 @@ In general, we might want to further process the data.
 Groovy provides nice options for this too. Suppose we have
 the following existing CSV file:
 
-image:https://blogs.apache.org/groovy/mediaresource/0128cd28-23e8-42ca-b408-c2eaf1c82d1c[HommesOverall]
+image:img/HommesOverall.png[HommesOverall]
 
 We can read in the file and select various columns of interest
 with code like below:
@@ -118,7 +118,7 @@ This summary has nothing in particular to do with CSV files but
 is summarised in honour of the great riding during the tour!
 Here's the output:
 
-image:https://blogs.apache.org/groovy/mediaresource/878dc821-991f-468c-823d-7672ddeccb98[MultipleWins]
+image:img/HommesMultipleWins.png[MultipleWins]
 
 Okay, now let's look at our three CSV libraries.
 
@@ -208,7 +208,7 @@ file.withReader { r ->
 If we look at the produced file, it is already a little fancier
 than earlier with double quotes around all data:
 
-image:https://blogs.apache.org/groovy/mediaresource/f226d423-3408-4aaa-ba3e-d835e6c894aa[FemmesPodiumStage1]
+image:img/FemmesPodiumStage1.png[FemmesPodiumStage1]
 
 If we want to do more elaborate processing, the
 `CSVReaderHeaderAware` class is aware of the initial header
