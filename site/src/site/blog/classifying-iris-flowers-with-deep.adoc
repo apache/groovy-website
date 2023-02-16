@@ -1,6 +1,7 @@
 = Classifying Iris Flowers with Deep Learning, Groovy and GraalVM
 Paul King
 :revdate: 2022-06-25T10:52:59+00:00
+:updated: 2022-06-27T11:16:59+00:00
 :keywords: groovy, machine learning, artificial intelligence, neural networks, tribuo, deep netts, encog, eclipse deeplearning4j, data science, deep learning, graalvm, native
 :description: This post looks at classifying Iris flowers using traditional and neural net based approaches \
 using Eclipse DeepLearning4j, Encog, Deep Netts and GraalVM.
@@ -83,9 +84,9 @@ println "Validation error: " + pretty(calculateRegressionError(bestMethod, model
 
 When we run the example, we see:
 
-[source,shell]
+[source,subs="quotes,macros"]
 ----
-paulk@pop-os:/extra/projects/iris_encog$ time groovy -cp "build/lib/*" IrisEncog.groovy 
+[lime]*paulk@pop-os*pass:v[:][blue]*/extra/projects/iris_encog*$ time groovy -cp "build/lib/*" IrisEncog.groovy
 1/5 : Fold #1
 1/5 : Fold #1/5: Iteration #1, Training Error: 1.43550735, Validation Error: 0.73302237
 1/5 : Fold #1/5: Iteration #2, Training Error: 0.78845427, Validation Error: 0.73302237
@@ -155,9 +156,9 @@ println eval.stats()
 
 When we run this example, we see:
 
-[source,shell]
+[source,subs="quotes,macros"]
 ----
-paulk@pop-os:/extra/projects/iris_dl4j$ time groovy -cp "build/lib/*" IrisDl4j.groovy 
+[lime]*paulk@pop-os*pass:v[:][blue]*/extra/projects/iris_encog*$ time groovy -cp "build/lib/*" IrisDl4j.groovy
 [main] INFO org.nd4j.linalg.factory.Nd4jBackend - Loaded [CpuBackend] backend
 [main] INFO org.nd4j.nativeblas.NativeOpsHolder - Number of threads used for linear algebra: 4
 [main] INFO org.nd4j.nativeblas.Nd4jBlas - Number of threads used for OpenMP BLAS: 4
@@ -249,9 +250,9 @@ new ClassifierEvaluator().with {
 
 When we run this command we see:
 
-[source,shell]
+[source,subs="quotes,macros"]
 ----
-paulk@pop-os:/extra/projects/iris_graalvm$ time groovy -cp "build/lib/*" Iris.groovy 
+[lime]*paulk@pop-os*pass:v[:][blue]*/extra/projects/iris_encog*$ time groovy -cp "build/lib/*" Iris.groovy
 16:49:27.089 [main] INFO deepnetts.core.DeepNetts - ------------------------------------------------------------------------
 16:49:27.091 [main] INFO deepnetts.core.DeepNetts - TRAINING NEURAL NETWORK
 16:49:27.091 [main] INFO deepnetts.core.DeepNetts - ------------------------------------------------------------------------
@@ -297,16 +298,16 @@ nature has a more limited set of metaprogramming capabilities but allows bytecod
 Java to be produced. Luckily, we aren't relying on any dynamic Groovy tricks for our example.
 We'll compile it up using static mode:
 
-[source,shell]
+[source,subs="quotes,macros"]
 ----
-paulk@pop-os:/extra/projects/iris_graalvm$ groovyc -cp "build/lib/*" --compile-static Iris.groovy
+[lime]*paulk@pop-os*pass:v[:][blue]*/extra/projects/iris_encog*$ groovyc -cp "build/lib/*" --compile-static Iris.groovy
 ----
 
 Next we build our native application:
 
-[source,shell]
+[source,subs="quotes,macros"]
 ----
-paulk@pop-os:/extra/projects/iris_graalvm$ native-image  --report-unsupported-elements-at-runtime \
+[lime]*paulk@pop-os*pass:v[:][blue]*/extra/projects/iris_encog*$ native-image  --report-unsupported-elements-at-runtime \
    --initialize-at-run-time=groovy.grape.GrapeIvy,deepnetts.net.weights.RandomWeights \
    --initialize-at-build-time --no-fallback  -H:ConfigurationFileDirectories=conf/  -cp ".:build/lib/*" Iris
 ----
@@ -317,9 +318,9 @@ We also did the same for the `RandomWeights` class to avoid it being locked into
 
 Now we are ready to run our application:
 
-[source,shell]
+[source,subs="quotes,macros"]
 ----
-paulk@pop-os:/extra/projects/iris_graalvm$ time ./iris
+[lime]*paulk@pop-os*pass:v[:][blue]*/extra/projects/iris_encog*$ time ./iris
 ...
 CLASSIFIER EVALUATION METRICS
 Accuracy: 0.93460923 (How often is classifier correct in total)

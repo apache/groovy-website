@@ -1,6 +1,8 @@
 = Testing your Java with Groovy, Spock, JUnit5, Jacoco, Jqwik and Pitest
 Paul King
-:revdate: '2022-07-15T08:26:15+00:00'
+:revdate: 2022-07-15T08:26:15+00:00
+:keywords: groovy, java, spock, testing, jqwik, pitest, junit, jacoco
+:description: This post looks at testing Java using Groovy, Spock, JUnit5, Jacoco, Jqwik and Pitest
 
 This blog post covers a common scenario seen in the Groovy community which is
 projects which use Java for their production code and Groovy for their tests.
@@ -16,9 +18,9 @@ For illustrative purposes, we will test a Java mathematics utility function
 `sumBiggestPair`. Given three numbers, it finds the two biggest and then adds them up.
 An initial stab at the code for this might look something like this:
 
-[source,groovy]
+[source,java]
 ----
-public class MathUtil {
+public class MathUtil {                       // Java
 
     public static int sumBiggestPair(int a, int b, int c) {
         int op1 = a;
@@ -133,9 +135,9 @@ image:img/ImperfectPuzzle.jpg[Imperfect puzzle,250]
 
 The good news is that we can fix this. Here is an updated algorithm:
 
-[source,groovy]
+[source,java]
 ----
-public static int sumBiggestPair(int a, int b, int c) {
+public static int sumBiggestPair(int a, int b, int c) {                // Java
     int op1 = a;
     int op2 = b;
     if (c > Math.min(a, b)) {
@@ -149,12 +151,12 @@ public static int sumBiggestPair(int a, int b, int c) {
 With this new algorithm, all 4 testcases now pass,
 and we again have 100% line and branch coverage.
 
-[source]
+[subs="quotes,macros"]
 ----
 > Task :SumBiggestPairPitest:test
-✔ Test sum of two biggest numbers [Tests: 4/4/0/0] [Time: 0.317 s]
-✔ Test util.MathUtilSpec [Tests: 4/4/0/0] [Time: 0.320 s]
-✔ Test Gradle Test Run :SumBiggestPairPitest:test [Tests: 4/4/0/0]
+[lime]*✔* Test sum of two biggest numbers pass:v[[]Tests: 4/[lime]*4*/[red]*0*/[gold]*0*] [Time: 0.317 s]
+[lime]*✔* Test util.MathUtilSpec pass:v[[]Tests: 4/[lime]*4*/[red]*0*/[gold]*0*] [Time: 0.320 s]
+[lime]*✔* Test Gradle Test Run :SumBiggestPairPitest:test pass:v[[]Tests: 4/[lime]*4*/[red]*0*/[gold]*0*]
 ----
 
 But haven't we been here before? How can we be sure there isn't some additional test

@@ -5,7 +5,7 @@ Paul King
 :description: This post looks at using Apache Ignite with Apache Groovy and the K-Means algorithm to cluster scotch whiskeys.
 
 In a previous https://groovy.apache.org/blog/using-groovy-with-apache-wayang[blog post],
-image:https://ignite.apache.org/img/logo.svg[Ignite logo,150,float="right"] we looked at
+image:https://www.apache.org/logos/res/ignite/default.png[Ignite logo,150,float="right"] we looked at
 using https://wayang.apache.org/[Apache Wayang] (incubating) and
 https://spark.apache.org/[Apache Spark] to scale up the
 https://en.wikipedia.org/wiki/K-means_clustering[k-means] clustering algorithm.

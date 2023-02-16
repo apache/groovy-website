@@ -4,9 +4,12 @@ Paul King
 :keywords: groovy, award
 :description: Congratulations to Graeme Rocher for receiving the Oracle Groundbreaker award.
 
-The http://groovy.apache.org/[Apache Groovy] team congratulates long-time Groovy committer Graeme Rocher on receiving his Groundbreaker award at Oracle Code One.
+The http://groovy.apache.org/[Apache Groovy] team congratulates long-time Groovy committer
+Graeme Rocher on receiving his Groundbreaker award at Oracle Code One.
 
-Graeme has made numerous significant contributions to Apache Groovy and has also founded two of the most important frameworks using Groovy: https://grails.org/[Grails] and http://micronaut.io/[Micronaut].
+Graeme has made numerous significant contributions to Apache Groovy and has also founded
+two of the most important frameworks using Groovy: https://grails.org/[Grails] and
+http://micronaut.io/[Micronaut].
 
 image:https://pbs.twimg.com/media/DqPOTAPU0AAK_5d.jpg[Graeme receiving the award,800,600]
 
