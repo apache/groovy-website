@@ -16,6 +16,8 @@ image:https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Mars_Climate_Orb
 If the system in question had been developed using a units of
 measurement system, perhaps the failure could have been avoided.
 
+== Units of measurement systems
+
 All programming languages have types for representing numbers.
 As an example, we may have three integers, one representing a
 height, one a weight and one a temperature. We can write code
@@ -49,6 +51,8 @@ mainstream programming, now seems like a great time to check the
 status. The JSR 385 maintenance release was approved last year and
 the latest version of the reference implementation was released
 earlier this year.
+
+== JSR 385: Units of Measurement API 2.0
 
 The first thing we need to do is bring in our dependencies (shown for https://gradle.org/[Gradle] - https://mvnrepository.com/artifact/tech.units/indriya/2.1.3[other options]).
 The main one is the reference implementation (it brings in the
@@ -103,8 +107,9 @@ println massₘ > diameterₘ
 
 We'll see a runtime error like this:
 
+[subs="quotes"]
 ----
-javax.measure.IncommensurableException: km is not compatible with kg
+[maroon]#javax.measure.IncommensurableException: km is not compatible with kg#
 ----
 
 Or, with `TypeChecked` or `CompileStatic` in play for a statement like this:
@@ -117,9 +122,10 @@ println massₘ.add(diameterₘ)
 
 We'd see a compile-time error like this:
 
+[subs="quotes"]
 ----
-[Static type checking] - Cannot call tech.units.indriya.ComparableQuantity#add(javax.measure.Quantity<javax.measure.quantity.Mass>)
-with arguments [tech.units.indriya.ComparableQuantity<javax.measure.quantity.Length>]
+[maroon]##[Static type checking] - Cannot call tech.units.indriya.ComparableQuantity#add(javax.measure.Quantity<javax.measure.quantity.Mass>)
+with arguments [tech.units.indriya.ComparableQuantity<javax.measure.quantity.Length>]##
 ----
 
 If for some strange reason we did want to compare or perform
@@ -177,6 +183,8 @@ Which shows us that the diameter of Mars is a little over 4200 miles:
 ----
 4212.275312176886980036586335798934 (m*1609344)/1000
 ----
+
+== Adding some metaprogramming
 
 Groovy has various features which allow methods to be (apparently)
 added to classes. We'll use extension methods. This technique
@@ -380,8 +388,9 @@ move forward by 2.kgs
 
 We'll now see a compile-time error:
 
+[subs="quotes"]
 ----
-[Static type checking] - Cannot call MoveHolder#by(javax.measure.Quantity<javax.measure.quantity.Length>) with arguments [javax.measure.Quantity<javax.measure.quantity.Mass>]
+[maroon]##[Static type checking] - Cannot call MoveHolder#by(javax.measure.Quantity<javax.measure.quantity.Length>) with arguments [javax.measure.Quantity<javax.measure.quantity.Mass>]##
 ----
 
 It is great to get this additional earlier feedback on script
@@ -434,9 +443,9 @@ afterMethodCall { call ->
 }
 ----
 
-This is only a partial implementation, it's make numerous
+This is only a partial implementation, it makes numerous
 assumptions. We could remove those assumptions by adding
-more code but for now we'll keep this simplified version.
+more code, but for now we'll keep this simplified version.
 
 So, now the following script (with the above type checking extension applied) compiles fine:
 
@@ -454,8 +463,9 @@ move right by 2.m at 6.cm/s
 
 The error message is:
 
+[subs="quotes"]
 ----
-[Static type checking] - Speed of 6 is too fast!
+[maroon]##[Static type checking] - Speed of 6 is too fast!##
 ----
 
 == Further information

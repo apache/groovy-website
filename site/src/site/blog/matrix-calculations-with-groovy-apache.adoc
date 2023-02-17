@@ -37,7 +37,7 @@ be in one year? The sequence goes like this:
 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233
 ----
 
-We can solve this problem using matrices. If we multiply the matrix image:img/FibMatrix.png[fibonacci matrix] by itself n times we get image:img/FibMatrixN.png[fib n matrix].
+We can solve this problem using matrices. If we multiply the matrix image:img/FibMatrix.png[fibonacci matrix,43] by itself n times we get image:img/FibMatrixN.png[fib n matrix,82].
 This is an operation known as matrix exponentiation.
 Let's explore this problem using four of the most popular
 and maintained matrix libraries.
@@ -150,13 +150,14 @@ numerous other numerical and related types).
 
 Running the script gives the following output:
 
+[subs="quotes"]
 ----
-...
+[maroon]##...
 [main] INFO org.nd4j.linalg.factory.Nd4jBackend - Loaded [CpuBackend] backend
 ...
 [main] INFO org.nd4j.linalg.cpu.nativecpu.CpuNDArrayFactory - Binary level Generic x86 optimization level AVX/AVX2
 [main] INFO org.nd4j.linalg.api.ops.executioner.DefaultOpExecutioner - Blas vendor: [OPENBLAS]
-...
+...##
 [[         3,         2],
  [         2,         1]]
 [[       233,       144],
@@ -286,8 +287,9 @@ This example was run on JDK16 with the following VM options:
 
 The output looks like this:
 
+[subs="quotes"]
 ----
-WARNING: Using incubator modules: jdk.incubator.vector
+[maroon]##WARNING: Using incubator modules: jdk.incubator.vector##
 Simple: 116.34 ms
 Optimized: 34.91 ms
 Vector: 21.94 ms
@@ -618,39 +620,43 @@ We saw earlier that some of the examples could make use of Groovy
 operator shorthand syntax, while others couldn't. Here is a
 summary of some common methods in the libraries:
 
-
+[subs="quotes,macros",cols=5]
 |===
-|Groovy operator | + | - | * | **
+| [blue]*_Groovy operator&nbsp;_*
+| [blue]*_+_*
+| [blue]*_-_*
+| [blue]**_pass:v[*]_**
+| [blue]**_pass:v[**]_**
 
-|Groovy method
-|plus
-|minus
-|multiply
-|power
+| [blue]*_Groovy method_*
+| [blue]*_plus_*
+| [blue]*_minus_*
+| [blue]*_multiply_*
+| [blue]*_power_*
 
-|Commons math
-|add
-|subtract
-|multiply
-|power
+|[aqua]*_Commons math_*
+|`add`
+|`subtract`
+|`multiply`
+|`power`
 
-|EJML
-|plus
-|minus
-|mult
+|[aqua]*_EJML_*
+|`plus`
+|`minus`
+|`mult`
 |-
 
-|Nd4j
-|add
-|sub
-|mmul
+|[aqua]*_Nd4j_*
+|`add`
+|`sub`
+|`mmul`
 |-
 
-|ojAlgo
-|add
-|subtract
-|multiply
-|power
+|[aqua]*_ojAlgo_*
+|`add`
+|`subtract`
+|`multiply`
+|`power`
 |===
 
 Where the library used the same name as Groovy's method,
@@ -703,9 +709,10 @@ jlatexmath library. So instead of seeing
 `Array2DRowRealMatrix{{13.0,8.0},{8.0,5.0}}`, they will see
 a graphical rendition of the matrix. So, the final end-user
 experience when using the GroovyConsole looks like this:
+
 image:img/GroovyConsoleOutputTransformsMatrix.png[matrix output transforms in groovy console]
 
-When using in Jupyter style environments, other pretty outpu
+When using in Jupyter style environments, other pretty output
 styles may be supported.
 
 == Further information

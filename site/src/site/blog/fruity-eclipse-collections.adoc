@@ -91,15 +91,17 @@ For some fun, let's look at whether the nominated color of each fruit matches th
 of the related emoji. As in the previous blog, we'll use the slightly nicer
 https://fonts.google.com/noto/specimen/Noto+Color+Emoji?preview.text=%F0%9F%8D%8E%F0%9F%8D%91%F0%9F%8D%8C%F0%9F%8D%92%F0%9F%8D%8A%F0%9F%8D%87&amp;preview.text_type=custom[Noto Color Emoji]
 fonts for our fruit as shown here:
+
 image:img/fruit_emoji.png[Noto Color Emoji]
+
 We'll use an Eclipse Collection `BiMap` to switch back and forth between the color names
 and java.awt colors:
 
 [source,groovy]
 ----
 @Field public static COLOR_OF = BiMaps.immutable.ofAll([
-WHITE: WHITE, RED: RED, GREEN: GREEN, BLUE: BLUE,
-ORANGE: ORANGE, YELLOW: YELLOW, MAGENTA: MAGENTA
+    WHITE: WHITE, RED: RED, GREEN: GREEN, BLUE: BLUE,
+    ORANGE: ORANGE, YELLOW: YELLOW, MAGENTA: MAGENTA
 ])
 @Field public static NAME_OF = COLOR_OF.inverse()
 ----
@@ -125,8 +127,9 @@ static rgb(BufferedImage image, int x, int y) {
 
 The HSB color space represents colors in a spectrum from 0 to 360 degrees:
 
+.Image credit: ++https://nycdoe-cs4all.github.io/units/1/lessons/lesson_3.2++
 image:https://nycdoe-cs4all.github.io/images/lessons/unit_1/3.2/circle.png[Color Circle]
-Image credit: https://nycdoe-cs4all.github.io/units/1/lessons/lesson_3.2
+
 
 We have two helper methods to assist with colors.
 The first picks out "_mostly black_" and "_mostly white_" colors while
