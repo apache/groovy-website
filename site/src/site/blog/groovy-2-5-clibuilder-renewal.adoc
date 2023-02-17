@@ -1,0 +1,838 @@
+= Apache Groovy 2.5 CliBuilder Renewal
+Remko Popma
+:revdate: 2018-05-30T11:28:31+00:00
+:keywords: groovy, release, clibuilder, picocli, commons cli
+:description: This post looks at new CliBuilder features from Groovy 2.5 in particular the Picocli-based implementation.
+
+The `CliBuilder` class for quickly and concisely building
+command-line applications has been renewed in Apache Groovy 2.5.
+This article highlights what is new.
+
+++++
+<div class="imageblock">
+<div class="content">
+<img src="http://picocli.info/images/CliBuilder2.5-cygwin.png" alt="CliBuilder2.5 cygwin">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_code_groovy_util_clibuilder_code_class_is_deprecated">The <code>groovy.util.CliBuilder</code> Class is Deprecated</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Previous versions of CliBuilder used Apache <a href="https://commons.apache.org/proper/commons-cli/index.html">Commons CLI</a> as the underlying parser library.
+From Groovy 2.5, there is an alternative version of CliBuilder based on the <a href="https://github.com/remkop/picocli">picocli</a> parser.</p>
+</div>
+<div class="paragraph">
+<p>It is recommended that applications explicitly import either <code>groovy.cli.picocli.CliBuilder</code> or <code>groovy.cli.commons.CliBuilder</code>. The <code>groovy.util.CliBuilder</code> class is deprecated and delegates to the Commons CLI version for backwards compatibility.</p>
+</div>
+<div class="paragraph">
+<p>New features will likely only be added to the picocli version, and <code>groovy.util.CliBuilder</code> may be removed in a future version of Groovy.
+The Commons CLI version is intended for applications that rely on the internals of the Commons CLI implementation of CliBuilder and cannot easily migrate to the picocli version.</p>
+</div>
+<div class="paragraph">
+<p>Next, let&#8217;s look at some new features in Groovy 2.5 CliBuilder.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_typed_options">Typed Options</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://picocli.info/images/Type.jpg" alt="Type">
+</div>
+</div>
+<div class="paragraph">
+<p>Options can be boolean flags or they can take one or more option parameters.
+In previous versions of CliBuilder, you would have to specify <code>args: 1</code> for options that need a parameter, or
+<code>args: &#39;+&#39;</code> for options that accept multiple parameters.</p>
+</div>
+<div class="paragraph">
+<p>This version of CliBuilder adds support for typed options. This is convenient when processing parse results,
+but additionally, the number of arguments is inferred from the type,
+so if the <code>type</code> is specified, <code>args</code> can be omitted.</p>
+</div>
+<div class="paragraph">
+<p>For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">def cli = new CliBuilder()
+cli.a(type: String, &#39;a-arg&#39;)
+cli.b(type: boolean, &#39;b-arg&#39;)
+cli.c(type: Boolean, &#39;c-arg&#39;)
+cli.d(type: int, &#39;d-arg&#39;)
+cli.e(type: Long, &#39;e-arg&#39;)
+cli.f(type: Float, &#39;f-arg&#39;)
+cli.g(type: BigDecimal, &#39;g-arg&#39;)
+cli.h(type: File, &#39;h-arg&#39;)
+cli.i(type: RoundingMode, &#39;i-arg&#39;)
+
+def argz = &#39;&#39;&#39;-a John -b -d 21 -e 1980 -f 3.5 -g 3.14159
+    -h cv.txt -i DOWN and some more&#39;&#39;&#39;.split()
+
+def options = cli.parse(argz)
+assert options.a == &#39;John&#39;
+assert options.b
+assert !options.c
+assert options.d == 21
+assert options.e == 1980L
+assert options.f == 3.5f
+assert options.g == 3.14159
+assert options.h == new File(&#39;cv.txt&#39;)
+assert options.i == RoundingMode.DOWN
+assert options.arguments() == [&#39;and&#39;, &#39;some&#39;, &#39;more&#39;]
+</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_supported_types">Supported Types</h3>
+<div class="paragraph">
+<p>The Commons CLI-based CliBuilder supports primitives, numeric types, files, enums and arrays thereof
+(using <a href="http://docs.groovy-lang.org/2.5.0-SNAPSHOT/html/gapi/index.html?org/codehaus/groovy/runtime/StringGroovyMethods.html#asType">StringGroovyMethods#asType(String, Class)</a>).
+The picocli-based CliBuilder supports those <a href="http://picocli.info/#_built_in_types">and more</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_adding_more_types">Adding More Types</h3>
+<div class="paragraph">
+<p>If the built-in types don&#8217;t meet your needs, it is easy to register a custom converter. Specify a <code>convert</code> Closure to convert the String argument to any other type. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">import java.nio.file.Paths
+import java.time.LocalTime
+
+def cli = new CliBuilder()
+cli.a(convert: { it.toUpperCase() }, &#39;a-arg&#39;)    // (1)
+cli.p(convert: { Paths.get(it) }, &#39;p-arg&#39;)       // (2)
+cli.t(convert: { LocalTime.parse(it) }, &#39;t-arg&#39;) // (3)
+
+def options = cli.parse(&#39;-a abc -p /usr/home -t 15:31:59&#39;.split())
+assert options.a == &#39;ABC&#39;
+assert options.p.absolute && options.p.parent == Paths.get(&#39;/usr&#39;)
+assert options.t.hour == 15 && options.t.minute == 31
+</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" value="1"></i><b>1</b></td>
+<td>Convert one String to another</td>
+</tr>
+<tr>
+<td><i class="conum" value="2"></i><b>2</b></td>
+<td>Option value is converted to a <code>java.nio.file.Path</code></td>
+</tr>
+<tr>
+<td><i class="conum" value="3"></i><b>3</b></td>
+<td>Option value is converted to a <code>java.time.LocalTime</code></td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_annotations">Annotations</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://picocli.info/images/a-annotations.png" alt="Annotations">
+</div>
+</div>
+<div class="paragraph">
+<p>From this release, Groovy offers an annotation API for processing command line arguments.</p>
+</div>
+<div class="paragraph">
+<p>Applications can annotate fields or methods with <code>@groovy.cli.Option</code> for named options
+or <code>@groovy.cli.Unparsed</code> for positional parameters.
+When the parser matches a command line argument with an option name or positional parameter, the value is converted
+to the correct type and injected into the field or method.</p>
+</div>
+<div class="sect2">
+<h3 id="_annotating_methods_of_an_interface">Annotating Methods of an Interface</h3>
+<div class="paragraph">
+<p>One way to use the annotations is on &quot;getter-like&quot; methods (methods that return a value) of an interface. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">import groovy.cli.*
+
+interface IHello {
+    @Option(shortName=&#39;h&#39;, description=&#39;display usage&#39;) Boolean help()   // (1)
+    @Option(shortName=&#39;u&#39;, description=&#39;user name&#39;)     String user()    // (2)
+    @Unparsed(description = &#39;positional parameters&#39;)    List remaining() // (3)
+}
+</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" value="1"></i><b>1</b></td>
+<td>Method returns <code>true</code> if <code>-h</code> or <code>--help</code> was specified on the command line.</td>
+</tr>
+<tr>
+<td><i class="conum" value="2"></i><b>2</b></td>
+<td>Method returns the parameter value that was specified for the <code>-u</code> or <code>--user</code> option.</td>
+</tr>
+<tr>
+<td><i class="conum" value="3"></i><b>3</b></td>
+<td>Any remaining parameters will be returned as a list from this method.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>How to use this interface (using the picocli version to demonstrate its usage help):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">import groovy.cli.picocli.CliBuilder
+
+def cli = new CliBuilder(name: &#39;groovy Greeter&#39;)
+def argz = &#39;--user abc&#39;.split()
+IHello hello = cli.parseFromSpec(IHello, argz)
+assert hello.user() == &#39;abc&#39;
+
+hello = cli.parseFromSpec(GreeterI, [&#39;--help&#39;, &#39;Some&#39;, &#39;Other&#39;, &#39;Args&#39;] as String[])
+assert hello.help()
+cli.usage()
+assert hello.remaining() == [&#39;Some&#39;, &#39;Other&#39;, &#39;Args&#39;]
+</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This prints the following usage help message:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>Usage: groovy Greeter [-h] [-u=&lt;user&gt;] [&lt;remaining&gt;...]
+      [&lt;remaining&gt;...]   positional parameters
+  -u, --user=&lt;user&gt;      user name
+  -h, --help             display usage</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When <code>parseFromSpec</code> is called, <code>CliBuilder</code> reads the annotations, parses the command line arguments
+and returns an instance of the interface.
+The interface methods return the option values matched on the command line.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_annotating_properties_or_setter_methods_of_a_class">Annotating Properties or Setter Methods of a Class</h3>
+<div class="paragraph">
+<p>Another way to use the annotations is on the properties or &quot;setter-like&quot; methods (<code>void</code> methods with a single parameter) of a class. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">class Hello {
+    @Option(shortName=&#39;h&#39;, description=&#39;display usage&#39;) // (1)
+    Boolean help
+
+    private String user
+    @Option(shortName=&#39;u&#39;, description=&#39;user name&#39;)     // (2)
+    void setUser(String user) {
+        this.user = user
+    }
+    String getUser() { user }
+
+    @Unparsed(description = &#39;positional parameters&#39;)    // (3)
+    List remaining
+}
+</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" value="1"></i><b>1</b></td>
+<td>The <code>help</code> Boolean property is set to <code>true</code> if <code>-h</code> or <code>--help</code> was specified on the command line.</td>
+</tr>
+<tr>
+<td><i class="conum" value="2"></i><b>2</b></td>
+<td>The <code>setUser</code> property setter method is invoked with the <code>-u</code> or <code>--user</code> option parameter value.</td>
+</tr>
+<tr>
+<td><i class="conum" value="3"></i><b>3</b></td>
+<td>The <code>remaining</code> property is set to a new <code>List</code> containing the remaining args, if any.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The annotated class can be used as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">String[] argz = [&#39;--user&#39;, &#39;abc&#39;, &#39;foo&#39;]
+
+def cli = new CliBuilder(usage: &#39;groovy Greeter [option]&#39;) // (1)
+Hello greeter = cli.parseFromInstance(new Hello(), argz)   // (2)
+assert greeter.user == &#39;abc&#39;                               // (3)
+assert greeter.remaining == [&#39;foo&#39;]                        // (4)
+</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" value="1"></i><b>1</b></td>
+<td>Create a <code>CliBuilder</code> instance.</td>
+</tr>
+<tr>
+<td><i class="conum" value="2"></i><b>2</b></td>
+<td>Extract options from the annotated instance, parse arguments, and populate and return the supplied instance.</td>
+</tr>
+<tr>
+<td><i class="conum" value="3"></i><b>3</b></td>
+<td>Verify that the String option value has been assigned to the property.</td>
+</tr>
+<tr>
+<td><i class="conum" value="4"></i><b>4</b></td>
+<td>Verify the remaining arguments property.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>When <code>parseFromInstance</code> is called, <code>CliBuilder</code> again reads the annotations, parses the command line
+arguments and finally returns the instance. The annotated fields and setter methods are initialized with the values
+matched for the associated option.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_script_annotations">Script Annotations</h3>
+<div class="imageblock">
+<div class="content">
+<img src="http://picocli.info/images/GroovyScriptAnnotations.png" alt="Script">
+</div>
+</div>
+<div class="paragraph">
+<p>Groovy 2.5 also offers new annotations for Groovy scripts.</p>
+</div>
+<div class="paragraph">
+<p><code>@OptionField</code> is equivalent to combining <code>@groovy.transform.Field</code> and <code>@Option</code>, whereas <code>@UnparsedField</code> is equivalent to combining <code>@Field</code> and <code>@Unparsed</code>.</p>
+</div>
+<div class="paragraph">
+<p>Use these annotations to turn script variables into fields so that the variables can be populated by CliBuilder. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">import groovy.cli.OptionField
+import groovy.cli.UnparsedField
+
+@OptionField String user
+@OptionField Boolean help
+@UnparsedField List remaining
+
+String[] argz = [&#39;--user&#39;, &#39;abc&#39;, &#39;foo&#39;]
+
+new CliBuilder().parseFromInstance(this, argz)
+assert user == &#39;abc&#39;
+assert remaining == [&#39;foo&#39;]
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_typed_positional_parameters">Typed Positional Parameters</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This version of CliBuilder offers some limited support for strongly typed positional parameters.</p>
+</div>
+<div class="paragraph">
+<p>If all positional parameters have the same type, the <code>@Unparsed</code> annotation can be used with an array type other than <code>String[]</code>.
+Again, the type conversion is done using <a href="http://docs.groovy-lang.org/2.5.0-SNAPSHOT/html/gapi/index.html?org/codehaus/groovy/runtime/StringGroovyMethods.html#asType">StringGroovyMethods#asType(String, Class)</a>
+in the Commons CLI version, while the picocli version of CliBuilder supports a <a href="http://picocli.info/#_built_in_types">superset</a> of those types.</p>
+</div>
+<div class="paragraph">
+<p>This functionality is only available for the annotations API, not for the dynamic API.
+Here is an example of an interface that can capture strongly typed positional parameters:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">interface TypedPositionals {
+    @Unparsed Integer[] nums()
+}
+</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The code below demonstrates the type conversion:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">def argz = &#39;12 34 56&#39;.split()
+def cli = new CliBuilder()
+def options = cli.parseFromSpec(TypedPositionals, argz)
+assert options.nums() == [12, 34, 56]
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_apache_commons_cli_features">Apache Commons CLI Features</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://picocli.info/images/FeatureIconAdvancedOptions.png" alt="FeatureIconAdvancedOptions">
+</div>
+</div>
+<div class="paragraph">
+<p>Sometimes you may want to use advanced features of the underlying parsing library.
+For example, you may have a command line application with mutually exclusive options.
+The below code shows how to achieve this using the Apache Commons CLI <code>OptionGroup</code> API:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">import groovy.cli.commons.CliBuilder
+import org.apache.commons.cli.*
+
+def cli = new CliBuilder()
+def optionGroup = new OptionGroup()
+optionGroup.with {
+  addOption cli.option(&#39;s&#39;, [longOpt: &#39;silent&#39;], &#39;s option&#39;)
+  addOption cli.option(&#39;v&#39;, [longOpt: &#39;verbose&#39;], &#39;v option&#39;)
+}
+cli.options.addOptionGroup optionGroup
+
+assert !cli.parse(&#39;--silent --verbose&#39;.split()) (1)
+</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" value="1"></i><b>1</b></td>
+<td>Parsing this input will fail because two mutually exclusive options were specified.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_picocli_clibuilder_features">Picocli CliBuilder Features</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://picocli.info/images/FeatureIconAdvancedOptions.png" alt="FeatureIconAdvancedOptions">
+</div>
+</div>
+<div class="sect2">
+<h3 id="_strongly_typed_lists">Strongly Typed Lists</h3>
+<div class="imageblock">
+<div class="content">
+<img src="http://picocli.info/images/list.png" alt="list">
+</div>
+</div>
+<div class="paragraph">
+<p>Options with multiple values often use an array or a List to capture the values.
+Arrays can be strongly typed, that is, contain elements other than String.
+The picocli version of CliBuilder lets you do the same with Lists.
+The <code>auxiliaryType</code> specifies the type that the elements should be converted to.
+For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">import groovy.cli.picocli.CliBuilder
+
+def cli = new CliBuilder()
+cli.T(type: List, auxiliaryTypes: Long, &#39;typed list&#39;)  // (1)
+
+def options = cli.parse(&#39;-T 1 -T 2 -T 3&#39;.split())      // (2)
+assert options.Ts == [ 1L, 2L, 3L ]                    // (3)
+</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" value="1"></i><b>1</b></td>
+<td>Define an option that can have multiple integer values.</td>
+</tr>
+<tr>
+<td><i class="conum" value="2"></i><b>2</b></td>
+<td>An example command line.</td>
+</tr>
+<tr>
+<td><i class="conum" value="3"></i><b>3</b></td>
+<td>The option values as a <code>List&lt;Integer&gt;</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_strongly_typed_maps">Strongly Typed Maps</h3>
+<div class="imageblock">
+<div class="content">
+<img src="http://picocli.info/images/map.png" alt="map">
+</div>
+</div>
+<div class="paragraph">
+<p>The picocli version of CliBuilder offers native support for Map options.
+This is as simple as specifying Map as the option type.
+By default, both keys and values are stored as Strings in the Map,
+but it’s possible to use <code>auxiliaryType</code> to specify the types that the keys and values should be converted to.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">import groovy.cli.picocli.CliBuilder
+
+def cli = new CliBuilder()
+cli.D(args: 2,   valueSeparator: &#39;=&#39;, &#39;Commons CLI style map&#39;)                 // (1)
+cli.X(type: Map, &#39;picocli style map support&#39;)                                  // (2)
+cli.Z(type: Map, auxiliaryTypes: [TimeUnit, Integer].toArray(), &#39;typed map&#39;)   // (3)
+
+def options = cli.parse(&#39;-Da=b -Dc=d -Xx=y -Xi=j -ZDAYS=2 -ZHOURS=23&#39;.split()) // (4)
+assert options.Ds == [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;]                                      // (5)
+assert options.Xs == [ &#39;x&#39;:&#39;y&#39;, &#39;i&#39;:&#39;j&#39; ]                                      // (6)
+assert options.Zs == [ (DAYS as TimeUnit):2, (HOURS as TimeUnit):23 ]          // (7)
+</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" value="1"></i><b>1</b></td>
+<td>Commons CLI has map-like options by specifying that each option must have two parameters, with some separator.</td>
+</tr>
+<tr>
+<td><i class="conum" value="2"></i><b>2</b></td>
+<td>The picocli version of CliBuilder has native support for Map options.</td>
+</tr>
+<tr>
+<td><i class="conum" value="3"></i><b>3</b></td>
+<td>The key type and value type can be specified for strongly-typed maps.</td>
+</tr>
+<tr>
+<td><i class="conum" value="4"></i><b>4</b></td>
+<td>An example command line.</td>
+</tr>
+<tr>
+<td><i class="conum" value="5"></i><b>5</b></td>
+<td>The Commons CLI style option gives a list of [key, value, key, value, &#8230;&#8203;] objects.</td>
+</tr>
+<tr>
+<td><i class="conum" value="6"></i><b>6</b></td>
+<td>The picocli style option gives the result as a <code>Map&lt;String, String&gt;</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" value="7"></i><b>7</b></td>
+<td>When <code>auxiliaryTypes</code> are specified, the keys and values of the map are converted to the specified types, giving you a <code>Map&lt;TimeUnit, Integer&gt;</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_usage_help_with_detailed_synopsis">Usage Help with Detailed Synopsis</h3>
+<div class="imageblock">
+<div class="content">
+<img src="http://picocli.info/images/iceberg.png" alt="iceberg">
+</div>
+</div>
+<div class="paragraph">
+<p>CliBuilder has always supported a <code>usage</code> property to display the usage help synopsis of a command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">// the old way
+new CliBuilder(usage: &#39;myapp [options]&#39;).usage()
+</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above program prints:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Usage: myapp [options]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This still works, but the picocli version has a better alternative with the <code>name</code> property.
+If you specify <code>name</code> instead of <code>usage</code>, picocli will show all options in a succinct synopsis with square brackets <code>[</code> and <code>]</code> for optional elements and ellipsis <code>&#8230;&#8203;</code> for elements that can be repeated one or more times. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">// the new way
+def cli = new CliBuilder(name: &#39;myapp&#39;) // detailed synopsis
+cli.a(&#39;option a description&#39;)
+cli.b(&#39;option b description&#39;)
+cli.c(type: List, &#39;option c description&#39;)
+cli.usage()
+</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above program prints:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Usage: myapp [-ab] [-c=PARAM]...
+  -a           option a description
+  -b           option b description
+  -c= PARAM    option c description</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_use_any_option_names">Use Any Option Names</h3>
+<div class="imageblock">
+<div class="content">
+<img src="http://picocli.info/images/freedom-c-PsychoShadow-www.bigstockphoto.com.jpg" alt="freedom c PsychoShadow www.bigstockphoto.com">
+</div>
+</div>
+<div class="paragraph">
+<p><em>Image credit: (c) PsychoShadow - www.bigstockphoto.com</em></p>
+</div>
+<div class="paragraph">
+<p>Before, if an option had multiple names with a single hyphen, you had no choice but to declare the option multiple times:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">// before: split -cp, -classpath into two options
+def cli = new CliBuilder(usage: &#39;groovyConsole [options] [filename]&#39;)
+cli.classpath(&#39;Where to find the class files&#39;)
+cli.cp(longOpt: &#39;classpath&#39;, &#39;Aliases for &#39;-classpath&#39;)
+</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The picocli version of CliBuilder supports a <code>names</code> property that can have any number of option names that can take any prefix. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">// after: an option can have many names with any prefix
+def cli = new CliBuilder(usage: &#39;groovyConsole [options] [filename]&#39;)
+cli._(names: [&#39;-cp&#39;, &#39;-classpath&#39;, &#39;--classpath&#39;], &#39;Where to find the class files&#39;)
+</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fine_grained_usage_help_message">Fine-grained Usage Help Message</h3>
+<div class="imageblock">
+<div class="content">
+<img src="http://picocli.info/images/sift.png" alt="sift">
+</div>
+</div>
+<div class="paragraph">
+<p>Picocli offers fine-grained control over the usage help message format and this functionality is exposed via the <code>usageMessage</code> CliBuilder property.</p>
+</div>
+<div class="paragraph">
+<p>The usage message has a number of sections: header, synopsis, description, parameters, options and finally the footer. Each section has a heading, that precedes the first line of its section. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">import groovy.cli.picocli.CliBuilder
+
+def cli = new CliBuilder()
+cli.name = &quot;groovy clidemo&quot;
+cli.usageMessage.with {                // (1)
+    headerHeading(&quot;Header heading:%n&quot;) // (2)
+    header(&quot;header 1&quot;, &quot;header 2&quot;)     // (3)
+    synopsisHeading(&quot;%nUSAGE: &quot;)
+    descriptionHeading(&quot;%nDescription heading:%n&quot;)
+    description(&quot;description 1&quot;, &quot;description 2&quot;)
+    optionListHeading(&quot;%nOPTIONS:%n&quot;)
+    footerHeading(&quot;%nFooter heading:%n&quot;)
+    footer(&quot;footer 1&quot;, &quot;footer 2&quot;)
+}
+cli.a(longOpt: &#39;aaa&#39;, &#39;a-arg&#39;)         // (4)
+cli.b(longOpt: &#39;bbb&#39;, &#39;b-arg&#39;)
+cli.usage()
+</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" value="1"></i><b>1</b></td>
+<td>Use the <code>usageMessage</code> CliBuilder property to customize the usage help message.</td>
+</tr>
+<tr>
+<td><i class="conum" value="2"></i><b>2</b></td>
+<td>Headings can contain string format specifiers like the <code>%n</code> newline.</td>
+</tr>
+<tr>
+<td><i class="conum" value="3"></i><b>3</b></td>
+<td>Sections are multi-line: each string will be rendered on a separate line.</td>
+</tr>
+<tr>
+<td><i class="conum" value="4"></i><b>4</b></td>
+<td>Define some options.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>This prints the following output:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Header heading:
+header 1
+header 2
+
+USAGE: groovy clidemo [-ab]
+
+Description heading:
+description 1
+description 2
+
+OPTIONS:
+  -a, --aaa    a-arg
+  -b, --bbb    b-arg
+
+Footer heading:
+footer 1
+footer 2</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_usage_help_with_ansi_colors">Usage Help with ANSI Colors</h3>
+<div class="paragraph">
+<p>Out of the box, the command name, option names and parameter labels in the usage help message are rendered with <a href="http://picocli.info/#_ansi_colors_and_styles">ANSI styles and colors</a>.
+The color scheme for these elements can be <a href="http://picocli.info/#_configuring_fixed_elements">configured</a> with system properties.</p>
+</div>
+<div class="paragraph">
+<p>Other than that, you can use colors and styles in the descriptions and other sections of the usage help message,
+using a <a href="http://picocli.info/#_usage_help_with_styles_and_colors">simple markup notation</a>. The example below demonstrates:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code lang="groovy">def cli = new groovy.cli.picocli.CliBuilder(name: &#39;myapp&#39;)
+cli.usageMessage.with {
+    headerHeading(&quot;@|bold,red,underline Header heading|@:%n&quot;)
+    header($/@|bold,green \
+  ___ _ _ ___      _ _    _
+ / __| (_) _ )_  _(_) |__| |___ _ _
+| (__| | | _ \ || | | / _` / -_) &#39;_|
+ \___|_|_|___/\_,_|_|_\__,_\___|_|
+|@/$)
+    synopsisHeading(&quot;@|bold,underline Usage|@: &quot;)
+    descriptionHeading(&quot;%n@|bold,underline Description heading|@:%n&quot;)
+    description(&quot;Description 1&quot;, &quot;Description 2&quot;)      // after the synopsis
+    optionListHeading(&quot;%n@|bold,underline Options heading|@:%n&quot;)
+    footerHeading(&quot;%n@|bold,underline Footer heading|@:%n&quot;)
+    footer($/@|bold,blue \
+   ___                         ___   ___
+  / __|_ _ ___  _____ ___  _  |_  ) | __|
+ | (_ | &#39;_/ _ \/ _ \ V / || |  / / _|__ \
+  \___|_| \___/\___/\_/ \_, | /___(_)___/
+                        |__/             |@/$)
+}
+cli.a(&#39;option a description&#39;)
+cli.b(&#39;option b description&#39;)
+cli.c(type: List, &#39;option c description&#39;)
+cli.usage()
+</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The code above gives the following output:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://picocli.info/images/CliBuilder2.5-cygwin.png" alt="CliBuilder2.5 cygwin">
+</div>
+</div>
+<div class="paragraph">
+<p>(Credit to <a href="http://patorjk.com/software/taag/">http://patorjk.com/software/taag/</a> for the ASCII art.)</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_new_code_errorwriter_code_property">New <code>errorWriter</code> Property</h3>
+<div class="imageblock">
+<div class="content">
+<img src="http://picocli.info/images/error.png" alt="error">
+</div>
+</div>
+<div class="paragraph">
+<p>When the user provided invalid input, the picocli version of CliBuilder writes an error message and the usage help message to the new <code>errorWriter</code> property (set to <code>System.err</code> by default).
+When the user requests help, and the application calls <code>CliBuilder.usage()</code>, the usage help message is printed to the <code>writer</code> property (<code>System.out</code> by default).</p>
+</div>
+<div class="paragraph">
+<p>Previous versions of CliBuilder used the <code>writer</code> property for both invalid input and user-requested help.</p>
+</div>
+<div class="paragraph">
+<p>Why this change? This helps command line application authors to follow standard practice and separate diagnostic output from the program output: If the output of a Groovy program is piped to another program,
+sending error messages to STDERR prevents the downstream program from inadvertently trying to parse error output.
+On the other hand, when users request help with <code>--help</code> or <code>--version</code>, the output should be sent to STDOUT,
+because the user may want to pipe the output to a utility like <code>less</code> or <code>grep</code>.</p>
+</div>
+<div class="paragraph">
+<p>For backwards compatibility, setting the <code>writer</code> property to another value will also set the <code>errorWriter</code> to the same value.
+(You can still set the <code>errorWriter</code> to another value afterwards if desired.)</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_gotchas_incompatibilities">Gotchas/Incompatibilities</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="http://picocli.info/images/incompatible.jpg" alt="incompatible">
+</div>
+</div>
+<div class="paragraph">
+<p>There are a few areas where the new versions of <code>CliBuilder</code> are not compatible with previous versions or with each other.</p>
+</div>
+<div class="sect2">
+<h3 id="_properties_code_options_code_and_code_formatter_code_unavailable_in_picocli_version">Properties <code>options</code> and <code>formatter</code> Unavailable in Picocli Version</h3>
+<div class="paragraph">
+<p>The Commons CLI version of CliBuilder, and previous versions of CliBuilder, expose an <code>options</code> property of type <code>org.apache.commons.cli.Options</code>, that can be used to configure the underlying Commons CLI parser without going through the CliBuilder API. This property is not available in the picocli version of CliBuilder.
+Applications that read or write this property must import <code>groovy.cli.commons.CliBuilder</code>
+or modify the application.</p>
+</div>
+<div class="paragraph">
+<p>Additionally, the <code>formatter</code> property of type <code>org.apache.commons.cli.HelpFormatter</code> is not available in the picocli version of CliBuilder. If your application uses this property, consider using the <code>usageMessage</code> property instead, or import <code>groovy.cli.commons.CliBuilder</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_property_code_parser_code_differs_in_picocli_and_commons_cli_versions">Property <code>parser</code> Differs in Picocli and Commons CLI Versions</h3>
+<div class="paragraph">
+<p>The picocli version of CliBuilder has a <code>parser</code> property that exposes a <code>picocli.CommandLine.Model.ParserSpec</code> object
+that can be used to configure the parser behavior.</p>
+</div>
+<div class="paragraph">
+<p>The Commons CLI version of CliBuilder, and previous versions of CliBuilder, expose a <code>parser</code> property of type <code>org.apache.commons.cli.CommandLineParser</code>. This functionality is not available in the picocli version of CliBuilder.</p>
+</div>
+<div class="paragraph">
+<p>If your application uses the <code>parser</code> property to set a different Commons CLI parser, consider using the <code>posix</code> property instead, or import <code>groovy.cli.commons.CliBuilder</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_different_parser_behavior_for_code_longoption_code">Different Parser Behavior for <code>longOption</code></h3>
+<div class="paragraph">
+<p>The Commons CLI <code>DefaultParser</code> recognizes <code>longOption</code> option names prefixed with a single hypen (e.g., <code>-option</code>)
+as well as options prefixed with a double hyphen (e.g., <code>--option</code>).
+This is not always obvious since the usage help message only shows the double hyphen prefix for <code>longOption</code> option names.</p>
+</div>
+<div class="paragraph">
+<p>For backwards compatibility, the picocli version of CliBuilder has an <code>acceptLongOptionsWithSingleHyphen</code> property:
+set this property to <code>true</code> if the parser should recognize long option names with both
+a single hyphen and a double hyphen prefix. The default is <code>false</code>,
+so only long option names with a double hypen prefix (<code>--option</code>) are recognized.</p>
+</div>
+</div>
+++++
+
+== Conclusion
+
+Groovy 2.5 CliBuilder offers a host of exciting new features.
+Try it out and let us know what you think!
+
+For reference: Groovy http://groovy-lang.org/[site] and
+GitHub https://github.com/apache/groovy/[mirror],
+picocli http://picocli.info/[site] and
+https://github.com/remkop/picocli[picocli GitHub project].
+Please star the projects if you like what you see!
+
+A copy of this article was previously published on the picocli website. +
+http://picocli.info/groovy-2.5-clibuilder-renewal.html[See the original article here.]
