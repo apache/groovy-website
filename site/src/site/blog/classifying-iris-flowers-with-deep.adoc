@@ -340,12 +340,24 @@ user    0m0.096s
 sys     0m0.029s
 ----
 
-We can see here that the speed has dramatically increased. This is great, but we should note, that using GraalVM often involves some tricky investigation especially for Groovy which by default has its dynamic nature. There are a few features of Groovy which won't be available when using Groovy's static nature and some libraries might be problematical. As an example, Deep Netts has log4j2 as one of its dependencies. At the time of writing, there are still issues using log4j2 with GraalVM. We excluded the `log4j-core` dependency and used `log4j-to-slf4j` backed by `logback-classic` to sidestep this problem.
-
-(*Update*: I put the Deep Netts GraalVM _iris_ application with some more detailed instructions into its own https://github.com/paulk-asert/groovy-data-science/tree/master/subprojects/IrisGraalVM[subproject].)
+We can see here that the speed has dramatically increased. This is great,
+but we should note, that using GraalVM often involves some tricky
+investigation especially for Groovy which by default has its dynamic
+nature. There are a few features of Groovy which won't be available
+when using Groovy's static nature and some libraries might be
+problematical. As an example, Deep Netts has log4j2 as one of its
+dependencies. At the time of writing, there are still issues using
+log4j2 with GraalVM. We excluded the `log4j-core` dependency and used
+`log4j-to-slf4j` backed by `logback-classic` to sidestep this problem.
 
 == Conclusion
 
-We have seen a few different libraries for performing deep learning classification using Groovy.
-Each has its own strengths and weaknesses.
-There are certainly options to cater for folks wanting blinding fast startup speeds through to options which scale to massive computing farms in the cloud.
+We have seen a few different libraries for performing deep learning classification
+using Groovy. Each has its own strengths and weaknesses.
+There are certainly options to cater for folks wanting blinding fast startup speeds
+through to options which scale to massive computing farms in the cloud.
+
+.Update history
+****
+*27/Sep/2022*: I put the Deep Netts GraalVM _iris_ application with some more detailed instructions into its own https://github.com/paulk-asert/groovy-data-science/tree/master/subprojects/IrisGraalVM[subproject].
+****

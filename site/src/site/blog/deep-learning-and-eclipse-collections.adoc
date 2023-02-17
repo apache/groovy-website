@@ -11,6 +11,8 @@ Recently, a couple of the highly recommended katas for Eclipse Collections have 
 revamped to include "pet" and "fruit" emojis for a bit of extra fun. What could be better
 than _Learning_ Eclipse Collections?_Deep Learning_ and Eclipse Collections of course!
 
+== Setting up our model and data
+
 First, we create a `PetType` enum with the emoji as `toString`:
 
 [source,groovy]
@@ -82,7 +84,9 @@ assert counts == expected
 
 As we expect, it passes.
 
-Now, for a bit of fun, we will use a neural network trained to detect cat and dog images and apply it to our emojis. We'll follow the process described http://ramok.tech/2018/01/03/java-image-cat-vs-dog-recognizer-with-deep-neural-networks/[here]. It uses DeepLearning4J to train and then use a model. The images used to train the model were real cat and dog images, not emojis, so we aren't expecting our model to be super accurate.
+== Applying deep learning
+
+Now, for a bit of fun, we will use a neural network trained to detect cat and dog images and apply it to our emojis. We'll follow the process described http://ramok.tech/2018/01/03/java-image-cat-vs-dog-recognizer-with-deep-neural-networks/[here]. It uses https://deeplearning4j.konduit.ai/[Eclipse DeepLearning4j] to train and then use a model. The images used to train the model were real cat and dog images, not emojis, so we aren't expecting our model to be super accurate.
 
 The first attempt was to write the emojis into swing JLabel components and then save using a buffered image. This lead to poor looking images:
 
@@ -122,15 +126,15 @@ Note that the model exceeds the maximum allowable size for normal GitHub repos, 
 
 When we run the script, we get the following output:
 
-[source]
+[subs="quotes"]
 ----
-[main] INFO org.nd4j.linalg.factory.Nd4jBackend - Loaded [CpuBackend] backend
+[maroon]##[main] INFO org.nd4j.linalg.factory.Nd4jBackend - Loaded [CpuBackend] backend
 ...
 [main] INFO org.nd4j.linalg.api.ops.executioner.DefaultOpExecutioner - Blas vendor: [OPENBLAS]
 ...
-==============================================================================================================
+==========================================================================================
 VertexName (VertexType)                 nIn,nOut       TotalParams    ParamsShape                    Vertex Inputs
-==============================================================================================================
+==========================================================================================
 input_1 (InputVertex)                   -,-            -              -                              -
 block1_conv1 (Frozen ConvolutionLayer)  3,64           1792           b:{1,64}, W:{64,3,3,3}         [input_1]
 block1_conv2 (Frozen ConvolutionLayer)  64,64          36928          b:{1,64}, W:{64,64,3,3}        [block1_conv1]
@@ -154,12 +158,12 @@ flatten (PreprocessorVertex)            -,-            -              -         
 fc1 (Frozen DenseLayer)                 25088,4096     102764544      b:{1,4096}, W:{25088,4096}     [flatten]
 fc2 (Frozen DenseLayer)                 4096,4096      16781312       b:{1,4096}, W:{4096,4096}      [fc1]
 predictions (OutputLayer)               4096,2         8194           b:{1,2}, W:{4096,2}            [fc2]
---------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
             Total Parameters:  134268738
         Trainable Parameters:  8194
            Frozen Parameters:  134260544
-==============================================================================================================
-...
+==========================================================================================
+...##
 Tabby is a cat
 Dolly is a cat
 Spot is a dog
