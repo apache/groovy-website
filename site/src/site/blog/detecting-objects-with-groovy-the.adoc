@@ -119,18 +119,20 @@ dependencies {
 
 We run the application with the gradle `run` task:
 
-```sh
-paulk@pop-os:/extra/projects/groovy-data-science$ ./gradlew DLMXNet:run
+[subs="quotes"]
+----
+[lime]#paulk@pop-os#:[blue]##/extra/projects/groovy-data-science##$ ./gradlew DLMXNet:run
 > Task :DeepLearningMxnet:run
-Downloading: 100% |████████████████████████████████████████| dog-ssd.jpg
-Loading:     100% |████████████████████████████████████████|
+Downloading: 100% |[olive]#████████████████████████████████████████#| dog-ssd.jpg
+Loading:     100% |[olive]#████████████████████████████████████████#|
 ...
-class: "car", probability: 0.99991, bounds: [x=0.611, y=0.137, width=0.293, height=0.160]
-class: "bicycle", probability: 0.95385, bounds: [x=0.162, y=0.207, width=0.594, height=0.588]
-class: "dog", probability: 0.93752, bounds: [x=0.168, y=0.350, width=0.274, height=0.593]
-```
+class: [green]*"car"*, probability: *0.99991*, bounds: [x=0.611, y=0.137, width=0.293, height=0.160]
+class: [green]*"bicycle"*, probability: *0.95385*, bounds: [x=0.162, y=0.207, width=0.594, height=0.588]
+class: [green]*"dog"*, probability: *0.93752*, bounds: [x=0.168, y=0.350, width=0.274, height=0.593]
+----
 
 The displayed image looks like this:
+
 image:img/detected_objects.png[Detected objects,468]
 
 == Further Information
@@ -140,4 +142,8 @@ https://github.com/paulk-asert/groovy-data-science/subprojects/DeepLearningMxnet
 
 == Conclusion
 
-We have examined using Apache Groovy, DLJ and Apache MXNet to detect objects within an image. We've used a model based on a rich deep learning model, but we didn't need to get into the details of the model or its neural network layers. DLJ and Apache MXNet did the hard lifting for us. Groovy provided a simple coding experience for building our application.
+We have examined using Apache Groovy, DLJ and Apache MXNet to detect objects
+within an image. We've used a model based on a rich deep learning model, but we
+didn't need to get into the details of the model or its neural network layers.
+DLJ and Apache MXNet did the hard lifting for us. Groovy provided a simple coding
+experience for building our application.

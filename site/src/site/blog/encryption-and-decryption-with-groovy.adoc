@@ -13,8 +13,8 @@ First, we need some text to encrypt. We'll use an excerpt of the one from the af
 
 [source,groovy]
 ----
-var text = 'Contrary to popular belief, Lorem Ipsum is not simply random text.\
- It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.'
+var text = 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has \
+roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.'
 ----
 
 Next, we'll create a factory for our cipher instance, generate a key, and set up an initialization vector.
@@ -102,7 +102,7 @@ Which has this output:
 [source]
 ----
 Encrypted bytes : [-117, 36, 18, 69, -101, -8, 35, 93, -102, -49, -12, …, -19, -100]
-Encrypted text : ‹$E›ø#]šÏôæ”Á˜çp^µ³=L(Ö^_ŒC&gt;CIË„ö,1É8ÆŸ.Š?vßG,Èw‰å¼zÜf&gt;?µ›D¹éÆk€ °˜2êÔ}í©àhl$&gt;?¹¡Kå3ÔO?±&amp;…êî¶Ê–¾°®q®à—0ú‘ÔhO&lt;H¦ç®Ç”ÈhAëjó QPyƒy6Ä¤*´un¼ï¯m¨´ÙjeJtëº\ó6ÆªKªœíœ
+Encrypted text : ‹$E›ø#]šÏôæ”Á˜çp^µ³=L(Ö^_ŒC>CIË„ö,1É8ÆŸ.Š?vßG,Èw‰å¼zÜf>?µ›D¹éÆk€ °˜2êÔ}í©àhl$>?¹¡Kå3ÔO?±&…êî¶Ê–¾°®q®à—0ú‘ÔhO<H¦ç®Ç”ÈhAëjó QPyƒy6Ä¤*´un¼ï¯m¨´ÙjeJtëº\ó6ÆªKªœíœ
 Decrypted bytes : [67, 111, 110, 116, 114, 97, 114, 121, 32, 116, 111, 32, …, 100, 46]
 Decrypted text : Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 ----
@@ -148,7 +148,7 @@ Which has this output:
 
 [source]
 ----
-Encrypted text : Mªá?r?v9£÷~4µT'›ÙÝÁl¿Þg¾0ñŽ¡?Ü=³9Q¬»3«ÖÁ¡µ ¾@4÷`FñÙŠfø7¥#›v¤Í–‰¼Ü¢ƒE6ôŽTÙlæÏz&gt;o?àL›¡¢z1nÖo9]šOÔ¼SÔOÍ#Ý7LœÀî}ó5m%q•»l%/AWT´¢zH#tì†±l¶£—Œ«©wˆÃ®&gt;®Ü6ër-E
+Encrypted text : Mªá?r?v9£÷~4µT'›ÙÝÁl¿Þg¾0ñŽ¡?Ü=³9Q¬»3«ÖÁ¡µ ¾@4÷`FñÙŠfø7¥#›v¤Í–‰¼Ü¢ƒE6ôŽTÙlæÏz>o?àL›¡¢z1nÖo9]šOÔ¼SÔOÍ#Ý7LœÀî}ó5m%q•»l%/AWT´¢zH#tì†±l¶£—Œ«©wˆÃ®>®Ü6ër-E
 Decrypted text : Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
 ----
 
