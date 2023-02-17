@@ -133,6 +133,18 @@ s = 9, e = 5, n = 6, d = 7
 m = 1, o = 0, r = 8, y = 2
 ----
 
+== Using Constraint Programming
+
+For the brute force approaches, we had a condition which checked any
+potential candidate answer to see if it was a correct solution. We had
+to be very explicit in how we wanted the potential candidates to be
+created. For constraint programming, we instead define variables to
+represent the problem, any known bounds on those variables, and we
+specify any other known properties of the solution, which in our case
+will be something similar to the condition we had to check if the
+answer was correct previously. Let's examine how to do that with
+three libraries, one with a variation.
+
 == Choco
 
 Here is the code using the https://choco-solver.org/[Choco]
@@ -339,6 +351,8 @@ programming libraries seem to be using the direct library classes.
 Indeed, the version of the Choco implementation used by the JSR331
 implementation is over 10 years old.
 
+=== Incorporating Carry
+
 The scalar product global constraint we have used in the previous
 examples is very powerful and probably would be our first choice
 for this problem. We can, however, model constraint programming
@@ -392,6 +406,8 @@ accurately a snapshot of ever-changing temporary calculations.
 They don't form part of the answer that interests us, so we would
 be free to just print out the part of the solution which interests
 us if we wanted.
+
+=== Creating a DSL
 
 The previous example has lots of calls to `add` and `mul` methods.
 We can create a little bit of a DSL to provide some syntactic

@@ -4,6 +4,7 @@ Paul King
 :keywords: groovy, java, spock, testing, jqwik, pitest, junit, jacoco
 :description: This post looks at testing Java using Groovy, Spock, JUnit5, Jacoco, Jqwik and Pitest
 
+image:img/spock_logo.png[spock logo,100,float="right"]
 This blog post covers a common scenario seen in the Groovy community which is
 projects which use Java for their production code and Groovy for their tests.
 This can be a low risk way for Java shops to try out and become more familiar
@@ -63,7 +64,7 @@ image:img/MathUtilJacocoReport.png[MathUtilSpec coverage report]
 
 We'll swap to use Spock's data-driven feature and include an additional testcase:
 
-[source,groovy]
+[source,groovy,subs="quotes"]
 ----
 def "sum of two biggest numbers"(int a, int b, int c, int d) {
     expect:
@@ -72,7 +73,7 @@ def "sum of two biggest numbers"(int a, int b, int c, int d) {
     where:
     a | b | c | d
     2 | 5 | 3 | 8
-    5 | 2 | 3 | 8
+    **5 | 2 | 3 | 8**
 }
 ----
 
@@ -83,7 +84,7 @@ image:img/MathUtilJacocoReport2.png[MathUtilSpec coverage report]
 That is a little better. We now have 100% line coverage but not 100% branch coverage.
 Let's add one more testcase:
 
-[source,groovy]
+[source,groovy,subs="quotes"]
 ----
 def "sum of two biggest numbers"(int a, int b, int c, int d) {
     expect:
@@ -93,7 +94,7 @@ def "sum of two biggest numbers"(int a, int b, int c, int d) {
     a | b | c | d
     2 | 5 | 3 | 8
     5 | 2 | 3 | 8
-    5 | 4 | 1 | 9
+    **5 | 4 | 1 | 9**
 }
 ----
 
@@ -104,7 +105,7 @@ image:img/MathUtilJacocoReport3.png[MathUtilSpec coverage report]
 At this point, we might be very confident in our code and ready to ship it to production.
 Before we do, we'll add one more testcase:
 
-[source,groovy]
+[source,groovy,subs="quotes"]
 ----
 def "sum of two biggest numbers"(int a, int b, int c, int d) {
     expect:
@@ -115,7 +116,7 @@ def "sum of two biggest numbers"(int a, int b, int c, int d) {
     2 | 5 | 3 | 8
     5 | 2 | 3 | 8
     5 | 4 | 1 | 9
-    3 | 2 | 6 | 9
+    **3 | 2 | 6 | 9**
 }
 ----
 

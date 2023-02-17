@@ -228,13 +228,13 @@ surefire plugin will use that by default and not find our test.
 
 Running the test should yield:
 
+[subs="quotes,macros"]
 ----
-[INFO] -------------------------------------------------------
-[INFO]  T E S T S
-[INFO] -------------------------------------------------------
-[INFO] Running JsonTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.36 s - in JsonTest
-Advanced features
+pass:v[[][blue]#INFO#] ------------------------------------------------------
+pass:v[[][blue]#INFO#]  T E S T S
+pass:v[[][blue]#INFO#] ------------------------------------------------------
+pass:v[[][blue]#INFO#] Running JsonTest
+pass:v[[][blue]#INFO#] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.36 s - in JsonTest
 ----
 
 == Advanced features
@@ -315,7 +315,7 @@ GINQ or GQuery. We can use that with JSON too.
 Suppose we have information in JSON format about fruits, their
 prices (per 100g) and the concentration of vitamin C (per 100g):
 
-[source,groovy]
+[source,json]
 ----
 {
     "prices": [
@@ -347,13 +347,13 @@ when we go shopping. Our GQuery processing looks like this:
 ----
 def jsonFile = new File('fruit.json')
 def json = new JsonSlurper().parse(jsonFile)
-assert GQ {
+assert GQL {
     from p in json.prices
     join c in json.vitC on c.name == p.name
     orderby c.conc / p.price in desc
     limit 2
     select p.name
-}.toList() == ['Kakuda plum', 'Kiwifruit']
+} == ['Kakuda plum', 'Kiwifruit']
 ----
 
 We can see, for this data, Kakadu plums followed by Kiwifruit
@@ -379,6 +379,7 @@ $ time groovy GroovyJsonIndexOverlay.groovy
 real    0m1.365s
 user    0m4.157s
 sys     0m0.145s
+
 $ time groovy GroovyJsonCharacterSource.groovy
 real    0m1.447s
 user    0m4.472s
