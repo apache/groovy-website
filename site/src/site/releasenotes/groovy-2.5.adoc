@@ -549,7 +549,7 @@ groovy:000>
 * Groovy's CliBuilder now supports annotation style definitions
 (link:https://issues.apache.org/jira/browse/GROOVY-7825[GROOVY-7825]).
 * Revamped versions of CliBuilder now exist supporting Commons CLI and Picocli backed implementations. See
-this https://blogs.apache.org/logging/entry/groovy-2-5-clibuilder-renewal[blog post] for more details.
+this https://groovy.apache.org/blog/groovy-2-5-clibuilder-renewal[blog post] for more details.
 
 [[Groovy2.5releasenotes-OtherImprovements]]
 == Other improvements
