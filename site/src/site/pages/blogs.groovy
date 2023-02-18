@@ -12,7 +12,7 @@ layout 'layouts/main.groovy', true,
                 yieldUnescaped '''
                 var blogList = new List('blog-list', {
                     valueNames: ['name'],
-                    page: 9,
+                    page: 10,
                     pagination: true
                 });
                 var blogIndex = new List('blog-index', {
