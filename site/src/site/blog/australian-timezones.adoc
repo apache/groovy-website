@@ -150,8 +150,9 @@ _Summer:_ UTC +11
 | Mawson Antarctic Station
 |===
 
-Most countries have whole number zone offsets, but you
-should notice that Australia has many 30-minute offsets too.
+The first thing you might notice, is that's quite a few time zones!
+Secondly, most countries have whole number zone offsets, but you
+should notice that Australia has several 30-minute offsets too.
 Ken mentioned that 45-minute offsets are even rarer (3 in the world).
 Let's look at Australia's contribution to that exclusive club:
 
@@ -261,6 +262,8 @@ months leave the terminal in one time zone and take off from the ground in anoth
 This has the potential to severely muck up the airlines _departed-on-time_ statistics!
 Thankfully the airport chooses to operate exclusively on Queensland time to avoid
 any potential confusion.
+
+image:https://www.wearegoldcoast.com.au/wp-content/uploads/2021/04/ryanfowlerphotography.jpg[Fireworks on the Gold Coast,600]
 
 Incidentally, if you love to celebrate New Year's Eve, Gold Coast might be the
 perfect destination. You can party and watch fireworks in Tweed Heads before heading
