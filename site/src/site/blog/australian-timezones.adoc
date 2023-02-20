@@ -1,6 +1,6 @@
 = Australian Time Zones
 Paul King
-:revdate: 2023-02-202T20:00:00+00:00
+:revdate: 2023-02-20T20:00:00+00:00
 :keywords: groovy, datetime, timezone, date
 :description: Inspired by a recent update related to Antarctic timezones, this post looks at some interesting Australian time zone facts.
 
@@ -194,7 +194,8 @@ https://en.wikipedia.org/wiki/Time_in_Australia#:~:text=The%20Indian%20Pacific%2
 We won't follow this unofficial timezone in our later exploration,
 but it would add another to our list if we wanted to include it too!
 
-Another strange timezone fact applies to the pristine Lord Howe Island.
+Another strange timezone fact applies to the pristine
+https://lordhoweisland.info/[Lord Howe Island].
 Lord Howe Island is a little over 600 km out from the north coast of New South Wales.
 That's about 1/4 of the way to New Zealand! Being that far East of the mainland,
 it rightly has a timezone 30 minutes earlier than the mainland.
@@ -251,3 +252,16 @@ The two assertions pass and the final println has the following output:
 ----
 [+10:00, +11:00, +07:00, +08:45, +09:30, +10:30, +05:00, +08:00, +06:30, +12:00]
 ----
+
+Just one final timezone obscurity to wrap up.
+
+The Queensland-New South Wales border actually cuts Gold Coast Airport almost
+precisely in half, including the runway. Technically, flights departing in the summer
+months leave the terminal in one time zone and take off from the ground in another.
+This has the potential to severely muck up the airlines _departed-on-time_ statistics!
+Thankfully the airport chooses to operate exclusively on Queensland time to avoid
+any potential confusion.
+
+Incidentally, if you love to celebrate New Year's Eve, Gold Coast might be the
+perfect destination. You can party and watch fireworks in Tweed Heads before heading
+just 10s of metres North to count down to midnight all over again, just one hour later.
