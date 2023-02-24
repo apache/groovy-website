@@ -17,6 +17,67 @@ Some features described here as "incubating" may become stable before 5.0.0 fina
 [[Groovy5.0-new]]
 == New features
 
+=== Extension method additions and improvements
+
+There are some additional extension methods for `File` objects:
+
+[source,groovy]
+----
+def myscript = new File('MyScript.groovy')
+assert myscript     // Groovy truth: true if the file exists
+assert myscript.extension == 'groovy'
+assert myscript.baseName == 'MyScript'
+----
+
+And similar methods for `Path` objects:
+[source,groovy]
+----
+def mypic = path.resolve('MyFigure.png')
+assert mypic       // Groovy truth: true if the file exists
+assert mypic.extension == 'png'
+assert mypic.baseName == 'MyFigure'
+----
+
+There are additional variants of `collectEntries` for arrays, iterables and iterators
+with separate functions for transforming the keys and values. There are variants
+with and without collectors.
+There are also variants which transform just the key or value.
+The `withCollectedKeys` method collects key/value pairs for each item with the
+item as the value and the key being the item transformed by the supplied function.
+The `withCollectedValues` method collects key/value pairs for each item with the
+item as the key and the value being the item transformed by the supplied function.
+
+[source,groovy]
+----
+def languages = ['Groovy', 'Java', 'Kotlin', 'Scala']
+
+def collector = [clojure:7]
+assert languages.collectEntries(collector, String::toLowerCase, String::size) ==
+    [clojure:7, groovy:6, java:4, kotlin:6, scala:5]
+assert languages.withCollectedKeys(s -> s.take(1)) ==
+    [G:'Groovy', J:'Java', K:'Kotlin', S:'Scala']
+assert languages.withCollectedValues(s -> s.size()) ==
+    [Groovy:6, Java:4, Kotlin:6, Scala:5]
+----
+
+There are also equivalent variants for maps. The `collectEntries` method
+takes separate functions for transforming the keys and values.
+The `collectKeys` and `collectValues` variants take a single function
+for transforming just the keys and values respectively.
+
+[source,groovy]
+----
+def lengths = [Groovy:6, Java:4, Kotlin:6, Scala:5]
+
+assert lengths.collectEntries(String::toLowerCase, { it ** 2 }) ==
+    [groovy:36, java:16, kotlin:36, scala:25]
+assert lengths.collectKeys{ it[0] } == [G:6, J:4, K:6, S:5]
+assert lengths.collectValues(Math.&pow.rcurry(2)) ==
+    [Groovy:36.0, Java:16.0, Kotlin:36.0, Scala:25.0]
+assert lengths.collectValues(Math.&pow.curry(2).memoize()) ==
+    [Groovy:64.0, Java:16.0, Kotlin:64.0, Scala:32.0]
+----
+
 [[Groovy5.0-other]]
 == Other improvements
 
