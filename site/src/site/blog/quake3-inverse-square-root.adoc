@@ -1,0 +1,388 @@
+= Quake III Arena and the fast inverse square root algorithm
+Paul King
+:revdate: 2023-02-28T00:05:18+00:00
+:keywords: groovy
+:description: Inspired by a recent tweet, this blog \
+looks at the fast inverse square root algorithm made famous in Quake III Arena.
+
+== Introduction
+
+In 1999, https://www.idsoftware.com/[id Software] released
+https://en.wikipedia.org/wiki/Quake_III_Arena[Quake III Arena],
+a multiplayer first-person shooter.
+
+image:https://cdn.80.lv/api/upload/content/b4/images/612db4a5b4d6c/widen_1840x0.jpeg[Quake III,460]
+
+When the game's source code was released to the world,
+it contained a previously unknown algorithm called the
+https://en.wikipedia.org/wiki/Fast_inverse_square_root[Fast Inverse Square Root].
+We don't plan to explain the algorithm in depth but its significance at the time
+is that it provided a very good approximation to the equation
+stem:[f(x) = 1/sqrt(x)]
+which is used for vector normalization and other math behind the game which is used extensively for numerous graphical aspects including 3D shading.
+The fast algorithm was 3-4 times faster at calculating the answer than using the
+traditional math libraries and the results were within < 0.2%.
+
+Here is the code:
+
+[source,c]
+----
+float Q_rsqrt( float number )
+{
+	long i;
+	float x2, y;
+	const float threehalfs = 1.5F;
+
+	x2 = number * 0.5F;
+	y  = number;
+	i  = * ( long * ) &y;                       // evil floating point bit level hacking
+	i  = 0x5f3759df - ( i >> 1 );               // what the f☼⁕k?
+	y  = * ( float * ) &i;
+	y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
+//	y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
+
+	return y;
+}
+----
+
+Why does it look strange? There are numerous parts which you wouldn't expect
+to be part of a square root calculation. There's some tricks for converting
+to and from float and long IEEE 754 32-bit representations, a "magic" constant,
+some bit shifting, and a touch of Newton's method throw in for good measure.
+
+The details have been explained in some detail in numerous blogs, e.g.
+https://suraj.sh/fast-square-root-approximation/[Fast Square Root Approximation]
+and
+https://betterexplained.com/articles/understanding-quakes-fast-inverse-square-root/[Understanding Quake’s Fast Inverse Square Root],
+and videos, e.g.
+https://www.youtube.com/watch?v=p8u_k2LIZyo[Fast Inverse Square Root — A Quake III Algorithm] and
+https://80.lv/articles/quake-iii-arena-s-unknown-algorithm-explained/[Quake III Arena's Unknown Algorithm Explained].
+There are even sites which show the algorithm for
+https://github.com/itchyny/fastinvsqrt[numerous languages] (including Groovy).
+
+Not long after the game's release, Intel added
+https://c9x.me/x86/html/file_module_x86_id_301.html[SQRTSS] and
+https://c9x.me/x86/html/file_module_x86_id_283.html[RSQRTSS]
+instructions to x86 processors.
+Here is one of the JDK enhancements to provide
+https://bugs.openjdk.org/browse/JDK-6452568[SQRTSS support for float Math.sqrt()].
+There are later blogs which explain that, due to these and other hardware advances,
+the algorithm is now mostly only relevant for historical folklore reasons, e.g.
+https://levelup.gitconnected.com/death-of-quake-3s-inverse-square-root-hack-32fd2eadd7b7[Death of Quake 3’s Inverse Square Root Hack] and
+https://www.linkedin.com/pulse/fast-inverse-square-root-still-armin-kassemi-langroodi/[Is Fast Inverse Square Root still Fast?].
+
+Let's have a look at a few alternatives for calculating the inverse square root
+including two variants of the fast inverse square root algorithm.
+We'll do this for Java and Groovy, and look at both `float` and `double` implementations. We could go further and try different numbers of iterations
+of the Newton's method correction, but we'll leave that as an exercise for the reader. 😊
+
+== Java Float implementations
+
+There are numerous places to see Java examples of the algorithm
+and numerous ways you could run a microbenchmark. We are using
+code somewhat similar to this
+https://gist.github.com/ClickerMonkey/adc35fece77eff67dfc3[gist].
+We could have been more elaborate and used
+https://github.com/openjdk/jmh[jmh], but we aren't
+trying to do a comprehensive performance analysis here,
+we just want some rough ballpark numbers. Perhaps that is
+the topic for a subsequent blog.
+
+As with all microbenchmarks, you should exercise extreme caution
+before applying too much weight to the results. The numbers will be
+different  on different machines, with different Java and Groovy
+versions and so forth. We used Groovy 4.0.8 and Java 17.0.2.
+
+We start with the most obvious implementation which is
+to use the `Math.sqrt` method which takes and returns a `double`:
+
+[source,java]
+----
+public static float invsqrt0(float x) {                   // Java
+    return 1.0f / (float)Math.sqrt(x);
+}
+----
+
+Compared to the C implementation above,
+Java doesn't have the bit casting trick, but it does have its own
+methods for getting at the bit representation:
+
+[source,java]
+----
+public static float invsqrt1(float x) {                   // Java
+    float xhalf = 0.5f * x;
+    int i = Float.floatToIntBits(x);
+    i = 0x5f3759df - (i >> 1);
+    x = Float.intBitsToFloat(i);
+    x = x * (1.5f - (xhalf * x * x));
+    return x;
+}
+----
+
+As an alternative, we can use a byte buffer to mangle the bits back and forth:
+
+[source,java]
+----
+private static ByteBuffer buf = ByteBuffer.allocateDirect(4);      // Java
+
+public static float invsqrt2(float x) {
+    float xhalf = 0.5f * x;
+    int i = buf.putFloat(0, x).getInt(0);
+    i = 0x5f3759df - (i >> 1);
+    x = buf.putInt(0, i).getFloat(0);
+    x = x * (1.5f - (xhalf * x * x));
+    return x;
+}
+----
+
+== Java Double implementations
+
+Again, we'll start with the obvious implementation:
+
+[source,java]
+----
+public static double invsqrt0(double x) {                   // Java
+    return 1.0d / Math.sqrt(x);
+}
+----
+
+Again, using the built-in methods for getting at the bit representation:
+
+[source,java]
+----
+public static double invsqrt1(double x) {                   // Java
+    double xhalf = 0.5d * x;
+    long i = Double.doubleToLongBits(x);
+    i = 0x5fe6ec85e7de30daL - (i >> 1);
+    x = Double.longBitsToDouble(i);
+    x *= (1.5d - xhalf * x * x);
+    return x;
+}
+----
+
+The code resembles the float version but the "magic" constant has
+changed for doubles.
+
+The byte buffer alternative:
+
+[source,java]
+----
+private static ByteBuffer buf = ByteBuffer.allocateDirect(8);      // Java
+
+public static double invsqrt2(double x) {
+    double xhalf = 0.5d * x;
+    long i = buf.putDouble(0, x).getLong(0);
+    //long i = Double.doubleToLongBits(x);
+    i = 0x5fe6ec85e7de30daL - (i >> 1);
+    x = buf.putLong(0, i).getDouble(0);
+    x *= (1.5d - xhalf * x * x);
+    return x;
+}
+----
+
+We can also for comparison try the `Math.pow` method:
+
+[source,java]
+----
+public static double invsqrt3(double x) {                   // Java
+    return Math.pow(x, -0.5d);
+}
+----
+
+(We could have done this for `float` too but it doesn't add much to our analysis
+since it would call through to this double method anyway.)
+
+== Groovy Float implementations
+
+All these examples are compiled with static compilation enabled.
+We want speed and aren't doing any metaprogramming, so we don't
+need Groovy's dynamic capabilities.
+
+Our code looks similar to Java for the obvious case:
+
+[source,groovy]
+----
+static float invsqrt0(float x) {
+    1.0f / Math.sqrt(x)
+}
+----
+
+Again, the code is similar to Java for the fast algorithm:
+
+[source,groovy]
+----
+static float invsqrt1(float x) {
+    float xhalf = 0.5f * x
+    int i = Float.floatToIntBits(x)
+    i = 0x5f3759df - (i >> 1)
+    x = Float.intBitsToFloat(i)
+    x *= 1.5f - (xhalf * x * x)
+}
+----
+
+And again with the byte buffer:
+
+[source,groovy]
+----
+private static ByteBuffer buf = ByteBuffer.allocateDirect(8)
+
+static float invsqrt2(float x) {
+    float xhalf = 0.5f * x
+    int i = buf.putDouble(0, x).getInt(0)
+    i = 0x5f3759df - (i >> 1)
+    x = buf.putInt(0, i).getDouble(0)
+    x *= 1.5f - (xhalf * x * x)
+}
+----
+
+We can also try Groovy's `**` operator (`power` method):
+
+[source,groovy]
+----
+static float invsqrt4(float x) {
+    (x ** -0.5).floatValue()
+}
+----
+
+== Groovy Double implementations
+
+The standard method should look familiar by now:
+
+[source,groovy]
+----
+static double invsqrt0(double x) {
+    1.0d / Math.sqrt(x)
+}
+----
+
+The fast algorithm:
+
+[source,groovy]
+----
+static double invsqrt1(double x) {
+    double xhalf = 0.5d * x
+    long i = Double.doubleToLongBits(x)
+    i = 0x5fe6ec85e7de30daL - (i >> 1)
+    x = Double.longBitsToDouble(i)
+    x *= (1.5d - xhalf * x * x)
+}
+----
+
+Incorporating the byte buffer:
+
+[source,groovy]
+----
+private static ByteBuffer buf = ByteBuffer.allocateDirect(8)
+
+static double invsqrt2(double x) {
+    double xhalf = 0.5d * x
+    long i = buf.putDouble(0, x).getLong(0)
+    i = 0x5fe6ec85e7de30daL - (i >> 1)
+    x = buf.putLong(0, i).getDouble(0)
+    x *= (1.5d - xhalf * x * x)
+}
+----
+
+Using `Math.pow`:
+
+[source,groovy]
+----
+static double invsqrt3(double x) {
+    Math.pow(x, -0.5d)
+}
+----
+
+Groovy's `**` operator (`power` method) again:
+
+[source,groovy]
+----
+static double invsqrt4(double x) {
+    (x ** -0.5).doubleValue()
+}
+----
+
+== Results
+
+Here are the results of executing the above methods.
+We used a harness similar to the previously mentioned
+https://gist.github.com/ClickerMonkey/adc35fece77eff67dfc3[gist],
+but found the inverse square root of 100_000 random numbers
+instead of 10_000, and we used 1000 iterations in the timing loop
+and found the average execution time per 100_000 calculations.
+
+[cols="2,1,1,1,1"]
+|===
+| Algorithm vs Implementation +
+(times m/s) |Java Float |Java Double |Groovy Float |Groovy Double
+
+|Math.sqrt
+|0.216
+|0.254
+|0.359
+|0.245
+
+|Fast inverse square root
+|0.230
+|0.236
+|0.357
+|0.127
+
+|Fast inverse square root with byte buffer
+|0.337
+|0.364
+|0.486
+|0.187
+
+|Math.pow(x, -0.5d)
+|
+|8.949
+|
+|8.997
+
+|x ** -0.5
+|
+|
+|0.737
+|1.807
+|===
+
+== Analysis
+
+For all the examples, using the byte buffer was always slower than the original
+algorithm, so we can rule that out as an optimization. We can also rule out using
+the `Math.pow` method. It is much slower than `Math.sqrt`. Interesting though,
+Groovy's `**` operator (`power` method) while still a slower option was
+significantly better than the JDK library `pow` implementation.
+
+The Java fast algorithm was slower for float and only marginally faster
+for doubles. It seems unlikely in most scenarios that taking on the extra
+code complexity is worth the small gain in performance.
+
+The Groovy float implementations are a little slower. This is due to Groovy
+doing most of the calculations using doubles and converting back to floats
+in between steps. That is an area for possible optimization in the future.
+
+The Groovy double implementations are at least as fast as Java.
+Interesting, the fast algorithms seem to be even faster in Groovy.
+These do seem worthwhile investigating further if you really need the speed,
+but given the extra precision of doubles, you might want to run extra
+Newton method iterations and those iterations might eat into any time saving.
+
+For interest, the errors for the fast algorithm for the random numbers
+was very close to 6E-5 for all implementations.
+
+== Conclusion
+
+We've done a little microbenchmark using Java and Groovy for the
+fast inverse square root algorithm. The result?
+You probably don't need to ever worry about the fast inverse
+square root algorithm anymore! But if you really have the need,
+it is still relatively fast, but you should benchmark your application
+and see if it really helps.
+
+== References
+
+* https://en.wikipedia.org/wiki/Fast_inverse_square_root[Fast inverse square root on Wikipedia]
+* https://medium.com/hard-mode/the-legendary-fast-inverse-square-root-e51fee3b49d9[History behind the algorithm]
+* http://www.lomont.org/papers/2003/InvSqrt.pdf[Fast Inverse Square Root paper]
+* https://www.slideshare.net/maksym_zavershynskyi/fast-inverse-square-root[Behind the Performance of Quake 3 Engine: Fast Inverse Square Root]
