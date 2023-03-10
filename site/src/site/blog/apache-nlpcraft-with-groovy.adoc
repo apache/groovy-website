@@ -91,11 +91,10 @@ the `ls` intent was triggered.
 
 When we run this script, our assertions pass, and the output is:
 
-[subs="quotes"]
 ----
-Lights are [lime]*[on]* in [blue]*[master bedroom]*.
-Lights are [red]*[off]* in [blue]*[entire house]*.
-Lights are [lime]*[on]* in [blue]*[1st floor, garage]*.
+Lights are [on] in [master bedroom].
+Lights are [off] in [entire house].
+Lights are [on] in [1st floor, garage].
 ----
 
 == Further information
