@@ -1,0 +1,103 @@
+= Converting natural language into actions with NLPCraft and Groovy
+Paul King
+:revdate: 2023-03-10T19:22:57+00:00
+:keywords: groovy, natural language processing, nlp, nlpcraft
+:description: This blog looks at using Apache NLPCraft from Groovy.
+
+This blog looks at using
+https://nlpcraft.apache.org/index.html[Apache NLPCraft]
+with Groovy.
+
+Apache NLPCraft (incubating) is a library for converting
+natural language into actions.
+It is designed around an advanced Intent Definition Language (IDL) for
+defining natural language _intents_ and a fully deterministic intent
+matching algorithm.
+
+
+The
+https://github.com/paulk-asert/groovy-data-science[groovy-data-science]
+GitHub repo has an example using the previous 0.9.0 version of Apache NLPCraft.
+The earlier version supported Java, Scala2, Kotlin and Groovy.
+The
+https://github.com/paulk-asert/groovy-data-science/blob/master/subprojects/LanguageProcessingNLPCraft/src/main/groovy/Lights.groovy[example] in the
+https://github.com/paulk-asert/groovy-data-science/blob/master/subprojects/LanguageProcessingNLPCraft/[LanguageProcessingNLPCraft] project showed how
+to interact with models in all 4 of those languages.
+
+The project recently announced the release of version
+https://nlpcraft.apache.org/relnotes/release-notes-1.0.0.html[1.0.0]
+which represents a deep refactoring over 18 months.
+The new version offers many enhancements and supports Scala3 for its models.
+If you are going to be using NLPCraft extensively, then Scala3
+is probably your best choice as programming language. Having said that,
+since we are on the JVM, certain integration steps aren't too hard.
+We'll show using Groovy as the client language.
+
+First, a bit of background about the example.
+We are trying to determine the intent behind English language
+commands to turn lights on and off in a house.
+We define a model using a combination of
+https://nlpcraft.apache.org/examples/light_switch.html#model[YAML]
+and
+https://nlpcraft.apache.org/examples/light_switch.html#code[Scala3 code].
+The key thing to note is that the model is made up of a number of action
+keywords and locations. If these are matched, the lightswitch (`ls`) intent
+is triggered.
+Actions and locations will become more obvious soon in our example.
+
+Our example uses an English language model but NLPCraft can support any language.
+They provide the lightswitch model also in
+https://nlpcraft.apache.org/examples/light_switch_fr.html[French] and other languages.
+
+We also need to add NLPCraft dependencies: `org.apache.nlpcraft:nlpcraft:1.0.0`
+and `org.apache.nlpcraft:nlpcraft-example-lightswitch:1.0.0` (for a pre-compiled model). You can use `@Grab` statements in your script or add the dependencies to your build file.
+
+NOTE: Depending on the Groovy version and modules you are using, if you see exceptions
+complaining about Jackson databind versions, simply exclude the Jackson versions
+Groovy is referencing. They are more recent than what Scala is expecting.
+
+Finally, here is the Groovy code:
+
+[source,groovy]
+----
+import org.apache.nlpcraft.*
+import org.apache.nlpcraft.examples.lightswitch.LightSwitchModel
+import scala.util.Using
+import static scala.collection.immutable.HashMap$.MODULE$ as ScalaMap
+
+var data = ScalaMap.empty()  // no optional data
+var user = 'someUserId'
+var expectedIntent = 'ls'    // from model
+
+var phrases = [
+    'Turn on the lights in the master bedroom',
+    'Please, no lights!',
+    'Turn up the illumination in garage and 1st floor'
+]
+
+new NCModelClient(new LightSwitchModel()).withCloseable { client ->
+    phrases.each { phrase ->
+        var result = client.ask(phrase, user, data)
+        println result.body
+        assert result.intentId.get() == expectedIntent
+    }
+}
+----
+
+Here, we are just going to print the result returned by the callback
+in the model class. Typically, we'd instead have HomeKit, Arduino or
+some other kind of integration at this point. We'll also check that
+the `ls` intent was triggered.
+
+When we run this script, our assertions pass, and the output is:
+
+[subs="quotes"]
+----
+Lights are [lime]*[on]* in [blue]*[master bedroom]*.
+Lights are [red]*[off]* in [blue]*[entire house]*.
+Lights are [lime]*[on]* in [blue]*[1st floor, garage]*.
+----
+
+== Further information
+
+https://nlpcraft.apache.org/index.html[Apache NLPCraft website]
