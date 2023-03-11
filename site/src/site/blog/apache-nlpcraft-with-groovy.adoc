@@ -36,21 +36,23 @@ We'll show using Groovy as the client language.
 First, a bit of background about the example.
 We are trying to determine the intent behind English language
 commands to turn lights on and off in a house.
-We define a model using a combination of
+We are going to use the project's pre-defined model which is part of their examples.
+It is defined using a combination of
 https://nlpcraft.apache.org/examples/light_switch.html#model[YAML]
 and
 https://nlpcraft.apache.org/examples/light_switch.html#code[Scala3 code].
-The key thing to note is that the model is made up of a number of action
-keywords and locations. If these are matched, the lightswitch (`ls`) intent
-is triggered.
+The key thing to note is that the model is made up of a number of keywords
+comprising _actions_ and _locations_.
+If these are matched, the lightswitch (`ls`) intent is triggered.
 Actions and locations will become more obvious soon in our example.
 
-Our example uses an English language model but NLPCraft can support any language.
+Our example uses an English language model but NLPCraft can support
+any natural language.
 They provide the lightswitch model also in
 https://nlpcraft.apache.org/examples/light_switch_fr.html[French] and other languages.
 
 We also need to add NLPCraft dependencies: `org.apache.nlpcraft:nlpcraft:1.0.0`
-and `org.apache.nlpcraft:nlpcraft-example-lightswitch:1.0.0` (for a pre-compiled model). You can use `@Grab` statements in your script or add the dependencies to your build file.
+and `org.apache.nlpcraft:nlpcraft-example-lightswitch:1.0.0` (for the pre-compiled model). You can use `@Grab` statements in your script or add the dependencies to your build file.
 
 NOTE: Depending on the Groovy version and modules you are using, if you see exceptions
 complaining about Jackson databind versions, simply exclude the Jackson versions

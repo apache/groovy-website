@@ -975,7 +975,7 @@ variants.each { key, params ->
         def result = categorizer.categorize(it.split('[ !]'))
         def category = categorizer.getBestCategory(result)
         def prob = sprintf '%4.2f', result[categorizer.getIndex(category)]
-        println "${it.padRight(w)} $category ($prob)}"
+        println "${it.padRight(w)} $category ($prob)"
     }
 }
 ----
@@ -990,14 +990,14 @@ Training using NaiveBayes …done.
 …
 
 Analyzing using Maxent
-OpenNLP is fantastic! positive (0.64)}
-Groovy is great fun! positive (0.74)}
-Math can be hard! negative (0.61)}
+OpenNLP is fantastic! positive (0.64)
+Groovy is great fun! positive (0.74)
+Math can be hard! negative (0.61)
 
 Analyzing using NaiveBayes
-OpenNLP is fantastic! positive (0.72)}
-Groovy is great fun! positive (0.81)}
-Math can be hard! negative (0.72)}
+OpenNLP is fantastic! positive (0.72)
+Groovy is great fun! positive (0.81)
+Math can be hard! negative (0.72)
 ----
 
 The models here appear to have lower probability levels compared to the model we
@@ -1013,7 +1013,7 @@ It looks at using the universal sentence encoder model from
 https://github.com/paulk-asert/groovy-data-science/tree/master/subprojects[TensorFlow Hub]
 via the https://djl.ai/[DeepJavaLibrary] (DJL) api.
 
-First we define a translator. The `Translator` interface allow us to specify pre
+First we define a translator. The `Translator` interface allow us to specify pre-
 and post-processing functionality.
 
 [source,groovy]
