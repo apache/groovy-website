@@ -33,6 +33,8 @@ is probably your best choice as programming language. Having said that,
 since we are on the JVM, certain integration steps aren't too hard.
 We'll show using Groovy as the client language.
 
+== Controlling house light switches
+
 image:https://original.accentuate.io/556263801041/1636542278424/Lighting-Automation-Mob.jpg[House lighting (source: accentuate.io),200,float="right"]
 First, a bit of background about the example.
 We are trying to determine the intent behind English language
@@ -65,7 +67,6 @@ Finally, here is the Groovy code:
 ----
 import org.apache.nlpcraft.*
 import org.apache.nlpcraft.examples.lightswitch.LightSwitchModel
-import scala.util.Using
 import static scala.collection.immutable.HashMap$.MODULE$ as ScalaMap
 
 var data = ScalaMap.empty()  // no optional data
