@@ -103,7 +103,7 @@ Lights are [on] in [1st floor, garage].
 
 == Asking for the time
 
-image:http://www.liquidcrystal.co.nz/wp-content/uploads/2018/12/kaltor.jpg[Robot watch (source: liquidcrystal.co.nz),150,float="right"]
+image:https://www.personalrobots.biz/wp-content/uploads/2021/10/takara-robot-watch-calculator.jpg[Robot watch (source: personalrobots.biz),150,float="right"]
 Let's now look at the NLPCraft `time` https://nlpcraft.apache.org/examples/time.html[example].
 It's a very simple world time bot implementation.
 
