@@ -1,6 +1,7 @@
 = Converting natural language into actions with NLPCraft and Groovy
 Paul King
 :revdate: 2023-03-10T19:22:57+00:00
+:updated: 2023-03-13T13:32:50+00:00
 :keywords: groovy, natural language processing, nlp, nlpcraft
 :description: This blog looks at using Apache NLPCraft from Groovy.
 
@@ -13,7 +14,6 @@ natural language into actions.
 It is designed around an advanced Intent Definition Language (IDL) for
 defining natural language _intents_ and a fully deterministic intent
 matching algorithm.
-
 
 The
 https://github.com/paulk-asert/groovy-data-science[groovy-data-science]
@@ -103,7 +103,7 @@ Lights are [on] in [1st floor, garage].
 
 == Asking for the time
 
-image:http://www.liquidcrystal.co.nz/wp-content/uploads/2018/12/kaltor.jpg[Robot watch,150,float="right"]
+image:http://www.liquidcrystal.co.nz/wp-content/uploads/2018/12/kaltor.jpg[Robot watch (source: liquidcrystal.co.nz),150,float="right"]
 Let's now look at the NLPCraft `time` https://nlpcraft.apache.org/examples/time.html[example].
 It's a very simple world time bot implementation.
 
@@ -117,7 +117,7 @@ We used a locally built version with `DefaultScalaModule` enabled
 for YAML processing.
 We also need the `groovy-yaml` module on the Groovy side if not already there.
 
-The model defines two intents. A match with `intent2` should be triggered
+The model defines two intents. THe `intent2` intent should be triggered
 if a match is found for a city location, otherwise `intent1` will be triggered
 if it looks like you are asking for the time without a city and this
 corresponds to finding the local time.
@@ -164,3 +164,8 @@ Brisbane, Australia: 13 Mar. 2023, 12:09:42 pm
 == Further information
 
 https://nlpcraft.apache.org/index.html[Apache NLPCraft website]
+
+.Update history
+****
+*13/Mar/2023*: Added the time example.
+****
