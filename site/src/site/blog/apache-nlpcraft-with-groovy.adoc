@@ -35,7 +35,7 @@ We'll show using Groovy as the client language.
 
 == Controlling house light switches
 
-image:https://original.accentuate.io/556263801041/1636542278424/Lighting-Automation-Mob.jpg[House lighting (source: accentuate.io),200,float="right"]
+image:https://original.accentuate.io/556263801041/1636542278424/Lighting-Automation-Mob.jpg[House lighting (source: accentuate.io),180,float="right"]
 First, a bit of background about the example.
 We are trying to determine the intent behind English language
 commands to turn lights on and off in a house.
@@ -65,7 +65,7 @@ Finally, here is the Groovy code:
 
 [source,groovy]
 ----
-import org.apache.nlpcraft.*
+import org.apache.nlpcraft.NCModelClient
 import org.apache.nlpcraft.examples.lightswitch.LightSwitchModel
 import static scala.collection.immutable.HashMap$.MODULE$ as ScalaMap
 
@@ -99,6 +99,66 @@ When we run this script, our assertions pass, and the output is:
 Lights are [on] in [master bedroom].
 Lights are [off] in [entire house].
 Lights are [on] in [1st floor, garage].
+----
+
+== Asking for the time
+
+image:http://www.liquidcrystal.co.nz/wp-content/uploads/2018/12/kaltor.jpg[Robot watch,150,float="right"]
+Let's now look at the NLPCraft `time` https://nlpcraft.apache.org/examples/time.html[example].
+It's a very simple world time bot implementation.
+
+The model is again defined as a combination of
+https://nlpcraft.apache.org/examples/time.html#model[YAML]
+and
+https://nlpcraft.apache.org/examples/time.html#code[Scala3 code].
+A pre-compiled version is available as
+`org.apache.nlpcraft:nlpcraft-example-time:1.0.0` from Maven central.
+We used a locally built version with `DefaultScalaModule` enabled
+for YAML processing.
+We also need the `groovy-yaml` module on the Groovy side if not already there.
+
+The model defines two intents. A match with `intent2` should be triggered
+if a match is found for a city location, otherwise `intent1` will be triggered
+if it looks like you are asking for the time without a city and this
+corresponds to finding the local time.
+
+Here is the Groovy client code:
+
+[source,groovy]
+----
+import groovy.yaml.YamlSlurper
+import org.apache.nlpcraft.NCModelClient
+import org.apache.nlpcraft.examples.time.TimeModel
+import static scala.collection.immutable.HashMap$.MODULE$ as ScalaMap
+
+var data = ScalaMap.empty()  // no optional data
+var user = 'someUserId'
+var phrases = [
+    "What time is it now in New York City?"                 : 'intent2',
+    "What's the current time in Singapore?"                 : 'intent2',
+    "Show me time of the day in London."                    : 'intent2',
+    "Can you please give me Tokyo's current date and time." : 'intent2',
+    "What's the local time?"                                : 'intent1'
+]
+
+new NCModelClient(new TimeModel()).withCloseable { client ->
+    phrases.each { phrase, expected ->
+        var result = client.ask(phrase, user, data)
+        assert result.intentId.get() == expected
+        def body = new YamlSlurper().parseText(result.body)
+        body.with{ println "$city, $country: $localTime" }
+    }
+}
+----
+
+Again, all our assertions pass, and here is the output:
+
+----
+New york city, United states: 12 Mar. 2023, 10:09:41 pm
+Singapore, Singapore: 13 Mar. 2023, 10:09:41 am
+London, United kingdom: 13 Mar. 2023, 2:09:41 am
+Tokyo, Japan: 13 Mar. 2023, 11:09:41 am
+Brisbane, Australia: 13 Mar. 2023, 12:09:42 pm
 ----
 
 == Further information
