@@ -117,9 +117,12 @@ We used a locally built version with `DefaultScalaModule` enabled
 for YAML processing.
 We also need the `groovy-yaml` module on the Groovy side if not already there.
 
-The model defines two intents. THe `intent2` intent should be triggered
-if a match is found for a city location, otherwise `intent1` will be triggered
-if it looks like you are asking for the time without a city and this
+The model defines two intents:
+
+* `intent2` should be triggered
+if a match is found for a city location.
+* `intent1` will be triggered
+if it looks like you are asking for the time without a city; this
 corresponds to finding the local time.
 
 Here is the Groovy client code:
