@@ -769,6 +769,7 @@ There are a few pieces to unpack in this output:
 
 == Further information
 
+* Sourcecode for this blog post (https://github.com/paulk-asert/groovy-combinations-permutations[GitHub])
 * Original blog (https://foojay.io/today/exhaustive-junit5-testing-with-combinations-permutations-and-products/[foojay.io])
 * Chronicle Test Framework (https://github.com/OpenHFT/Chronicle-Test-Framework[GitHub])
 * AllPairs4J (https://github.com/pavelicii/allpairs4j[GitHub])
