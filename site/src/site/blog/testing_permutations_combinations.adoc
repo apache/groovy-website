@@ -405,7 +405,7 @@ help limit this explosion in cases. It relies on the fact that many bugs surface
 two features interact badly. If we have a test involving five features, then perhaps
 we don't need every combination of all five features. It is perhaps easier to see with an example.
 
-Let's add a few more operations and then split them into three classes:
+Let's add a few more operations and then split them into three groups:
 _grow_, _shrink_ and _read_ operations.
 
 [source,groovy]
@@ -602,7 +602,7 @@ Now, when we run the test we see:
 
 Here we can see that cases 0, 1 and 2 succeeded.
 For case 3, the grow operation, which adds an element randomly half the time, must not have
-added anything, and the subsequent attempt to remove the first failed.
+added anything, and the subsequent attempt to remove the first element failed.
 So, even with our small number of test cases, this "bug" was detected.
 
 == Jqwik
