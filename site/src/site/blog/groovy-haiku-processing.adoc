@@ -1,0 +1,250 @@
+= Groovy Haiku processing
+Paul King
+:revdate: 2023-03-252T19:22:00+00:00
+:keywords: groovy, eclipse collections, streams
+:description: This blog looks at processing some creative writing looking at various properties of the letters within the text.
+
+This blog looks at some Groovy solutions for the examples in the
+https://medium.com/javarevisited/haiku-for-java-using-text-blocks-6b7862ccd067[Haiku for Java using Text Blocks] post by https://twitter.com/TheDonRaab[Donald Raab]. In his example,
+he is making use of Java text blocks, but Groovy already supports similar functionality
+with its multi-line strings, so we won't elaborate further on that aspect.
+
+Here is some of Donald's creative writing:
+
+image:https://miro.medium.com/v2/resize:fit:1400/format:webp/1*zcMH0Q37PFrGS4bC2EHqiw.png[text of Donald Raab's haikus]
+
+In his examples, he processes those examples in various ways. We'll look at doing the same
+examples using Groovy.
+
+There has also been an excellent follow-on discussion of these examples in a recent
+https://www.youtube.com/watch?v=wW7uzc61tZ8[JEP Café video] by
+https://twitter.com/JosePaumard[José Paumard].
+
+If you want more background about the examples, we highly recommend reading Donald's
+https://medium.com/javarevisited/haiku-for-java-using-text-blocks-6b7862ccd067[blog]
+or watching José's
+https://www.youtube.com/watch?v=wW7uzc61tZ8[video].
+
+== Example 1: Finding the distinct letters
+
+In this example, we want to see all the individual letters used in the haiku text.
+We will disregard any punctuation characters and convert all letters to lowercase
+since we don't care about the distinction of case.
+
+Here is the Groovy code:
+
+[source,groovy]
+----
+assert haiku.codePoints().toArray()
+    .findAll(Character::isAlphabetic)
+    .collect(Character::toLowerCase)
+    .toUnique()
+    .collect(Character::toString)
+    .join() == 'breakingthoupvmwcdflsy'
+----
+
+We made a slight change compared to what is in the blog and video.
+We used `codePoints()` instead of `chars()`.
+While Donald's current haiku text doesn't contain any surrogate pairs,
+we might as well be ready to handle any if they appear in the future.
+You can see here that the following smiley face emoji is encoded
+with two characters:
+
+[source,groovy]
+----
+assert "😃".codePoints().mapToObj(Character::toString).toList()[0].size() == 2
+----
+
+And we are sure it's only a matter of time before such symbols start appearing
+more frequently in someone's haiku.
+
+== Example 2: Splitting letters into unique and duplicate partitions
+
+In the next example, we want to count the number of occurrences of each letter
+and distinguish between letters which are duplicated multiple times and any
+letters which might occur only once.
+
+We are going to use a map to store letters seen (the key)
+and the number of times they occur (the value).
+We'll create a condition which is true for the map entries
+which are seen only once.
+
+[source,groovy]
+----
+var uniqueAndDuplicatePartitions = e -> e.value == 1
+----
+
+We use Groovy's `countBy` method to create our map and then the `split`
+method with our previous condition. This partitions the map into the unique
+and duplicate sets.
+
+[source,groovy]
+----
+assert haiku.codePoints().toArray()
+    .findAll(Character::isAlphabetic)
+    .collect(Character::toLowerCase)
+    .collect(Character::toString)
+    .countBy{ it }
+    .split(uniqueAndDuplicatePartitions)
+    *.size() == [0, 22]
+----
+
+When we check the sizes of the two sets, we discover that no letters occur only once
+and that all letters are duplicated.
+
+== Example 3: Finding the top used letters
+
+Our final example is a variant of the previous example.
+Instead of just finding unique and duplicate characters,
+we want to find the three most frequently occurring letters.
+
+Like before, we need a condition. This time, once
+that we will use for sorting (in reverse order):
+
+[source,groovy]
+----
+var byCountDescending = e -> -e.value
+----
+
+Now, we just sort using our condition and take the first 3.
+
+[source,groovy]
+----
+assert haiku.codePoints().toArray()
+    .findAll(Character::isAlphabetic)
+    .collect(Character::toLowerCase)
+    .collect(Character::toString)
+    .countBy{ it }
+    .sort(byCountDescending)
+    .take(3) == [e:94, t:65, i:62]
+----
+
+== Example 3: Other variations
+
+We can also use Eclipse Collections for this:
+
+[source,groovy]
+----
+var top3 = Strings.asCodePoints(haiku)
+    .select(Character::isAlphabetic)
+    .collectInt(Character::toLowerCase)
+    .collect(Character::toString)
+    .toBag()
+    .topOccurrences(3)
+
+[e:94, t:65, i:62].eachWithIndex{ k, v, i ->
+    assert top3[i] == PrimitiveTuples.pair(k, v)
+}
+----
+
+Using the `Bag` and its `topOccurrences` method have done much of the hard work for us.
+In fact, this solution also has a behavioral difference in the presence of ties which
+we'll come back to later.
+
+We can of course use the Stream API as is done in both the blog and video.
+Here is the Groovy equivalent:
+
+[source,groovy]
+----
+assert haiku.codePoints()
+        .filter(Character::isAlphabetic)
+        .map(Character::toLowerCase)
+        .mapToObj(Character::toString)
+        .collect(Collectors.groupingBy(
+                Function.identity(),
+                Collectors.counting()
+        ))
+        .entrySet()
+        .stream()
+        .sorted(Map.Entry.comparingByValue().reversed())
+        .limit(3)
+        .toList()
+        .collectEntries() == [e:94, t:65, i:62]
+----
+
+The video makes the point that the above code is quite technical in nature in
+that you need to keep track of how we are using the map to model our problem
+domain in order to understand what each processing step is doing.
+
+It suggests using records to better capture a little domain model
+and make our code more intuitive. Let's look at doing the same thing on Groovy.
+
+Here are three records that we will use:
+
+[source,groovy]
+----
+record Letter(int codePoint) {
+    Letter(int codePoint) {
+        this.codePoint = Character.toLowerCase(codePoint)
+    }
+}
+
+record LetterCount(int count) implements Comparable<LetterCount> {
+    int compareTo(LetterCount other) {
+        Integer.compare(this.count, other.count)
+    }
+}
+
+record LetterByCount(Letter letter, LetterCount count) {
+    LetterByCount(Letter letter, Integer count) {
+        this(letter, new LetterCount(count))
+    }
+    static Comparator<? super LetterByCount> comparingByCount() {
+        Comparator.comparing(LetterByCount::count)
+    }
+
+}
+----
+
+Now our _collecting_ and _sorting_ steps are in terms of our domain model,
+and it is a little easier to understand:
+
+[source,groovy]
+----
+assert haiku.codePoints().toArray()
+    .findAll(Character::isAlphabetic)
+    .collect(Letter::new)
+    .countBy{ it }
+    .collect(LetterByCount::new)
+    .toSorted(LetterByCount.comparingByCount().reversed())
+    .take(3)
+    *.letter
+    *.codePoint
+    .collect(Character::toString) == ['e', 't', 'i']
+----
+
+The video also goes into an interesting difference with the Eclipse Collections
+version. The `topOccurrences` method from the bag class handles ties and in
+the case of a tie returns both occurrences. There aren't any ties in the top
+3 occurrences, nor indeed the top 14, but if you call `topOccurrences(15)`,
+then 16 occurrences are returned. We can follow the suggestion in the video
+which gives us the following Groovy code:
+
+[source,groovy]
+----
+var byCountReversed = e -> -e.key
+assert haiku.codePoints().toArray()
+    .findAll(Character::isAlphabetic)
+    .collect(Character::toLowerCase)
+    .collect(Character::toString)
+    .countBy{ it }
+    .groupBy{ k, v -> v }
+    .sort(byCountReversed)
+    .take(15)
+    *.value.sum()*.key == ['e', 't', 'i', 'a',
+                           'o', 'n', 's', 'r',
+                           'h', 'd', 'w', 'l',
+                           'u', 'm', 'p', 'c']
+----
+
+We are essentially doing two _grouping_ statements, the first as part of `countBy`
+and then a subsequent `groupBy` on values. As we can see, if we look at the top
+15 occurrences, 16 values are returned.
+
+== Further information
+
+Referenced sites:
+
+https://www.youtube.com/watch?v=wW7uzc61tZ8
+
+https://medium.com/javarevisited/haiku-for-java-using-text-blocks-6b7862ccd067
