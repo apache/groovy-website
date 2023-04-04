@@ -1,4 +1,4 @@
-= Hello World with Groovy
+= Hello World with Emojis
 Paul King
 :revdate: 2023-04-04T12:24:07+00:00
 :keywords: groovy, emoji
