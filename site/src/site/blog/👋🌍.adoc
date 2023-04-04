@@ -11,4 +11,4 @@ using various libraries.
 Let's go the other way and look at a really fun way to write such a class with
 kudos to https://twitter.com/hugs[Jason Huggins] for the https://twitter.com/hugs/status/1642004520874942464[idea]. It's all in the picture:
 
-image:img/👋🌍.png[code for hello world]
+image:img/helloworld.png[code for hello world]
