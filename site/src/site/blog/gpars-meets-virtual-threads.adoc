@@ -68,7 +68,24 @@ withExistingPool(Executors.newVirtualThreadPerTaskExecutor()) {
 
 Nice! Using virtual threads is very simple!
 
-Let's move onto some examples which might be
+Let's look at one more example, the https://en.wikipedia.org/wiki/Fizz_buzz[FizzBuzz] example:
+
+[source,groovy]
+----
+var result = withExistingPool(Executors.newVirtualThreadPerTaskExecutor()) {
+    (1..15).collectParallel {
+        switch(it) {
+            case { it % 15 == 0 } -> 'FizzBuzz'
+            case { it % 5 == 0 } -> 'Buzz'
+            case { it % 3 == 0 } -> 'Fizz'
+            default -> it
+        }
+    }.join(',')
+}
+assert result == '1,2,Fizz,4,Buzz,Fizz,7,8,Fizz,Buzz,11,Fizz,13,14,FizzBuzz'
+----
+
+Now, let's move onto some examples which might be
 less familiar to Java developers.
 
 GPars has additional features for providing custom thread pools
