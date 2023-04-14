@@ -1,30 +1,45 @@
 = GPars meets Virtual Threads
 Paul King
 :revdate: 2022-06-15T11:28:56+00:00
+:updated: 2023-04-14T18:23:00+00:00
 :keywords: concurrency, groovy, virtual threads, actors, dataflow, agents
-:description: Thi post looks at using GPars with virtual threads.
+:description: This post looks at using GPars with virtual threads.
 
 image:img/gpars_logo.png[gpars,150,float="right"]
-An exciting preview feature coming in JDK19 is Virtual Threads
-(https://openjdk.java.net/jeps/425[JEP 425]). In my experiments
-so far, virtual threads work well with my favourite Groovy parallel
+An exciting feature coming in JDK21 is Virtual Threads
+(https://openjdk.java.net/jeps/444[JEP 444]).
+It has been previewed in JDK19 (https://openjdk.java.net/jeps/425[JEP 425])
+and JDK20 (https://openjdk.java.net/jeps/436[JEP 436]) but JDK21 will be the first version
+that the feature is available without using Java's preview switch.
+The examples in this blog were tested with Groovy 4.0.11 using JDK version 21-ea+18-1480
+(and using JDK19 with preview features enabled).
+
+Virtual threads work well with my favourite Groovy parallel
 and concurrency library http://gpars.org/[GPars]. GPars has been
 around a while (since Java 5 and Groovy 1.8 days) but still has
 many useful features. Let's have a look at a few examples.
 
-If you want to try these out, make sure you have a recent JDK19
-(currently EA) and enable _preview_ features with your Groovy
-tooling.
+If you want to try these out, use the latest JDK21ea version which has virtual
+thread support as standard. Or use a recent JDK19-20 version
+and enable _preview_ features with your Groovy tooling.
 
 == Parallel Collections
 
-First a refresher, to use the GPars parallel collections feature
-with normal threads, use the GParsPool.withPool method as follows:
+First a refresher, we'll first look at using the GPars parallel collections feature
+with normal threads. Let's start with a list of numbers:
+
+[source,groovy]
+----
+var nums = [1, 2, 3]
+----
+
+To calculate the list of squares of our original numbers in
+parallel with normal threads, we use the `GParsPool.withPool` method as follows:
 
 [source,groovy]
 ----
 withPool {
-    assert [1, 2, 3].collectParallel{ it ** 2 } == [1, 4, 9]
+    assert nums.collectParallel{ it ** 2 } == [1, 4, 9]
 }
 ----
 
@@ -36,7 +51,7 @@ something like:
 
 [source,groovy]
 ----
-assert [1, 2, 3].parallelStream().map(n -> n ** 2).collect(Collectors.toList()) == [1, 4, 9]
+assert nums.parallelStream().map(n -> n ** 2).collect(Collectors.toList()) == [1, 4, 9]
 ----
 
 Now, let's bring virtual threads into the picture. Luckily,
@@ -47,17 +62,19 @@ threads for such code easy:
 [source,groovy]
 ----
 withExistingPool(Executors.newVirtualThreadPerTaskExecutor()) {
-    assert [1, 2, 3].collectParallel{ it ** 2 } == [1, 4, 9]
+    assert nums.collectParallel{ it ** 2 } == [1, 4, 9]
 }
 ----
 
-Nice! But let's move onto some areas examples which might be
+Nice! Using virtual threads is very simple!
+
+Let's move onto some examples which might be
 less familiar to Java developers.
 
 GPars has additional features for providing custom thread pools
 and the remaining examples rely on those features. The current
 version of GPars doesn't have a `DefaultPool` constructor that
-takes a vanilla executor service, so, we'll write our own class:
+takes a vanilla executor service; so, we'll write our own class:
 
 [source,groovy]
 ----
@@ -89,8 +106,8 @@ safety of the underlying wrapped object.
 
 [source,groovy]
 ----
-def mutableState = []     // a non-synchronized mutable list
-def agent = new Agent(mutableState)
+var mutableState = []     // a non-synchronized mutable list
+var agent = new Agent(mutableState)
 
 agent.attachToThreadPool(new VirtualPool()) // omit line for normal threads
 
@@ -112,14 +129,14 @@ Let's create one backed by virtual threads:
 
 [source,groovy]
 ----
-def vgroup = new DefaultPGroup(new VirtualPool())
+var vgroup = new DefaultPGroup(new VirtualPool())
 ----
 
 Now we can write an encrypting and decrypting actor pair as follows:
 
 [source,groovy]
 ----
-def decryptor = vgroup.actor {
+var decryptor = vgroup.actor {
     loop {
         react { String message ->
             reply message.reverse()
@@ -127,7 +144,7 @@ def decryptor = vgroup.actor {
     }
 }
 
-def console = vgroup.actor {
+var console = vgroup.actor {
     decryptor << 'lellarap si yvoorG'
     react {
         println 'Decrypted message: ' + it
@@ -143,6 +160,12 @@ Dataflow offers an inherently safe and robust declarative
 concurrency model. Dataflows are also managed via thread
 groups, so we'll use `vgroup` which we created earlier.
 
+For the sake of an example, we'll create a scenario where two
+tasks are producing some results and a third task is adding the results
+of the other tasks.
+
+image:img/gpars_dataflow.png[]
+
 We have three logical tasks which can run in parallel and perform
 their work. The tasks need to exchange data and they do so using
 _dataflow variables_. Think of dataflow variables as one-shot
@@ -151,23 +174,27 @@ their consumers.
 
 [source,groovy]
 ----
-def df = new Dataflows()
+var df = new Dataflows()
 
-vgroup.task {
-    df.z = df.x + df.y
+vgroup.with {
+    task {
+        df.z = df.x + df.y
+    }
+
+    task {
+        df.x = 10
+    }
+
+    task {
+        df.y = 5
+    }
+
+    assert df.z == 15
 }
-
-vgroup.task {
-    df.x = 10
-}
-
-vgroup.task {
-    df.y = 5
-}
-
-assert df.z == 15
 ----
 
+This code is declarative in style. We can specify the three tasks in any order.
+We aren't giving any indication of which tasks should occur first.
 The dataflow framework works out how to schedule the individual
 tasks and ensures that a task's input variables are ready when
 needed.
@@ -175,7 +202,5 @@ needed.
 == Conclusion
 
 We have had a quick glimpse at using virtual threads with Groovy
-and GPars. It is very early days, so expect much more to emerge
-in this space once virtual threads are released in preview in
-production versions of JDK19 and eventually beyond a preview
-feature.
+and GPars. It is still early days with virtual threads, so expect
+much more to emerge as JDK21 becomes more mainstream.
