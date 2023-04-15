@@ -57,11 +57,18 @@ assert nums.parallelStream().map(n -> n ** 2).collect(Collectors.toList()) == [1
 Now, let's bring virtual threads into the picture. Luckily,
 GPars parallel collection facilities provide a hook for using
 an _existing_ custom executor service. This makes using virtual
-threads for such code easy:
+threads for such code easy. First we create our pool (backed by virtual threads):
 
 [source,groovy]
 ----
-withExistingPool(Executors.newVirtualThreadPerTaskExecutor()) {
+var vtPool = Executors.newVirtualThreadPerTaskExecutor()
+----
+
+Now, we can use it as follows:
+
+[source,groovy]
+----
+withExistingPool(vtPool) {
     assert nums.collectParallel{ it ** 2 } == [1, 4, 9]
 }
 ----
@@ -69,8 +76,9 @@ withExistingPool(Executors.newVirtualThreadPerTaskExecutor()) {
 Or we can use one of the other many _'*Parallel'_ methods, in this case `findAllParallel`:
 [source,groovy]
 ----
-withExistingPool(Executors.newVirtualThreadPerTaskExecutor()) {
-    assert (1..9).findAllParallel{ it % 2 == 0 } == (2..8).step(2)
+var isEven = n -> n % 2 == 0
+withExistingPool(vtPool) {
+    assert (1..9).findAllParallel(isEven) == (2..8).step(2)
 }
 ----
 
@@ -80,7 +88,7 @@ Let's look at one more example, the https://en.wikipedia.org/wiki/Fizz_buzz[Fizz
 
 [source,groovy]
 ----
-var result = withExistingPool(Executors.newVirtualThreadPerTaskExecutor()) {
+var result = withExistingPool(vtPool) {
     (1..15).collectParallel {
         switch(it) {
             case { it % 15 == 0 } -> 'FizzBuzz'
