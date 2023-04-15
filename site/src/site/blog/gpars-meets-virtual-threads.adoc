@@ -66,6 +66,14 @@ withExistingPool(Executors.newVirtualThreadPerTaskExecutor()) {
 }
 ----
 
+Or we can use one of the other many _'*Parallel'_ methods, in this case `findAllParallel`:
+[source,groovy]
+----
+withExistingPool(Executors.newVirtualThreadPerTaskExecutor()) {
+    assert (1..9).findAllParallel{ it % 2 == 0 } == (2..8).step(2)
+}
+----
+
 Nice! Using virtual threads is very simple!
 
 Let's look at one more example, the https://en.wikipedia.org/wiki/Fizz_buzz[FizzBuzz] example:
