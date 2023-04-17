@@ -51,7 +51,7 @@ something like:
 
 [source,groovy]
 ----
-assert nums.parallelStream().map(n -> n ** 2).collect(Collectors.toList()) == [1, 4, 9]
+assert nums.parallelStream().map(n -> n ** 2).toList() == [1, 4, 9]
 ----
 
 Now, let's bring virtual threads into the picture. Luckily,
