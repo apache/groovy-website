@@ -1,0 +1,327 @@
+= Lego Bricks with Groovy
+Paul King
+:revdate: 2023-04-25T23:28:50+00:00
+:keywords: groovy, eclipse collections, lego
+:description: This post compares Groovy built-in capabilities to Java and Eclipse Collections.
+
+https://twitter.com/TheDonRaab[Donald Raab] has continued has interesting
+series on learning https://www.eclipse.org/collections/[Eclipse Collections].
+His latest blog post, https://donraab.medium.com/getting-started-with-eclipse-collections-part-4-a72eb23cce0e[part 4], looks at _processing information in collections_.
+
+== Basic Collection Processing
+
+Donald has a useful comparison table of operations for basic
+collection processing. We'll add a Groovy column:
+
+|===
+|Operation |Eclipse Collections |Java Streams |Groovy
+
+|Do
+|`forEach` +
+(or `each`)
+|`forEach`
+|`each`
+
+|Filter
+|`select` (include) +
+`reject` (exclude) +
+`partition` (both)
+|`filter` +
+`filter` (negated predicate) +
+`Collectors.partitioningBy`
+|`findAll` +
+`findAll` (negated predicate) +
+`split`
+
+|Transform
+|`collect`
+|`map`
+|`collect`
+
+|Find
+|`detect`
+|`filter().findFirst().orElse(null)`
+|`find`
+
+|Test
+|`anySatisfy` +
+`allSatisfy` +
+`nonSatisfy`
+|`anyMatch` +
+`allMatch` +
+`noneMatch`
+|`any` +
+`every` +
+`every` (negated predicate)
+
+|Count
+|`count`
+|`filter().count()`
+|`count`
+|===
+
+While Groovy has built-in collection processing capabilities, it also works
+well with Eclipse Collections and Java Streams.
+So, the first two columns are equally valid when using Groovy too.
+
+== Our example domain
+
+We are going to follow one of the examples, that of Lego bricks, in Donald's post.
+
+We'll simplify the example slightly for our purposes and for this post, ignore the different
+block types.
+
+So, we'll start with a color enum. We are just interested in representing simple blocks and
+use the colored dots to represent the top view of that block:
+
+[source,groovy]
+----
+enum Color {
+    RED("🔴"),
+    YELLOW("🟡"),
+    BLUE("🔵"),
+    GREEN("🟢"),
+    WHITE("⚪️"),
+    BLACK("⚫️")
+
+    final String circle
+
+    Color(String circle) {
+        this.circle = circle
+    }
+}
+----
+
+We'll have a similar record for dimensions (but include a `toString()`:
+
+[source,groovy]
+----
+record Dimensions(int width, int length) {
+    String toString() { "$length X $width" }
+}
+----
+
+Now, our lego brick record just combines the color and dimensions:
+
+[source,groovy]
+----
+record LegoBrick(Color color, Dimensions dimensions) {
+    LegoBrick(Color color, int width, int length) {
+        this(color, new Dimensions(width, length))
+    }
+
+    static generateMultipleSizedBricks(int count, Set<Color> colors, Set<Dimensions> sizes) {
+        [[colors, sizes].combinations() * count]*.collect{
+            Color c, Dimensions d -> new LegoBrick(c, d)
+        }.sum()
+    }
+
+    String toString() {
+        ([color.circle * dimensions.length] * dimensions.width).join('\n')
+    }
+
+    int length() {
+        dimensions.length()
+    }
+
+    int width() {
+        dimensions.width()
+    }
+}
+----
+
+While we don't use it in this post, we created an additional constructor
+for making it easier to create bricks of certain sizes.
+There's also a factory method for putting together collections of bricks.
+
+== Some bricks to play with
+
+The first thing we do in our test script is set up some bricks to use
+in the remaining examples:
+
+[source,groovy]
+----
+Set sizes = [[1, 2], [2, 2], [1, 3], [2, 3], [2, 4]].collect {
+    h, w -> new Dimensions(h, w)
+}
+Set colors = Color.values()
+var bricks = LegoBrick.generateMultipleSizedBricks(5, colors, sizes)
+assert bricks.size() == 150
+----
+
+The type of brick is determined by its color and size.
+There are FIVE different sizes, and SIX colors.
+There are FIVE of each type in the collection.
+Which makes a total of 150 bricks.
+
+== Using `each` ("Do")
+
+[source,groovy]
+----
+Set seen = []
+bricks.shuffled().each {
+    if (seen.add(it.dimensions)) {
+        println "$it ($it.dimensions)"
+    }
+}
+----
+
+We shuffle the bricks and them process them one by one.
+If we see a brick of a size we haven't seen before we output it, and its size.
+
+The output will be similar to this:
+
+----
+🔴🔴 (2 X 1)
+🔵🔵🔵 (3 X 1)
+⚫️⚫️⚫️
+⚫️⚫️⚫️ (3 X 2)
+🔴🔴
+🔴🔴 (2 X 2)
+⚪️⚪️⚪️⚪️
+⚪️⚪️⚪️⚪️ (4 X 2)
+----
+
+Due to the shuffling, you might see different colors or a different order for the sizes.
+
+== Using `findAll` ("Filter")
+
+Let's now find the unique sizes for red bricks that are of width two (and we'll sort them by length):
+
+[source,groovy]
+----
+var redWidthTwo = bricks.findAll(b -> b.width() == 2 && b.color == RED)
+        .toSet()
+        .sort(LegoBrick::length)
+assert redWidthTwo.join(',\n') == '''\
+🔴🔴
+🔴🔴,
+🔴🔴🔴
+🔴🔴🔴,
+🔴🔴🔴🔴
+🔴🔴🔴🔴'''
+----
+
+== Using `split` (also "Filter")
+
+Let's find the bricks of length 4 or more (and we'll find just the
+unique variations and sort them by color):
+
+[source,groovy]
+----
+def (selected, rejected) = bricks.findAll(b -> b.length() > 3)
+        .toSet()
+        .sort(LegoBrick::color)
+        .split { b ->
+            switch (b.color) {
+                case GREEN, WHITE, YELLOW -> true
+                case BLUE, RED, BLACK -> false
+            }
+        }
+
+assert selected.join(',\n') == '''
+    🟡🟡🟡🟡
+    🟡🟡🟡🟡,
+    🟢🟢🟢🟢
+    🟢🟢🟢🟢,
+    ⚪️⚪️⚪️⚪️
+    ⚪️⚪️⚪️⚪️
+'''.stripIndent().trim()
+assert rejected.join(',\n') == '''
+    🔴🔴🔴🔴
+    🔴🔴🔴🔴,
+    🔵🔵🔵🔵
+    🔵🔵🔵🔵,
+    ⚫️⚫️⚫️⚫️
+    ⚫️⚫️⚫️⚫️
+'''.stripIndent().trim()
+----
+
+== Using `collect` ("Transform")
+
+Let's transform each brick into the toString for its dimensions and then find the unique values:
+
+[source,groovy]
+----
+Set dims = bricks.collect(b -> b.dimensions.toString()).toUnique()
+assert dims == ['2 X 1', '2 X 2', '3 X 1', '3 X 2', '4 X 2'] as Set
+----
+
+== Using `find` ("Find")
+
+Let's shuffle the bricks again (no cheating here!) and then find the first
+green brick of width and length 2:
+
+[source,groovy]
+----
+var greenTwoByTwo = bricks.shuffled().find {
+    b -> b.width() == b.length() && b.color == GREEN
+}
+assert greenTwoByTwo.toString() == '🟢🟢\n🟢🟢'
+----
+
+== Using `any` and `every` ("Test")
+
+Let's check that there are no 1 x 1 (or some kind of 0 size bricks).
+Either the width or length must be strictly greater than 1.
+Also, let's check there is some brick where the width is the same as the length
+(recall `greenTwoByTwo` as just one example).
+
+[source,groovy]
+----
+assert bricks.every { b -> b.width() > 1 || b.length() > 1 }
+assert bricks.any { b -> b.width() == b.length() }
+----
+
+== Using `count` ("Count")
+
+Let's count how many green bricks there are,
+and how many have length of 4:
+
+[source,groovy]
+----
+assert bricks.count { b -> b.color == GREEN } == 25
+assert bricks.count { b -> b.length() == 4 } == 30
+----
+
+== A mosaic of bricks
+
+In our final example, we took a mosaic of bricks from (1 x 1)
+and larger sizes and put them together. We took the toString
+and to save space (and bring a moment of suspense) we compressed it
+and encoded it in chunked base64. Your challenge, should you choose
+to accept it, is to decode the brick mosaic from its compressed
+representation. Here is some code that might help:
+
+[source,groovy]
+----
+var encodedCompressedLegoMosaic = '''
+eJztmj1uwzAMhfdcvkunLN3duUDPkwskRwiCoKljm9Tjn0gZBmLCkmmB+h5NyUZOl/P39fdjOJse
+gLs9VQhCYW9fnz/pQRw6HDpUsA8R/o5nT1Ywxs7B6M+5v/Mf1O6Af5HMFzVDsU/Eudhu0R4q61+/
+IN5rupOFelHe6bApnHrYHOlZXamQw4ylLjkKwMONQl8g6RUSuGBHinc09ir1Zn3iAnqNmKrjdsRt
+r/Qs5pspxNv09RRLMJdaNX88s912jcTIyJi853+/eQrTfJBGGVziZ12RHSG+a6TuxasWvoRwPYZh
+t/vZUsnlO/3M8/R09ca+UshSkknSCPIL/7nWUMFBRPAtTPhoKSKgU0PXIIEWdCC6LbxlYxSnxguK
+VVIdUqMea7J4EcKXCERLPgZ8wcF9pNp3EsMim10wL0+LGPjuLFkMHQ7kKYlCJkx2HyWC9ODp++qx
+bSWvetaX67fIFg7Npvv6oOHdIoB/oPD5UkRGvHkL33T80KaDGnkYo8zC2VC5K8JdoETKW2+QlpJf
+j6WWxpV6gRMO4j4nJH8DqYLcZOtGlJjGB70HVXmJ62fVsSlYO8NVoMyirA4+k3KF9OwpQzL0PWP2
+nz91abD/we3DHmIUsqQYd3YE/rA=
+'''.trim()
+var os = new ByteArrayOutputStream()
+
+try (var ios = new InflaterOutputStream(os)) {
+    ios.write(encodedCompressedLegoMosaic.decodeBase64())
+}
+println os.toString()
+----
+
+The output is left as an exercise for the reader.
+
+== Conclusion
+
+We have had a quick look at some of the basic collection processing
+functionality. We've really only touched the surface. Take a look at
+an earlier blog post giving a Groovy list processing
+https://groovy.apache.org/blog/groovy-list-processing-cheat-sheet[cheat sheet]
+if you want to see a whole lot more methods.
+Also, we highly recommend you try out all of the Eclipse Collections
+examples in Donald's original post using Groovy.
