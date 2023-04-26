@@ -29,6 +29,7 @@ menu {
         item 'Support',                     'support.html'
         item 'Contribute',                  "${devSiteBase}"
         item 'Ecosystem',                   'ecosystem.html'
+        item 'Blog posts',                  "${devSiteBase}blogs"
     }
 
     group('About') {

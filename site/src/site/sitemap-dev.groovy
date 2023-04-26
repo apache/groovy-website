@@ -30,6 +30,7 @@ menu {
         item 'Support',                     "${userSiteBase}support.html"
         item 'Contribute',                  "${devSiteBase}"
         item 'Ecosystem',                   "${userSiteBase}ecosystem.html"
+        item 'Blog posts',                  "${devSiteBase}blogs"
         item '',                            "https://groovy.apache.org/events.html" // keep ASF web crawler somewhat happy
     }
 

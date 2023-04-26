@@ -38,7 +38,11 @@ layout 'layouts/main.groovy', true,
                                         yield ' various aspects of the language or its APIs'
                                     }
                                     li {
-                                        yield 'Creating or commenting on the '
+                                        a(href: '#blogging', 'writing a blog post')
+                                        yield ' about some Groovy feature or your Groovy usage'
+                                    }
+                                    li {
+                                        yield 'creating or commenting on the '
                                         a(href: 'wiki/geps.html', 'Groovy Enhancement Proposals')
                                         yield ' which describe how we make significant changes to the language'
                                     }
@@ -90,6 +94,20 @@ layout 'layouts/main.groovy', true,
                                 p {
                                     button(type: 'button', class: 'btn btn-default', 'Report an issue',
                                             onclick: 'window.location.href="https://issues.apache.org/jira/browse/GROOVY"')
+                                }
+
+                                hr(class: 'divider')
+
+                                a(name: 'blogging') {}
+                                h2 'Writing a blog post'
+                                p {
+                                    yield '''
+                                    Groovy has a lot of great features that some folks have never heard of.
+                                    Why not write an interesting post about your favourite feature. You can
+                                    use your own blogging platform or create a pull request for a new post in the '''
+                                    a(href: 'https://github.com/apache/groovy-website/tree/asf-site/site/src/site/blog', 'blog part')
+                                    yield ' of our website.'
+
                                 }
 
                                 hr(class: 'divider')
