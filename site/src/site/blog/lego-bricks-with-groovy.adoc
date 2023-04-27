@@ -1,6 +1,7 @@
 = Lego Bricks with Groovy
 Paul King
 :revdate: 2023-04-25T23:28:50+00:00
+:updated: 2023-04-27T22:42:50+00:00
 :keywords: groovy, eclipse collections, lego
 :description: This post compares Groovy built-in capabilities to Java and Eclipse Collections.
 
@@ -60,8 +61,12 @@ collection processing. We'll add a Groovy column:
 |`count`
 |===
 
-While Groovy has built-in collection processing capabilities, it also works
-well with Eclipse Collections and Java Streams.
+We highly recommend reading Donald's blog post to give more
+context for these categories.
+
+Also note that while Groovy has built-in collection processing capabilities
+(the third column),
+it also _works well with Eclipse Collections and Java Streams_.
 So, the first two columns are equally valid when using Groovy too.
 
 == Our example domain
@@ -72,7 +77,7 @@ We'll simplify the example slightly for our purposes and for this post, ignore t
 block types.
 
 So, we'll start with a color enum. We are just interested in representing simple blocks and
-use the colored dots to represent the top view of that block:
+use the colored dots to represent the top view of a block:
 
 [source,groovy]
 ----
@@ -92,7 +97,8 @@ enum Color {
 }
 ----
 
-We'll have a similar record for dimensions (but include a `toString()`:
+We'll have a similar record to Donald's post for dimensions
+(but include a `toString()`:
 
 [source,groovy]
 ----
@@ -265,7 +271,7 @@ assert greenTwoByTwo.toString() == '🟢🟢\n🟢🟢'
 Let's check that there are no 1 x 1 (or some kind of 0 size bricks).
 Either the width or length must be strictly greater than 1.
 Also, let's check there is some brick where the width is the same as the length
-(recall `greenTwoByTwo` as just one example).
+(recall our earlier `greenTwoByTwo` as just one example).
 
 [source,groovy]
 ----
@@ -306,19 +312,25 @@ bSWvetaX67fIFg7Npvv6oOHdIoB/oPD5UkRGvHkL33T80KaDGnkYo8zC2VC5K8JdoETKW2+QlpJf
 j6WWxpV6gRMO4j4nJH8DqYLcZOtGlJjGB70HVXmJ62fVsSlYO8NVoMyirA4+k3KF9OwpQzL0PWP2
 nz91abD/we3DHmIUsqQYd3YE/rA=
 '''.trim()
+
 var os = new ByteArrayOutputStream()
 
 try (var ios = new InflaterOutputStream(os)) {
     ios.write(encodedCompressedLegoMosaic.decodeBase64())
 }
-println os.toString()
+println os
 ----
 
-The output is left as an exercise for the reader.
+The output is left as an exercise for the reader (but
+if you try on a terminal, you should have at least a
+72 x 36 layout, and use a terminal that supports unicode).
+
+Spoiler alert: if you don't want to run the script yourself, try it
+https://groovyconsole.appspot.com/edit/4889700582031360?execute[here].
 
 == Conclusion
 
-We have had a quick look at some of the basic collection processing
+We have had a quick look at some of Groovy's basic collection processing
 functionality. We've really only touched the surface. Take a look at
 an earlier blog post giving a Groovy list processing
 https://groovy.apache.org/blog/groovy-list-processing-cheat-sheet[cheat sheet]
