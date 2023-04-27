@@ -106,8 +106,9 @@ layout 'layouts/main.groovy', true,
                                     Why not write an interesting post about your favourite feature. You can
                                     use your own blogging platform or create a pull request for a new post in the '''
                                     a(href: 'https://github.com/apache/groovy-website/tree/asf-site/site/src/site/blog', 'blog part')
-                                    yield ' of our website.'
-
+                                    yield ' of our website which are published onto our own '
+                                    a(href: 'https://groovy.apache.org/blog', 'blogging site')
+                                    yield '.'
                                 }
 
                                 hr(class: 'divider')

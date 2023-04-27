@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-def userSiteBase = 'http://groovy-lang.org/'
+def userSiteBase = 'https://groovy-lang.org/'
 def devSiteBase = '/'
 
 changelogs = false
@@ -30,7 +30,7 @@ menu {
         item 'Support',                     "${userSiteBase}support.html"
         item 'Contribute',                  "${devSiteBase}"
         item 'Ecosystem',                   "${userSiteBase}ecosystem.html"
-        item 'Blog posts',                  "${devSiteBase}blogs"
+        item 'Blog posts',                  "${devSiteBase}blog"
         item '',                            "https://groovy.apache.org/events.html" // keep ASF web crawler somewhat happy
     }
 
