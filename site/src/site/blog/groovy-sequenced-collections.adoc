@@ -83,8 +83,10 @@ for collections, arrays and numerous other classes.
 |Aggregate Type |First element |Last element
 
 |`List`, `Deque`, `Set`, array
-|`aggregate[0]` or `aggregate.first()`
-|`aggregate[-1]` or `aggregate.last()`
+|`aggregate[0]` or +
+`aggregate.first()`
+|`aggregate[-1]` or +
+`aggregate.last()`
 |===
 
 Groovy also provides _take_ extension methods which could be used here. You could use
@@ -215,11 +217,17 @@ Groovy does offer the `leftShift` operator (`<<`) as another way to append to th
 Another area tackled by JEP-431 is improved consistency for
 working with a collection in reverse order.
 Groovy already offers some enhancements for this scenario
-with `reverseEach` and `asReversed` extension methods.
-These methods aren't available for all sets, e.g. not for `LinkedHashSet`
-but only `NavigableSet` instances. Also, the `asReversed` method
-creates a new collection rather than a view that is provided by
-JEP-431s `reversed()` method. There are times when the latter might be preferred.
+with `reverse`, `reverseEach` and `asReversed` extension methods.
+The functionality isn't universal however and sometimes catches folks out.
+The `reverse` method isn't available for maps and sets. You need to
+use e.g. the set's iterator. Also, the standard `reverse` produces
+a new collection (or array) and there is an optional boolean parameter
+which makes the method a mutating operation - reversing itself in-place.
+This is in contrast to `reversed()` from JEP-431 and `asReversed()`
+which return a view.
+Also, the `reverseEach` and `asReversed` are only provided for
+`NavigableSet` instances.
+
 So, all in all, this functionality provided by JEP-431 is most welcome.
 
 |===
@@ -257,15 +265,18 @@ var result = []
 list.reverseEach { result << it }
 assert result == [3, 2, 1]
 assert list.asReversed() == [3, 2, 1]
+assert list.reverse() == [3, 2, 1]
 assert list.reversed() == [3, 2, 1]                        // NEW
 
 result = []
 deque.reverseEach { result << it }
 assert result == [3, 2, 1]
 assert deque.asReversed() == [3, 2, 1]
+assert deque.reverse() == [3, 2, 1]
 assert deque.reversed() == [3, 2, 1]                       // NEW
 
 result = []
+assert set.iterator().reverse().toList() == [3, 2, 1]
 assert set.reversed() == [3, 2, 1] as Set                  // NEW
 
 result = []
