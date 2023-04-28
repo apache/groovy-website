@@ -237,12 +237,14 @@ So, all in all, this functionality provided by JEP-431 is most welcome.
 |use `list.listIterator(list.size()).previous()`
 | `list.reversed()`
 | `list.reverseEach` +
+`list.reverse()` +
 `list.asReversed()`
 
 |`Deque`
 |use `deque.descendingIterator()`
 |`deque.reversed()`
 | `deque.reverseEach` +
+`deque.reverse()` +
 `deque.asReversed()`
 
 |`NavigableSet`
@@ -251,10 +253,10 @@ So, all in all, this functionality provided by JEP-431 is most welcome.
 | `set.reverseEach` +
 `set.asReversed()`
 
-|`Set`
+|`Set` (other)
 |N/A
 |`set.reversed()`
-|N/A
+|`set.iterator().reverse()`
 |===
 
 === Examples
