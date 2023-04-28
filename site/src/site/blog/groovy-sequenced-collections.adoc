@@ -6,7 +6,7 @@ Paul King
 
 An exciting feature coming in JDK21 is
 https://openjdk.org/jeps/431[Sequenced Collections]
-which improve processing for collections which have
+which provide improved processing for collections which have
 a defined encounter order. Additional details about the new
 functionality can be found in the <<Additional References>> section later.
 
@@ -28,9 +28,8 @@ We'll post an update if anything changes.
 Sequenced Collections adds three new interfaces: `SequencedSet`,
 `SequencedCollection`, and `SequencedMap`. Each interface adds
 some new methods which we'll encounter in later examples.
-In the rest of this post, we'll explain the new sequenced collections
-functionality by looking at various scenarios you might face when processing
-various collections.
+In the rest of this post, we'll explain the new sequenced collections functionality
+by looking at various scenarios you might face when processing collections.
 
 == Accessing the first and last element
 
@@ -38,7 +37,7 @@ various collections.
 
 Something as simple as accessing the first and last elements
 for various collection types isn't consistent or as easy as might be expected (hence JEP-431).
-Here are some examples:
+Here are some examples of the JDK API calls you would use for this scenario:
 
 |===
 |Collection Type |First element |Last element
@@ -149,10 +148,10 @@ assert list.getLast() == 3                                 // NEW
 assert list.last == 3                                      // NEW
 
 LinkedList deque = [1, 2, 3]
-assert deque.getFirst() == 1
 assert deque[0] == 1
 assert deque.first() == 1
-assert deque.first == 1
+assert deque.getFirst() == 1                               // NEW
+assert deque.first == 1                                    // NEW
 
 assert deque[-1] == 3
 assert deque.last() == 3
@@ -218,7 +217,7 @@ working with a collection in reverse order.
 Groovy already offers some enhancements for this scenario
 with `reverseEach` and `asReversed` extension methods.
 These methods aren't available for all sets, e.g. not for `LinkedHashSet`
-but only `NavigableSet` instances. The `asReversed` method
+but only `NavigableSet` instances. Also, the `asReversed` method
 creates a new collection rather than a view that is provided by
 JEP-431s `reversed()` method. There are times when the latter might be preferred.
 So, all in all, this functionality provided by JEP-431 is most welcome.
