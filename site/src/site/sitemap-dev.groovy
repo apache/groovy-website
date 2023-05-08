@@ -98,6 +98,7 @@ downloads {
         }
         version('4.0.11') {
             stable true
+            archive true
             windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-4.0.11/'
         }
     }
