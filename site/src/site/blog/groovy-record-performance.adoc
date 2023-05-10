@@ -39,7 +39,7 @@ public record JavaRecordLabel(String x0, String x1, String x2, String x3, String
 
 === Java class with Lombok's @Data
 
-Here is the Lombok equivalent:
+For Lombok, the default equivalent will look like this:
 
 [source,java]
 ----
@@ -49,6 +49,19 @@ public class LombokDataLabel {
 }
 ----
 
+But to get behavior closer to records, we can configure Lombok in a different way like this:
+
+[source,java]
+----
+@Data
+@EqualsAndHashCode(doNotUseGetters = true)
+public class LombokDirectDataLabel {
+    final String x0, x1, x2, x3, x4;
+}
+----
+
+We'll discuss this in more detail later.
+
 === Kotlin data class
 
 Here is the Kotlin equivalent:
@@ -56,8 +69,7 @@ Here is the Kotlin equivalent:
 [source,kotlin]
 ----
 data class KotlinDataLabel (
-    val x0: String, val x1: String, val x2: String,
-    val x3: String, val x4: String)
+    val x0: String, val x1: String, val x2: String, val x3: String, val x4: String)
 ----
 
 === Scala case class
@@ -138,36 +150,39 @@ The results show average time taken in nanoseconds, so a smaller _Score_ means f
 
 ----
 Benchmark                                         Mode  Cnt   Score   Error  Units
-HashCodeBenchmark.hashcodeGroovyEmulatedRecord    avgt   10   3.530 ± 0.186  ns/op
-HashCodeBenchmark.hashcodeGroovyRecord            avgt   10   3.180 ± 0.145  ns/op
-HashCodeBenchmark.hashcodeJavaRecord              avgt   10   3.184 ± 0.156  ns/op
-HashCodeBenchmark.hashcodeKotlinDataLabel         avgt   10   7.523 ± 0.272  ns/op
-HashCodeBenchmark.hashcodeLombokDataLabel         avgt   10  19.042 ± 0.425  ns/op
-HashCodeBenchmark.hashcodeScalaCaseLabel          avgt   10  21.639 ± 0.843  ns/op
+HashCodeBenchmark.hashcodeGroovyEmulatedRecord      avgt   10   3.130 ±  0.015  ns/op
+HashCodeBenchmark.hashcodeGroovyRecord              avgt   10   2.814 ±  0.003  ns/op
+HashCodeBenchmark.hashcodeJavaRecord                avgt   10   2.813 ±  0.001  ns/op
+HashCodeBenchmark.hashcodeKotlinDataLabel           avgt   10   5.213 ±  0.016  ns/op
+HashCodeBenchmark.hashcodeLombokDirectDataLabel     avgt   10   5.427 ±  0.071  ns/op
+HashCodeBenchmark.hashcodeLombokDataLabel           avgt   10  18.328 ±  0.006  ns/op
+HashCodeBenchmark.hashcodeScalaCaseLabel            avgt   10  16.901 ±  0.007  ns/op
 ----
 
 ==== Using windows-latest
 
 ----
 Benchmark                                         Mode  Cnt   Score   Error  Units
-HashCodeBenchmark.hashcodeGroovyEmulatedRecord    avgt   10   3.074 ± 0.010  ns/op
-HashCodeBenchmark.hashcodeGroovyRecord            avgt   10   2.832 ± 0.004  ns/op
-HashCodeBenchmark.hashcodeJavaRecord              avgt   10   3.233 ± 0.003  ns/op
-HashCodeBenchmark.hashcodeKotlinDataLabel         avgt   10   4.091 ± 0.006  ns/op
-HashCodeBenchmark.hashcodeLombokDataLabel         avgt   10  19.000 ± 0.027  ns/op
-HashCodeBenchmark.hashcodeScalaCaseLabel          avgt   10  18.984 ± 0.172  ns/op
+HashCodeBenchmark.hashcodeGroovyEmulatedRecord      avgt   10   2.948 ± 0.005  ns/op
+HashCodeBenchmark.hashcodeGroovyRecord              avgt   10   3.410 ± 0.005  ns/op
+HashCodeBenchmark.hashcodeJavaRecord                avgt   10   3.407 ± 0.004  ns/op
+HashCodeBenchmark.hashcodeKotlinDataLabel           avgt   10   6.635 ± 0.005  ns/op
+HashCodeBenchmark.hashcodeLombokDirectDataLabel     avgt   10   8.520 ± 0.017  ns/op
+HashCodeBenchmark.hashcodeLombokDataLabel           avgt   10  16.172 ± 0.026  ns/op
+HashCodeBenchmark.hashcodeScalaCaseLabel            avgt   10  19.150 ± 0.048  ns/op
 ----
 
 ==== Using macos-latest
 
 ----
 Benchmark                                         Mode  Cnt   Score   Error  Units
-HashCodeBenchmark.hashcodeGroovyEmulatedRecord    avgt   10   2.732 ± 0.135  ns/op
-HashCodeBenchmark.hashcodeGroovyRecord            avgt   10   2.995 ± 0.038  ns/op
-HashCodeBenchmark.hashcodeJavaRecord              avgt   10   3.056 ± 0.147  ns/op
-HashCodeBenchmark.hashcodeKotlinDataLabel         avgt   10   6.670 ± 0.308  ns/op
-HashCodeBenchmark.hashcodeLombokDataLabel         avgt   10  16.560 ± 0.425  ns/op
-HashCodeBenchmark.hashcodeScalaCaseLabel          avgt   10  17.542 ± 0.465  ns/op
+HashCodeBenchmark.hashcodeGroovyEmulatedRecord      avgt   10   2.999 ± 0.194  ns/op
+HashCodeBenchmark.hashcodeGroovyRecord              avgt   10   2.765 ± 0.741  ns/op
+HashCodeBenchmark.hashcodeJavaRecord                avgt   10   2.990 ± 0.280  ns/op
+HashCodeBenchmark.hashcodeKotlinDataLabel           avgt   10   7.103 ± 0.123  ns/op
+HashCodeBenchmark.hashcodeLombokDirectDataLabel     avgt   10   6.494 ± 0.063  ns/op
+HashCodeBenchmark.hashcodeLombokDataLabel           avgt   10  15.100 ± 0.108  ns/op
+HashCodeBenchmark.hashcodeScalaCaseLabel            avgt   10  20.327 ± 0.085  ns/op
 ----
 
 ==== Graphing the results
@@ -315,8 +330,8 @@ HashCodeCacheBenchmark.hashcodeJavaRecord         avgt   10  32.837 ± 1.136  ns
 
 As expected, the effect of caching is clearly visible. We could certainly
 write our own caching with an explicit `hashCode` method in Java and perhaps
-call into `Objects.hash` or similar, but it's not as nice as having a declarative
-approach to achieve that.
+call into `Objects.hash` or similar, but it's not as nice as having the option
+of a declarative approach.
 
 As a side note, we could add `@Memoized` to the `hashCode` method in our earlier
 `GroovyRecordScalaMurmur3Label` example to turn on caching when using that algorithm.
@@ -374,8 +389,8 @@ For any well-behaved record class, `r1.equals(r2)` should be true, which
 won't be the case for `JavaRecordLabelUpper`.
 
 Accessing the component through its getter is slower but would preserve the above property.
-Both the Lombok and Scala implementations use the getter. This accounts for some of the
-reduced speed of those implementations.
+Both the `LombokDataLabel` and `ScalaCaseLabel` implementations use the getter.
+This accounts for some of the reduced speed of those implementations.
 
 Groovy records default to Java behavior here but allow you to use the getters
 for `hashCode` (and `equals` and `toString`) if you so desire. It will be slower
@@ -393,8 +408,8 @@ record GroovyRecordUpperGetter(String x0, String x1, String x2) {
 
 The explicit `@EqualsAndHashCode` annotation tells the compiler to provide
 Groovy's default generated `hashCode` bytecode which does use getters rather
-than special record bytecode. It ends up being the same hashing algorithm but
-use the getters to access the components.
+than the special record bytecode which doesn't. It ends up being the same hashing
+algorithm but uses the getters to access the components.
 
 And now our tests pass (with `assertEquals` instead of `assertNotEquals`):
 
@@ -438,36 +453,39 @@ The results show average time taken in nanoseconds, so a smaller _Score_ means f
 
 ----
 Benchmark                                           Mode  Cnt   Score   Error  Units
-EqualsBenchmark.equalsGroovyEmulatedRecord          avgt   10   2.573 ± 0.017  ns/op
-EqualsBenchmark.equalsGroovyRecord                  avgt   10   0.592 ± 0.002  ns/op
-EqualsBenchmark.equalsJavaRecord                    avgt   10   0.595 ± 0.006  ns/op
-EqualsBenchmark.equalsKotlinDataLabel               avgt   10   3.560 ± 0.024  ns/op
-EqualsBenchmark.equalsLombokDataLabel               avgt   10  24.914 ± 0.118  ns/op
-EqualsBenchmark.equalsScalaCaseLabel                avgt   10  25.000 ± 0.141  ns/op
+EqualsBenchmark.equalsGroovyEmulatedRecord          avgt   10   2.615 ±  0.005  ns/op
+EqualsBenchmark.equalsGroovyRecord                  avgt   10   0.603 ±  0.001  ns/op
+EqualsBenchmark.equalsJavaRecord                    avgt   10   0.686 ±  0.154  ns/op
+EqualsBenchmark.equalsKotlinDataLabel               avgt   10   3.617 ±  0.002  ns/op
+EqualsBenchmark.equalsLombokDirectDataLabel         avgt   10   3.617 ±  0.002  ns/op
+EqualsBenchmark.equalsLombokDataLabel               avgt   10  24.115 ±  0.014  ns/op
+EqualsBenchmark.equalsScalaCaseLabel                avgt   10  24.130 ±  0.045  ns/op
 ----
 
 ==== Using windows-latest
 
 ----
 Benchmark                                           Mode  Cnt   Score   Error  Units
-EqualsBenchmark.equalsGroovyEmulatedRecord          avgt   10   2.221 ± 0.012  ns/op
+EqualsBenchmark.equalsGroovyEmulatedRecord          avgt   10   2.216 ± 0.004  ns/op
 EqualsBenchmark.equalsGroovyRecord                  avgt   10   0.511 ± 0.002  ns/op
-EqualsBenchmark.equalsJavaRecord                    avgt   10   0.512 ± 0.001  ns/op
-EqualsBenchmark.equalsKotlinDataLabel               avgt   10   3.071 ± 0.007  ns/op
-EqualsBenchmark.equalsLombokDataLabel               avgt   10  21.491 ± 0.038  ns/op
-EqualsBenchmark.equalsScalaCaseLabel                avgt   10  21.477 ± 0.032  ns/op
+EqualsBenchmark.equalsJavaRecord                    avgt   10   0.511 ± 0.001  ns/op
+EqualsBenchmark.equalsKotlinDataLabel               avgt   10   3.066 ± 0.004  ns/op
+EqualsBenchmark.equalsLombokDirectDataLabel         avgt   10   3.068 ± 0.005  ns/op
+EqualsBenchmark.equalsLombokDataLabel               avgt   10  21.451 ± 0.021  ns/op
+EqualsBenchmark.equalsScalaCaseLabel                avgt   10  21.442 ± 0.024  ns/op
 ----
 
 ==== Using macos-latest
 
 ----
 Benchmark                                           Mode  Cnt   Score   Error  Units
-EqualsBenchmark.equalsGroovyEmulatedRecord          avgt   10   1.841 ± 0.036  ns/op
-EqualsBenchmark.equalsGroovyRecord                  avgt   10   0.557 ± 0.002  ns/op
-EqualsBenchmark.equalsJavaRecord                    avgt   10   0.557 ± 0.001  ns/op
-EqualsBenchmark.equalsKotlinDataLabel               avgt   10   2.620 ± 0.013  ns/op
-EqualsBenchmark.equalsLombokDataLabel               avgt   10  19.273 ± 0.125  ns/op
-EqualsBenchmark.equalsScalaCaseLabel                avgt   10  19.335 ± 0.298  ns/op
+EqualsBenchmark.equalsGroovyEmulatedRecord          avgt   10   1.943 ± 0.116  ns/op
+EqualsBenchmark.equalsGroovyRecord                  avgt   10   0.612 ± 0.013  ns/op
+EqualsBenchmark.equalsJavaRecord                    avgt   10   0.579 ± 0.021  ns/op
+EqualsBenchmark.equalsKotlinDataLabel               avgt   10   2.727 ± 0.068  ns/op
+EqualsBenchmark.equalsLombokDirectDataLabel         avgt   10   2.734 ± 0.096  ns/op
+EqualsBenchmark.equalsLombokDataLabel               avgt   10  21.206 ± 2.789  ns/op
+EqualsBenchmark.equalsScalaCaseLabel                avgt   10  20.673 ± 0.766  ns/op
 ----
 
 ==== Graphing the results
