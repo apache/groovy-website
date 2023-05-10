@@ -1,6 +1,7 @@
 = Groovy Record Performance
 Paul King
 :revdate: 2023-05-09T23:39:00+00:00
+:updated: 2023-05-10T19:57:00+00:00
 :description: This post looks at the performance of some of the generated methods in Groovy records.
 :keywords: groovy, records, java, scala, kotlin, lombok
 
