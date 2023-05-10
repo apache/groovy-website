@@ -499,10 +499,13 @@ image:img/equalsTimes.png[equalsTimes]
 We saw for `hashCode`, that using getters retained JavaBean-like expectations
 but with additional costs of calling that method. That impact is doubly worse
 for `equals` since we call the getters for `this` and the instance we are comparing
-against. This explains a significant part of the slowness for Lombok and Scala.
+against. This explains a significant part of the slowness for the `LombokDataLabel`
+and `ScalaCaseLabel` implementations.
 
-Groovy follows Java behavior here by default but enables you to turn on getters
-if you desire.
+Like we discussed for `hashCode`, you would not normally modify the getters
+for records and record-like classes. But for Java and Groovy which allow you to,
+it might come as a surprise. Groovy follows Java behavior here by default but
+allows you to enable access via getters if you desire.
 
 The JLS has an example of a `SmallPoint` record in section
 https://docs.oracle.com/javase/specs/jls/se20/html/jls-8.html#jls-8.10.3[8.10.3]
