@@ -379,7 +379,7 @@ reduced speed of those implementations.
 
 Groovy records default to Java behavior here but allow you to use the getters
 for `hashCode` (and `equals` and `toString`) if you so desire. It will be slower
-be preserves traditional JavaBean-like getter behavior.
+but now preserves traditional JavaBean-like getter behavior.
 
 Here is what the code would look like:
 
@@ -391,8 +391,10 @@ record GroovyRecordUpperGetter(String x0, String x1, String x2) {
 }
 ----
 
-The explicit annotation turns on Groovy's emulated record bytecode
-which is the same algorithm but defaults to using the getters.
+The explicit `@EqualsAndHashCode` annotation tells the compiler to provide
+Groovy's default generated `hashCode` bytecode which does use getters rather
+than special record bytecode. It ends up being the same hashing algorithm but
+use the getters to access the components.
 
 And now our tests pass (with `assertEquals` instead of `assertNotEquals`):
 
@@ -409,8 +411,8 @@ assertEquals(GROOVY_UPPER_GETTER_1.hashCode(), GROOVY_UPPER_GETTER_2.hashCode())
 ==== Summary
 
 Groovy records have good `hashCode` performance. There are times when you might want to
-enable caching. Rarely, you might want to also consider swapping the hashing algorithm
-or enabling getters, but if you need to, Groovy makes that easy too.
+enable caching. On rare occasions, you might want to also consider swapping the hashing
+algorithm or enabling getters, but if you need to, Groovy makes that easy too.
 
 == Performance of `equals`
 
@@ -512,7 +514,7 @@ Never-the-less, for this particular example, it might be better style to leave t
 normal field access in place and provide something like a compact canonical
 constructor to truncate the points during construction.
 
-== Summary
+== Conclusion
 
 We have looked at a few aspects of the performance of Groovy records and compared
 them to other languages. Groovy's default behavior piggybacks directly on Java's
