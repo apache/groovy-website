@@ -21,6 +21,9 @@ we looked at reading and writing CSV files using a number of CSV libraries. Toda
 https://duckdb.org/[DuckDB]
 which can read in CSV files on the fly.
 
+
+Our goal is very simple, just print out the information but grouped by each rider's country.
+
 [source,groovy]
 ----
 Sql.withInstance('jdbc:duckdb:', 'org.duckdb.DuckDBDriver') { sql ->
@@ -78,8 +81,8 @@ println GQ {
 }
 ----
 
-We could have used a CSV library to read in the data, but for this simple example
-we just used Groovy's line/text processing capabilities.
+We could use a CSV library to read in the data, but for this simple example
+we'll just use Groovy's line/text processing capabilities.
 GQuery doesn't currently have built in equivalents to `bar` or `string_agg`
 so we roll our own crude bar character function and aggregators, `aggRiders`
 and `aggPlaces`.
