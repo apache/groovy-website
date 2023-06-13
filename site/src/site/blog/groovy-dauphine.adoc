@@ -44,16 +44,17 @@ to produce a pretty barchart.
 
 Running this code produces the following output:
 
-```
+[source,text]
+----
 Country  Riders                                  Places    Count
 🇩🇰       JONAS VINGEGAARD                        1         ███████▌
 🇬🇧       ADAM YATES                              2         ███████▌
-🇦🇺       BEN O'CONNOR, JAI HINDLEY, JACK HAIG    3, 4, 5   ██████████████████████▌
+🇦🇺       BEN O’CONNOR, JAI HINDLEY, JACK HAIG    3, 4, 5   ██████████████████████▌
 🇫🇷       GUILLAUME MARTIN, JULIAN ALAPHILIPPE    6, 10     ███████████████
 🇿🇦       LOUIS DU BOUISSON MEINTJES              7         ███████▌
 🇳🇴       TORSTEIN TRÆEN                          8         ███████▌
 🇪🇸       CARLOS RODRIGUEZ CANO                   9         ███████▌
-```
+----
 
 We can achieve a similar result using GQuery (AKA GINQ) using the following code:
 
@@ -85,11 +86,12 @@ and `aggPlaces`.
 
 Running this code gives the following output:
 
-```
+[source,text]
+----
 +---------+--------------------------------------+---------+--------+
 | Country | Riders                               | Places  | Count  |
 +---------+--------------------------------------+---------+--------+
-| 🇦🇺      | BEN O'CONNOR, JAI HINDLEY, JACK HAIG | 3, 4, 5 | ██████ |
+| 🇦🇺      | BEN O’CONNOR, JAI HINDLEY, JACK HAIG | 3, 4, 5 | ██████ |
 | 🇩🇰      | JONAS VINGEGAARD                     | 1       | ██     |
 | 🇳🇴      | TORSTEIN TRÆEN                       | 8       | ██     |
 | 🇿🇦      | LOUIS DU BOUISSON MEINTJES           | 7       | ██     |
@@ -97,9 +99,10 @@ Running this code gives the following output:
 | 🇪🇸      | CARLOS RODRIGUEZ CANO                | 9       | ██     |
 | 🇫🇷      | GUILLAUME MARTIN, JULIAN ALAPHILIPPE | 6, 10   | ████   |
 +---------+--------------------------------------+---------+--------+
-
-```
+----
 
 For Groovy 5, we are currently exploring the possibility of adding more
 functions in GQuery, like `bar` and `stringAgg`. If you are interested in this
-functionality, please get in touch via the mailing lists or slack.
+functionality, please get in touch via the
+https://groovy-lang.org/mailing-lists.html[mailing lists] or
+http://groovycommunity.com/[Slack].
