@@ -202,6 +202,11 @@ Groovy scripts but might impact code which manipulates AST nodes such as AST tra
 Before compiling with Groovy 4, some of these may need one or more appropriate static import statements added.
 AST transforms which extend `AbstractASTTransformation` are one example of potentially affected classes.
 (link:https://issues.apache.org/jira/browse/GROOVY-9736[GROOVY-9736]).
+* Scripts containing a static `main` method and no statements outside that method have changed slightly
+for improved JEP 445 compatibility. The script class for such methods no longer extends `Script` and
+hence no longer has access to the script context or bindings. For many such scripts, access to the
+binding isn't needed and there is now a simpler structure for those scripts. Scripts which need access
+to the binding should instead use a no-arg instance `run` method. (link:https://issues.apache.org/jira/browse/GROOVY-11118[GROOVY-11118])
 
 [[Groovy5.0-requirements]]
 == JDK requirements
