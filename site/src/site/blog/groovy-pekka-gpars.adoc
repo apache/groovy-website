@@ -232,7 +232,8 @@ When we receive the `Greet` message, we log the details to stdout and
 send the acknowledgement.
 
 If we don't want to use the DSL syntax, we can use the related classes directly.
-Here we'll define a `BotActor` using this style. It shows adding the state variables:
+Here we'll define a `BotActor` using this slightly more verbose style.
+It shows adding the state variables we need for tracking the invocation count:
 
 [source,groovy]
 ----
@@ -295,6 +296,7 @@ Greeting 3 for GPars
 == Conclusion
 
 We have had a quick glimpse at using actors with Apache Pekka and GPars.
+
 The sample code can be found here:
 
-
+https://github.com/paulk-asert/groovy-pekka-gpars
