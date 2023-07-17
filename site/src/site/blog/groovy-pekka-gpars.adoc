@@ -1,6 +1,6 @@
 = Using Apache Pekka actors and GPars actors with Groovy
 Paul King
-:revdate: 2022-07-17T23:24:56+00:00
+:revdate: 2023-07-17T23:24:56+00:00
 :keywords: concurrency, groovy, actors, pekka, gpars
 :description: This post looks at using Apache Pekka Actors and GPars Actors with Groovy.
 
