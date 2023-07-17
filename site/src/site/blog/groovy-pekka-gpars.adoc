@@ -1,0 +1,300 @@
+= Using Apache Pekka actors and GPars actors with Groovy
+Paul King
+:revdate: 2022-07-17T23:24:56+00:00
+:keywords: concurrency, groovy, actors, pekka, gpars
+:description: This post looks at using Apache Pekka Actors and GPars Actors with Groovy.
+
+image:https://pekko.apache.org/assets/images/pekko_logo.png[pekka logo,100,float="right"]
+https://pekko.apache.org/[Apache Pekka] is a project undergoing https://incubator.apache.org/[incubation] at the Apache Software Foundation.
+It is an Apache licensed fork of the Akka project (based on Akka version 2.6.x) and provides a
+framework for building applications that are concurrent, distributed, resilient and elastic.
+Pekko provides high-level abstractions for concurrency based on actors,
+as well as additional libraries for persistence, streams, HTTP, and more.
+It provides Scala and Java APIs/DSLs for writing your applications. We'll be using the latter.
+We'll look at just one example of using Pekka actors.
+
+image:img/gpars_logo.png[gpars,180,float="right"]
+By way of comparison, we'll also be looking at http://www.gpars.org/[GPars],
+a concurrency library for Java and Groovy with support for actors, agents,
+concurrent & parallel map/reduce, fork/join, asynchronous closures, dataflow, and more.
+A https://groovy.apache.org/blog/gpars-meets-virtual-threads[previous blog post]
+looks at additional features of GPars and how to use it with virtual threads.
+Here, we'll just look at the comparable actor features for our Pekka example.
+
+== The example
+
+A common first example involving actors involves creating two actors where one actor
+sends a message to the second actor which sends a reply back to the first.
+We could certainly do that, but we'll use a slightly more interesting example involving three
+actors. The example comes from the
+https://pekko.apache.org/docs/pekko/current/typed/actors.html#first-example[Pekka documentation]
+and is illustrated in the following diagram (from the Pekka documentation):
+
+image:https://pekko.apache.org/docs/pekko/current/typed/images/hello-world2.png[actors in our system - from pekka documentation]
+
+The system consists of the following actors:
+
+* The `HelloWorldMain` actor creates the other two actors and sends
+an initial message to kick off our little system. The initial message
+goes to the `HelloWorld` actor and gives the `HelloWorldBot` as the reply address.
+* The `HelloWorld` actor is listening for `Greet`
+messages. When it receives one, it sends a `Greeted` acknowledgement back to a reply address.
+* The `HelloWorldBot` is like an echo chamber. It returns any message it receives.
+This would potentially be an infinite loop, however, the actor has a parameter
+to tell it the maximum number of times to echo the message before stopping.
+
+== A Pekka implementation in Groovy
+
+This example uses Groovy 4.0.13, JDK11 and Pekka 1.0.0, but should also
+run using later JDK versions.
+
+The Pekka documentation gives Java and Scala implementations.
+You should notice that the Groovy implementation is similar to the Java one
+but just a little shorter. The Groovy code is a little more complex than the
+equivalent Scala code. We could certainly use Groovy meta-programming to
+simplify the Groovy code in numerous ways but that is a topic for another day.
+
+Here is the code for `HelloWorld`:
+
+[source,groovy]
+----
+class HelloWorld extends AbstractBehavior<HelloWorld.Greet> {
+
+    static record Greet(String whom, ActorRef<Greeted> replyTo) {}
+    static record Greeted(String whom, ActorRef<Greet> from) {}
+
+    static Behavior<Greet> create() {
+        Behaviors.setup(HelloWorld::new)
+    }
+
+    private HelloWorld(ActorContext<Greet> context) {
+        super(context)
+    }
+
+    @Override
+    Receive<Greet> createReceive() {
+        newReceiveBuilder().onMessage(Greet.class, this::onGreet).build()
+    }
+
+    private Behavior<Greet> onGreet(Greet command) {
+        context.log.info "Hello $command.whom!"
+        command.replyTo.tell(new Greeted(command.whom, context.self))
+        this
+    }
+}
+----
+
+First we define `Greet` and `Greeter` records to have strong typing for the messages in our system.
+We then define the details of our actor. A fair bit of this is boilerplate. The interesting part
+is inside the `onGreet` method. We log the message details before sending back the `Greeted` acknowledgement.
+
+The `HelloWorldBot` is similar. You should notice some state variables which keep an
+invocation counter and a maximum number of invocations before terminating:
+
+[source,groovy]
+----
+class HelloWorldBot extends AbstractBehavior<HelloWorld.Greeted> {
+
+    static Behavior<HelloWorld.Greeted> create(int max) {
+        Behaviors.setup(context -> new HelloWorldBot(context, max))
+    }
+
+    private final int max
+    private int greetingCounter
+
+    private HelloWorldBot(ActorContext<HelloWorld.Greeted> context, int max) {
+        super(context)
+        this.max = max
+    }
+
+    @Override
+    Receive<HelloWorld.Greeted> createReceive() {
+        newReceiveBuilder().onMessage(HelloWorld.Greeted.class, this::onGreeted).build()
+    }
+
+    private Behavior<HelloWorld.Greeted> onGreeted(HelloWorld.Greeted message) {
+        greetingCounter++
+        context.log.info "Greeting $greetingCounter for $message.whom"
+        if (greetingCounter == max) {
+            return Behaviors.stopped()
+        } else {
+            message.from.tell(new HelloWorld.Greet(message.whom, context.self))
+            return this
+        }
+    }
+}
+----
+
+The interesting logic is in the `onGreeted` method. We increment the counter and either stop,
+if we have reached the maximum count threshold, or echo back the message contents to the sender.
+
+Let's have a look at the final actor:
+
+[source,groovy]
+----
+class HelloWorldMain extends AbstractBehavior<HelloWorldMain.SayHello> {
+
+    static record SayHello(String name) { }
+
+    static Behavior<SayHello> create() {
+        Behaviors.setup(HelloWorldMain::new)
+    }
+
+    private final ActorRef<HelloWorld.Greet> greeter
+
+    private HelloWorldMain(ActorContext<SayHello> context) {
+        super(context)
+        greeter = context.spawn(HelloWorld.create(), 'greeter')
+    }
+
+    @Override
+    Receive<SayHello> createReceive() {
+        newReceiveBuilder().onMessage(SayHello.class, this::onStart).build()
+    }
+
+    private Behavior<SayHello> onStart(SayHello command) {
+        var replyTo = context.spawn(HelloWorldBot.create(3), command.name)
+        greeter.tell(new HelloWorld.Greet(command.name, replyTo))
+        this
+    }
+}
+----
+
+There is a `SayHello` record, to act as a strongly typed incoming message.
+The `HelloWorldMain` actor creates the other actors.
+It creates one `HelloWorld` actor which is the _greeter_ target of subsequent messages.
+For each incoming `SayHello` message, it creates a _bot_, then sends a message
+to the _greeter_ containing the `SayHello` payload and telling it to reply to the _bot_.
+
+Finally, we need to kick off our system. We create the `HelloWorldMain` actor and
+send it two messages:
+
+[source,groovy]
+----
+var system = ActorSystem.create(HelloWorldMain.create(), 'hello')
+
+system.tell(new HelloWorldMain.SayHello('World'))
+system.tell(new HelloWorldMain.SayHello('Pekko'))
+----
+
+The log output from running the script will look similar to this:
+
+----
+[hello-pekko.actor.default-dispatcher-3] INFO org.codehaus.groovy.vmplugin.v8.IndyInterface - Hello World!
+[hello-pekko.actor.default-dispatcher-3] INFO org.codehaus.groovy.vmplugin.v8.IndyInterface - Hello Pekko!
+[hello-pekko.actor.default-dispatcher-5] INFO org.codehaus.groovy.vmplugin.v8.IndyInterface - Greeting 1 for World
+[hello-pekko.actor.default-dispatcher-3] INFO org.codehaus.groovy.vmplugin.v8.IndyInterface - Greeting 1 for Pekko
+[hello-pekko.actor.default-dispatcher-3] INFO org.codehaus.groovy.vmplugin.v8.IndyInterface - Hello World!
+[hello-pekko.actor.default-dispatcher-3] INFO org.codehaus.groovy.vmplugin.v8.IndyInterface - Hello Pekko!
+[hello-pekko.actor.default-dispatcher-5] INFO org.codehaus.groovy.vmplugin.v8.IndyInterface - Greeting 2 for World
+[hello-pekko.actor.default-dispatcher-3] INFO org.codehaus.groovy.vmplugin.v8.IndyInterface - Hello World!
+[hello-pekko.actor.default-dispatcher-3] INFO org.codehaus.groovy.vmplugin.v8.IndyInterface - Greeting 3 for World
+[hello-pekko.actor.default-dispatcher-6] INFO org.codehaus.groovy.vmplugin.v8.IndyInterface - Greeting 2 for Pekko
+[hello-pekko.actor.default-dispatcher-6] INFO org.codehaus.groovy.vmplugin.v8.IndyInterface - Hello Pekko!
+[hello-pekko.actor.default-dispatcher-6] INFO org.codehaus.groovy.vmplugin.v8.IndyInterface - Greeting 3 for Pekko
+[hello-pekko.actor.default-dispatcher-6] INFO org.apache.pekko.actor.CoordinatedShutdown - Running CoordinatedShutdown with reason [ActorSystemTerminateReason]
+----
+
+== A GPars implementation in Groovy
+
+This example uses Groovy 4.0.13, JDK11 and GPars 1.2.1, but should
+run with any JDK 8+ version.
+
+We'll follow the same conventions for strongly typed messages in our GPars example.
+Here are our three message containers:
+
+[source,groovy]
+----
+record Greet(String whom, Actor replyTo) { }
+
+record Greeted(String whom, Actor from) {}
+
+record SayHello(String name) { }
+----
+
+Now we'll define our `helloWorld` actor:
+
+[source,groovy]
+----
+helloWorld = actor {
+    loop {
+        react { Greet command ->
+            println "Hello $command.whom!"
+            command.replyTo << new Greeted(command.whom, helloWorld)
+        }
+    }
+}
+----
+
+Here, we are using GPars Groovy continuation-style DSL for defining actors.
+The `loop` indicates that the actor will loop continually.
+When we receive the `Greet` message, we log the details to stdout and
+send the acknowledgement.
+
+If we don't want to use the DSL syntax, we can use the related classes directly.
+Here we'll define a `BotActor` using this style. It shows adding the state variables:
+
+[source,groovy]
+----
+class BotActor extends DefaultActor {
+    int max
+    private int greetingCounter = 0
+    @Override
+    protected void act() {
+        loop {
+            react { Greeted message ->
+                greetingCounter++
+                println "Greeting $greetingCounter for $message.whom"
+                if (greetingCounter < max) message.from << new Greet(message.whom, this)
+                else terminate()
+            }
+        }
+    }
+}
+----
+
+Our main actor is very simple. It is waiting for `SayHello` messages, and when it receives one,
+it sends the payload to the helloWorld greeter telling it to reply to a newly created _bot_.
+
+[source,groovy]
+----
+var main = actor {
+    loop {
+        react { SayHello command ->
+            helloWorld << new Greet(command.name, new BotActor(max: 3).start())
+        }
+    }
+}
+----
+
+Finally, we start the system going by sending some initial messages:
+
+[source,groovy]
+----
+main << new SayHello('World')
+main << new SayHello('GPars')
+----
+
+The output looks like this:
+
+----
+Hello World!
+Hello GPars!
+Greeting 1 for World
+Greeting 1 for GPars
+Hello World!
+Hello GPars!
+Greeting 2 for World
+Hello World!
+Greeting 2 for GPars
+Hello GPars!
+Greeting 3 for World
+Greeting 3 for GPars
+----
+
+== Conclusion
+
+We have had a quick glimpse at using actors with Apache Pekka and GPars.
+The sample code can be found here:
+
+
