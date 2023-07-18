@@ -1,6 +1,7 @@
 = Using Apache Pekko actors and GPars actors with Groovy
 Paul King
 :revdate: 2023-07-17T23:24:56+00:00
+:updated: 2023-07-18T18:45:00+00:00
 :keywords: concurrency, groovy, actors, pekko, gpars
 :description: This post looks at using Apache Pekko Actors and GPars Actors with Groovy.
 
@@ -45,8 +46,8 @@ to tell it the maximum number of times to echo the message before stopping.
 
 == A Pekko implementation in Groovy
 
-This example uses Groovy 4.0.13, JDK11 and Pekko 1.0.0, but should also
-run using later JDK versions.
+This example uses Groovy 4.0.13 and Pekko 1.0.0.
+It was tested with JDK 11 and 17.
 
 The Pekko documentation gives Java and Scala implementations.
 You should notice that the Groovy implementation is similar to the Java one
@@ -197,8 +198,8 @@ The log output from running the script will look similar to this:
 
 == A GPars implementation in Groovy
 
-This example uses Groovy 4.0.13, JDK11 and GPars 1.2.1, but should
-run with any JDK 8+ version.
+This example uses Groovy 4.0.13 and GPars 1.2.1.
+It was tested with JDK 8, 11 and 17.
 
 We'll follow the same conventions for strongly typed messages in our GPars example.
 Here are our three message containers:
@@ -216,7 +217,7 @@ Now we'll define our `helloWorld` actor:
 
 [source,groovy]
 ----
-helloWorld = actor {
+greeter = actor {
     loop {
         react { Greet command ->
             println "Hello $command.whom!"
@@ -232,14 +233,15 @@ When we receive the `Greet` message, we log the details to stdout and
 send the acknowledgement.
 
 If we don't want to use the DSL syntax, we can use the related classes directly.
-Here we'll define a `BotActor` using this slightly more verbose style.
+Here we'll define a `HelloWorldBot` using this slightly more verbose style.
 It shows adding the state variables we need for tracking the invocation count:
 
 [source,groovy]
 ----
-class BotActor extends DefaultActor {
+class HelloWorldBot extends DefaultActor {
     int max
     private int greetingCounter = 0
+
     @Override
     protected void act() {
         loop {
@@ -262,7 +264,7 @@ it sends the payload to the helloWorld greeter telling it to reply to a newly cr
 var main = actor {
     loop {
         react { SayHello command ->
-            helloWorld << new Greet(command.name, new BotActor(max: 3).start())
+            greeter << new Greet(command.name, new HelloWorldBot(max: 3).start())
         }
     }
 }
@@ -292,6 +294,47 @@ Hello GPars!
 Greeting 3 for World
 Greeting 3 for GPars
 ----
+
+== Discussion
+
+The GPars implementation is less verbose compared to the Pekko implementation but Pekko
+is known for providing additional type safety for actor messages and that is partly what we are seeing.
+
+GPars supports a mixture of styles, some offering less verbosity at the expense of capturing some
+errors at runtime rather than compile-time. Such code can be useful when wanting very succinct code
+using Groovy's dynamic nature. When using Groovy's static nature or Java, you might consider using
+select parts of the GPars API.
+
+For example, we can provide an alternative definition for `HelloWorldBot` like this:
+
+[source,groovy]
+----
+class HelloWorldBot extends StaticDispatchActor<Greeted> {
+    int max
+    private int greetingCounter = 0
+
+    @Override
+    void onMessage(Greeted message) {
+        greetingCounter++
+        println "Greeting $greetingCounter for $message.whom"
+        if (greetingCounter < max) message.from << new Greet(message.whom, this)
+        else terminate()
+    }
+}
+----
+
+The `StaticDispatchActor` dispatches the message solely based on the compile-time information.
+This can be more efficient when dispatching based on message run-time type is not necessary.
+
+We could also provide an alternative definition for `Greet` as follows:
+
+[source,groovy]
+----
+record Greet(String whom, StaticDispatchActor<Greeted> replyTo) { }
+----
+
+With changes like these in place we can code a solution with additional message type safety
+when using Groovy's static nature.
 
 == Conclusion
 
