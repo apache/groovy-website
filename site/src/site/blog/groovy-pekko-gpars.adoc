@@ -1,17 +1,17 @@
-= Using Apache Pekka actors and GPars actors with Groovy
+= Using Apache Pekko actors and GPars actors with Groovy
 Paul King
 :revdate: 2023-07-17T23:24:56+00:00
-:keywords: concurrency, groovy, actors, pekka, gpars
-:description: This post looks at using Apache Pekka Actors and GPars Actors with Groovy.
+:keywords: concurrency, groovy, actors, pekko, gpars
+:description: This post looks at using Apache Pekko Actors and GPars Actors with Groovy.
 
-image:https://pekko.apache.org/assets/images/pekko_logo.png[pekka logo,100,float="right"]
-https://pekko.apache.org/[Apache Pekka] is a project undergoing https://incubator.apache.org/[incubation] at the Apache Software Foundation.
+image:https://pekko.apache.org/assets/images/pekko_logo.png[pekko logo,100,float="right"]
+https://pekko.apache.org/[Apache Pekko] is a project undergoing https://incubator.apache.org/[incubation] at the Apache Software Foundation.
 It is an Apache licensed fork of the Akka project (based on Akka version 2.6.x) and provides a
 framework for building applications that are concurrent, distributed, resilient and elastic.
 Pekko provides high-level abstractions for concurrency based on actors,
 as well as additional libraries for persistence, streams, HTTP, and more.
 It provides Scala and Java APIs/DSLs for writing your applications. We'll be using the latter.
-We'll look at just one example of using Pekka actors.
+We'll look at just one example of using Pekko actors.
 
 image:img/gpars_logo.png[gpars,180,float="right"]
 By way of comparison, we'll also be looking at http://www.gpars.org/[GPars],
@@ -19,7 +19,7 @@ a concurrency library for Java and Groovy with support for actors, agents,
 concurrent & parallel map/reduce, fork/join, asynchronous closures, dataflow, and more.
 A https://groovy.apache.org/blog/gpars-meets-virtual-threads[previous blog post]
 looks at additional features of GPars and how to use it with virtual threads.
-Here, we'll just look at the comparable actor features for our Pekka example.
+Here, we'll just look at the comparable actor features for our Pekko example.
 
 == The example
 
@@ -27,10 +27,10 @@ A common first example involving actors involves creating two actors where one a
 sends a message to the second actor which sends a reply back to the first.
 We could certainly do that, but we'll use a slightly more interesting example involving three
 actors. The example comes from the
-https://pekko.apache.org/docs/pekko/current/typed/actors.html#first-example[Pekka documentation]
-and is illustrated in the following diagram (from the Pekka documentation):
+https://pekko.apache.org/docs/pekko/current/typed/actors.html#first-example[Pekko documentation]
+and is illustrated in the following diagram (from the Pekko documentation):
 
-image:https://pekko.apache.org/docs/pekko/current/typed/images/hello-world2.png[actors in our system - from pekka documentation]
+image:https://pekko.apache.org/docs/pekko/current/typed/images/hello-world2.png[actors in our system - from pekko documentation]
 
 The system consists of the following actors:
 
@@ -43,12 +43,12 @@ messages. When it receives one, it sends a `Greeted` acknowledgement back to a r
 This would potentially be an infinite loop, however, the actor has a parameter
 to tell it the maximum number of times to echo the message before stopping.
 
-== A Pekka implementation in Groovy
+== A Pekko implementation in Groovy
 
-This example uses Groovy 4.0.13, JDK11 and Pekka 1.0.0, but should also
+This example uses Groovy 4.0.13, JDK11 and Pekko 1.0.0, but should also
 run using later JDK versions.
 
-The Pekka documentation gives Java and Scala implementations.
+The Pekko documentation gives Java and Scala implementations.
 You should notice that the Groovy implementation is similar to the Java one
 but just a little shorter. The Groovy code is a little more complex than the
 equivalent Scala code. We could certainly use Groovy meta-programming to
@@ -295,8 +295,8 @@ Greeting 3 for GPars
 
 == Conclusion
 
-We have had a quick glimpse at using actors with Apache Pekka and GPars.
+We have had a quick glimpse at using actors with Apache Pekko and GPars.
 
 The sample code can be found here:
 
-https://github.com/paulk-asert/groovy-pekka-gpars
+https://github.com/paulk-asert/groovy-pekko-gpars
