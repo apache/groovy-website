@@ -17,6 +17,16 @@ Some features described here as "incubating" may become stable before 5.0.0 fina
 [[Groovy5.0-new]]
 == New features
 
+=== Support for `var` with multi-assignment
+
+The `var` keyword can be used in combination with multi-assignment:
+
+[source,groovy]
+----
+var (x, y) = [1, 2]
+assert x == 1 && y == 2
+----
+
 === Extension method additions and improvements
 
 There are some additional extension methods for `File` objects:
