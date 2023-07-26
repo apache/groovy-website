@@ -1,7 +1,7 @@
 = Using Apache Pekko actors and GPars actors with Groovy
 Paul King
 :revdate: 2023-07-17T23:24:56+00:00
-:updated: 2023-07-18T18:45:00+00:00
+:updated: 2023-07-26T15:02:00+00:00
 :keywords: concurrency, groovy, actors, pekko, gpars
 :description: This post looks at using Apache Pekko Actors and GPars Actors with Groovy.
 
@@ -46,7 +46,7 @@ to tell it the maximum number of times to echo the message before stopping.
 
 == A Pekko implementation in Groovy
 
-This example uses Groovy 4.0.13 and Pekko 1.0.0.
+This example uses Groovy 4.0.13 and Pekko 1.0.1.
 It was tested with JDK 11 and 17.
 
 The Pekko documentation gives Java and Scala implementations.
@@ -221,7 +221,7 @@ greeter = actor {
     loop {
         react { Greet command ->
             println "Hello $command.whom!"
-            command.replyTo << new Greeted(command.whom, helloWorld)
+            command.replyTo << new Greeted(command.whom, greeter)
         }
     }
 }
@@ -343,3 +343,10 @@ We have had a quick glimpse at using actors with Apache Pekko and GPars.
 The sample code can be found here:
 
 https://github.com/paulk-asert/groovy-pekko-gpars
+
+.Update history
+****
+*17/Jul/2023*: Initial version. +
+*18/Jul/2023*: Add discussion about type-safe messages. +
+*26/Jul/2023*: Update to Pekko 1.0.1.
+****
