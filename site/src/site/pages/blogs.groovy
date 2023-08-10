@@ -1,6 +1,9 @@
 import generator.DocUtils
 
 def keywords = [:].withDefault{ 0 }
+list.removeAll { k, v ->
+    v.attributes.draft
+}
 list.each { k, v ->
     v.attributes.keywords?.split(',')*.trim().each{ keywords[it]++ }
 }
