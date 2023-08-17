@@ -48,7 +48,7 @@ layout 'layouts/main.groovy', true,
             }
         },
         mainContent: contents {
-            def sorted = list.sort { e -> e.value.revisionInfo.date }
+            def sorted = list.sort { e -> e.value.attributes.updated ?: e.value.revisionInfo.date }
             div(id: 'content', class: 'page-1') {
                 div(class: 'row') {
                     div(class: 'row-fluid') {
