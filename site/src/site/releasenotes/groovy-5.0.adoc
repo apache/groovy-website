@@ -9,8 +9,17 @@ In addition, it incorporates numerous new features and streamlines various legac
 |===
 a| NOTE: _WARNING:_
 Material on this page is still under development!
-We are currently working on alpha versions of Groovy 5.0 with a goal of gathering feedback on the language changes from our community. In addition, early versions assist other projects and tool vendors within the Groovy ecosystem to begin assessing the impact of moving to/supporting Groovy 5.0. Caution should be exercised if using new features as the details may change before final release.
-Some features described here as "incubating" may become stable before 5.0.0 final is released, others are expected to remain incubating for version 5. We don’t recommend using alpha versions or incubating features for production systems.
+We are currently working on alpha versions of Groovy 5.0 with a goal of gathering
+feedback on the language changes from our community. In addition, early versions
+assist other projects and tool vendors within the Groovy ecosystem to begin assessing
+the impact of moving to/supporting Groovy 5.0. Caution should be exercised if using
+new features as the details may change before final release. +
+Some features described here as "incubating" may become stable before 5.0.0
+final is released, others are expected to remain incubating for version 5.
+We don’t recommend using alpha versions or incubating features for production systems.
+We don't regard alpha versions as being feature-complete, so caution should be exercised
+before undertaking any large scale ports to Groovy 5. Having said that, we don't
+expect porting to Groovy 5 from Groovy 4 should involve much effort.
 |===
 
 
@@ -206,25 +215,63 @@ link:https://issues.apache.org/jira/browse/GROOVY-9273[GROOVY-9273]
 [[Groovy5.0-breaking]]
 == Other breaking changes
 
-* Numerous classes previously "leaked" ASM constants which are essentially an internal implementation detail by virtue of
-implementing an `Opcodes` interface. This will not normally affect the majority of
-Groovy scripts but might impact code which manipulates AST nodes such as AST transforms.
-Before compiling with Groovy 4, some of these may need one or more appropriate static import statements added.
-AST transforms which extend `AbstractASTTransformation` are one example of potentially affected classes.
-(link:https://issues.apache.org/jira/browse/GROOVY-9736[GROOVY-9736]).
 * Scripts containing a static `main` method and no statements outside that method have changed slightly
 for improved JEP 445 compatibility. The script class for such methods no longer extends `Script` and
 hence no longer has access to the script context or bindings. For many such scripts, access to the
 binding isn't needed and there is now a simpler structure for those scripts. Scripts which need access
-to the binding should instead use a no-arg instance `run` method. (link:https://issues.apache.org/jira/browse/GROOVY-11118[GROOVY-11118])
+to the binding should instead use a no-arg instance `run` method.
+(link:https://issues.apache.org/jira/browse/GROOVY-11118[GROOVY-11118])
+* The `getProperty` method allows for getting properties that don't exist within a class.
+Previously, static properties from an outer class were given priority over overrides
+by `getProperty`. This is in conflict with the priority given to outer classes in other places.
+(link:https://issues.apache.org/jira/browse/GROOVY-10985[GROOVY-10985])
+* The minus operator for sets in Groovy was subject to an existing
+https://bugs.openjdk.org/browse/JDK-6394757[JDK bug]
+in the JDK's `AbstractSet#removeAll` method. The behavior now confirms
+with the behavior of the fix being proposed for that bug.
+If for some strange reason you rely on the buggy behavior, you can use
+the `removeAll` method directly rather than the `minus` operator (at least until it is fixed in the JDK).
+(link:https://issues.apache.org/jira/browse/GROOVY-10964[GROOVY-10964])
+* Groovy 4 had a `$getLookup` method used to work around stricter JPMS access requirements.
+Groovy no longer needs this hook. This method is not normally visible or of use to
+typical Groovy users but if framework writers are making use of that hook,
+they should rework their code.
+(link:https://issues.apache.org/jira/browse/GROOVY-10931[GROOVY-10931])
+* Groovy was incorrectly setting a null default value for annotations
+without a default value. If framework writers have made use of,
+or coded around the buggy behavior, they may need to rework their code.
+It might mean simplification by removing a workaround.
+(link:https://issues.apache.org/jira/browse/GROOVY-10862[GROOVY-10862])
+* Some Groovy AST transform annotations, like `@ToString` were given
+`RUNTIME` retention even though Groovy itself and typical Groovy user
+behavior never needs access to that annotation at runtime. This was
+done with a view that perhaps some future tools or framework might
+be able to use that information in some useful way. We know of no such
+frameworks or tools, so we have changed the retention to `SOURCE` to
+give cleaner class files.
+(link:https://issues.apache.org/jira/browse/GROOVY-10862[GROOVY-10862])
+* Groovy's `%` operator is called the "remainder" operator. Informally,
+it is also known as the "mod" operator and indeed, for operator overloading
+purposes we have historically used the `mod` method. While this name is in
+part just a convention, it can cause some confusion, since for example,
+the `BigInteger` class has both `remainder` and `mod` methods and
+our behavior, like Java's, follows the behavior of the `remainder` method.
+In Groovy 5, operator overloading for `%` is now handled by the `remainder` method.
+Fallback behavior is supported and workarounds exist for folks already using the `mod` method.
+(link:https://issues.apache.org/jira/browse/GROOVY-10800[GROOVY-10800])
+* Improvements have been made to better align how method selection
+is performed between the dynamic Groovy runtime and with static compilation.
+(link:https://issues.apache.org/jira/browse/GROOVY-8788[GROOVY-8788])
+* Improvements have been made to accessing fields within Maps.
+(link:https://issues.apache.org/jira/browse/GROOVY-6144[GROOVY-6144],
+link:https://issues.apache.org/jira/browse/GROOVY-5001[GROOVY-5001])
 
 [[Groovy5.0-requirements]]
 == JDK requirements
 
-Groovy 5.0 requires JDK16+ to build and JDK8 is the
+Groovy 5 requires JDK16+ to build and JDK11 is the
 minimum version of the JRE that we support.
-This may change before the GA version of Groovy 5 is released.
-Groovy has been tested on JDK versions 8 through 17.
+Groovy 5 has been tested on JDK versions 11 through 20.
 
 [[Groovy5.0-more-info]]
 == More information
