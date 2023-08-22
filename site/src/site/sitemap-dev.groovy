@@ -82,7 +82,11 @@ downloads {
             a(href: "${userSiteBase}releasenotes/groovy-5.0.html", 'Groovy 5.0')
             yield ' is the next major '
             a(href: 'versioning.html', 'version')
-            yield ' of Groovy. We expect to have alpha releases soon.'
+            yield ' of Groovy. Alpha releases are not recommended for production use.'
+        }
+        version('5.0.0-alpha-1') {
+            stable false
+//            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-5.0.0-alpha-1/'
         }
     }
     distribution('Groovy 4.0') {
