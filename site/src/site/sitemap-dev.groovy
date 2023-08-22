@@ -82,7 +82,7 @@ downloads {
             a(href: "${userSiteBase}releasenotes/groovy-5.0.html", 'Groovy 5.0')
             yield ' is the next major '
             a(href: 'versioning.html', 'version')
-            yield ' of Groovy. Alpha releases are not recommended for production use.'
+            yield ' of Groovy designed for JDK11+. Alpha releases are not recommended for production use.'
         }
         version('5.0.0-alpha-1') {
             stable false
@@ -96,8 +96,13 @@ downloads {
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK8+ with much improved JPMS support.'
         }
+        version('4.0.14') {
+            stable true
+//            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-4.0.14/'
+        }
         version('4.0.13') {
             stable true
+            archive true
             windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-4.0.13/'
         }
     }
