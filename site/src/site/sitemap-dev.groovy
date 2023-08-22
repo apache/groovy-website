@@ -130,8 +130,13 @@ downloads {
             a(href: 'versioning.html', 'version')
             yield ' of Groovy still in widespread use.'
         }
+        version('2.5.23') {
+            stable true
+//            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-2.5.23/'
+        }
         version('2.5.22') {
             stable true
+            archive true
             windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-2.5.22/'
         }
     }
