@@ -14,14 +14,12 @@ feedback on the language changes from our community. In addition, early versions
 assist other projects and tool vendors within the Groovy ecosystem to begin assessing
 the impact of moving to/supporting Groovy 5.0. Caution should be exercised if using
 new features as the details may change before final release. +
-Some features described here as "incubating" may become stable before 5.0.0
-final is released, others are expected to remain incubating for version 5.
+&nbsp; +
 We don’t recommend using alpha versions or incubating features for production systems.
 We don't regard alpha versions as being feature-complete, so caution should be exercised
 before undertaking any large scale ports to Groovy 5. Having said that, we don't
 expect porting to Groovy 5 from Groovy 4 should involve much effort.
 |===
-
 
 [[Groovy5.0-new]]
 == New features
@@ -36,7 +34,73 @@ var (x, y) = [1, 2]
 assert x == 1 && y == 2
 ----
 
+=== AST transform additions and improvements
+
+There is a new `OperatorRename` AST transform.
+This is very useful when using third-party libraries which use different
+names to those used by Groovy's operator overloading functionality.
+For example, using the Apache Commons Numbers Fraction library:
+
+[source,groovy]
+----
+@OperatorRename(plus='add')
+def testAddOfTwoFractions() {
+    var half = Fraction.of(1, 2)
+    var third = Fraction.of(1, 3)
+    assert half.add(third) == Fraction.of(5, 6)  // old style still works
+    assert half + third == Fraction.of(5, 6)     // fraction '+' operator!
+}
+----
+
+This transform is quite handy when using various matrix packages.
+Such packages often align with Groovy's operator overloading conventions
+for many, but usually not all, operators.
+For instance, you might like to rename:
+
+* `mult` to `multiply` if using Ejml
+* `add` to `plus` if using Commons Math matrices
+* `sub` to `minus` if using Nd4j matrices
+
 === Extension method additions and improvements
+
+==== Additional primitive array extensions
+
+There are over 160 additional extension methods on primitive arrays.
+Methods like `any`, `chop`, `each`, `eachWithIndex`, `equals`, `every`,
+`first`, `head`, `init`, `join`, `last`, `max`, `maxBy`, `maxComparing`,
+`min`, `minBy`, `minComparing`, `reverse`, `reverseEach`, `tail`, and `transpose`
+now have variants for primitive arrays like `int[]`, `long[]`, `double[]`, etc.
+And methods like `flatten` are added for `int[][]`,`long[][]`, etc.
+
+Some examples:
+
+[source,groovy]
+----
+int[] nums = -3..2
+assert nums.any{ it > 1 }
+       && nums.every(n -> n < 4)
+       && nums.join(' ') == '-3 -2 -1 0 1 2'
+       && nums.head() == -3
+       && nums.tail() == -2..2
+       && nums.max() == 2
+       && nums.min{ it.abs() } == 0
+       && nums.maxComparing(Comparator.reverseOrder()) == -3
+       && nums.reverse() == 2..-3
+
+int[][] matrix = [[1,   2],
+                  [10,  20],
+                  [100, 200]]
+assert matrix.transpose() == [[1, 10, 100],
+                              [2, 20, 200]]
+----
+
+In some cases, the methods existed for a few of the primitive types but now work with more primitive types.
+In numerous cases, the functionality was only available by converting the array to a list first - which was easy but increased memory usage and decreased performance.
+For other cases, implementations now avoid un/boxing where possible.
+All up this means that Groovy now works better in data science scenarios
+allowing more streamlined and performant code.
+
+==== Additional File and Path extensions
 
 There are some additional extension methods for `File` objects:
 
@@ -49,6 +113,7 @@ assert myscript.baseName == 'MyScript'
 ----
 
 And similar methods for `Path` objects:
+
 [source,groovy]
 ----
 def mypic = path.resolve('MyFigure.png')
@@ -56,6 +121,28 @@ assert mypic       // Groovy truth: true if the file exists
 assert mypic.extension == 'png'
 assert mypic.baseName == 'MyFigure'
 ----
+
+==== Additional Collection extensions
+
+We have added a `flattenMany` method which is a close cousin to the
+`collectMany` method. These are Groovy's `flatMap` like methods.
+
+[source,groovy]
+----
+var items = ["1", "2", "foo", "3", "bar"]
+var toInt = s -> s.number ? Optional.of(s.toInteger()) : Optional.empty()
+assert items.flattenMany(toInt) == [1, 2, 3]
+assert items.flattenMany(String::toList) == ['1', '2', 'f', 'o', 'o', '3', 'b', 'a', 'r']
+assert items.flattenMany{ it.split(/[aeiou]/) } == ['1', '2', 'f', '3', 'b', 'r']
+
+assert ['01/02/99', '12/12/23'].flattenMany{ it.split('/') } ==
+    ['01', '02', '99', '12', '12', '23']
+----
+
+If you are working solely with collections, using `collectMany` will offer
+improved type inference with type checked code. If you also want to
+flat other things like arrays and optionals, `flattenMany` gives some
+added flexibility.
 
 There are additional variants of `collectEntries` for arrays, iterables and iterators
 with separate functions for transforming the keys and values. There are variants
@@ -97,8 +184,95 @@ assert lengths.collectValues(Math.&pow.curry(2).memoize()) ==
     [Groovy:64.0, Java:16.0, Kotlin:64.0, Scala:32.0]
 ----
 
+There are a number of new extensions for Sets including operator overload
+variants:
+
+[source,groovy]
+----
+var a = [1, 2, 3] as Set
+var b = [2, 3, 4] as Set
+assert a.union(b) == [1, 2, 3, 4] as Set
+assert a.intersect(b) == [2, 3] as Set
+assert (a | b) == [1, 2, 3, 4] as Set
+assert (a & b) == [2, 3] as Set
+assert (a ^ b) == [1, 4] as Set
+
+Set d = ['a', 'B', 'c']
+Set e = ['A', 'b', 'D']
+assert d.and(e, String.CASE_INSENSITIVE_ORDER) == ['a', 'B'] as Set
+assert e.union(d, String.CASE_INSENSITIVE_ORDER) == ['A', 'b', 'D', 'c'] as Set
+----
+
+
+==== Checked collections
+
+Java, being statically typed, tries hard to ensure type safety at compile time
+but provides some flexibility to work with objects whose type can only be
+checked at runtime. Because of type erasure, Java's runtime checking is curtailed
+to some degree. It is not unusual for errant programs to fail, e.g. with a ClassCastException. The issue is the failure may occur
+a long way from the part of the code which caused the problem. The CheckedXXX
+classes within `java.util.Collections` provide a way to improve type safety and
+find such issues at the origin of the problem. When debugging errant code,
+one recommendation is to wrap your collections with the checked classes.
+Once the error is found and fixed, remove the wrapping code for better performance.
+
+Code using Groovy's dynamic
+nature can be even more lenient than Java code, so Groovy can benefit from these
+classes even more than Java, so we made them easy to use with an `asChecked`
+method added for the common collection types.
+
+[source,groovy]
+----
+// assume type checking turned off
+List<String> names = ['john', 'pete']
+names << 'mary' // ok
+names << 35     // danger! but unnoticed at this point
+println names*.toUpperCase() // fails here
+----
+
+In this example, we could turn type checking on for immediate feedback
+but in general we might be using a library with less information available
+due to type erasure. In any case, we can use `asChecked` to fail early:
+
+[source,groovy]
+----
+// assume type checking turned off
+List<String> names = ['john', 'pete'].asChecked(String)
+names << 'mary' // ok
+names << 35     // boom! fails early
+----
+
 [[Groovy5.0-other]]
 == Other improvements
+
+=== Underscore as a placeholder
+
+The use of "_" (underscore) as a placeholder for unused parameters is earmarked
+for inclusion in future Java versions (see "Treatment of underscores" in https://openjdk.java.net/jeps/302[JEP 302: Lambda Leftovers]).
+This is available in Groovy 5. Some examples:
+
+[source,groovy]
+----
+// unused components in multi-assignment
+var (_, y, m, _, _, d) = Calendar.instance
+println "Today is $y-${m+1}-$d" // Today is 2023-8-23
+
+// unused lambda parameters
+def c = (_, _, a, b) -> a + b
+def d = (_, a, _, b) -> a + b
+def e = (_, a, b, _) -> a + b
+assert c(1000, 100, 10, 1) == 11
+assert d(1000, 100, 10, 1) == 101
+assert e(1000, 100, 10, 1) == 110
+
+// unused closure parameters
+def f = { a, _, _, b -> a + b }
+def g = { a, _, b, _ -> a + b }
+def h = { a, b, _, _ -> a + b }
+assert f(1000, 100, 10, 1) == 1001
+assert g(1000, 100, 10, 1) == 1010
+assert h(1000, 100, 10, 1) == 1100
+----
 
 [[Groovy5.0-ongoing]]
 == Ongoing work
@@ -142,7 +316,7 @@ def make3D(pt) {
 }
 --------------------------------------
 
-You could use something like:
+You could potentially use something like:
 
 [source,groovy]
 --------------------------------------
@@ -169,7 +343,7 @@ static void testTriangle(Shape s) {
     switch (s) {
         case null ->
             System.out.println("Null!");
-        case Triangle t && (t.calculateArea() > 100) ->
+        case Triangle t when t.calculateArea() > 100 ->
             System.out.println("Large triangle");
         case Triangle t ->
             System.out.println("Small triangle");
@@ -210,7 +384,6 @@ static void printColorOfUpperLeftPoint(Rectangle r) {
 
 * Module definitions written in Groovy (i.e. module-info.groovy)
 link:https://issues.apache.org/jira/browse/GROOVY-9273[GROOVY-9273]
-* Use of "_" (underscore) for unused parameters (see "Treatment of underscores" in https://openjdk.java.net/jeps/302[JEP 302: Lambda Leftovers])
 
 [[Groovy5.0-breaking]]
 == Other breaking changes
@@ -262,7 +435,7 @@ Fallback behavior is supported and workarounds exist for folks already using the
 * Improvements have been made to better align how method selection
 is performed between the dynamic Groovy runtime and with static compilation.
 (link:https://issues.apache.org/jira/browse/GROOVY-8788[GROOVY-8788])
-* Improvements have been made to accessing fields within Maps.
+* Improvements have been made to improve consistency when accessing fields within Map-like classes.
 (link:https://issues.apache.org/jira/browse/GROOVY-6144[GROOVY-6144],
 link:https://issues.apache.org/jira/browse/GROOVY-5001[GROOVY-5001])
 
