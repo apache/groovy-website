@@ -34,6 +34,113 @@ var (x, y) = [1, 2]
 assert x == 1 && y == 2
 ----
 
+=== Scripting alternate forms
+
+https://openjdk.org/jeps/445[JEP 445] (a preview feature for JDK 21) allows certain
+Java executable classes to have a shortened form, potentially leaving out the class
+declaration and having  a simplified `main` method declaration.
+Such classes are still more verbose than Groovy scripts,
+but we have provided support for JEP 445 compatible classes in
+Groovy 5 to ease support for Java developers using Groovy and provide
+a few nice benefits to Groovy developers along the way.
+
+Let's recap the story so far. First, a traditional Java class:
+
+[source,java]
+----
+public class HelloWorld {                       // Java
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+----
+
+Next, the Groovy equivalent:
+
+[source,groovy]
+----
+println 'Hello, World!'
+----
+
+What is being proposed for JEP 445 in Java:
+
+[source,java]
+----
+void main() {                                   // Java future
+    System.out.println("Hello, World!");
+}
+----
+
+What Groovy will also support:
+
+[source,groovy]
+----
+void main() {
+    println 'Hello, World!'
+}
+----
+
+Obviously, this is longer than the traditional Groovy one-liner script
+but has the advantage that we can place annotations on the `main` method.
+`TYPE` targeted annotations on the `main` method will be moved to the generated
+script class. `METHOD` targeted annotations remain on the method.
+
+Classes created with an instance `main` method (like above) are JEP 445 compatible
+classes and will need to be invoked from the JDK with JEP 445 capability enabled
+(currently requires enabling preview in JDK21) or using the Groovy runner which
+now supports such classes from JDK11+.
+
+For backwards compatibility, classes created with a static `main` method are
+_promoted_ to have the normal public static void main signature. They can be run
+like normal Java or Groovy classes.
+
+There are variants in Java and Groovy to also have arguments available:
+
+[source,groovy]
+----
+@CompileStatic
+static main(args) {
+    println 'Groovy world!'
+}
+----
+
+JEP 445 compatible classes may also contain other field and method definitions as shown here:
+
+[source,groovy]
+----
+def main() {
+    assert upper(foo) + lower(bar) == 'FOObar'
+}
+
+def upper(s) { s.toUpperCase() }
+
+def lower = String::toLowerCase
+def (foo, bar) = ['Foo', 'Bar']
+----
+
+But they can't contain any other "uncontained" statements, otherwise they
+are treated like a normal Groovy script. Another important distinction for JEP 445
+compatible classes is that fields (like `lower`, `foo`, and `bar` in the above example)
+don't need to be annotated with `@Field`.
+
+An additional form is also supported which involves overwriting the `run` method
+in a script. This provides an alternate form to the earlier shown `main` variants.
+The difference is that rather than producing a JEP 445 compatible class, Groovy
+produces a script class which extends the `Script` class in the normal way and has
+access to the normal script binding and context. The use case is again where you
+might want to supply annotations, e.g.:
+
+[source,groovy]
+----
+@JsonIgnoreProperties(["binding"])
+def run() {
+    var mapper = new ObjectMapper()
+    assert mapper.writeValueAsString(this) == '{"pets":["cat","dog"]}'
+}
+
+public pets = ['cat', 'dog']
+----
+
 === AST transform additions and improvements
 
 There is a new `OperatorRename` AST transform.
@@ -203,7 +310,6 @@ assert d.and(e, String.CASE_INSENSITIVE_ORDER) == ['a', 'B'] as Set
 assert e.union(d, String.CASE_INSENSITIVE_ORDER) == ['A', 'b', 'D', 'c'] as Set
 ----
 
-
 ==== Checked collections
 
 Java, being statically typed, tries hard to ensure type safety at compile time
@@ -273,6 +379,21 @@ assert f(1000, 100, 10, 1) == 1001
 assert g(1000, 100, 10, 1) == 1010
 assert h(1000, 100, 10, 1) == 1100
 ----
+
+=== Miscellaneous enhancements
+
+There is now a utility method to produce simple ascii-art barcharts. The following code:
+
+[source,groovy]
+----
+['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].each {
+    println "\n${it.padRight(12)}${bar(it.size(), 0, 10, 10)}"
+}
+----
+
+produces this image:
+
+image:img/ascii_barchart.png[image]
 
 [[Groovy5.0-ongoing]]
 == Ongoing work
