@@ -217,18 +217,20 @@ ecosystem {
 
 allEvents {
     // Note that the event image should be 257x180 to look nice
-    event('ApacheCon NA') {
-        location 'New Orleans, Louisiana'
-        date 'October 3-6, 2022'
-        url 'https://www.apachecon.com/acna2022/'
-        logo 'img/confs/acna2022.png'
+    event('Community over Code NA') {
+        location 'Halifax, Nova Scotia'
+        date 'October 7-10, 2023'
+        url 'https://communityovercode.org/'
+        logo 'img/confs/coc2023.png'
         description '''
             <p>
             The latest innovations from dozens of Apache projects and their communities in a collaborative,
             vendor-neutral environment.
             </p>
-            <p>There is a 2-day Groovy track covering latest news, functional programming with Groovy,
-            Spock, Grails, Micronaut, Gradle, DSLs and more. Also, there is Groovy content in other tracks
+            <p>There is a 2-day Groovy track covering latest news, testing and functional programming with Groovy,
+            Spock, Grails, Micronaut, GORM, Gradle, DSLs, using Groovy for data science, with Apache Ignite,
+            with Kubernetes, and more.
+            Also, there is Groovy content in other tracks
             plus some special events like BoF sessions and other surprises.</p>
         '''
     }
