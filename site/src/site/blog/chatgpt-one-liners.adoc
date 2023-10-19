@@ -334,3 +334,50 @@ try {
 ----
 
 '''
+[quote]
+****
+_A politician visited a village and asked what their needs were._
+
+_”We have 2 basic needs sir,” replied the villager._
+
+_“Firstly, we have a hospital, but there’s no doctor.”_
+
+_On hearing this, politician whipped out his cellphone, and after speaking for a while he reassured the village leader that the doctor would be there the next day. He then asked about the second problem._
+
+_“Secondly sir, there is no cellphone coverage anywhere in this village._
+****
+
+First let's look at how we might write a `Politician` class:
+
+[source,groovy]
+----
+class Politician {
+    private static int next = 0
+    boolean elected
+    private List<String> excuses = ['No budget', 'Maybe later', 'Not a priority']
+    String canYouHelpFix(String problem) {
+        if (!elected) 'Sure can!'
+        else excuses[next++ % excuses.size()]
+    }
+}
+----
+
+Groovy can't help fix all political problems, but using the `@Memoized` annotation, and leaving everything else the same, we can make sure that once a politician responds one way, they can only keep responding in exactly the same way, regardless of whether they are elected or not.
+
+[source,groovy]
+----
+import groovy.transform.*
+
+class Politician {
+    private static int next = 0
+    boolean elected
+    private List<String> excuses = ['No budget', 'Maybe later', 'Not a priority']
+    @Memoized
+    String canYouHelpFix(String problem) {
+        if (!elected) 'Sure can!'
+        else excuses[next++ % excuses.size()]
+    }
+}
+----
+
+'''
