@@ -317,3 +317,20 @@ use(JediMindTrick) {
 ----
 
 '''
+[quote]
+****
+_Q: What happened when the pirates pet bird tried to say "Pieces of 7"?_
+
+_A: It got a ParrotyError!"_
+****
+
+As shown here:
+
+[source,groovy]
+----
+try {
+   pet.say('Pieces of 7')
+} catch(ParrotyError ignore) { }
+----
+
+'''
