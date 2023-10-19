@@ -261,3 +261,59 @@ assert c.toString() == 'Car[make=Landrover, model=Explore, color=Black, year=201
 ----
 
 '''
+
+[quote]
+****
+_Why did the Jedi use a mind trick on the stormtroopers when they couldn't find the missing droids?_
+
+_Because, as Obi-Wan said, "These aren't the droids you're looking for. You're actually looking for your misplaced keys, and you'll find them in the last place you look!"_
+****
+
+Let's first show how Groovy could help us find some droids that we are looking for.
+Drones are hardest to find when there are several clone look-a-likes. We won't mention the clone wars!
+
+We'll create a shuffled list of droids and their clones, and then search for the ones we are after:
+
+[source,groovy]
+----
+@AutoClone class Droid { String name }
+
+def r2d2 = new Droid(name: 'R2-D2')
+def c3po = new Droid(name: 'C-3PO')
+def droids = [r2d2, c3po]
+3.times {
+    droids << r2d2.clone()
+    droids << c3po.clone()
+}
+droids.shuffle()
+droids.eachWithIndex { droid, index ->
+    if (droid == r2d2) println "Droid $index is $r2d2.name"
+    if (droid == c3po) println "Droid $index is $c3po.name"
+}
+----
+
+If we don't want to output the index where we found the droid, we can use
+an alternative expression to show that the droids we are after are found:
+
+[source,groovy]
+----
+assert droids.any{ it.is(r2d2) }
+assert droids.any{ it.is(c3po) }
+----
+
+Of course, Obi-Wan uses a Jedi mind trick which we can show here using
+some Groovy metaprogramming, in this case a category class:
+
+[source,groovy]
+----
+class JediMindTrick {
+    static boolean is(Droid d, Droid other) { false }
+}
+
+use(JediMindTrick) {
+    assert !droids.any{ it.is(r2d2) }
+    assert !droids.any{ it.is(c3po) }
+}
+----
+
+'''
