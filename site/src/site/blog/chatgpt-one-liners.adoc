@@ -1,7 +1,6 @@
 = ChatGPT meets Groovy one-liners
 Paul King
 :revdate: 2023-10-19T18:00:00+00:00
-:draft: true
 :keywords: groovy, chatgpt, one-liners
 :description: I asked ChatGPT if it could represent some short/one-liner programming-related dad jokes as short/one-liner Groovy scripts.
 
