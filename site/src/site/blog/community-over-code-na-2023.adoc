@@ -52,6 +52,8 @@ The Groovy track was spread over the first two days of the conference and had te
 as well as a _birds-of-a-feather_ session after the first day.
 The sessions typically had mini-themes: Groovy update, for Java developers, Kubernetes and Groovy,
 Groovy and Data Science (this year featuring Apache Ignite) and so on.
+Here we'll just look at a few highlights of each talk. You are encouraged to peruse
+the slides and other content if you want more details.
 
 === Groovy update
 
@@ -67,7 +69,7 @@ Some highlights:
 
 * Groovy downloads recently surpassed the 3 billion mark in total and is currently tracking just over
 3 million downloads per day on average.
-* Groovy supports classes and scripts but with JEP 445 scripting on the way in Java (preview in JDK21),
+* Groovy already supports classes and scripts but with JEP 445 scripting on the way in Java (preview in JDK21),
 Groovy 5 supports additional forms so that JEP 445 code examples will run straight in Groovy (for JDK11+).
 +
 [source,groovy]
@@ -80,7 +82,7 @@ There are variations that remain strictly JEP 445 compatible (to gain the same b
 and variations which retain Groovy's extra features like access to the script binding and context.
 The `run` method is used instead of the `main` method to gain the traditional Groovy script features.
 An added bonus is that Groovy's `@Field` annotation isn't needed to designate fields within JEP 445-like scripts.
-Here is another example:
+Here is another example, this one using Jackson data binding to serialize itself as a JSON file:
 +
 [source,groovy]
 ----
@@ -101,9 +103,13 @@ println "Today is $y-${m+1}-$d" // Today is 2023-8-23
 ----
 * An additional `@OperatorRename` AST transform is now available which makes it easier to use
 a multitude of libraries with Groovy's operator overloading. This is handy when working with
-packages that might manipulate complex numbers, matrices, or fractions (as per the example below
+libraries that might manipulate complex numbers, matrices, or fractions (as per the example below
 which uses the Apache Commons Numbers Fraction library).
-Such libraries can now easily be used with the operator overloading feature.
+Previously, you may have forgone using the operator overloading shortcuts,
+or you (or someone else) would have possibly written some Groovy specific
+extension methods to provide the nicer operator overloading syntactic sugar for a particular library
+of interest. Now, such libraries can now easily be used straight out-of-the-box
+with the operator overloading feature.
 +
 [source,groovy]
 ----
@@ -174,7 +180,8 @@ which yields:
 | C         | [CANTALOUPE]     |
 +-----------+------------------+
 ----
-* Groovy gives you powerful switch expressions:
+* While we like, many of the exciting changes for switch expressions coming along with
+recent Java versions, Groovy still provides numerous additional options (for JDK8+):
 image:img/Groovy2023Switch.png[Groovy switch expressions,border="1"]
 * Groovy gives you the choice of emulated records for JDK8+
 or native records for JDK16+ with many record enhancements:
@@ -184,6 +191,7 @@ easier by Groovy's AST transforms. The slides have examples of combining
 records with the following AST transforms:
 `@PropertyOptions`, `@ToString`, `@Memoized`, `@Builder`,
 `@Requires`, `@Sortable`, `@Newify`, and `@OperatorRename`.
+But of course, you aren't limited to just that list.
 
 === Groovy for Java developers
 
@@ -192,7 +200,8 @@ they could use Groovy for their development or testing needs.
 
 Groovy for Java Developers
 
-Testing your Java with Groovy, Spock, JUnit5, Jacoco, Jqwik and Pitest
+The next talk was
+https://speakerdeck.com/paulk/property-based-testing[Testing your Java with Groovy, Spock, JUnit5, Jacoco, Jqwik and Pitest].
 
 === Kubernetes and Groovy
 
@@ -211,15 +220,19 @@ care of by the platform.
 The sample application was a simple solution to the
 https://en.wikipedia.org/wiki/Collatz_conjecture[Collatz conjecture].
 I remember studying this back in my Uni days but had forgotten the details.
-Basically one of two calculations is performed, depending on whether the
-current result is even. Eventually, the result always equals 1.
+Basically, given a starting number, one of two calculations is performed,
+depending on whether the current number is even.
+Odd numbers are multiplied by 3 and then 1 is added, even numbers are divided by 2.
+This is stopped if the result becomes the number 1, but otherwise continues.
+The conjecture is that eventually, the calculation terminates, i.e. it always eventually equals 1.
+
 Of interest is the number of cycles needed to get to 1.
 Here is an algorithm that returns the number of cycles:
 
 [source,groovy]
 ----
 class Collatz {
-  static long getAt(BigInteger n){
+  static long getAt(BigInteger n) {
     var result = n
     var count = 0L
     while (result != 1G) {
@@ -236,6 +249,7 @@ class Collatz {
 }
 ----
 
+We used a static `getAt` method to give us a neat shorthand for getting the result.
 We can test out some of the example sequences mentioned in the https://en.wikipedia.org/wiki/Collatz_conjecture[Wikipedia page]:
 
 [source,groovy]
@@ -258,6 +272,9 @@ mn create-app \
     --lang groovy collatz
 ----
 
+We've shown some example features you might want to use.
+You could add further features depending on your application's needs.
+
 We can change the skeleton controller to have our desired functionality:
 
 [source,groovy]
@@ -274,7 +291,26 @@ We can change the skeleton controller to have our desired functionality:
 Jorge then went on to explain the k8s configuration details and gave a demonstration
 deploying the application.
 
-Let Groovy operate your k8s cluster
+Jorge also presented the next talk: https://communityovercode.files.wordpress.com/2023/10/sat_groovy_let_groovy_operate_your_cluster-jorge.pdf[Let Groovy operate your k8s cluster].
+This dived into more k8s details. He showed how to write a swagger-operator in Groovy
+which removed the need for tedious manual steps when deploying k8s applications.
+The operator monitors our services, rewrites the configmap if needed and restarts the pod.
+
+The operator itself was written in https://micronaut.io/[Micronaut]:
+
+[source,groovy]
+----
+@Operator(
+    informer = @Informer(
+        apiType = V1Swagger,
+        apiListType = V1SwaggerList,
+        apiGroup = V1SwaggerWrapper.GROUP,
+        resourcePlural = V1SwaggerWrapper.PLURAL,
+        resyncCheckPeriod = 10000L)
+)
+class SwaggerOperator implements ResourceReconciler<V1Swagger>{
+}
+----
 
 === Apache Groovy and Apache Ignite
 
