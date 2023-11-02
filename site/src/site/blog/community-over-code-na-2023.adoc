@@ -205,9 +205,10 @@ https://speakerdeck.com/paulk/property-based-testing[Testing your Java with Groo
 
 === Kubernetes and Groovy
 
+The next mini-theme in the Groovy track was Kubernetes and Groovy.
 image:https://photos.apachecon.com/_data/i/upload/2023/10/12/20231012200925-e882ed51-me.jpg[Jorge Aguilera,200,float="right"]
 
-It works on my cluster. Deploying a groovy kubernetes application to Okteto.
+The first talk was by https://jvm.social/@jorge[Jorge Aguilera]: _It works on my cluster. Deploying a groovy kubernetes application to Okteto._
 https://communityovercode.files.wordpress.com/2023/10/sat_groovy_it_works_on_my_cluster-jorge.pdf[Slides]
 
 In this talk, Jorge showed a
@@ -314,13 +315,21 @@ class SwaggerOperator implements ResourceReconciler<V1Swagger>{
 
 === Apache Groovy and Apache Ignite
 
-image:https://photos.apachecon.com/_data/i/upload/2023/10/13/20231013192401-65a58458-cu_s9999x410.jpg[Jeremy Meyer,200,float="right"]
+The next mini-theme was Groovy and Data Science. Groovy has been described
+as the Python equivalent for the JVM and Groovy works well with many of the ASF
+frameworks and technologies related to data science and big data in general.
+This year the conference had a particular focus on scaling up data science,
+data and compute applications using https://ignite.apache.org/[Apache Ignite].
 
-Whiskey Clustering with Apache Groovy and Apache Ignite
+The first talk was https://speakerdeck.com/paulk/whisky-clustering-groovy-ignite[Whisky Clustering with Apache Groovy and Apache Ignite]
 
+As a side note, it is rumoured that additional extensive research on this topic may (or may not)
+have been held in conjunction with the conference. Only because the conference was in (Nova) Scotia no doubt!
 image:img/HalifaxWhisky.png[Citadel]
 
-Scalable Distributed Computing with Groovy Using Apache Ignite
+image:https://photos.apachecon.com/_data/i/upload/2023/10/13/20231013192401-65a58458-cu_s9999x410.jpg[Jeremy Meyer,200,float="right"]
+The second talk was by https://www.linkedin.com/in/jeremy-s-meyer/[Jeremy Meyer]:
+https://drive.google.com/file/d/1vjDkFmG9zz9y7yDY10ru9tya7KidJsqG/view?usp=sharing[Scalable Distributed Computing with Groovy Using Apache Ignite]
 
 === Miscellaneous
 
