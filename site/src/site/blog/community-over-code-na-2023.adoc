@@ -198,6 +198,8 @@ But of course, you aren't limited to just that list.
 The next two talks were aimed at Java developers who wanted to understand how
 they could use Groovy for their development or testing needs.
 
+image:https://photos.apachecon.com/_data/i/upload/2023/10/12/20231012200013-649bb746-me.jpg[Jeff Scott Brown,200,float="right"]
+
 The next talk was by https://www.linkedin.com/in/jeffscottbrown/[Jeff Scott Brown] on
 _Groovy for Java Developers_. Jeff covered a range of topics including:
 
@@ -393,30 +395,168 @@ class SwaggerOperator implements ResourceReconciler<V1Swagger>{
 The next mini-theme was Groovy and Data Science. Groovy has been described
 as the Python equivalent for the JVM and Groovy works well with many of the ASF
 frameworks and technologies related to data science and big data in general.
-This year the conference had a particular focus on scaling up data science,
-data and compute applications using https://ignite.apache.org/[Apache Ignite].
 
-The first talk was https://speakerdeck.com/paulk/whisky-clustering-groovy-ignite[Whisky Clustering with Apache Groovy and Apache Ignite]
+This year the Groovy track's data science content had a particular focus on
+scaling up your data science applications,
+and your data and compute applications in general,
+using https://ignite.apache.org/[Apache Ignite].
+
+The first talk was https://speakerdeck.com/paulk/whisky-clustering-groovy-ignite[Whisky Clustering with Apache Groovy and Apache Ignite]. This was a case study looking at how to cluster
+86 single malt scotch whiskies.
+
+image:img/Clustering0.png[Whiskey flavour profiles]
+
+There are different algorithms that can be used to do the clustering.
+Here K-Means clustering was used.
+
+image:img/Clustering1.png[The k-means algorithm]
+
+For this particular dataset, the number of datapoints is relatively small
+and scaling up isn't crucial. But larger datasets would be split up in the same way
+so we'll look at how we'd scale this up. First we read in the data:
+
+image:img/Clustering2.png[Whiskey flavour profiles]
+
+Apache Ignite has special features for reading in data within a cluster environment,
+but we can get by using Apache Commons CSV for our example.
+
+If you know the K-Means algorithm, at first glance it doesn't appear amenable to
+distribution. To cluster points you need to calculate distances of _all_ the points
+to your centroids. Luckily, various distributed versions of the algorithm have been
+devised and this is what is included in the `ignite-ml` library. We just use the library
+in the same way we'd use a non-distributed version and Ignite does the hard work for you.
+Here is the result:
+
+image:img/Clustering3.png[Whiskey flavour profiles]
+
+There are various options we have to tweak the algorithm and various
+ways to visualize the results.
+
+image:img/Clustering4.png[Whiskey flavour profiles]
 
 As a side note, it is rumoured that additional extensive research on this topic may (or may not)
 have been held in conjunction with the conference. Only because the conference was in (Nova) Scotia no doubt!
 image:img/HalifaxWhisky.png[Citadel]
 
 image:https://photos.apachecon.com/_data/i/upload/2023/10/13/20231013192401-65a58458-cu_s9999x410.jpg[Jeremy Meyer,200,float="right"]
-The second talk was by https://www.linkedin.com/in/jeremy-s-meyer/[Jeremy Meyer]:
-https://drive.google.com/file/d/1vjDkFmG9zz9y7yDY10ru9tya7KidJsqG/view?usp=sharing[Scalable Distributed Computing with Groovy Using Apache Ignite]
+The second talk was by https://www.linkedin.com/in/jeremy-s-meyer/[Jeremy Meyer] discussing
+https://drive.google.com/file/d/1vjDkFmG9zz9y7yDY10ru9tya7KidJsqG/view?usp=sharing[Scalable Distributed Computing with Groovy Using Apache Ignite].
+
+In this talk, Jeremy posed the question:
+
+[quote]
+What if we used the dynamic, easy to code and prototype aspects of Groovy... +
+...with the fantastically scalable compute power of Apache Ignite's
+compute grid, and clever peer class loading?
+
+For those that know Ignite, it can be used in numerous ways:
+
+image:img/IgniteRubiks1.png[Ignite,90%]
+
+In this scenario, it was going to be used for distributed computing
+and the task at hand was to solve Rubik's cubes. In this case,
+particular non-destructive corner moves of a 3x3x2 cube.
+
+image:img/IgniteRubiks2.png[Numbers,90%]
+
+First up was to create a little domain model to represent the cube:
+
+image:img/IgniteRubiks3.png[Model,90%]
+
+Then piece together a cluster of computers of varying skills for the compute grid:
+
+image:img/IgniteRubiks4.png[Team,90%]
+
+Or a different visualization of the machines if you're not
+a Guardians of the Galaxy fan:
+
+image:img/IgniteRubiks5.png[Machines,90%]
+
+Then code up the corner swapping algorithm:
+
+image:img/IgniteRubiks6.png[Algorithm,90%]
+
+And finally get the results:
+
+image:img/IgniteRubiks7.png[Results,90%]
+
+I won't steal Jeremy's thunder. Check out the link for details.
+But a lesson learned is that naively allocating work to machines of
+differing capabilities can sometimes yield surprising results.
+Luckily, there are various ways that compute grids job allocation
+can account for such variations.
 
 === Miscellaneous
 
 GORM Data Services
 
+image:img/JeffOpenSourceSoftwareAndYou.jpg[Jeff Scott Brown,300,float="right"]
 Open Source Software and You
 
-== But wait, there's more...
+== Other tracks
+
+In addition to the Groovy track, the conference was full of other fascinating content too,
+grouped into the following tracks:
+
+* API/Microservices Track
+* Big Data: Compute Track
+* Big Data: Storage Track
+* Cloud and Runtime Track
+* Community Track
+* Content Wrangling Track
+* Data Engineering Track
+* Fintech Track
+* Frameworks Track
+* Geospatial Track
+* Highlights Track
+* Incubator Track
+* Internet of Things Track
+* Performance Engineering Track
+* Search Track
+* Serverside Chat with ASF Infra
+* Streaming Track
+* Sustainability Track
+* Tomcat and httpd Track
+
+I did manage to see quite a few talks from some of the
+other tracks but instead of trying to summarise everything I saw,
+I'll point you to the online content which is being linked to the conference
+https://communityovercode.org/schedule/[schedule].
+
+== An evening at the Citadel
+
+The conference attendee event was an evening at the Halifax Citadel National Historic Site.
+The Citadel is a fortification that was built (and rebuilt several times) to
+protect the city. It stands high on a hill overlooking the harbour and also has
+been a crucial communication hub at times.
+
+It is worthwhile visiting the Citadel if you are ever in Halifax.
+They have historical tours, ghost tours, daily cannon firing,
+and occasional marching and band drills. I'll just point out one feature
+that was mentioned in the tour. The flag poles served the dual purpose of
+military and commercial signalling before the advent of electronic telecommunications.
+Even after the invention of the telegraph, the flags have still been used
+as a tradition to earlier times.
+
+The commercial signal mast was used by the British army to communicate marine
+traffic in the harbour to the public. Different flags would indicate the
+number and nationality of approaching ships (among other things).
+The military signal mast used a code based on flags and disks.
+Messages could be relayed to other signal posts and allowed a message
+to be sent great distances quickly. A message that might take half a day
+to deliver on horseback could be done in 30 minutes using the signal masts and codes.
 
 image:img/HalifaxCitadel.png[Citadel]
 
+== But wait, there's more...
+
+Of course, there is much more to ASF conferences than I can hope to do justice to hear.
+There's great people, great food, hallway conversations, a chance to chat to the wonderful
+Infra folks. And did I say great people and great food?
+
 image:img/HalifaxConferenceOverall.png[conference]
+
+I hope to see you at a future ASF conference.
 
 == Back home
 
@@ -424,6 +564,8 @@ When you return from a trip, make sure to catch up with family and friends.
 In my case, this involved a weekend away at the beach.
 
 image:img/MermaidBeach.jpg[Mermaid Beach]
+
+If you visit Australia, make sure to pop in.
 
 == Other information
 
