@@ -198,10 +198,85 @@ But of course, you aren't limited to just that list.
 The next two talks were aimed at Java developers who wanted to understand how
 they could use Groovy for their development or testing needs.
 
-Groovy for Java Developers
+The next talk was by https://www.linkedin.com/in/jeffscottbrown/[Jeff Scott Brown] on
+_Groovy for Java Developers_. Jeff covered a range of topics including:
+
+* Groovy optional typing
+* Groovy properties
+* Groovy script syntax
+* Evolving Java source to Groovy
+* Special features of Groovy
+* Groovy extension methods for Groovy and Java classes
 
 The next talk was
 https://speakerdeck.com/paulk/property-based-testing[Testing your Java with Groovy, Spock, JUnit5, Jacoco, Jqwik and Pitest].
+This talk covered a common scenario of using Groovy tests with Java production code, though most of the content
+is applicable for production code in other JVM languages (including Groovy!) too.
+It also showed examples of a few advanced tools you might want to consider as part of your testing toolkit.
+
+The central example for the talk was based around what initially appears to be a very
+simple mathematical calculation originally implemented using the following Java code:
+
+image:img/TestingJava1.png[Buggy code,80%]
+
+We write a Groovy test using the https://spockframework.org/[Spock] testing framework which
+at first glance seems to indicate our initial implementation is correct since all the tests
+pass and we have 100% test coverage.
+
+image:img/TestingJava2.png[Code coverage,90%]
+
+But this is 100% line and branch coverage but doesn't reflect 100% state coverage.
+We can illustrate this by adding one more test case, which now fails:
+
+image:img/TestingJava3.png[Add fault revealing test case,90%]
+
+It turns out there was one edge case the initial implementation didn't cater
+for but it is simple enough to fix:
+
+image:img/TestingJava4.png[Corrected algorithm,90%]
+
+We now have all test cases passing and still 100% coverage.
+
+The moral of the story is that 100% line and branch coverage isn't sufficient
+to ensure a correct implementation. You should try to add test cases until
+you think the problem domain is fully tested. The rest of the talk looked
+at two advanced tools which could assist you in finding test case deficiencies.
+
+The https://pitest.org/[Pitest tool] is a mutation testing tool.
+Understanding how it works and how it can help is a little mind-bending at first.
+Pitest mutates your production code and then re-runs your test suite.
+If the test suite still passes, i.e. the mutant survives, it represents a possible code smell.
+
+Often it means that your test suite isn't complete enough to kill the mutant,
+and you should add some more test cases.
+But mutation testing is not an exact science, if a mutant survives,
+it could mean there is a missing test case,
+it could mean there is a flaw in the existing test cases,
+it could mean there is a bug in the implementation code,
+or it could be a false positive.
+
+Running the tool on the faulty implementation when we had 3 test cases,
+indeed reveals some surviving mutations and analysis indicates that indeed the mutations
+correspond to the faulty edge case:
+
+image:img/TestingJava5.png[Pitest result,90%]
+
+This should direct us to add the additional test case like we did manually earlier
+and this would hopefully have forced us to discover the bug.
+
+Running the tool on the fixed implementation showed an improvement
+but still indicated a possible code smell. That finding reflects that
+for our fixed implementation, that `c > Math.min(a, b)` and `c >= Math.min(a, b)`
+are equivalent, even though in the general case it might mean
+an edge case wasn't being tested. So mutation testing can certainly be
+useful but often requires human analysis to rule out any false positives.
+
+The other tool examined was https://jqwik.net/[Jqwik], a property-based testing tool.
+Such tools check that certain properties hold when exercising the implementation
+under test with random data. Indeed, such testing also reveals the flaw in the
+original code, with no flaw found in the fixed code.
+
+image:img/TestingJava6.png[Jqwik result,90%]
 
 === Kubernetes and Groovy
 
