@@ -3,7 +3,6 @@ Paul King
 :revdate: 2023-10-26T17:00:00+00:00
 :description: This post looks at the ASF Community Over Code conference in Halifax, Nova Scotia, October 7-10 2023, with a particular focus on the Groovy Track.
 :keywords: groovy, asf, apachecon, communityovercode
-:draft: true
 
 This year's North American edition of the ASF conference, https://communityovercode.org/[Community Over Code],
 featured four in-person days of sessions (October 7-10) at the Halifax Convention Centre.
@@ -488,10 +487,31 @@ can account for such variations.
 
 === Miscellaneous
 
-GORM Data Services
+Jeff gave another talk, this time on _GORM Data Services_.
+First covered was the traditional GORM functionality including dynamic finders,
+the Criteria API, Where queries, and HQL:
+
+image:img/GORM1.png[1]
+
+Then he covered GORM Data Services:
+
+image:img/GORM2.png[2]
 
 image:img/JeffOpenSourceSoftwareAndYou.jpg[Jeff Scott Brown,300,float="right"]
-Open Source Software and You
+Jeff also gave the final talk for the track: _Open Source Software and You_.
+In this talk, Jeff gave an insight into his own open source journey.
+He covered some of his insights from his 30+ years working in open source.
+Discussing why you might want to contribute to open source, and how you could contribute.
+His journey gives us all some inspiration for anyone starting
+or continuing on their own open source journeys.
+
+Jeff covered some of his early projects. He went on to discuss Grails
+which was a key driver during Groovy's early evolution.
+He also reiterated the continuing investment Unity Foundation
+is making towards the Grails foundation and Micronaut foundation - two technologies
+which are very well known to many Groovy users.
+He also discussed some of Unity Foundation's recent projects
+which target applying open source to help underserved communities.
 
 == Other tracks
 
