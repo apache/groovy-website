@@ -54,3 +54,7 @@ also work when using Eclipse Collections. We simply use
 
 What's more, since Groovy operator overloading is extensible, you can have similar
 shorthand notation for your own domain objects also. Enjoy!
+
+This example used an alpha version of Groovy 5. Groovy 5 adds a little bit
+of extra syntactic sugar when using sets. Earlier versions of Groovy
+have `union` and `intersect` methods for sets.
