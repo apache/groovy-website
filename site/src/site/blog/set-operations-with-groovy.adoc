@@ -1,0 +1,47 @@
+= Set Operators with Groovy
+Paul King
+:revdate: 2023-11-14T15:22:57+00:00
+:keywords: groovy, emoji, set
+:description: This blog looks at union, intersection, difference & symmetric difference operators in Groovy.
+
+https://twitter.com/TheDonRaab[Donald Raab] posted an article about set operators using Java collections and https://github.com/eclipse/eclipse-collections[Eclipse Collections]. That post focuses
+on the _union_, _intersection_ and _difference_ operators. We'll add in
+_symmetric difference_ since Groovy supports operator overloading for that
+operator also.
+
+First, a quick refresh about the operators for two sets *A* and *B*:
+
+image:img/SetOperators.png[]
+
+We'll use the same emoji sets from Donald's post:
+
+[source,groovy]
+----
+Set OCT = ["🍁", "🍃", "🎃", "🥧", "🍫", "🌝", "👻", "🌽", "🍎", "🪵", "☕️"]
+Set NOV = ["🍂", "🍁", "🥧", "🦃", "🌽", "🍎", "🪵", "☕️"]
+Set DEC = ["🥧", "🦃", "⛄️", "🍎", "🌰", "🛷", "🪵", "🎄", "☕️"]
+----
+
+Groovy lets you write the same code as in Donald's post but also offers
+operator overloading for these operators as follows:
+
+[source,groovy]
+----
+assert (OCT & NOV & DEC) == ["🪵", "🥧", "🍎", "☕️"] as Set
+
+assert (OCT | NOV | DEC) == ["🪵", "🦃", "🌰", "🛷", "🍎", "🎄",
+                             "🍫", "🌝", "☕️", "🥧", "⛄️", "🍁",
+                             "🍂", "🍃", "👻", "🌽", "🎃"] as Set
+
+assert (OCT - NOV - DEC) == ["🍫", "🌝", "🍃", "👻", "🎃"] as Set
+assert (NOV - OCT - DEC) == ["🍂"] as Set
+assert (DEC - OCT - NOV) == ["🎄", "🌰", "⛄️", "🛷"] as Set
+
+assert (OCT ^ NOV ^ DEC) == ['⛄️', '🌰', '🛷', '🎄', '🍃', '🎃', '🍫', '🌝',
+                             '👻', '🍂', '🥧', '🍎', '🪵', '☕️'] as Set
+assert (NOV ^ OCT ^ DEC) == ['🍂', '🍃', '🎃', '🍫', '🌝', '👻', '🥧', '⛄️',
+                             '🍎', '🌰', '🛷', '🪵', '🎄', '☕️'] as Set
+----
+
+Since operator overloading is extensible in Groovy, you can have similar
+shorthand notation for your domain objects also. Enjoy!
