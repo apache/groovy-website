@@ -4,7 +4,7 @@ Paul King
 :keywords: groovy, emoji, set
 :description: This blog looks at union, intersection, difference & symmetric difference operators in Groovy.
 
-https://twitter.com/TheDonRaab[Donald Raab] posted an article about set operators using Java collections and https://github.com/eclipse/eclipse-collections[Eclipse Collections]. That post focuses
+https://twitter.com/TheDonRaab[Donald Raab] posted https://donraab.medium.com/comparing-set-operations-between-java-and-eclipse-collections-92cf1df28d3b[an article] about set operators using Java collections and https://github.com/eclipse/eclipse-collections[Eclipse Collections]. https://donraab.medium.com/comparing-set-operations-between-java-and-eclipse-collections-92cf1df28d3b[That post] focuses
 on the _union_, _intersection_ and _difference_ operators. We'll add in
 _symmetric difference_ since Groovy supports operator overloading for that
 operator also.
@@ -43,5 +43,14 @@ assert (NOV ^ OCT ^ DEC) == ['🍂', '🍃', '🎃', '🍫', '🌝', '👻', '�
                              '🍎', '🌰', '🛷', '🪵', '🎄', '☕️'] as Set
 ----
 
-Since operator overloading is extensible in Groovy, you can have similar
-shorthand notation for your domain objects also. Enjoy!
+This code is using standard mutable Java collections,
+but we could use the normal `Set.of(...)` form and work with immutable sets
+if that was our preference.
+
+Also, since the Eclipse Collections Set implementations implement
+the standard Java `Set` interface, these operator overloading shorthands
+also work when using Eclipse Collections. We simply use
+`Sets.immutable.of(...)` in our set definitions.
+
+What's more, since Groovy operator overloading is extensible, you can have similar
+shorthand notation for your own domain objects also. Enjoy!
