@@ -556,6 +556,45 @@ Fallback behavior is supported and workarounds exist for folks already using the
 * Improvements have been made to better align how method selection
 is performed between the dynamic Groovy runtime and with static compilation.
 (link:https://issues.apache.org/jira/browse/GROOVY-8788[GROOVY-8788])
+* In earlier versions of Groovy,
+the compiler was lenient when finding duplicate imports or an import
+and a similarly-named class definition.
+While having duplicates was considered _poor style_, the compiler followed the
+lenient behavior of letting the last definition "win", ignoring earlier definitions.
+E.g. for two imports (Groovy 1-4):
++
+[source,groovy]
+----
+import java.util.Date
+import java.sql.Date
+
+println Date // => class java.sql.Date
+----
++
+or an import and a class definition (Groovy 1-4):
++
+[source,groovy]
+----
+import java.sql.Date
+class Date { }
+
+println Date // => class Date
+----
++
+or a regular import and an alias import (Groovy 1-4):
++
+[source,groovy]
+----
+import java.util.Date
+import java.util.Calendar as Date // don't do this!
+
+println Date // => class java.util.Calendar
+----
+From Groovy 5, the compiler now follows Java behavior and gives an error in such cases
+(link:https://issues.apache.org/jira/browse/GROOVY-8254[GROOVY-8254]). A slightly more
+lenient approach is taken when using `groovysh`. For the `groovysh` repl, a newly entered
+import is deemed to override an old import with the same simple name,
+with the old import being discarded (link:https://issues.apache.org/jira/browse/GROOVY-11224[GROOVY-11224]).
 * Improvements have been made to improve consistency when accessing fields within Map-like classes.
 (link:https://issues.apache.org/jira/browse/GROOVY-6144[GROOVY-6144],
 link:https://issues.apache.org/jira/browse/GROOVY-5001[GROOVY-5001])
