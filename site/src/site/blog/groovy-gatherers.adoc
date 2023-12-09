@@ -123,7 +123,7 @@ process the stream multiple times, or you shoved all the logic in the
 collector, but then you'd be giving up some of the key benefits of streams.
 Luckily, with gatherers, we can now obtain this functionality.
 
-The first cases is so common, there is a built-in gatherer (`Gatherers#windowFixed`) for it:
+The first case is so common, there is a built-in gatherer (`Gatherers#windowFixed`) for it:
 
 [source,groovy]
 ----
