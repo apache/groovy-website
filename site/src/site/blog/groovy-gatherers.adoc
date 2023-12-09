@@ -1,0 +1,269 @@
+= Using Gatherers with Groovy
+Paul King
+:revdate: 2023-12-09T11:30:00+00:00
+:draft: true
+:keywords: gatherers, jdk22, chop, collate, ginq, jep461
+:description: This post looks at using Gatherers (JEP 461) with Groovy.
+
+An interesting feature being previewed in JDK22 is _Gatherers_
+(https://openjdk.java.net/jeps/461[JEP 461]).
+This blog looks at using that feature with Groovy.
+The examples in this blog were tested with Groovy 4.0.16 using JDK version 22-ea+27-2262.
+As this JDK version is still in early access,
+you should read the disclaimers to understand that this JDK feature
+is subject to change before final release. If and when the feature becomes
+final, Groovy supports it without needing any additional support.
+
+== Understanding Gatherers
+
+Java developers are by now very familiar with streams.
+A stream is a potentially unbounded sequence of values supporting lazy computation.
+Processing streams is done via a stream pipeline which consists of three parts:
+a source of elements, zero or more intermediate operations (like `filter` and `map`),
+and a terminal operation.
+
+This framework is very powerful and efficient and offers some extensibility
+via a customisable terminal operation. The available intermediate operations
+is fixed in size, and while the built-in ones are very useful,
+some complex tasks cannot easily be expressed as stream pipelines.
+Enter _gatherers_. Gatherers provide the ability to customize intermediate operations.
+
+The stream API is updated to support a `gather` intermediate operation which takes a gatherer
+and returns a transformed stream. Let's dive into a few more details of gatherers.
+
+A gatherer has four functions:
+
+* The optional _initializer_ is just a `Supplier` which returns some (initial) state.
+
+* The _integrator_ is typically the most important part. It satisfies the following interface:
++
+[source,java]
+----
+interface Integrator<A, T, R> {
+    boolean integrate(A state, T element, Downstream<? super R> downstream);
+}
+----
++
+where `state` is some state -- we'll use a list as state in a few of the upcoming
+examples, but it could just as easily be an instance of a class or record, `element`
+is the next element in the current stream to be processed, and `downstream` is
+a hook for creating the elements that will be processed in the next stage of the stream pipeline.
+
+* The optional `finisher` has access to the state and downstream pipeline hook.
+It performs any last step actions which might be needed.
+
+* The optional _combiner_ is used to evaluate the gatherer in parallel when processing an input stream in parallel. The examples we'll look at in this blog post are inherently ordered in nature
+and thus cannot be parallelized, so we won't discuss this aspect further here.
+
+Over and above, the Gatherer API, there are a number of built-in gathers
+like `windowFixed` and `windowSliding`, among others.
+
+== Accessing parts of a collection
+
+Groovy provides very flexible indexing variants to
+select specific elements from a collection:
+
+[source,groovy]
+----
+assert (1..8)[0..2] == [1, 2, 3]                   // index by closed range
+assert (1..8)[3<..<6] == [5, 6]                    // index by open range
+assert (1..8)[0..2,3..4,5] == [1, 2, 3, 4, 5, 6]   // index by multiple ranges
+assert (1..8)[0..2,3..-1] == 1..8                  // ditto
+assert (1..8)[0,2,4,6] == [1,3,5,7]                // select odd numbers
+assert (1..8)[1,3,5,7] == [2,4,6,8]                // select even numbers
+----
+
+You can also pick out a window of elements using `take` and `drop`:
+
+[source,groovy]
+----
+assert (1..8).take(3) == [1, 2, 3]                 // same as [0..2]
+assert (1..8).drop(2).take(3) == [3, 4, 5]         // same as [2..4]
+----
+
+Stream users might do the same thing using `skip` and `limit`:
+
+[source,groovy]
+----
+assert (1..8).stream().limit(3).toList() == [1, 2, 3]
+assert (1..8).stream().skip(2).limit(3).toList() == [3, 4, 5]
+----
+
+But what about some of Groovy's more elaborate mechanisms for manipulating collections?
+I'm glad you asked. Let's look at `collate` and `chop`.
+
+== Collate
+
+Groovy's `collate` method splits a collection into fixed size chunks:
+
+[source,groovy]
+----
+assert (1..8).collate(3) == [[1, 2, 3], [4, 5, 6], [7, 8]]
+----
+
+The last chunk in this example is smaller than the chunk size.
+It contains the remaining elements left over after all full size chunks
+have been created. If we don't want the leftover chunk,
+we can ask for it to be excluded using an optional boolean parameter:
+
+[source,groovy]
+----
+assert (1..8).collate(3, false) == [[1, 2, 3], [4, 5, 6]]
+----
+
+Such functionality isn't really possible with streams unless you wanted to
+process the stream multiple times, or you shoved all the logic in the
+collector, but then you'd be giving up some of the key benefits of streams.
+Luckily, with gatherers, we can now obtain this functionality.
+
+The first cases is so common, there is a built-in gatherer (`Gatherers#windowFixed`) for it:
+
+[source,groovy]
+----
+assert (1..8).stream().gather(windowFixed(3)).toList() ==
+    [[1, 2, 3], [4, 5, 6], [7, 8]]
+----
+
+There is no exact equivalent to handle the less common case of discarding
+the leftover elements, but it's easy enough to write our own:
+
+[source,groovy]
+----
+<T> Gatherer<T, ?, List<T>> windowFixedTruncating(int windowSize) {
+    Gatherer.ofSequential(
+        () -> [],
+        Gatherer.Integrator.ofGreedy { window, element, downstream ->
+            window << element
+            if (window.size() < windowSize) return true
+            var result = List.copyOf(window)
+            window.clear()
+            downstream.push(result)
+        }
+    )
+}
+----
+
+We have an initializer which just returns an empty list as our initial state.
+The gatherer keeps adding elements to the state (our list or window). Once the
+list is filled to the window size, we'll output it to the downstream,
+and then clear the list ready for the next window.
+The code here is essentially a simplified version of `windowFixed`, we can
+just leave out the finalizer that `windowFixed` would require to potentially
+output the partially-filled window at the end.
+
+A few details. Our operation is sequential since it is inherently ordered,
+hence we used `ofSequential` to mark it so. We will also always process all
+elements, so we create a greedy gatherer using `ofGreedy`. While not strictly
+necessary, this allows for optimisation of the pipeline.
+
+We'd use it like this:
+
+[source,groovy]
+----
+assert (1..8).stream().gather(windowFixedTruncating(3)).toList() ==
+    [[1, 2, 3], [4, 5, 6]]
+----
+
+The default when using `collate` is to start the next chunk/window
+at the element directly after the previous one, but there are overloads
+which also take a step size. This is used to calculate the index at which
+the second (and subsequent) window(s) will start.
+There is an optional `keepRemaining` boolean
+to handle the leftover case as well.
+If we want to slide along by 1 and discard leftovers, we'd use:
+
+[source,groovy]
+----
+assert (1..5).collate(3, 1, false) == [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
+----
+
+This aligns with the built-in `windowSliding` gatherer:
+
+[source,groovy]
+----
+assert (1..5).stream().gather(windowSliding(3)).toList() ==
+    [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
+----
+
+If we want the step size to be other than 1, or we want control over
+the leftovers, there is no built-in gatherer option,
+but we can again write one ourselves. Let's consider some examples.
+We'll look at a gatherer implementation shortly, but first Groovy's
+collection variants:
+
+[source,groovy]
+----
+assert (1..5).collate(3, 1) == [[1, 2, 3], [2, 3, 4], [3, 4, 5], [4, 5], [5]]
+assert (1..8).collate(3, 2) == [[1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8]]
+assert (1..8).collate(3, 2, false) == [[1, 2, 3], [3, 4, 5], [5, 6, 7]]
+assert (1..8).collate(3, 4, false) == [[1, 2, 3], [5, 6, 7]]
+assert (1..8).collate(3, 3) == [[1, 2, 3], [4, 5, 6], [7, 8]]  // same as collate(3)
+----
+
+Now let's write our gatherer:
+
+[source,groovy]
+----
+<T> Gatherer<T, ?, List<T>> windowSlidingByStep(int windowSize, int stepSize, boolean keepRemaining = true) {
+    int skip = 0
+    Gatherer.ofSequential(
+        () -> [],                                                        // initializer
+        Gatherer.Integrator.ofGreedy { window, element, downstream ->    // integrator
+            if (skip) {
+                skip--
+                return true
+            }
+            window << element
+            if (window.size() < windowSize) return true
+            var result = List.copyOf(window)
+            skip = stepSize > windowSize ? stepSize - windowSize : 0
+            [stepSize, windowSize].min().times { window.removeFirst() }
+            downstream.push(result)
+        },
+        (window, downstream) -> {                                        // finalizer
+            if (keepRemaining) {
+                while(window.size() > stepSize) {
+                    downstream.push(List.copyOf(window))
+                    stepSize.times{ window.removeFirst() }
+                }
+                downstream.push(List.copyOf(window))
+            }
+        }
+    )
+}
+----
+
+Some points. Our gatherer is still sequential for the same reasons as previously.
+We are still processing every element, so we again created a greedy gatherer.
+We have a little bit of optimization baked into the code. If our step size
+is bigger than the window size, we can do no further processing in our gatherer
+for the elements in between our windows. We could simplify the code and store those
+elements only to throw them away later, but it's not too much effort to make
+the algorithm as efficient as possible. We also need a finalizer here which
+handles the leftover chunk(s).
+
+And we'd use it like this:
+[source,groovy]
+----
+assert (1..5).stream().gather(windowSlidingByStep(3, 1)).toList() ==
+    [[1, 2, 3], [2, 3, 4], [3, 4, 5], [4, 5], [5]]
+assert (1..8).stream().gather(windowSlidingByStep(3, 2)).toList() ==
+    [[1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8]]
+assert (1..8).stream().gather(windowSlidingByStep(3, 2, false)).toList() ==
+    [[1, 2, 3], [3, 4, 5], [5, 6, 7]]
+assert (1..8).stream().gather(windowSlidingByStep(3, 4, false)).toList() ==
+    [[1, 2, 3], [5, 6, 7]]
+assert (1..8).stream().gather(windowSlidingByStep(3, 3)).toList() ==
+    [[1, 2, 3], [4, 5, 6], [7, 8]]
+----
+
+== Chop
+
+== Testing for a subsequence
+
+== Conclusion
+
+We have had a quick glimpse at using gatherers with Groovy.
+We are still in the early days of gatherers being available,
+so expect much more to emerge as this feature becomes more mainstream.
+We look forward to it advancing past preview status.
