@@ -132,7 +132,7 @@ assert (1..8).stream().gather(windowFixed(3)).toList() ==
 ----
 
 There is no exact equivalent to handle the less common case of discarding
-the leftover elements, but it's easy enough to write our own:
+the leftover elements, but it's easy enough to write our own gatherer:
 
 [source,groovy]
 ----
@@ -171,7 +171,7 @@ to focus on the new gatherer functionality. Check out how `windowFixed`
 throws `IllegalArgumentException` for window sizes less than 1 to see what
 should really also be added here if you were using this in production.
 
-We'd use it like this:
+We'd use `windowFixedTruncating` like this:
 
 [source,groovy]
 ----
@@ -317,12 +317,12 @@ assert GQL {
 }*.toList() == [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
 ----
 
-
 == Chop
 
-A related collection method is `chop`. For this method, we also create chunks
-from the original collection but rather than specifying a fixed size that applies to
-all chunks, we specify the size we want for each chunk. Each size is only used once.
+A related collection extension method in Groovy is `chop`.
+For this method, we also create chunks from the original collection but rather
+than specifying a fixed size that applies to all chunks, we specify the size we
+want for each chunk. We give a list of sizes, and each size is only used once.
 The special size of `-1` indicates that we want the remainder of the collection as
 the last chunk.
 
@@ -388,7 +388,7 @@ assert (1..8).stream().gather(windowMultiple(3, -1)).toList() ==
 
 == Inject and fold
 
-Groovy's `inject` is a little different to the stream `reduce` intermediate operator.
+Groovy's `inject` is a little different to the streams `reduce` intermediate operator.
 The latter expects a binary operator which restricts the types of the elements
 being consumed and produced.
 
@@ -414,7 +414,7 @@ assert (1..5).stream()
 As a final example, let's have a look at how we might test
 if one list is a subset of another.
 
-We'll start with a list of words, and a list containing the search terms:
+We'll start with a list of words, and a list containing the ordered search terms:
 
 [source,groovy]
 ----
@@ -432,7 +432,7 @@ assert Collections.indexOfSubList(words, search) != -1
 Let's have a look at some possible stream implementations.
 But first a diversion. For any functional programmers who might have dabbled
 with Haskell, you may have seen the book http://learnyouahaskell.com/[Learn You a Haskell for Great Good!]. It sets an interesting exercise for finding a "Needle in the Haystack"
-using `inits` and `tails`. So what are `inits` and `tails`? They are built-in fuctions
+using `inits` and `tails`. So what are `inits` and `tails`? They are built-in functions
 in Haskell and Groovy:
 
 [source,groovy]
@@ -527,7 +527,7 @@ assert words.stream().gather(initsOfTails()).anyMatch { it == search }
 But it might have been more efficient to have collected
 the stream as a list and used Groovy's built-in `inits` and `tails` on that.
 
-But all is not lost. If we were willing to tweak the algorithm slightly,
+But all is not lost. If we are willing to tweak the algorithm slightly,
 we could make better use of the stream pipeline. For example, if we don't
 mind getting the `inits` results in the reverse order, we could define the following
 gatherer for `inits`:
