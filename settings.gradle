@@ -22,7 +22,7 @@ plugins {
 }
 
 rootProject.name = 'groovy-website'
-include 'generator',/*'site-dev',*/'site-user'
+include 'generator','site-dev','site-user'
 
 gradleEnterprise {
     buildScan {

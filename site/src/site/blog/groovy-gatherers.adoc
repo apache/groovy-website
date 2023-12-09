@@ -138,8 +138,8 @@ the leftover elements, but it's easy enough to write our own:
 ----
 <T> Gatherer<T, ?, List<T>> windowFixedTruncating(int windowSize) {
     Gatherer.ofSequential(
-        () -> [],                                                       // initializer
-        Gatherer.Integrator.ofGreedy { window, element, downstream ->   // integrator
+        () -> [],                                                      // initializer
+        Gatherer.Integrator.ofGreedy { window, element, downstream ->  // integrator
             window << element
             if (window.size() < windowSize) return true
             var result = List.copyOf(window)
@@ -222,8 +222,8 @@ Now let's write our gatherer:
 <T> Gatherer<T, ?, List<T>> windowSlidingByStep(int windowSize, int stepSize, boolean keepRemaining = true) {
     int skip = 0
     Gatherer.ofSequential(
-        () -> [],                                                        // initializer
-        Gatherer.Integrator.ofGreedy { window, element, downstream ->    // integrator
+        () -> [],                                                      // initializer
+        Gatherer.Integrator.ofGreedy { window, element, downstream ->  // integrator
             if (skip) {
                 skip--
                 return true
@@ -235,7 +235,7 @@ Now let's write our gatherer:
             [stepSize, windowSize].min().times { window.removeFirst() }
             downstream.push(result)
         },
-        (window, downstream) -> {                                        // finisher
+        (window, downstream) -> {                                      // finisher
             if (keepRemaining) {
                 while(window.size() > stepSize) {
                     downstream.push(List.copyOf(window))
@@ -403,7 +403,10 @@ The `fold` built-in gatherer provides the equivalent functionality:
 
 [source,groovy]
 ----
-assert (1..5).stream().gather(fold(() -> '', (string, number) -> string + number)).findFirst().get() == '12345'
+assert (1..5).stream()
+             .gather(fold(() -> '', (string, number) -> string + number))
+             .findFirst()
+             .get() == '12345'
 ----
 
 == Testing for a subsequence (fun with `inits` and `tails`)
