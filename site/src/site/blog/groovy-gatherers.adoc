@@ -1,7 +1,7 @@
 = Using Gatherers with Groovy
 Paul King
 :revdate: 2023-12-09T15:30:00+00:00
-:keywords: gatherers, jdk22, chop, collate, inject, ginq, jep461
+:keywords: gatherers, jdk22, chop, collate, inject, ginq, streams, jep461
 :description: This post looks at using Gatherers (JEP 461) with Groovy.
 
 An interesting feature being previewed in JDK22 is _Gatherers_
@@ -553,6 +553,12 @@ Which we'd use like this:
 assert search.stream().gather(inits()).toList() ==
     [[], ['brown'], ['brown', 'fox']]
 ----
+
+== Further information
+
+* https://openjdk.org/jeps/461[JEP 461: Stream Gatherers (Preview)]
+* https://nipafx.dev/inside-java-newscast-57/[Better Java Streams with Gatherers - Inside Java Newscast #57]
+* https://nipafx.dev/implementing-gatherers/[Implementing New Java Stream Operations]
 
 == Conclusion
 
