@@ -1,18 +1,18 @@
 = Using Gatherers with Groovy
 Paul King
-:revdate: 2023-12-09T11:30:00+00:00
-:draft: true
-:keywords: gatherers, jdk22, chop, collate, ginq, jep461
+:revdate: 2023-12-09T15:30:00+00:00
+:keywords: gatherers, jdk22, chop, collate, inject, ginq, jep461
 :description: This post looks at using Gatherers (JEP 461) with Groovy.
 
 An interesting feature being previewed in JDK22 is _Gatherers_
 (https://openjdk.java.net/jeps/461[JEP 461]).
 This blog looks at using that feature with Groovy.
 The examples in this blog were tested with Groovy 4.0.16 using JDK version 22-ea+27-2262.
-As this JDK version is still in early access,
+As the JDK version we used is still in early access status,
 you should read the disclaimers to understand that this JDK feature
 is subject to change before final release. If and when the feature becomes
-final, Groovy supports it without needing any additional support.
+final, it looks like Groovy will automatically support it without needing
+any additional tweaks.
 
 == Understanding Gatherers
 
@@ -28,10 +28,11 @@ is fixed in size, and while the built-in ones are very useful,
 some complex tasks cannot easily be expressed as stream pipelines.
 Enter _gatherers_. Gatherers provide the ability to customize intermediate operations.
 
-The stream API is updated to support a `gather` intermediate operation which takes a gatherer
-and returns a transformed stream. Let's dive into a few more details of gatherers.
+With gatherers, the stream API is updated to support a `gather` intermediate operation
+which takes a gatherer and returns a transformed stream.
+Let's dive into a few more details of gatherers.
 
-A gatherer has four functions:
+A gatherer is defined by four pieces of functionality:
 
 * The optional _initializer_ is just a `Supplier` which returns some (initial) state.
 
@@ -45,7 +46,7 @@ interface Integrator<A, T, R> {
 ----
 +
 where `state` is some state -- we'll use a list as state in a few of the upcoming
-examples, but it could just as easily be an instance of a class or record, `element`
+examples, but it could just as easily be an instance of some other class or record, `element`
 is the next element in the current stream to be processed, and `downstream` is
 a hook for creating the elements that will be processed in the next stage of the stream pipeline.
 
@@ -56,7 +57,12 @@ It performs any last step actions which might be needed.
 and thus cannot be parallelized, so we won't discuss this aspect further here.
 
 Over and above, the Gatherer API, there are a number of built-in gathers
-like `windowFixed` and `windowSliding`, among others.
+like `windowFixed`, `windowSliding`, and `fold`, among others.
+
+Before getting into functionality where gatherers will become essential,
+let's start off by looking at accessing collections where functionality
+is well provided for in both the collection and stream APIs and related
+extension methods.
 
 == Accessing parts of a collection
 
@@ -89,8 +95,9 @@ assert (1..8).stream().limit(3).toList() == [1, 2, 3]
 assert (1..8).stream().skip(2).limit(3).toList() == [3, 4, 5]
 ----
 
-But what about some of Groovy's more elaborate mechanisms for manipulating collections?
-I'm glad you asked. Let's look at `collate` and `chop`.
+We can see here there are stream equivalents for `drop` and `take`,
+but what about some of Groovy's more elaborate mechanisms for manipulating collections?
+I'm glad you asked. Let's look at stream equivalents for `collate` and `chop`.
 
 == Collate
 
@@ -131,8 +138,8 @@ the leftover elements, but it's easy enough to write our own:
 ----
 <T> Gatherer<T, ?, List<T>> windowFixedTruncating(int windowSize) {
     Gatherer.ofSequential(
-        () -> [],
-        Gatherer.Integrator.ofGreedy { window, element, downstream ->
+        () -> [],                                                       // initializer
+        Gatherer.Integrator.ofGreedy { window, element, downstream ->   // integrator
             window << element
             if (window.size() < windowSize) return true
             var result = List.copyOf(window)
@@ -144,17 +151,25 @@ the leftover elements, but it's easy enough to write our own:
 ----
 
 We have an initializer which just returns an empty list as our initial state.
-The gatherer keeps adding elements to the state (our list or window). Once the
+The integrator keeps adding elements to the state (our list or window). Once the
 list is filled to the window size, we'll output it to the downstream,
 and then clear the list ready for the next window.
+
 The code here is essentially a simplified version of `windowFixed`, we can
-just leave out the finalizer that `windowFixed` would require to potentially
+just leave out the finisher that `windowFixed` would require to potentially
 output the partially-filled window at the end.
 
-A few details. Our operation is sequential since it is inherently ordered,
-hence we used `ofSequential` to mark it so. We will also always process all
+A few details:
+
+* Our operation is sequential since it is inherently ordered,
+hence we used `ofSequential` to mark it so.
+* We will also always process all
 elements, so we create a greedy gatherer using `ofGreedy`. While not strictly
 necessary, this allows for optimisation of the pipeline.
+* We have specifically left out some validation logic out of this example
+to focus on the new gatherer functionality. Check out how `windowFixed`
+throws `IllegalArgumentException` for window sizes less than 1 to see what
+should really also be added here if you were using this in production.
 
 We'd use it like this:
 
@@ -220,7 +235,7 @@ Now let's write our gatherer:
             [stepSize, windowSize].min().times { window.removeFirst() }
             downstream.push(result)
         },
-        (window, downstream) -> {                                        // finalizer
+        (window, downstream) -> {                                        // finisher
             if (keepRemaining) {
                 while(window.size() > stepSize) {
                     downstream.push(List.copyOf(window))
@@ -233,16 +248,21 @@ Now let's write our gatherer:
 }
 ----
 
-Some points. Our gatherer is still sequential for the same reasons as previously.
+Some points:
+
+* Our gatherer is still sequential for the same reasons as previously.
 We are still processing every element, so we again created a greedy gatherer.
-We have a little bit of optimization baked into the code. If our step size
+* We have a little bit of optimization baked into the code. If our step size
 is bigger than the window size, we can do no further processing in our gatherer
 for the elements in between our windows. We could simplify the code and store those
 elements only to throw them away later, but it's not too much effort to make
-the algorithm as efficient as possible. We also need a finalizer here which
-handles the leftover chunk(s).
+the algorithm as efficient as possible.
+* We also need a finisher here which
+handles the leftover chunk(s) when required.
+* As per the previous example, we chose to elide some argument validation logic.
 
 And we'd use it like this:
+
 [source,groovy]
 ----
 assert (1..5).stream().gather(windowSlidingByStep(3, 1)).toList() ==
@@ -257,13 +277,293 @@ assert (1..8).stream().gather(windowSlidingByStep(3, 3)).toList() ==
     [[1, 2, 3], [4, 5, 6], [7, 8]]
 ----
 
+Before leaving this section, let's look at a few examples using Groovy's
+language integrated query capabilities as an alternative way to manipulate
+collections.
+
+Firstly, the equivalent of what we saw with `take` / `limit`:
+
+[source,groovy]
+----
+assert GQL {
+    from n in 1..8
+    limit 3
+    select n
+} == [1, 2, 3]
+----
+
+Then, the equivalent if we added in `drop` / `skip`:
+
+[source,groovy]
+----
+assert GQL {
+    from n in 1..8
+    limit 2, 3
+    select n
+} == [3, 4, 5]
+----
+
+Finally, a sliding window equivalent:
+
+[source,groovy]
+----
+assert GQL {
+    from ns in (
+        from n in 1..8
+        select n, (lead(n) over(orderby n)), (lead(n, 2) over(orderby n))
+    )
+    limit 3
+    select ns
+}*.toList() == [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
+----
+
+
 == Chop
 
-== Testing for a subsequence
+A related collection method is `chop`. For this method, we also create chunks
+from the original collection but rather than specifying a fixed size that applies to
+all chunks, we specify the size we want for each chunk. Each size is only used once.
+The special size of `-1` indicates that we want the remainder of the collection as
+the last chunk.
+
+[source,groovy]
+----
+assert (1..8).chop(3) == [[1, 2, 3]]
+assert (1..8).chop(3, 2, 1) == [[1, 2, 3], [4, 5], [6]]
+assert (1..8).chop(3, -1) == [[1, 2, 3], [4, 5, 6, 7, 8]]
+----
+
+There is no original stream or pre-built gatherer for this functionality.
+We'll write our own:
+
+[source,groovy]
+----
+<T> Gatherer<T, ?, List<T>> windowMultiple(int... steps) {
+    var remaining = steps.toList()
+    Gatherer.ofSequential(
+        () -> [],
+        Gatherer.Integrator.of { window, element, downstream ->
+            if (!remaining) {
+                return false
+            }
+            window << element
+            if (remaining[0] != -1) remaining[0]--
+            if (remaining[0]) return true
+            remaining.removeFirst()
+            var result = List.copyOf(window)
+            window.clear()
+            downstream.push(result)
+        },
+        (window, downstream) -> {
+            if (window) {
+                var result = List.copyOf(window)
+                downstream.push(result)
+            }
+        }
+    )
+}
+----
+
+Some points:
+
+* This is also an ordered algorithm, so we use `ofSequential` again.
+* This is similar to what we used for collate, but we have a different sized
+window for each chunk size as we process the elements.
+* Once we hit the last chunk, we don't want to process further
+elements unless we see the special -1 marker, so we won't create a greedy gatherer.
+* We do need a finisher to potentially output elements that have been stored but not yet
+pushed downstream.
+
+We'd use `windowMultiple` like this:
+
+[source,groovy]
+----
+assert (1..8).stream().gather(windowMultiple(3)).toList() ==
+    [[1, 2, 3]]
+assert (1..8).stream().gather(windowMultiple(3, 2, 1)).toList() ==
+    [[1, 2, 3], [4, 5], [6]]
+assert (1..8).stream().gather(windowMultiple(3, -1)).toList() ==
+    [[1, 2, 3], [4, 5, 6, 7, 8]]
+----
+
+== Inject and fold
+
+Groovy's `inject` is a little different to the stream `reduce` intermediate operator.
+The latter expects a binary operator which restricts the types of the elements
+being consumed and produced.
+
+The `inject` method can have different types for its arguments as shown here:
+
+[source,groovy]
+----
+assert (1..5).inject(''){ string, number -> string + number } == '12345'
+----
+
+The `fold` built-in gatherer provides the equivalent functionality:
+
+[source,groovy]
+----
+assert (1..5).stream().gather(fold(() -> '', (string, number) -> string + number)).findFirst().get() == '12345'
+----
+
+== Testing for a subsequence (fun with `inits` and `tails`)
+
+As a final example, let's have a look at how we might test
+if one list is a subset of another.
+
+We'll start with a list of words, and a list containing the search terms:
+
+[source,groovy]
+----
+var words = 'the quick brown fox jumped over the lazy dog'.split().toList()
+var search = 'brown fox'.split().toList()
+----
+
+It turns out that this is solved already in the JDK for collections:
+
+[source,groovy]
+----
+assert Collections.indexOfSubList(words, search) != -1
+----
+
+Let's have a look at some possible stream implementations.
+But first a diversion. For any functional programmers who might have dabbled
+with Haskell, you may have seen the book http://learnyouahaskell.com/[Learn You a Haskell for Great Good!]. It sets an interesting exercise for finding a "Needle in the Haystack"
+using `inits` and `tails`. So what are `inits` and `tails`? They are built-in fuctions
+in Haskell and Groovy:
+
+[source,groovy]
+----
+assert (1..6).inits() == [[1, 2, 3, 4, 5, 6],
+                          [1, 2, 3, 4, 5],
+                          [1, 2, 3, 4],
+                          [1, 2, 3],
+                          [1, 2],
+                          [1],
+                          []]
+
+assert (1..6).tails() == [[1, 2, 3, 4, 5, 6],
+                             [2, 3, 4, 5, 6],
+                                [3, 4, 5, 6],
+                                   [4, 5, 6],
+                                      [5, 6],
+                                         [6],
+                                          []]
+----
+
+Once we know about these methods, we can paraphrase the "Needle in the Haystack"
+solution for collections in Groovy as follows:
+
+[source,groovy]
+----
+var found = words.tails().any{ subseq -> subseq.inits().contains(search) }
+assert found
+----
+
+It may not be the most efficient implementation of this functionality,
+but it has a nice symmetry. Let's now explore some stream-based solutions.
+
+We can start off with a `tails` gatherer:
+
+[source,groovy]
+----
+<T> Gatherer<T, ?, List<T>> tails() {
+    Gatherer.ofSequential(
+        () -> [],
+        Gatherer.Integrator.ofGreedy { state, element, downstream ->
+            state << element
+            return true
+        },
+        (state, downstream) -> {
+            state.tails().each(downstream::push)
+        }
+    )
+}
+----
+
+In the integrator, we just store away all the elements,
+and in the finisher we do all the work. This works but isn't really
+properly leveraging the stream pipeline nature.
+
+We can check it works as follows:
+
+[source,groovy]
+----
+assert search.stream().gather(tails()).toList() ==
+    [['brown', 'fox'], ['fox'], []]
+----
+
+We could continue with this approach to create an `initsOfTails` gatherer:
+
+[source,groovy]
+----
+<T> Gatherer<T, ?, List<T>> initsOfTails() {
+    Gatherer.ofSequential(
+        () -> [],
+        Gatherer.Integrator.ofGreedy { state, element, downstream ->
+            state << element
+            return true
+        },
+        (state, downstream) -> {
+            state.tails()*.inits().sum().each(downstream::push)
+        }
+    )
+}
+----
+
+Again, all the work is in the finisher, and we haven't really made use
+of the power of the stream pipeline.
+
+It still works of course:
+
+[source,groovy]
+----
+assert words.stream().gather(initsOfTails()).anyMatch { it == search }
+----
+
+But it might have been more efficient to have collected
+the stream as a list and used Groovy's built-in `inits` and `tails` on that.
+
+But all is not lost. If we were willing to tweak the algorithm slightly,
+we could make better use of the stream pipeline. For example, if we don't
+mind getting the `inits` results in the reverse order, we could define the following
+gatherer for `inits`:
+
+[source,groovy]
+----
+<T> Gatherer<T, ?, List<T>> inits() {
+    Gatherer.ofSequential(
+        () -> [],
+        Gatherer.Integrator.ofGreedy { state, element, downstream ->
+            downstream.push(List.copyOf(state))
+            state << element
+            return true
+        },
+        (state, downstream) -> {
+            downstream.push(state)
+        }
+    )
+}
+----
+
+Which we'd use like this:
+
+[source,groovy]
+----
+assert search.stream().gather(inits()).toList() ==
+    [[], ['brown'], ['brown', 'fox']]
+----
 
 == Conclusion
 
-We have had a quick glimpse at using gatherers with Groovy.
+It is great that Groovy has a rich set of methods that
+work with collections. Some of these methods have stream
+equivalents, and now we see that using gatherers with Groovy,
+we can emulate more of the methods.
+Not all algorithms need or benefit from using streams,
+but it's great to know that with gatherers, we can
+likely pick whichever style makes sense.
+
 We are still in the early days of gatherers being available,
 so expect much more to emerge as this feature becomes more mainstream.
 We look forward to it advancing past preview status.
