@@ -101,6 +101,7 @@ I'm glad you asked. Let's look at stream equivalents for `collate` and `chop`.
 
 == Collate
 
+image:img/collate.png[collate a list - produced by Dall-E 3,200,float='right']
 Groovy's `collate` method splits a collection into fixed size chunks:
 
 [source,groovy]
@@ -319,6 +320,7 @@ assert GQL {
 
 == Chop
 
+image:img/chop.png[chop a list - produced by Dall-E 3,200,float='right']
 A related collection extension method in Groovy is `chop`.
 For this method, we also create chunks from the original collection but rather
 than specifying a fixed size that applies to all chunks, we specify the size we
@@ -562,6 +564,7 @@ assert search.stream().gather(inits()).toList() ==
 * https://openjdk.org/jeps/461[JEP 461: Stream Gatherers (Preview)]
 * https://nipafx.dev/inside-java-newscast-57/[Better Java Streams with Gatherers - Inside Java Newscast #57]
 * https://nipafx.dev/implementing-gatherers/[Implementing New Java Stream Operations]
+* https://github.com/paulk-asert/groovy-gatherers[Source code on GitHub]
 
 == Conclusion
 
