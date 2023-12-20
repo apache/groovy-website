@@ -85,7 +85,7 @@ image:img/emoji5.png[using isEmoji]
 Another sequencing trick offered by Unicode is to combine related
 emojis to form new ones with an intervening _zero width joiner_ (ZWJ).
 For example, you might combine the woman emoji, "👩", possibly with
-an additional skin tone emoji, then a ZWJ character,
+an additional skin tone emoji, then a ZWJ character (Unicode 200D in hex),
 followed by the rocket emoji "🚀", which combined gives
 a female astronaut emoji "👩🏽‍🚀".
 
@@ -107,19 +107,21 @@ We can check the exact Unicode characters using regex's `\x{...}` notation,
 noting that we don't use surrogate pairs. We can also check the
 emoji names using the `\N{...}` notation.
 
-Combinations aren't limited to size two. One "family" emoji combination
-combined 3 emojis, again with ZWJ characters.
+Combinations aren't limited to size two. One of the possible "family" emoji combinations
+combines 3 emojis, with interleaved ZWJ characters.
 
 image:img/emoji7.png[using isEmoji]
 
-We can do similar regex checks.
+We can do similar regex checks as previously, checking the
+exact Unicode values or the names.
 
 As a final example, let's look at the "🙋🏻‍♀️" emoji.
 Looking at the first line of code below might lead us to think we have combined
 three characters, but checking the size shows there are 5 parts to the
-combined emoji. The "🙋🏻" emoji combines a base emoji with a skin tone.
+combined emoji. The first and last emojis are already combinations.
+The "🙋🏻" emoji combines a base emoji with a skin tone.
 The "♀️" emoji combines the female sign character "♀" with a special
-_variation selector_, which indicates that the previous character
+_variation selector_ character, which indicates that the previous character
 should be treated as an emoji rather than a character.
 
 image:img/emoji8.png[using isEmoji]
