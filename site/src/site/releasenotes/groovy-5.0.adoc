@@ -141,6 +141,41 @@ def run() {
 public pets = ['cat', 'dog']
 ----
 
+=== An Optional Type Checker for Format Strings
+
+The `format` methods in `java.util.Formatter`, and other similar methods,
+support formatted printing in the style of C's `printf` method with a
+format string and zero or more arguments.
+
+Let's consider an example which produces a string comprised of three terms:
+
+* a floating-point representation (`%f`) of PI (with 2 decimal places of precision),
+* the hex representation (`%X`) of 15 (as two uppercase digits with a leading 0),
+* and the Boolean (`%B`) `True` (in uppercase).
+
+The assertion checks our expectations:
+
+[source,groovy]
+----
+assert String.format('%4.2f %02X %B', Math.PI, 15, true) == '3.14 0F TRUE'
+----
+
+This is a powerful method supporting numerous conversions and flags.
+If the developer supplies incorrect conversions or flags,
+they will receive one of numerous possible runtime errors.
+As examples, consider the following mistakes and resulting runtime exceptions:
+
+* supplying a String as the parameter for either of the first two arguments results in an
+`IllegalFormatConversionException`,
+* leaving out the last argument results in a
+`MissingFormatArgumentException`,
+* supplying the _leading zero_ flag for the Boolean parameter results in a
+`FlagsConversionMismatchException`.
+
+The goal of the `FormatStringChecker` is to eliminate
+a large number of such runtime errors. If the API call passes type checking,
+it will be guaranteed to succeed at runtime.
+
 === AST transform additions and improvements
 
 There is a new `OperatorRename` AST transform.
