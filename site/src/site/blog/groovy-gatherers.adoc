@@ -426,8 +426,19 @@ assert (1..5).inject([]) { acc, next ->
 } == [1, 3, 6, 10, 15]
 ----
 
-This particular operation is deemed useful enough that Java actually
-has a built-in library function for arrays:
+Groovy has a number of alternatives to achieve this functionality.
+Here is one using `inits`:
+
+[source,groovy]
+----
+assert (1..5).inits().grep().reverse()*.sum() == [1, 3, 6, 10, 15]
+----
+
+`inits` is a list processing function which we cover in more detail
+in the next section.
+
+Before examining gatherer equivalents, we should note that this particular operation
+is deemed useful enough that Java actually has built-in library function for arrays:
 
 [source,groovy]
 ----
@@ -436,7 +447,7 @@ Arrays.parallelPrefix(nums, Integer::sum)
 assert nums == [1, 3, 6, 10, 15]
 ----
 
-This particular operation isn't well suited to traditional streams,
+Cumulative sum isn't well suited to traditional streams,
 but now with gatherers, we can use the `scan` built-in gatherer
 to have similar functionality when processing streams:
 
