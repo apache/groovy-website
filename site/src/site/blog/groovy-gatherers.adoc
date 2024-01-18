@@ -1,7 +1,8 @@
 = Using Gatherers with Groovy
 Paul King
 :revdate: 2023-12-09T15:30:00+00:00
-:keywords: gatherers, jdk22, chop, collate, inject, ginq, streams, jep461
+:updated: 2024-01-03T22:00:00+00:00
+:keywords: gatherers, jdk22, chop, collate, inject, ginq, streams, jep461, fold, scan
 :description: This post looks at using Gatherers (JEP 461) with Groovy.
 
 An interesting feature being previewed in JDK22 is _Gatherers_
@@ -388,9 +389,9 @@ assert (1..8).stream().gather(windowMultiple(3, -1)).toList() ==
     [[1, 2, 3], [4, 5, 6, 7, 8]]
 ----
 
-== Inject and fold
+== Inject, fold and scan
 
-Groovy's `inject` is a little different to the streams `reduce` intermediate operator.
+Groovy's `inject` is a little different to the stream APIs `reduce` intermediate operator.
 The latter expects a binary operator which restricts the types of the elements
 being consumed and produced.
 
@@ -401,7 +402,7 @@ The `inject` method can have different types for its arguments as shown here:
 assert (1..5).inject(''){ string, number -> string + number } == '12345'
 ----
 
-The `fold` built-in gatherer provides the equivalent functionality:
+The `fold` built-in gatherer allows us to write the equivalent functionality for stream processing as shown here:
 
 [source,groovy]
 ----
@@ -409,6 +410,41 @@ assert (1..5).stream()
              .gather(fold(() -> '', (string, number) -> string + number))
              .findFirst()
              .get() == '12345'
+----
+
+Let's look at another `inject` example. This time _cumulative sum_.
+If we have a sequence of numbers, the cumulative sum is another sequence
+whose value at any index is determined by accumulating all the
+numbers from the original sequence up to and including the index in question, e.g. the cumulative sum of `[1, 2, 3, 4]` is `[1, 3, 6, 10]`.
+
+This is again a good fit for Groovy's `inject`:
+
+[source,groovy]
+----
+assert (1..5).inject([]) { acc, next ->
+    acc + [acc ? acc.last() + next : next]
+} == [1, 3, 6, 10, 15]
+----
+
+This particular operation is deemed useful enough that Java actually
+has a built-in library function for arrays:
+
+[source,groovy]
+----
+Integer[] nums = 1..5
+Arrays.parallelPrefix(nums, Integer::sum)
+assert nums == [1, 3, 6, 10, 15]
+----
+
+This particular operation isn't well suited to traditional streams,
+but now with gatherers, we can use the `scan` built-in gatherer
+to have similar functionality when processing streams:
+
+[source,groovy]
+----
+assert (1..5).stream()
+             .gather(scan(() -> 0, Integer::sum))
+             .toList() == [1, 3, 6, 10, 15]
 ----
 
 == Testing for a subsequence (fun with `inits` and `tails`)
@@ -579,3 +615,8 @@ likely pick whichever style makes sense.
 We are still in the early days of gatherers being available,
 so expect much more to emerge as this feature becomes more mainstream.
 We look forward to it advancing past preview status.
+
+.Update history
+****
+*18/Jan/2024*: Updated with a scan/cumulative sum example.
+****
