@@ -1,7 +1,7 @@
 = Using Gatherers with Groovy
 Paul King
 :revdate: 2023-12-09T15:30:00+00:00
-:updated: 2024-01-03T22:00:00+00:00
+:updated: 2024-01-18T22:00:00+00:00
 :keywords: gatherers, jdk22, chop, collate, inject, ginq, streams, jep461, fold, scan
 :description: This post looks at using Gatherers (JEP 461) with Groovy.
 
