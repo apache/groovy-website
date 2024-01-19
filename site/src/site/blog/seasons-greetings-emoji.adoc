@@ -1,6 +1,7 @@
 = Season's Greetings with Emojis
 Paul King
 :revdate: 2023-12-23T12:24:07+00:00
+:updated: 2024-01-19T22:15:00+00:00
 :keywords: groovy, emoji
 :description: Season's greetings with some emoji fun.
 
@@ -8,7 +9,7 @@ In a https://groovy.apache.org/blog/helloworldemoji[previous blog post]
 we looked at a fun way to write a _hello world_ script using Groovy and Emojis.
 
 Let's look at some of the additional emoji API calls
-available in JDK 21. We're using Groovy 5.0.0-alpha-4,
+available in JDK 21. We're using Groovy 5.0.0-alpha-5,
 but most of the examples work as is with recent Groovy 4 versions.
 Groovy 5, adds one shortcut for making it easier to get to code points
 as an array.
@@ -145,3 +146,8 @@ Oh yes, and Season's greetings everyone 🎄🎅☃️🎁🌟🎉!
 * https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Character.html[JDK 21 JavaDoc for java.lang.Character]
 * https://www.youtube.com/watch?v=O1oq1sbUnmU[Java 21 Improved Emoji Support 💪 Video]
 * https://inside.java/2023/11/20/sip089/[Improved Emoji Support in Java 21 - Sip of Java]
+
+.Update history
+****
+*19/Jan/2024*: Bumped Groovy from 5.0.0-alpha-4 to 5.0.0-alpha-5.
+****
