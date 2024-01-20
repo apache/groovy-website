@@ -1,0 +1,154 @@
+= Groovy Type Checkers
+Paul King
+:revdate: 2024-01-20T20:30:00+00:00
+:keywords: type checking, printf, regex, format
+:description: This post looks at Groovy's Type Checkers.
+
+By default, Groovy only performs minimal static type checking
+during compilation. This allows you to write scripts which
+make use of very dynamic features of the language,
+like adding methods at runtime. But many programs don't
+make use of such dynamic features, so Groovy allows
+you to ramp up the amount of type checking the compiler will
+do when you need to, by using Groovy's
+https://docs.groovy-lang.org/docs/latest/html/documentation/#static-type-checking[static type checking] features.
+
+But rather than just providing a dynamic/static (or on/off)
+type checking capability, Groovy provides a
+https://docs.groovy-lang.org/docs/groovy-5.0.0-alpha-5/html/documentation/#_type_checking_extensions[type checking extension] mechanism. It turns out there are many scenarios
+where you want mostly Java-like type checking but some minor
+relaxations for just a __light sprinkling__ of dynamic behavior.
+Conversely, there are times when you want __stronger-than-Java__ checking.
+Here we will look at two built-in checkers for this latter case.
+
+* The https://docs.groovy-lang.org/docs/groovy-5.0.0-alpha-5/html/documentation/#_checking_regular_expressions[RegexChecker] was introduced in Groovy 4. It performs additional checks when using Groovy's regex operators or calling Java regex API calls.
+It looks for illegal characters, unclosed capturing groups or ranges, illegal or unknown syntax and many other errors that would normally occur at runtime. Using the checker ensures that if your program compiles, you won't receive a runtime error.
+
+* The https://docs.groovy-lang.org/docs/groovy-5.0.0-alpha-5/html/documentation/#_checking_format_strings[FormatStringChecker]
+is available in alpha releases of Groovy 5. It
+checks various printf and format methods. It looks for illegal precision
+specifications, unknown format conversions, type conversion mismatches
+and other errors. When using the checker, if your program compiles, you should
+not receive such errors.
+
+Both these checkers rely on having the regular expression or format string
+available somewhere in the code. If you store such expressions in databases
+or properties files, or somewhere else, then you are out of luck.
+But remember, the mechanism is extensible, so adding further support
+is only a few lines (or possibly tens of lines) of code away.
+
+== An Example
+
+Let's look at an example which uses both those checkers. It is an example
+which uses regex to pull some information out of a log message from
+the first commit in Groovy's source code repository. For simplicity,
+we duplicated the log message as a String but Groovy has nice capabilities
+if we wanted to extract that from git ourselves.
+
+[source,groovy]
+----
+var firstCommitLog = 'Date:   Thu Aug 28 18:48:39 2003 +0000' // <1>
+
+@TypeChecked(extensions = 'groovy.typecheckers.RegexChecker') // <2>
+def getMatcher(String text) {
+    text =~ /Date:\s*(\w{3})\s(\w{3})\s(\d{2})\s(\d{2}):(\d{2}):(\d{2})\s(\d{4})/
+}
+
+@TypeChecked(extensions = 'groovy.typecheckers.FormatStringChecker') // <3>
+def displayInfo(String day, boolean afternoon, BigDecimal numYears) {
+    printf 'Day: %s, Afternoon: %x, Years ago: %3.1f', day, afternoon, numYears
+}
+
+var (_, day, month, date, hour, _, _, year) = getMatcher(firstCommitLog)[0] // <4>
+
+var afternoon = hour.toInteger() >= 12
+int monthNumber = DateTimeFormatter.ofPattern('MMM').parse(month)[MONTH_OF_YEAR]
+var now = LocalDate.now()
+var firstCommitDate = LocalDate.of(year.toInteger(), monthNumber, date.toInteger())
+var numYears = (now - firstCommitDate) / 365  // <5>
+
+displayInfo(day, afternoon, numYears)
+----
+<1> One of the lines in the first git commit message
+<2> A method with additional regex checking
+<3> A method with additional format string checking
+<4> Extract components from first match
+<5> Calculate the number of years since the first commit as a floating-point number
+
+When we run this script we get the following output:
+
+----
+Day: Thu, Afternoon: true, Years ago: 20.4
+----
+
+So, we know the first commit happened over 20 years ago on a Thursday afternoon/evening.
+
+Here we annotated the two methods in question with `TypeChecked`,
+and explicitly listed out the `extensions` we wanted in each case.
+Groovy provides programmatic
+https://docs.groovy-lang.org/docs/groovy-5.0.0-alpha-5/html/documentation/#compilation-customizers[compiler configuration]
+and
+https://docs.groovy-lang.org/docs/groovy-5.0.0-alpha-5/html/documentation/#_the_configscript_commandline_parameter[configuration
+scripts]
+to potentially hide away such details, but we won't go into further details here.
+
+Let's have a look at some of the compile-time errors we would see
+if we had made errors in the script.
+
+Let's put an accidental closing grouping bracket at the start of the expression:
+
+----
+[Static type checking] - Bad regex: Unmatched closing ')'
+)Date:\s*(\w{3})\s(\w{3})\s(\d{2})\s(\d{2}):(\d{2}):(\d{2})\s(\d{4})
+----
+
+Or leave off the closing curly brace on the first repetition:
+
+----
+[Static type checking] - Bad regex: Unclosed counted closure near index 13
+Date:\s*(\w{3)\s(\w{3})\s(\d{2})\s(\d{2}):(\d{2}):(\d{2})\s(\d{4})
+             ^
+----
+
+Or used a bad escape sequence:
+
+----
+[Static type checking] - Bad regex: Illegal/unsupported escape sequence near index 6
+Date:\g*(\w{3})\s(\w{3})\s(\d{2})\s(\d{2}):(\d{2}):(\d{2})\s(\d{4})
+      ^
+----
+
+Similarly, we might make mistakes in displaying the gathered information.
+Possibly, we might get the types incorrect, here mixing up the order
+of the last two parameters:
+
+----
+[Static type checking] - IllegalFormatConversion: f != java.lang.Boolean
+       printf 'Day: %s, Afternoon: %b, Years ago: %3.1f', day, numYears, afternoon
+----
+
+Or perhaps just getting the conversion character altogether wrong,
+using `%y` for year but there is no such conversion character:
+
+----
+[Static type checking] - UnknownFormatConversion: Conversion = 'y'
+       printf 'Day: %s, Afternoon: %b, Years ago: %y', day, afternoon, numYears
+----
+
+Or perhaps asking for the boolean to be 0-padded:
+
+----
+[Static type checking] - FormatFlagsConversionMismatch: Conversion = b, Flags = '0'
+       printf 'Day: %s, Afternoon: %0b, Years ago: %3.1f', day, afternoon, numYears
+----
+
+Check out the documentation to see more of around 30 classes of errors that are detected.
+
+== Conclusion
+
+Regular expressions and format strings are niche activities, so
+you may not have the need for such checking often. But the fact that
+you don't use these features all the time increases the chance of making
+mistakes. Have these additional checkers can put your mind at rest. And remember,
+these are just examples of using Groovy's extensible type checking.
+Why not add additional checking for your own scenarios! Have fun!
