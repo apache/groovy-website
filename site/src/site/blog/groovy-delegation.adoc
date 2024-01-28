@@ -1,0 +1,399 @@
+= Using the Delegation Pattern with Groovy
+Paul King
+:revdate: 2024-01-28T20:08:00+00:00
+:keywords: delegation, design pattern
+:description: This post looks at using the Delegation Design Pattern with Groovy.
+
+The
+https://en.wikipedia.org/wiki/Delegation_pattern[delegation design pattern]
+is used when one class delegates part of its functionality
+to one or more helper objects (known as _delegates_).
+It is often used as an alternative to the object-oriented
+https://en.wikipedia.org/wiki/Inheritance_(object-oriented_programming)[inheritance]
+mechanism which allows behavior to be derived from a superclass.
+When used in this way, it is often termed favoring
+https://en.wikipedia.org/wiki/Composition_over_inheritance[composition over inheritance].
+
+== Case Study
+
+As a case study, let's consider writing some code to track
+menu items that you might find at your favorite restaurant
+or take-away food establishment. We'll use a `MenuItem` record
+to capture the name and price of an item we can order:
+
+[source,groovy]
+----
+record MenuItem(String name, int price) { }
+----
+
+For very simple applications, this might be enough.
+We can simply use other collection types, like sets, maps
+or lists, of `MenuItem` instances. For our first example, we'll just use a list:
+
+[source,groovy]
+----
+var spanishTapas = [
+    new MenuItem('Gambas al ajillo', 8),
+    new MenuItem('Tortilla de patatas', 6),
+    new MenuItem('Calamares a la romana', 7)
+]
+
+assert spanishTapas.size() == 3
+assert spanishTapas[0].price == 8
+assert spanishTapas[-1].name.startsWith('Calamares')
+assert spanishTapas.every{ it.price < 10 }
+----
+
+If we want to build more sophisticated applications, we quickly
+might find it useful to have a `Menu` class to embody additional
+functionality. Let's look at alternative ways to create such a class.
+
+== Using explicit "by-hand" delegation
+
+This is the approach that is often suggested in various design pattern
+guides. We have one (or more) objects called delegate(s).
+For numerous methods in the class we are defining, we call through
+to the delegate(s).
+
+We'll declare our delegate helper, in this case a list.
+We'll define `add`, `getAt` and `size` methods which do no  more than
+pass on the arguments to the delegate's identically named method.
+We'll also add a `findByPrice` method which contains a tiny bit of
+its own business logic but mostly uses an underlying method from the delegate.
+Here is what the class might look like:
+
+[source,groovy]
+----
+class Menu {
+    private ArrayList<MenuItem> delegate = []
+
+    boolean add(MenuItem newItem) {
+        delegate.add(newItem)
+    }
+
+    MenuItem getAt(int index) {
+        delegate[index]
+    }
+
+    int size() {
+        delegate.size()
+    }
+
+    MenuItem findByPrice(int price) {
+        delegate.find{ it.price == price }
+    }
+}
+----
+
+Here is how we might use the class:
+
+[source,groovy]
+----
+def vietnamese = new Menu().tap {
+    add(new MenuItem('Phở', 7))
+    add(new MenuItem('Bánh Mì', 5))
+}
+
+assert vietnamese[0].price == 7
+assert vietnamese.size() == 2
+assert vietnamese.findByPrice(7).name == 'Phở'
+----
+
+This class isn't too hard to understand, but if we wanted to add more
+list-like functionality into our `Menu` class, we'll see a lot
+more repeated boilerplate code. As the class gets larger,
+it also becomes harder to see the intent that we are primarily
+using the delegation pattern with only a handful of methods (potentially)
+that might add their own business logic.
+
+At this point, we might question whether moving away from inheritance
+and to composition/delegation was a good idea.
+Extending from the `ArrayList` class, say, would automatically derive
+many of the methods we may be interested in, and we'd eliminate some
+of the boilerplate delegation methods. But, if a `Menu` isn't really
+_just_ a list, but has added functionality, trying to force fit it into
+the `List` inheritance hierarchy will usually not end well.
+Moreover, if it turns out we need to delegate to more than one helper
+object, then the single parent class model offered by inheritance
+(Groovy follows Java here and only allows a single parent),
+makes it impossible to use this approach.
+
+Before examining Groovy's special support for delegation (which overcomes
+the exploding amount of boilerplate problem), let's look at Groovy's support for traits.
+Traits are a mechanism which does overcome the
+limitation of _inheriting_ behavior from a single parent superclass.
+
+== Using Traits
+
+Groovy traits provide a powerful mechanism for inheriting behavior.
+Unlike extending from a single superclass,
+you can implement multiple traits and derive behavior from multiple places.
+Rules and conventions are in place to overcome the
+https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem[diamond inheritance problem].
+Traits are a bit like Java's _interfaces with default methods_ but traits
+have a few additional features, in particular, we'll use _stateful_ traits
+which allow inheriting state, not just behavior.
+
+In our case study, let's now suppose that we want to enhance our `Menu`
+class to also have the concept of a _date_.
+We might have different menus on different days of the week,
+or we might evolve the menu over time with seasonal ingredients,
+or have special menus for special days of celebration.
+
+We'll explore two traits, one for list-like behavior, and one for date-like behavior.
+We'll examine the list-like behavior first, and for simplicity, we'll follow
+a very similar approach to our explicit delegation example above, but add
+a couple of additional methods.
+
+Here is what our trait might look like:
+
+[source,groovy]
+----
+trait HasList {
+    List<MenuItem> listDelegate = []
+    boolean add(MenuItem item) { listDelegate.add(item) }
+    MenuItem getAt(int index) { listDelegate[index] }
+    boolean any(Closure predicate) { listDelegate.any(predicate) }
+    boolean contains(MenuItem item) { listDelegate.contains(item) }
+}
+----
+
+Next will be our trait for date-like behavior. For simplicity,
+let's start with a single `isBefore` method which lets us check whether
+the intended date for one menu precedes the date of another menu.
+This is just an example which maps directly onto one of the methods offered
+by our `LocalDate` delegate.
+
+Here is what our trait might look like:
+
+[source,groovy]
+----
+trait HasDate {
+    LocalDate dateDelegate
+    boolean isBefore(LocalDate other) { dateDelegate.isBefore(other) }
+}
+----
+
+Now we can create a class using those two traits:
+
+[source,groovy]
+----
+class Menu implements HasList, HasDate {
+    Menu(LocalDate date) { dateDelegate = date }
+}
+----
+
+There are several advantages to the explicit delegation example:
+
+* it becomes clear that we are using the delegation pattern
+* if we wanted to add in some methods, like `findByPrice` that
+we used earlier, it becomes clear, that such a method is where additional
+business logic might be added over-and-above the delegation pattern
+* if we have a need for list-like or date-like behavior in other scenarios,
+we now have some somewhat general-purpose traits that we can reuse
+
+Here is how we might use our new class:
+
+[source,groovy]
+----
+def italianWednesday = new Menu(LocalDate.of(2024, 1, 24)).tap {
+    add(new MenuItem('Spaghetti Bolognese', 10))
+    add(new MenuItem('Gnocchi di Patate', 11))
+    add(new MenuItem('Tiramisù', 9))
+}
+
+def italianThursday = new Menu(LocalDate.of(2024, 1, 25)).tap {
+    add(new MenuItem('Fettuccine al Pomodoro', 12))
+    add(new MenuItem('Pizza Margherita', 10))
+    add(new MenuItem('Pannacotta', 10))
+}
+
+assert italianWednesday[0].price == 10
+assert !italianWednesday.any{ italianThursday.contains(it) }
+assert italianWednesday.isBefore(italianThursday.dateDelegate)
+----
+
+Here we are doing a similar price check to what we have seen earlier,
+then since we might want to stress variety, we are checking that
+no menu items from Wednesday and Thursday overlap, then we are checking
+that the date associated with the first menu precedes the second.
+
+== Using dynamic language features
+
+Groovy has several dynamic features which facilitate delegation.
+The
+https://docs.groovy-lang.org/latest/html/documentation/#_implement_delegation_pattern_using_expandometaclass[Groovy documentation]
+shows an approach using Groovy's `ExpandoMetaClass`. Here, we'll show an approach that
+makes use of Groovy's `methodMissing` hook:
+
+[source,groovy]
+----
+class Menu {
+    private ArrayList<MenuItem> delegate = []
+
+    def findByPrice(int price) {
+        delegate.find{ it.price == price }
+    }
+
+    def methodMissing(String name, args) {
+        delegate."$name"(*args)
+    }
+}
+----
+
+Here we have one explicit method, `findByPrice`, which we couldn't delegate directly.
+All other method calls are intercepted and directed to our delegate.
+
+Here is how we might use the class:
+
+[source,groovy]
+----
+def frenchBakery = new Menu().tap {
+    add(new MenuItem('Croissant', 4))
+    add(new MenuItem('Baguette', 5))
+}
+
+assert frenchBakery[0].price == 4
+assert frenchBakery.size() == 2
+assert frenchBakery.findByPrice(4).name == 'Croissant'
+----
+
+In general, we could extend our class to also make use of the `propertyMissing`
+method, if we had properties (think getters) that we wanted to also delegate.
+It is also possible to delegate to multiple delegates but the logic in
+our `methodMissing` method would become a little more complex.
+
+A difference of this dynamic approach is that the delegate methods don't
+appear in our `Menu` class file since they are discovered at runtime.
+This might make our life slightly easier if new versions of the delegate
+class are used, we'll automatically delegate to any new methods.
+Similarly, if we are adding methods to our delegate at runtime,
+this approach can happily delegate to those methods.
+It does however have the downside that the delegate methods don't appear in
+our `Menu` class file, which means they won't appear in our Groovydoc, and we
+might have less favorable IDE completion depending on how smart our tooling is.
+
+We'll look at an approach that overcomes those downsides next.
+
+== Using the @Delegate transform
+
+Groovy also provides compile-time delegation support via the `@Delegate`
+transform. Here we annotate two properties (our delegates).
+This automatically adds boilerplate methods
+similar to what we saw earlier for explicit delegation for
+every public method in the two classes (about 120 methods in total).
+Also, any interfaces implemented by our delegates are also automatically
+added to our classes implements clause.
+
+[source,groovy]
+----
+@TupleConstructor(includes='date')
+class Menu {
+    @Delegate
+    final ArrayList<MenuItem> items = []
+    @Delegate
+    final LocalDate date
+}
+----
+
+This automatically adds boilerplate methods
+similar to what we saw earlier for explicit delegation for
+every public method in the two classes (about 120 methods in total).
+Also, any interfaces implemented by our delegates are also automatically
+added to our `Menu` class's implements clause.
+
+Here is how we might use it:
+
+[source,groovy]
+----
+def bistroTuesday = new Menu(LocalDate.of(2024, 1, 16)).tap {
+    add(new MenuItem('Tacos', 12))
+    add(new MenuItem('Chicken Parma', 15))
+}
+def bistroFriday = new Menu(LocalDate.of(2024, 1, 19)).tap {
+    add(new MenuItem('Chicken Parma', 15))
+    add(new MenuItem('Fish & Chips', 12))
+}
+
+assert bistroTuesday.any{ bistroFriday.contains(it) }
+assert bistroTuesday.isBefore(bistroFriday)
+assert bistroTuesday instanceof List
+assert bistroFriday instanceof ChronoLocalDate
+----
+
+If we don't really need all the list and date methods implemented,
+we can just delegate to the ones we are interested in. In this case,
+we also need to disable the automatic collection of delegate interfaces.
+
+Here is how we might write our class (just for list-like features):
+
+[source,groovy]
+----
+class Menu {
+    @Delegate(includes='add,forEach,get,size', interfaces=false)
+    final ArrayList<MenuItem> items = []
+}
+----
+
+Here is how we might use it:
+
+[source,groovy]
+----
+def japanese = new Menu().tap {
+    add(new MenuItem('Sushi', 8))
+    add(new MenuItem('Vegetarian Ramen', 12))
+    add(new MenuItem('Vegetable Gyoza', 12))
+    add(new MenuItem('Teriyaki Tofu', 12))
+}
+
+assert japanese.size() == 4
+japanese.forEach{ it.price % 4 == 0 }
+assert japanese.get(3).price == 12
+assert japanese !instanceof List
+----
+
+We can see that the class does have the methods of interest,
+but doesn't implement the `List` interface.
+
+== Groovy use of the delegation pattern
+
+Groovy also uses the delegation pattern internally in numerous places including Closures.
+You wouldn't normally do this in normal code, but you can set and change
+the delegate of a Closure like this example shows:
+
+[source,groovy]
+----
+var sizeClosure = { size() }
+sizeClosure.delegate = 5..6
+assert sizeClosure() == 2
+sizeClosure.delegate = 'foo'
+assert sizeClosure() == 3
+----
+
+While this example may not look all that useful, the technique is
+fundamental to how builders and other nested Closures operate
+under the covers.
+
+Here's another example involving dynamically adding a couple of methods to integers using `ExpandoMetaClass`:
+
+[source,groovy]
+----
+Integer.metaClass {
+    twice { multiply(2) }     // <1>
+    thrice { delegate * 3 }   // <2>
+}
+assert 3.twice() == 2.thrice()
+----
+<1> Implicit
+<2> Explicit
+
+== Further information
+
+* https://docs.groovy-lang.org/latest/html/documentation/#_delegation_pattern
+* https://blog.mrhaki.com/2009/08/groovy-goodness-delegate-to-simplify.html
+* https://blog.mrhaki.com/2013/11/groovy-goodness-choose-which-delegated.html
+
+== Conclusion
+
+We have seen how to use the delegation pattern in Groovy
+by hand, as well as with Groovy's special runtime and compile-time support.
