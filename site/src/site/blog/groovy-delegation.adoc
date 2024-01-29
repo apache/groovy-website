@@ -278,12 +278,8 @@ We'll look at an approach that overcomes those downsides next.
 == Using the @Delegate transform
 
 Groovy also provides compile-time delegation support via the `@Delegate`
-transform. Here we annotate two properties (our delegates).
-This automatically adds boilerplate methods
-similar to what we saw earlier for explicit delegation for
-every public method in the two classes (about 120 methods in total).
-Also, any interfaces implemented by our delegates are also automatically
-added to our classes implements clause.
+transform. Here we annotate two properties (our delegates) with the
+`@Delegate` annotation.
 
 [source,groovy]
 ----
@@ -300,7 +296,7 @@ This automatically adds boilerplate methods
 similar to what we saw earlier for explicit delegation for
 every public method in the two classes (about 120 methods in total).
 Also, any interfaces implemented by our delegates are also automatically
-added to our `Menu` class's implements clause.
+added to our `Menu` class's _implements_ clause.
 
 Here is how we might use it:
 
@@ -321,9 +317,18 @@ assert bistroTuesday instanceof List
 assert bistroFriday instanceof ChronoLocalDate
 ----
 
-If we don't really need all the list and date methods implemented,
-we can just delegate to the ones we are interested in. In this case,
-we also need to disable the automatic collection of delegate interfaces.
+Here we are checking that at least one item appears on both menus
+and that the Tuesday menu is before the Friday menu.
+
+If the standard delegation options aren't what we need, we can customise
+what code is generated for us by using annotation attributes.
+For example, if we don't really need all the list and date methods implemented,
+we can just delegate to the ones we are interested in by using the
+`includes` annotation attribute. This now just brings in the delegation
+boilerplate code for the methods of interest.
+In this case, we'll also want to disable the automatic collection of
+delegate interfaces, since we no longer will be implementing all the methods
+listed in the interfaces. We do this using the `interfaces` annotation attribute.
 
 Here is how we might write our class (just for list-like features):
 
@@ -353,7 +358,9 @@ assert japanese !instanceof List
 ----
 
 We can see that the class does have the methods of interest,
-but doesn't implement the `List` interface.
+since we are using those methods in the example,
+and also that it doesn't implement the `List` interface
+as the last assertion shows.
 
 == Groovy use of the delegation pattern
 
