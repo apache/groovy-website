@@ -51,15 +51,17 @@ functionality. Let's look at alternative ways to create such a class.
 == Using explicit "by-hand" delegation
 
 This is the approach that is often suggested in various design pattern
-guides. We have one (or more) objects called delegate(s).
-For numerous methods in the class we are defining, we call through
-to the delegate(s).
+guides which talk about the delegation pattern.
+We have one (or more) _helper_ objects called delegate(s).
+For numerous methods in the class we are defining, we simply call through
+to corresponding methods of the delegate(s).
 
 We'll declare our delegate helper, in this case a list.
-We'll define `add`, `getAt` and `size` methods which do no  more than
+We'll define `add`, `getAt` and `size` methods which do no more than
 pass on the arguments to the delegate's identically named method.
 We'll also add a `findByPrice` method which contains a tiny bit of
-its own business logic but mostly uses an underlying method from the delegate.
+its own business logic, but mostly uses an underlying method from the delegate.
+
 Here is what the class might look like:
 
 [source,groovy]
