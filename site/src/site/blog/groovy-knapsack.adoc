@@ -1,0 +1,556 @@
+= Solving the Knapsack Problem with Groovy
+Paul King
+:revdate: 2024-02-03T20:08:00+00:00
+:keywords: knapsack, optimisation
+:draft: true
+:description: This post looks at solving the knapsack problem with Groovy.
+
+The
+https://en.wikipedia.org/wiki/Knapsack_problem[knapsack problem]
+is a problem in combinatorial optimization.
+Given a set of items, each of a given weight and value,
+determine which items to place into a knapsack (or other container)
+in order to maximise the value within the knapsack without exceeding
+a given weight limit.
+
+image:img/knapsack2.jpg[A knapsack and some gems]
+
+== Case Study
+
+For our case study, we'll start with placing gems within the
+knapsack. The gems have the following characteristics:
+
+|===
+| Number | Weight | Value
+
+| 1
+| 1
+| 1
+
+| 2
+| 2
+| 5
+
+| 3
+| 3
+| 10
+
+| 4
+| 5
+| 15
+
+| 5
+| 6
+| 17
+|===
+
+The gem can either be in the knapsack or not.
+This is known as the 0/1 knapsack variation of the problem.
+We'll look at some other variations later.
+
+Our goal then is to find out which gems we place into the knapsack.
+
+image:img/knapsack.jpg[A knapsack and some gems]
+
+== Brute force recursion
+
+The first approach we might take is simply to try all
+possible combinations, throwing away any which exceed
+the weight limit, and then finding the maximum value of those that are left.
+
+One way to do this is to generate all possible index combinations.
+Then, select the ones which satisfy the knapsack weight constraint.
+Then, find the one which yields the highest value as shown here:
+
+[source,groovy]
+----
+int[] values = [1, 5, 10, 15, 17]  // Gem values
+int[] weights = [1, 2, 3, 5, 6]    // Weights
+int W = 10
+var indexCombos = weights.indices.collect{ [null, it] }.combinations()*.findResults()
+var validWeight = indexCombos.findAll{ weights[it].sum() <= W }
+var best = validWeight.max{ values[it].sum() }
+println "Total value for capacity $W = ${values[best].sum()}"
+println "Gems taken: $best"
+println "Gem weights: ${weights[best]}"
+----
+
+Running this script yields the following output:
+
+----
+Total value for capacity 10 = 30
+Gems taken: [1, 2, 3]
+Gem weights: [2, 3, 5]
+----
+
+While this is simple enough, it doesn't offer many opportunities
+for optimisation. Let's instead, consider a recursive solution
+which lets us opt out earlier for cases which are over the valid knapsack weight:
+
+[source,groovy]
+----
+int solve(int[] w, int[] v, int W) {
+    knapsack(w, v, v.length, W)
+}
+
+int knapsack(int[] w, int[] v, int n, int W) {
+    if (n <= 0) {
+        0
+    } else if (w[n - 1] > W) {
+        knapsack(w, v, n - 1, W)
+    } else {
+        [knapsack(w, v, n - 1, W),
+         v[n - 1] + knapsack(w, v, n - 1, W - w[n - 1])].max()
+    }
+}
+
+int[] values = [1, 5, 10, 15, 17]  // Gem values
+int[] weights = [1, 2, 3, 5, 6]    // Weights
+[6, 8, 10].each {
+    println "Total value for capacity $it = ${solve(weights, values, it)}"
+}
+----
+
+We calculate here the result for 3 different knapsack weight limits (6, 8, and 10).
+The output looks like this:
+
+----
+Total value for capacity 6 = 17
+Total value for capacity 8 = 25
+Total value for capacity 10 = 30
+----
+
+We now have some possibilities for optimisation. One quick win is to
+memoize (cache) the results of calling the `knapsack` method.
+The only change from above is the addition of the `@Memoized` annotation.
+
+[source,groovy]
+----
+@Memoized
+int knapsack(int[] w, int[] v, int n, int W) {
+    if (n <= 0) {
+        0
+    } else if (w[n - 1] > W) {
+        knapsack(w, v, n - 1, W)
+    } else {
+        [knapsack(w, v, n - 1, W),
+         v[n - 1] + knapsack(w, v, n - 1, W - w[n - 1])].max()
+    }
+}
+----
+
+Running this has the same result as before but the number of executions of
+the `knapsack` method reduces from 44 to 32 (when just calculating for the knapsack of weight limit 10), and from 107 to 49 (when calculating for 6, 8, and 10).
+
+== Using Dynamic Programming
+
+[source,groovy]
+----
+int solve(int[] v, int[] w, int W) {
+    knapsack(new Integer[v.length][W+1], v, w, W, 0)
+}
+
+int knapsack(Integer[][] dp, int[] v, int[] w, int W, int n) {
+    if (W <= 0 || n >= v.length) {
+        return 0
+    }
+    if (dp[n][W]) {
+        return dp[n][W]
+    }
+    int tryN = w[n] > W ? 0 : v[n] + knapsack(dp, v, w, W - w[n], n + 1)
+    int skipN = knapsack(dp, v, w, W, n + 1)
+    dp[n][W] = max(tryN, skipN)
+}
+
+int[] values = [1, 5, 10, 15, 17]  // Gem values
+int[] weights = [1, 2, 3, 5, 6]    // Weights
+[6, 8, 10].each {
+    println "Total value for capacity $it = ${solve(values, weights, it)}"
+}
+----
+
+----
+Total value for capacity 6 = 17
+Total value for capacity 8 = 25
+Total value for capacity 10 = 30
+----
+
+[source,groovy]
+----
+int[] values = [1, 5, 10, 15, 17]  // Gem values
+int[] weights = [1, 2, 3, 5, 6]    // Weights
+int W = 10
+int N = values.length
+
+int[][] dp = new int[N + 1][W + 1]
+boolean[][] sol = new boolean[N + 1][W + 1]
+
+for (int n = 1; n <= N; n++) {
+    for (int w = 1; w <= W; w++) {
+        int skipN = dp[n - 1][w]
+        int tryN = weights[n - 1] > w ? 0 : values[n - 1] + dp[n - 1][w - weights[n - 1]]
+        dp[n][w] = max(skipN, tryN)
+        sol[n][w] = tryN > skipN
+    }
+}
+
+println "Total value for capacity $W = ${dp[N][W]}"
+
+def taken = []
+for (int i = N, j = W; j > 0; i--) {
+    if (sol[i][j]) {
+        taken << i - 1
+        j -= weights[i - 1]
+    }
+}
+println "Gems taken: $taken"
+----
+
+----
+Total value for capacity 10 = 30
+Gems taken: [3, 2, 1]
+----
+
+== Using Branch and Bound
+
+[source,groovy]
+----
+record Item(int weight, int value) {}
+----
+
+[source,groovy]
+----
+@Canonical
+class Node {
+    int level, value, weight
+    public int bound
+
+    static Node next(Node parent) {
+        new Node(parent.level + 1, parent.value, parent.weight)
+    }
+}
+----
+
+[source,groovy]
+----
+int bound(Node u, int n, int W, List<Item> items) {
+    if (u.weight >= W)
+        return 0
+
+    int valueBound = u.value
+    int j = u.level + 1
+    int totalWeight = u.weight
+
+    while (j < n && totalWeight + items[j].weight <= W) {
+        totalWeight += items[j].weight
+        valueBound += items[j].value
+        j++
+    }
+
+    if (j < n)
+        valueBound += (int) ((W - totalWeight) * items[j].value / items[j].weight)
+
+    valueBound
+}
+
+int knapsack(int W, List<Item> items, int n) {
+    items.sort { it.value / it.weight }
+    var q = new PriorityQueue<>((a, b) -> b.bound <=> a.bound)
+    Node u, v
+
+    q.offer(new Node(-1, 0, 0))
+
+    int bestValue = 0
+
+    while (q) {
+        u = q.poll()
+
+        if (u.level == n - 1)
+            continue
+        else
+            v = Node.next(u)
+
+        v.weight += items[v.level].weight
+        v.value += items[v.level].value
+
+        if (v.weight <= W && v.value > bestValue)
+            bestValue = v.value
+
+        v.bound = bound(v, n, W, items)
+
+        if (v.bound > bestValue)
+            q.offer(v)
+
+        v = Node.next(u)
+        v.bound = bound(v, n, W, items)
+
+        if (v.bound > bestValue)
+            q.offer(v)
+    }
+
+    bestValue
+}
+
+int W = 10
+
+int[] values = [1, 5, 10, 15, 17]  // Gem values
+int[] weights = [1, 2, 3, 5, 6]    // Weights
+var items = values.indices.collect {
+    new Item(weights[it], values[it])
+}
+
+println "Total value for capacity $W = ${knapsack(W, items, values.length)}"
+----
+
+Which has this output:
+
+----
+Total value for capacity 10 = 30
+----
+
+== Using Constraint Programming
+
+[source,groovy]
+----
+int[] values = [1, 5, 10, 15, 17]  // Gem values
+int[] weights = [1, 2, 3, 5, 6]    // Weights
+int W = 10
+int unbounded = 100000
+
+var counts = new IntVar[values.length]
+var found = false
+
+new Model('KnapsackProblem').with {
+    counts.indices.each(i -> counts[i] = intVar("count$i", 0, W))
+    scalar(counts, weights, '<=', W).post()
+    var total = intVar("Total value for capacity $W (unbounded)", 0, unbounded)
+    scalar(counts, values, '=', total).post()
+    setObjective(MAXIMIZE, total)
+
+    while (solver.solve()) {
+        found = true
+        println "$total, $counts"
+    }
+}
+if (!found) println 'No solution'
+----
+
+----
+Total value for capacity 10 (unbounded) = 25, [count0 = 0, count1 = 5, count2 = 0, count3 = 0, count4 = 0]
+Total value for capacity 10 (unbounded) = 30, [count0 = 0, count1 = 2, count2 = 2, count3 = 0, count4 = 0]
+Total value for capacity 10 (unbounded) = 31, [count0 = 1, count1 = 0, count2 = 3, count3 = 0, count4 = 0]
+----
+
+[source,groovy]
+----
+int[] values = [1, 5, 10, 15, 17]  // Gem values
+int[] weights = [1, 2, 3, 5, 6]    // Weights
+int W = 10
+int unbounded = 100000
+
+var counts = new IntVar[values.length]
+var found = false
+
+new Model('KnapsackProblem').with {
+    counts.indices.each(i -> counts[i] = intVar("count$i", 0, W))
+    var totalValue = intVar("Total value for capacity $W (unbounded)", 0, unbounded)
+    var totalWeight = intVar("Total weight taken", 0, W)
+    knapsack(counts, totalWeight, totalValue, weights, values).post()
+    setObjective(MAXIMIZE, totalValue)
+
+    while (solver.solve()) {
+        found = true
+        println "$totalValue, $totalWeight, $counts"
+    }
+}
+if (!found) println 'No solution'
+----
+
+----
+Total value for capacity 10 (unbounded) = 30, Total weight taken = 10, [count0 = 0, count1 = 2, count2 = 2, count3 = 0, count4 = 0]
+Total value for capacity 10 (unbounded) = 31, Total weight taken = 10, [count0 = 1, count1 = 0, count2 = 3, count3 = 0, count4 = 0]
+----
+
+== Using OrTools
+
+[source,groovy]
+----
+Loader.loadNativeLibraries()
+var solver = new KnapsackSolver(KNAPSACK_MULTIDIMENSION_BRANCH_AND_BOUND_SOLVER, "knapsack")
+
+long[] values = [1, 5, 10, 15, 17]
+long[][] weights = [[1, 2, 3, 5, 6]]
+long[] capacities = [10]
+
+solver.init(values, weights, capacities)
+
+long computedValue = solver.solve()
+println "Total value for capacity ${capacities[0]} = " + computedValue
+
+var packedItems = []
+var packedWeights = []
+int totalWeight = 0
+values.indices.each { i ->
+    if (solver.bestSolutionContains(i)) {
+        packedItems << i
+        packedWeights << weights[0][i]
+        totalWeight += weights[0][i]
+    }
+}
+println "Actual weight: $totalWeight"
+println "Gems taken: $packedItems"
+println "Gem weights: $packedWeights"
+----
+
+----
+Total value for capacity 10 = 30
+Actual weight: 10
+Gems taken: [1, 2, 3]
+Gem weights: [2, 3, 5]
+----
+
+== Using Jenetics
+
+[source,groovy]
+----
+record Item(int weight, int value) implements Serializable {}
+----
+
+[source,groovy]
+----
+class Knapsack implements Problem<ISeq<Item>, BitGene, Integer> {
+    private final Codec<ISeq<Item>, BitGene> codec
+    private final double knapsackSize
+
+    Knapsack(ISeq<Item> items, int knapsackSize) {
+        codec = Codecs.ofSubSet(items)
+        this.knapsackSize = knapsackSize
+    }
+
+    @Override
+    Function<ISeq<Item>, Integer> fitness() {
+        (items) -> {
+            var sum = items.inject(new Item(0, 0)) { acc, next ->
+                new Item(acc.weight + next.weight, acc.value + next.value)
+            }
+            sum.weight <= knapsackSize ? sum.value : 0
+        }
+    }
+
+    @Override
+    Codec<ISeq<Item>, BitGene> codec() { codec }
+}
+----
+
+[source,groovy]
+----
+int W = 10
+int[] values = [1, 5, 10, 15, 17]  // Gem values
+int[] weights = [1, 2, 3, 5, 6]    // Weights
+var items = [weights, values].transpose().collect { w, v -> new Item(w, v) }
+var iSeq = items.stream().collect(ISeq.toISeq())
+var knapsack = new Knapsack(iSeq, W)
+
+var engine = Engine.builder(knapsack)
+    .populationSize(8)
+    .survivorsSelector(new TournamentSelector<>(3))
+    .offspringSelector(new RouletteWheelSelector<>())
+    .alterers(
+        new Mutator<>(0.1),
+        new SinglePointCrossover<>(0.2),
+        new MultiPointCrossover<>(0.1))
+    .build()
+
+var log = { EvolutionResult er ->
+    var avg = er.population().average{ it.fitness() }
+    var best = er.bestFitness()
+    printf "avg = %5.2f, best = %d%n", avg, best
+}
+
+var best = engine.stream()
+    .limit(bySteadyFitness(8))
+    .limit(30)
+    .peek(log)
+    .collect(toBestPhenotype())
+
+println best
+----
+
+----
+avg = 18.88, best = 23
+avg = 21.00, best = 25
+avg = 22.00, best = 25
+avg = 22.63, best = 25
+avg = 25.63, best = 30
+avg = 27.50, best = 30
+avg = 27.63, best = 30
+avg = 24.38, best = 30
+avg = 22.50, best = 30
+avg = 26.25, best = 30
+avg = 30.00, best = 30
+avg = 30.00, best = 30
+[00001110] -> 30
+----
+
+----
+avg = 16.75, best = 27
+avg = 17.13, best = 23
+avg = 18.00, best = 23
+avg = 21.38, best = 27
+avg = 24.00, best = 27
+avg = 24.88, best = 27
+avg = 22.50, best = 27
+avg = 26.88, best = 27
+[00010100] -> 27
+----
+
+== Using Greedy selection
+
+[source,groovy]
+----
+int[] values = [1, 5, 10, 15, 17]  // Gem values
+int[] weights = [1, 2, 3, 5, 6]    // Weights
+var ratios = values.indices.collect { values[it] / weights[it] }.withIndex().sort { -it[0] }
+int W = 10
+Map<Integer, BigDecimal> taken = [:]
+var remaining = W
+while (remaining && ratios) {
+    var next = ratios.head()
+    var index = next[1]
+    if (remaining >= weights[index]) {
+        taken[index] = 1
+        remaining -= weights[index]
+    } else {
+        taken[index] = remaining / weights[index]
+        break
+    }
+    ratios = ratios.tail()
+}
+var total = taken.collect{ index, qty -> values[index] * qty }.sum()
+println taken
+printf 'Total value for capacity %d (with fractions) = %6.3f%n', W, total
+----
+
+----
+[2:1, 3:1, 4:0.3333333333]
+Total value for capacity 10 (with fractions) = 30.667
+----
+
+
+== Further information
+
+* https://www.youtube.com/watch?v=xCbYmUPvc2Q[The 0/1 Knapsack Problem (Demystifying Dynamic Programming)]
+* https://www.youtube.com/watch?v=MacVqujSXWE[The Knapsack Problem & Genetic Algorithms - Computerphile]
+* https://www.youtube.com/watch?v=cJ21moQpofY[0/1 Knapsack problem | Dynamic Programming]
+* https://www.youtube.com/watch?v=zRza99HPvkQ[0/1 Knapsack Problem (Program) - Dynamic Programming]
+* https://www.youtube.com/watch?v=nLmhmB6NzcM[0/1 Knapsack - Two Methods - Dynamic Programming]
+* https://www.youtube.com/watch?v=oTTzNMHM05I[Knapsack Problem - Greedy Method]
+* https://www.baeldung.com/java-knapsack[Baeldung: Knapsack Problem Implementation in Java]
+* https://www.hindawi.com/journals/mpe/2023/1742922/[Solving the 0/1 Knapsack Problem Using Metaheuristic and Neural Networks for the Virtual Machine Placement Process in Cloud Computing Environment]
+* https://choco-solver.org/[Choco home page]
+* https://github.com/paulk-asert/groovy-knapsack[Example source code]
+
+== Conclusion
+
+We have seen how to solve the knapsack problem in Groovy
+using several approaches.
