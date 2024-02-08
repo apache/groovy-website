@@ -69,7 +69,7 @@ task generateSite(type:JavaExec) {
     outputs.files fileTree(outputDir)
 
     classpath = project(':generator').sourceSets.main.runtimeClasspath
-    main = 'generator.SiteGenerator'
+    mainClass = 'generator.SiteGenerator'
     args = [sources, outputDir, 'sitemap-user.groovy', project.watchmode]
     systemProperties.docs_baseurl = System.getProperty('docs_baseurl')
 }
@@ -113,10 +113,10 @@ task checkDeadLinks(dependsOn: generateSite) {
 
 task webzip(type:Zip, dependsOn: checkDeadLinks) {
     description = "Creates a zip with the generated website and the deadlink report"
-    destinationDir = file("$buildDir/distributions")
+    destinationDirectory = file("$buildDir/distributions")
 
-    baseName = 'groovy'
-    appendix = 'website'
+    archiveBaseName = 'groovy'
+    archiveAppendix = 'website'
     from(generateSite.outputDir) {
         into 'site'
     }
