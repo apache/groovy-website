@@ -26,7 +26,7 @@ import util.CheckLinks
 
 plugins {
     id 'base'                  // common lifecycle tasks and artifact types
-    id 'org.ajoberstar.grgit' version '5.0.0' // to publish website to asf-git branch
+    id 'org.ajoberstar.grgit' version '5.2.1' // to publish website to asf-git branch
 }
 
 ext {

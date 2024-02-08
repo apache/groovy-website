@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    ext.groovyVersion = '3.0.14'
+    ext.groovyVersion = '3.0.20'
     ext.asciidocVersion = '2.5.7'
     implementation "org.codehaus.groovy:groovy:$groovyVersion"
     implementation "org.codehaus.groovy:groovy-dateutil:$groovyVersion"

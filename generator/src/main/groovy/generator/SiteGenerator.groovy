@@ -264,8 +264,8 @@ class SiteGenerator {
             def groovyMinorVersionInTitle = v.structuredDoctitle.combined.findAll(/(?i)(groovy \d[.]\d+)/)
             groovyMinorVersionInTitle?.each {keywords[k] << it }
         }
-        def related = [:].withDefault{ [:] }
-        [blogList.keySet(), blogList.keySet()].combinations { one, two ->
+        Map<String, Map<String, Integer>> related = [:].withDefault{ [:] }
+        [blogList.keySet(), blogList.keySet()].eachCombination { String one, String two ->
             if (one != two) {
                 related[one][two] = keywords[one].intersect(keywords[two]).size()
             }
