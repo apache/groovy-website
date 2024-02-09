@@ -230,7 +230,7 @@ class SiteGenerator {
     }
 
     private void renderBlog() {
-        def asciidoctor = AsciidoctorFactory.instance
+        def asciidoctor = AsciidoctorFactory.instanceasciidoctor.requireLibrary('asciidoctor-diagram')
         println "Rendering blogs"
 
         def blogDir = new File(sourcesDir, "blog")

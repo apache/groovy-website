@@ -17,15 +17,19 @@
  *  under the License.
  */
 
-apply plugin: 'groovy'
+plugins {
+    id 'groovy'
+}
 
 repositories {
     mavenCentral()
 }
 
+ext.groovyVersion = '3.0.20'
+ext.asciidocVersion = '2.5.11'
+ext.asciidoctorDiagram='2.2.10'
+
 dependencies {
-    ext.groovyVersion = '3.0.20'
-    ext.asciidocVersion = '2.5.7'
     implementation "org.codehaus.groovy:groovy:$groovyVersion"
     implementation "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
     implementation "org.codehaus.groovy:groovy-json:$groovyVersion"
@@ -37,6 +41,7 @@ dependencies {
         // you might need to use a custom jruby version
         //exclude(group: 'org.jruby', module: 'jruby-complete')
     }
+    implementation "org.asciidoctor:asciidoctorj-diagram:$asciidoctorDiagram"
     //compile "org.jruby:jruby-complete:9.1.17.0"
 }
 

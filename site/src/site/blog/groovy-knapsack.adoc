@@ -1,8 +1,7 @@
 = Solving the Knapsack Problem with Groovy
 Paul King
-:revdate: 2024-02-03T20:08:00+00:00
-:keywords: knapsack, optimisation
-:draft: true
+:revdate: 2024-02-09T15:00:00+00:00
+:keywords: knapsack, optimisation, choco, genetic algorithms, dynamic programming
 :description: This post looks at solving the knapsack problem with Groovy.
 
 The
@@ -48,8 +47,8 @@ The gem can either be in the knapsack or not.
 This is known as the 0/1 knapsack variation of the problem.
 We'll look at some other variations later.
 
-Our goal then is to find out which gems we place into the knapsack to maximise
-the value.
+Our goal then is to find out which gems we place into the knapsack to
+maximise the value.
 
 image:img/knapsack.jpg[A knapsack and some gems]
 
@@ -141,8 +140,11 @@ the limit, then we can discard that path from further processing.
 
 It is useful to visualize the above process as a solution tree (shown for capacity 10):
 
-[graphviz]
-----
+image:img/brute-force-tree.png[brute force tree]
+
+//[graphviz,brute-force-tree]
+[comment]
+--
 digraph unix {
 	fontname="Helvetica,Arial,sans-serif"
 	node [fontname="Helvetica,Arial,sans-serif"]
@@ -260,7 +262,9 @@ digraph unix {
 	n____ -> n____1 [label="Gem1"];
 	n____ -> n_____ [label=<<s>Gem1</s>>];
 }
-----
+--
+
+The light red nodes indicate where subsequent processing of the solution tree can be skipped.
 
 We calculate here the result for 3 different knapsack weight limits (6, 8, and 10).
 The output looks like this:
@@ -299,16 +303,22 @@ the `knapsack` method reduces from 44 to 32 (when just calculating for the knaps
 
 == Using Branch and Bound
 
-Another technique often used for optimisation is branch and bound.
+Another technique often used for optimisation is
+https://en.wikipedia.org/wiki/Branch_and_bound[branch and bound].
 It's a special form of the general principle of divide and conquer;
 solving a big problem by turning it into smaller problems.
 
 Divide and conquer is similar to what we did for the recursive solution above,
 but with branch and bound, we perform smarter elimination.
 Before processing the children of a branch, the branch is checked against
-upper and lower estimated bounds of some optimal solution and is discarded
-if it cannot produce a better solution. For the knapsack problem,
-we could find an optimal "greedy" solution if we could use fractional
+upper and lower estimated bounds of some optimal solution. Processing for
+a given path is terminated if we can determine that heading down that
+path can't possibly be better than heading done some alternative path.
+For the knapsack problem,
+we can work out those bounds by finding the optimal "greedy" solution if
+we were allowed to use fractional quantities of a given knapsack item.
+We'll look at fractional quantities as the last example in this blog.
+It turns out we can calculate them very efficiently.
 
 First, we'll create an `Item` record for holding our weights and values.
 
@@ -418,8 +428,11 @@ println "Total value for capacity $W = ${knapsack(W, items, values.length)}"
 
 Which has this visualization (for capacity 10):
 
-[graphviz]
-----
+image:img/branch-and-bound-tree.png[branch and bound tree]
+
+//[graphviz,img/branch-and-bound-tree]
+[comment]
+--
 digraph unix {
 	fontname="Helvetica,Arial,sans-serif"
 	node [fontname="Helvetica,Arial,sans-serif"]
@@ -511,11 +524,11 @@ digraph unix {
 	n34__ -> n34___ [label=<<s>Gem1</s>>];
 	n3___ -> n3____ [label=<<s>Gem1</s>>];
 }
-----
+--
 
 We should note that as well as discarding the
-infeasible paths which exceed the weight limit,
-we now also discard unfruitful paths which our bound
+infeasible paths which exceed the weight limit (light red),
+we now also discard unfruitful paths (light purple) which our bound
 value tells us can never exceed some alternative _best_ path
 we already know about.
 
@@ -527,7 +540,9 @@ Total value for capacity 10 = 30
 
 == Using Dynamic Programming
 
-You can think of dynamic programming as a special case of the
+You can think of
+https://en.wikipedia.org/wiki/Dynamic_programming[dynamic programming]
+as a special case of the
 branch and bound technique. It can also be thought of as similar
 to the memoization we looked at earlier. In this case, rather
 than Groovy providing us with the cache, we track it ourselves
@@ -557,6 +572,14 @@ int[] weights = [1, 2, 3, 5, 6]    // Weights
     println "Total value for capacity $it = ${solve(values, weights, it)}"
 }
 ----
+
+To solve the knapsack problem, we break it into smaller pieces.
+If we have already cached the solution to the smaller piece, we use
+the cached value. Because of the way we have structured our problem,
+we are actually sharing the cached results for the different
+knapsack sizes.
+
+When we run this script, it produces the following output:
 
 ----
 Total value for capacity 6 = 17
@@ -642,7 +665,7 @@ It has the following output:
 Total value for capacity 10 = 30
 ----
 
-Most often bitsets are used not just to save memory but
+Most often, bitsets are used not just to save memory but
 because for certain problems we can perform operations
 on entire bitsets. You can think of this as bulk
 operations with _free_ parallelism when compared to performing
@@ -678,6 +701,8 @@ println "Total value for capacity $W = $totalValue"
 Which has the same output for this case study,
 so luckily, our crude optimisation step didn't reject the best solution.
 
+In ths example, we just shifted an integer. Depending on the
+particular problem, we might wan tto instead shift a long or bitset.
 Groovy 5 adds support for `<<` (left shift),`>>` (right shift),
 and `>>>` (right shift unsigned) operators for bitsets.
 This kind of functionality will make working on such
@@ -685,15 +710,21 @@ problems even nicer with Groovy.
 
 == Using Constraint Programming
 
-Another technique we could consider is constraint programming.
+Another technique we could consider is
+https://en.wikipedia.org/wiki/Constraint_programming[constraint programming].
 Here we define some constraints and let a solver find solutions
-for us. Here we have used the Choco solver.
+for us. Here we have used the
+https://choco-solver.org/[Choco solver].
 
 We thought we would also spice up the example and illustrate
-what is known as the bounded knapsack problem. Instead of
+what is known as the _bounded knapsack problem_. Instead of
 either taking the gem or leaving it out, we now consider
 gems to be readily available commodities and the weight and
 value would apply to all gems of a particular type.
+
+In general, we can take as many gems of a particular type as we want
+(this would be unbounded), or as we'll do here take as many
+gems of a particular type up to some bound.
 
 In our example, we'll set the bound for our solver's
 domain variables to be between `0` and `W`.
@@ -787,7 +818,9 @@ Total value for capacity 10 (unbounded) = 31, Total weight taken = 10, [count0 =
 == Using OrTools
 
 Other libraries also have built-in solvers for knapsack.
-Here is another implementation using the OrTools library:
+Here is another implementation using the
+https://developers.google.com/optimization[OrTools]
+library:
 
 [source,groovy]
 ----
@@ -829,7 +862,9 @@ Gem weights: [2, 3, 5]
 
 == Using Jenetics
 
-We can also use Genetic Algorithms to find a solution.
+We can also use
+https://en.wikipedia.org/wiki/Genetic_algorithm[Genetic Algorithms]
+to find a solution.
 When creating solutions based on genetic algorithms,
 a series of steps take place which mimic evolution
 in nature. We typically start with some random guesses,
@@ -1029,5 +1064,8 @@ https://developers.google.com/optimization/pack/knapsack[a different knapsack ex
 == Conclusion
 
 We have seen how to solve the knapsack problem in Groovy
-using several approaches. In the references, there are even
+using several approaches. In the
+https://www.hindawi.com/journals/mpe/2023/1742922/[references], there are even
 more exotic algorithms which can be used to solve the knapsack problem.
+If you have a great way to solve the knapsack problem using Groovy,
+let us know and we can add it to this blog!
