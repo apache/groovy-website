@@ -45,12 +45,12 @@ ext.excludeFromChecks = [
 
 def commitedChanges = false
 def gitboxUrl = project.findProperty('gitPublishRemote') ?: 'https://gitbox.apache.org/repos/asf/groovy-dev-site.git'
-def stagingDevSite = layout.buildDirectory.dir('staging-dev-site')
-def generatedDevSite = layout.buildDirectory.dir('site')
+def stagingDevSite = "$project.buildDir/staging-dev-site/"
+def generatedDevSite = "$project.buildDir/site/"
 
 task copyAssets(type:Copy) {
     from file('../site/src/site/assets')
-    into layout.buildDirectory.dir('site')
+    into file("$buildDir/site")
     filesMatching('**/*.css') { f->
         if (!f.name.contains('.min.')) {
             filter(CssFilter)
@@ -65,12 +65,12 @@ task copyAssets(type:Copy) {
 
 task copyWikiAssets(type:Copy) {
     from file('../site/src/site/wiki/img')
-    into layout.buildDirectory.dir('site/wiki/img')
+    into file("$buildDir/site/wiki/img")
 }
 
 task copyBlogAssets(type:Copy) {
     from file('../site/src/site/blog/img')
-    into layout.buildDirectory.dir('site/blog/img')
+    into file("$buildDir/site/blog/img")
 }
 
 task generateSite(type:JavaExec) {
@@ -80,7 +80,7 @@ task generateSite(type:JavaExec) {
     dependsOn copyWikiAssets
     dependsOn copyBlogAssets
     ext.sources = file('../site/src/site')
-    ext.outputDir = layout.buildDirectory.dir('site/wiki/img').get().asFile
+    ext.outputDir = file("$buildDir/site")
 
     inputs.files fileTree(sources)
     outputs.files fileTree(outputDir)
@@ -94,7 +94,7 @@ task generateSite(type:JavaExec) {
 task checkDeadLinks(dependsOn: generateSite) {
     description = "Checks for dead links in the generated Groovy website"
 
-    ext.outputDir = layout.buildDirectory.dir('reports').get().asFile
+    ext.outputDir = file("$buildDir/reports")
     ext.reportFile = file("$outputDir/deadlinks.html")
 
     inputs.files fileTree(generateSite.outputDir)
@@ -130,7 +130,7 @@ task checkDeadLinks(dependsOn: generateSite) {
 
 task webzip(type:Zip, dependsOn: checkDeadLinks) {
     description = "Creates a zip with the generated website and the deadlink report"
-    destinationDirectory = layout.buildDirectory.dir('distributions')
+    destinationDirectory = file("$buildDir/distributions")
 
     archiveBaseName = 'groovy'
     archiveAppendix = 'website'

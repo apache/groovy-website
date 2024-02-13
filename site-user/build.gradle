@@ -39,7 +39,7 @@ apply plugin: 'base'
 
 task copyAssets(type:Copy) {
     from file('../site/src/site/assets')
-    into layout.buildDirectory.dir('site')
+    into file("$buildDir/site")
     filesMatching('**/*.css') { f->
         if (!f.name.contains('.min.')) {
             filter(CssFilter)
@@ -54,15 +54,16 @@ task copyAssets(type:Copy) {
 
 task copyReleaseNotesAssets(type:Copy) {
     from file('../site/src/site/releasenotes/img')
-    into layout.buildDirectory.dir('site/releasenotes/img')
+    into file("$buildDir/site/releasenotes/img")
 }
 
 task generateSite(type:JavaExec) {
+
     description = 'Generates the Groovy User Website'
     dependsOn copyAssets
     dependsOn copyReleaseNotesAssets
     ext.sources = file('../site/src/site')
-    ext.outputDir = layout.buildDirectory.dir('site').get().asFile
+    ext.outputDir = file("$buildDir/site")
 
     inputs.files fileTree(sources)
     outputs.files fileTree(outputDir)
@@ -76,7 +77,7 @@ task generateSite(type:JavaExec) {
 task checkDeadLinks(dependsOn: generateSite) {
     description = "Checks for dead links in the generated Groovy website"
 
-    ext.outputDir = layout.buildDirectory.dir('reports').get().asFile
+    ext.outputDir = file("$buildDir/reports")
     ext.reportFile = file("$outputDir/deadlinks.html")
 
     inputs.files fileTree(generateSite.outputDir)
@@ -102,7 +103,7 @@ task checkDeadLinks(dependsOn: generateSite) {
         }
         def tplEngine = new MarkupTemplateEngine(this.class.classLoader, file('../site/gradle/templates'), tplConf)
 
-        def report = tplEngine.createTemplateByPath('deadlinks.groovy').make(deadLinks: checkLinks.deadLinks).toString()
+        def report = tplEngine.createTemplateByPath("deadlinks.groovy").make(deadLinks: checkLinks.deadLinks).toString()
 
         reportFile.write(report, 'utf-8')
         def reportURL = new ConsoleRenderer().asClickableFileUrl(reportFile)
@@ -111,8 +112,8 @@ task checkDeadLinks(dependsOn: generateSite) {
 }
 
 task webzip(type:Zip, dependsOn: checkDeadLinks) {
-    description = 'Creates a zip with the generated website and the deadlink report'
-    destinationDirectory = layout.buildDirectory.dir('distributions')
+    description = "Creates a zip with the generated website and the deadlink report"
+    destinationDirectory = file("$buildDir/distributions")
 
     archiveBaseName = 'groovy'
     archiveAppendix = 'website'
