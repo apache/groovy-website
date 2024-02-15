@@ -223,7 +223,7 @@ Similar Vulnerabilities:
 References:
 
 [1] CWE-379: Creation of Temporary File in Directory with Insecure Permissions (https://cwe.mitre.org/data/definitions/379.html)
-[2] "File.createTempFile" should not be used to create a directory (https://rules.sonarsource.com/java/tag/owasp/RSPEC-2976)
+[2] "File.createTempFile" should not be used to create a directory (https://rules.sonarsource.com/java/RSPEC-5445/)
 [3] Groovy CVE list (https://groovy-lang.org/security.html)
 [4] https://docs.groovy-lang.org/latest/html/groovy-jdk/java/io/File.html#createTempDir()
 [5] https://docs.groovy-lang.org/latest/html/groovy-jdk/java/io/File.html#createTempDir(java.lang.String,%20java.lang.String)

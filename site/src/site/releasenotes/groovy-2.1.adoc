@@ -415,7 +415,7 @@ more complete documentation of the various extension points and utility
 methods going forward.
 
 For more details take a look at
-the link:http://docs.groovy-lang.org/latest/html/documentation/type-checking-extensions.html[type checking extensions documentation].
+the link:https://groovy-lang.org/semantics.html#_type_checking_extensions[type checking extensions documentation].
 
 [[Groovy21releasenotes-Compile-time-Meta-annotations]]
 == Compile-time Meta-annotations
@@ -423,17 +423,17 @@ the link:http://docs.groovy-lang.org/latest/html/documentation/type-checking-ex
 Annotations are a great way to add supplementary meta-data to classes,
 methods, fields, and other source code elements, thus frameworks,
 libraries, and even Groovy’s homegrown AST transformations can take
-advantage of them to do some special treatments to the corresponding AST
-nodes. Every now and then the use case arises to reuse a combination of
-annotations, potentially at the expense of a galore of at-signs that
+advantage of them to do some special treatments to the corresponding AST
+nodes. Sometimes the use case arises to reuse a combination of
+annotations, potentially at the expense of a multitude of at-signs that
 obscure the general intent of that particular combination.
 
 To group annotations together, to make the intent clearer or to
-streamline your code, Groovy 2.1 offers a *meta-annotation system, which
+streamline your code, Groovy 2.1 offers a *meta-annotation system, which
 allows to combine other annotations into one "alias" annotation*.
 
 Imagine we are using some annotations defining constraints on properties
-of your class, like `@NotNull`, `@Length`, or `@Pattern`, which could be
+of your class, like `@NotNull`, `@Length`, or `@Pattern`, which could be
 defined as follows:
 
 [source,groovy]

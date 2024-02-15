@@ -556,7 +556,7 @@ by `getProperty`. This is in conflict with the priority given to outer classes i
 (link:https://issues.apache.org/jira/browse/GROOVY-10985[GROOVY-10985])
 * The minus operator for sets in Groovy was subject to an existing
 https://bugs.openjdk.org/browse/JDK-6394757[JDK bug]
-in the JDK's `AbstractSet#removeAll` method. The behavior now confirms
+in the JDK's `AbstractSet#removeAll` method. The behavior now conforms
 with the behavior of the fix being proposed for that bug.
 If for some strange reason you rely on the buggy behavior, you can use
 the `removeAll` method directly rather than the `minus` operator (at least until it is fixed in the JDK).

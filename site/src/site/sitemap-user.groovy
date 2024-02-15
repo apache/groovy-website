@@ -107,7 +107,7 @@ documentation {
         item 'Domain-Specific Languages',                   'dsls',             'core-domain-specific-languages'
         item 'Integrating Groovy into applications',        'integrating',      'guide-integrating'
         item 'Security',                                    'security',         'security'
-        item 'Design patterns in Groovy',                   'design-patterns',  'design-pattern-in-groovy'
+        item 'Design patterns in Groovy',                   'design-patterns',  'design-patterns-in-groovy'
         item 'Style guide',                                 'style-guide',      'style-guide'
     }
 
@@ -217,21 +217,40 @@ ecosystem {
 
 allEvents {
     // Note that the event image should be 257x180 to look nice
-    event('Community over Code NA') {
-        location 'Halifax, Nova Scotia'
-        date 'October 7-10, 2023'
-        url 'https://communityovercode.org/'
-        logo 'img/confs/coc2023.png'
+    event('Everything Open 2024') {
+        location 'Gladstone, Australia'
+        date 'April 16-18, 2024'
+        url 'https://everythingopen.au/'
+        logo 'img/confs/eo2024.png'
+        description '''
+            <p>
+            Everything Open is a conference focused on open technologies, including Linux, open source software,
+            open hardware and open data, and the communities that surround them.
+            </p>
+        '''
+    }
+    event('Community over Code EU') {
+        location 'Bratislava, Slovakia'
+        date 'June 3-5, 2024'
+        url 'https://eu.communityovercode.org/'
+        logo 'img/confs/coc2024eu.png'
         description '''
             <p>
             The latest innovations from dozens of Apache projects and their communities in a collaborative,
             vendor-neutral environment.
             </p>
-            <p>There is a 2-day Groovy track covering latest news, testing and functional programming with Groovy,
-            Spock, Grails, Micronaut, GORM, Gradle, DSLs, using Groovy for data science, with Apache Ignite,
-            with Kubernetes, and more.
-            Also, there is Groovy content in other tracks
-            plus some special events like BoF sessions and other surprises.</p>
+        '''
+    }
+    event('Community over Code EU') {
+        location 'Denver, Colorado'
+        date 'October 7-10, 2024'
+        url 'https://communityovercode.org/'
+        logo 'img/confs/coc2024.png'
+        description '''
+            <p>
+            The latest innovations from dozens of Apache projects and their communities in a collaborative,
+            vendor-neutral environment.
+            </p>
         '''
     }
 }
@@ -261,14 +280,14 @@ books {
     book('Groovy 2 Cookbook') {
         authors 'Andrey Adamovitch, Luciano Fiandeso'
         cover 'img/books/g2cook.jpg'
-        url 'https://www.packtpub.com/application-development/groovy-2-cookbook'
+        url 'https://www.packtpub.com/product/groovy-2-cookbook/9781849519366'
         description 'Over 90 recipes that provide solutions to everyday programming challenges using the powerful features of Groovy 2'
     }
 
     book('Groovy for Domain-Specific Languages - Second Edition') {
         authors 'Fergal Dearle'
         cover 'img/books/gdsl.jpg'
-        url 'https://www.packtpub.com/application-development/groovy-domain-specific-languages-second-edition'
+        url 'https://www.packtpub.com/product/groovy-for-domain-specific-languages/9781849695404'
         description 'Extend and enhance your Java applications with domain-specific scripting in Groovy'
     }
 
@@ -282,7 +301,7 @@ books {
     book('Learning Groovy') {
         authors 'Adam L. Davis'
         cover 'img/books/learning_groovy.jpg'
-        url 'http://www.apress.com/us/book/9781484221167'
+        url 'https://link.springer.com/book/10.1007/978-1-4842-2117-4'
         description "Start building powerful apps that take advantage of the dynamic scripting capabilities of the Groovy language. This book covers Groovy fundamentals, such as installing Groovy, using Groovy tools, and working with the Groovy Development Kit (GDK). You'll also learn more advanced aspects of Groovy."
     }
 
@@ -343,10 +362,6 @@ usergroups {
     userGroup('Coder Consortium of Sacramento') {
         location 'North-America/United States'
         url 'http://coderconsortium.com/'
-    }
-    userGroup('DFW Groovy & Grails User Group') {
-        location 'North-America/United States'
-        url 'http://dfw2gug.org'
     }
     userGroup('Groovy Users of Minnesota') {
         location 'North-America/United States'

@@ -636,9 +636,9 @@ In earlier versions of Groovy we introduced the JUnit
 4-friendly link:{DOCS_BASEURL}/html/gapi/groovy/util/GroovyAssert.html[GroovyAssert],
 which is a convenient class offering the usual assertion methods of
 `GroovyTestCase`, but in the form of static methods that you can static
-import in your test class. In Groovy 2.3 we’ve enriched `GroovyAssert`
-with additional features. There should be no reason to move on from
-JUnit 3 if you haven’t already done so. We didn’t include all of the
+import in your test class. In Groovy 2.3, we’ve enriched `GroovyAssert`
+with additional features. With these additions, there should be no functionality which is restricted to just JUnit 3,
+so feel free to move to later versions if you haven’t already done so. We didn’t include all the
 myriad of `assertEquals` methods from `GroovyTestCase` as they are typically
 less useful than Groovy’s built-in power assert, but it provides some
 handy `shouldFail()` and `assertScript()` methods

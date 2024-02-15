@@ -65,27 +65,6 @@ layout 'layouts/main.groovy', true,
 
                                 h2 'Alternative mailing list archives'
                                 ul {
-                                    li {
-                                        p """
-                                        The mailing lists are archived on ${
-                                            $a(href: 'http://groovy.markmail.org/', 'MarkMail')
-                                        }.
-                                        You can browse ${
-                                            $a(href: 'http://groovy.markmail.org/search/?q=', 'recent emails')
-                                        }."""
-                                        p """
-                                        MarkMail also provide RSS feeds: ${
-                                            $a(href: 'http://groovy.markmail.org/atom/+list:org.apache.groovy.users', 'users')
-                                        } ${
-                                            $a(href: 'http://groovy.markmail.org/atom/+list:org.apache.groovy.dev', 'dev')
-                                        } ${
-                                            $a(href: 'http://groovy.markmail.org/atom/+list:org.apache.groovy.commits', 'commits')
-                                        } ${
-                                            $a(href: 'http://groovy.markmail.org/atom/+list:org.apache.groovy.notifications', 'notifications')
-                                        }
-                                        """
-                                    }
-
                                     li """
                                     You can also find archives on mail-archive.com: ${
                                         $a(href: 'https://www.mail-archive.com/users@groovy.apache.org/', 'users')} ${

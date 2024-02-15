@@ -49,7 +49,7 @@ Again, Groovy's flexibility and expressiveness and its scripting
 capabilities open the doors to advanced build scripting or
 infrastructure systems for your continuous integration practices and
 project build solutions, such
-as link:https://gant.github.io/[Gant] and link:http://www.gradle.org/[Gradle].
+as link:https://github.com/Gant/Gant[Gant] and link:http://www.gradle.org/[Gradle].
 
 At the tooling level, Groovy also progresses, for instance with
 its `groovydoc` Ant task to let you generate proper JavaDoc covering,

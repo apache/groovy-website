@@ -704,7 +704,7 @@ since `groovy-jaxb` is currently bundled in the Groovy install.
 {nbsp}{nbsp}{nbsp}{nbsp}javax.activation:activation:1.1.1 +
 The first is required at compile time, the last three at runtime, the last only required for JDK11.
 For an example Gradle build that works JDK8 through 11, see
-link:https://github.com/apache/groovy/blob/master/subprojects/groovy-jaxb/build.gradle[build.gradle]
+link:https://github.com/apache/groovy/blob/GROOVY_2_5_X/subprojects/groovy-jaxb/build.gradle[build.gradle]
 in the groovy-jaxb subproject.
 |===
 Note: The above steps aren't our final plan in this space. For 2.5.1, we focused just on making

@@ -7,7 +7,7 @@ me mention the great progress made in terms of IDE support for Groovy
 http://gradle.org/[Gradle], https://gant.github.io/[Gant] or
 http://grails.org/[Grails]). All the major IDEs (Eclipse,
 http://www.jetbrains.com/idea/features/groovy_grails.html[IntelliJ
-IDEA], http://wiki.netbeans.org/Groovy[NetBeans]) provide an excellent
+IDEA], https://netbeans.apache.org/tutorial/main/kb/docs/java/groovy-quickstart/[NetBeans]) provide an excellent
 level of support for the language. Initially, the Eclipse support was
 the one lacking the most, but thanks to the hard work of the
 SpringSource Eclipse team, we now have a great environment for
