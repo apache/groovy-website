@@ -5,18 +5,20 @@ Before diving directly into the new features in Groovy 1.7, please let
 me mention the great progress made in terms of IDE support for Groovy
 (and also for http://griffon-framework.org/[Griffon],
 http://gradle.org/[Gradle], https://gant.github.io/[Gant] or
-http://grails.org/[Grails]). All the major IDEs (Eclipse,
-http://www.jetbrains.com/idea/features/groovy_grails.html[IntelliJ
-IDEA], https://netbeans.apache.org/tutorial/main/kb/docs/java/groovy-quickstart/[NetBeans]) provide an excellent
-level of support for the language. Initially, the Eclipse support was
+http://grails.org/[Grails]). All the major IDEs provide excellent support for Groovy including https://github.com/groovy/groovy-eclipse[Eclipse],
+IntelliJ IDEA (supports https://www.jetbrains.com/help/idea/groovy.html[Groovy] & https://www.jetbrains.com/help/idea/grails.html[Grails]), and https://netbeans.apache.org/tutorial/main/kb/docs/java/groovy-quickstart/[NetBeans].
+Initially, the Eclipse support was
 the one lacking the most, but thanks to the hard work of the
 SpringSource Eclipse team, we now have a great environment for
 developing mixed Java / Groovy applications with features like
 cross-language refactoring, Groovy-specific code completion, and more.
 
-New and Improved Eclipse pluginFor more information on the Eclipse
+.New and Improved Eclipse plugin
+****
+For more information on the Eclipse
 support, please have a look at the Groovy Eclipse plugin home page, as
 well as the notes for the M1 release and M2 release.
+****
 
 [[Groovy17releasenotes-Newfeatures]]
 == New features
@@ -29,12 +31,15 @@ areas where the lack of Anonymous Inner Classes (AIC) and Nested Classes
 (NC) can be problematic. That’s why we decided to eventually implement
 AIC and NC in Groovy 1.7.
 
-Be CarefulThe implementation of AIC and NC follows the Java lead, but
+.Be Careful
+****
+The implementation of AIC and NC follows the Java lead, but
 you should not take out the Java Language Spec and keep shaking the head
 about things that are different. The implementation done looks much like
 what we do for groovy.lang.Closure, with some benefits and some
 differences. Accessing private fields and methods for example can become
 a problem, but on the other hand local variables don’t have to be final.
+****
 
 [[Groovy17releasenotes-NestedStaticClasses]]
 ==== Nested Static Classes
@@ -73,9 +78,12 @@ sleep 100
 assert called
 --------------------------------
 
-More informationIf you want to learn a bit more about the cases which
+.More information
+****
+If you want to learn a bit more about the cases which
 are currently supported in 1.7, you can have a look at one of our unit
 tests covering this new feature.
+****
 
 [[Groovy17releasenotes-AccessingtheOuterContextfromaNestedClass]]
 ==== Accessing the Outer Context from a Nested Class
@@ -87,7 +95,7 @@ support this syntax.
 [[Groovy17releasenotes-CreatingInstancesofNon-StaticInnerClasses]]
 ==== Creating Instances of Non-Static Inner Classes
 
-In Java you can do this:
+In Java, you can do this:
 
 [source,java]
 ----------------------------------
@@ -103,14 +111,15 @@ public class Y {
 ----------------------------------
 
 It should be noted that the nested class X needs a reference to the
-outer class instance of Y. For this Java will create a constructor that
+outer class instance of Y. For this, Java will create a constructor that
 takes Y as first parameter in X. This constructor is synthetic, so it
-won’t appear in any code completion. +
- In case of new X(), like you have it in method foo(), then compiler
-will then create new X(this) instead. In case of createX the compiler
-will create new X(y). Groovy does not support this.
+won't appear in any code completion.
 
-Instead Groovy supports giving the instance in like the compiler would
+In case of `new X()`, like in method `foo`, the compiler
+will create a `new X(this)` instead. In case of `createX` the compiler
+will create `new X(y)`. Groovy does not currently support this.
+
+Instead, Groovy supports explicitly giving the instance in like the compiler would
 do it. That means the code above has to be rewritten as
 
 [source,groovy]
@@ -126,12 +135,15 @@ public class Y {
 }
 ----------------------------------
 
-CautionCaution though, Groovy supports calling methods with one
+.Caution
+****
+Caution though, Groovy supports calling methods with one
 parameter without giving an argument. The parameter will then have the
 value null. Basically the same rules apply to calling a constructor.
 There is a danger that you will write new X() instead of new X(this) for
 example. Since this might also be the regular way we have not yet found
 a good way to prevent this problem.
+****
 
 [[Groovy17releasenotes-Annotations]]
 === Annotations
@@ -150,7 +162,7 @@ We’ll take a look at the usage of those extended annotations on Grape.
 The Grape dependency system lets you request dependencies in your
 scripts, without having to deal with downloading, packaging, or
 specifying the classpath yourself. To use Grape, we had to use the @Grab
-annotation to ``grab'' a dependency from a repository (Maven’s central
+annotation to `grab` a dependency from a repository (Maven's central
 repository, for example). The problem was that annotation had to be
 attached to some allowed elements, i.e. the places where annotations can
 be put in Java. Now, we can put annotations on imports:
@@ -181,11 +193,14 @@ def books = builder.books {
 assert books.toString() == '''{"books":{"book":{"title":"Groovy in Action","author":"Dierk Koenig"}}}'''
 --------------------------------------------------------------------------------------------------------
 
-RemarkPlease note on this one an improvement in the @Grab annotation: we
+.Remark
+****
+Please note an improvement in the @Grab annotation: we
 provide a shorter version taking just a String as value parameter
 representing the dependency, in addition to the more verbose example in
 the previous example. You simply append the group, module, version and
 classifier together, joined by colons.
+****
 
 A Grape *resolver* was added, so you can specify a remote location where
 grapes are downloaded from:
@@ -201,7 +216,7 @@ import org.restlet.Restlet
 [[Groovy17releasenotes-PowerAsserts]]
 === Power Asserts
 
-Groovy’s ``assert'' keyword has sometimes been criticized as it’s, in a
+Groovy’s `assert` keyword has sometimes been criticized as it's, in a
 way, limited, as it just checks that the expression it’s being passed is
 true or false. Unlike with testing frameworks such as JUnit/TestNG and
 the various additional assertion utilities, where you get nicer and more
@@ -299,10 +314,13 @@ List<ASTNode> nodes = new AstBuilder().buildFromSpec {
 }
 ------------------------------------------------------
 
-For more informationPlease have a look at the documentation on the AST
+.For more information
+****
+Please have a look at the documentation on the AST
 Builder. You’ll discover the advantages and inconveniences of the
 various forms, and why all three are needed depending on what you want
 to achieve with the AST.
+****
 
 [[Groovy17releasenotes-Otherminorenhancements]]
 Other minor enhancements
@@ -329,7 +347,7 @@ with regards to how they were coerced to a boolean value, but now it is
 possible to provide a method for coercion to boolean in your own
 classes. For example, the following Predicate class offers the ability
 to coerce Predicate instances to true or false, thanks to the
-implementation of the boolean asBoolean() method:
+implementation of the boolean `asBoolean()` method:
 
 [source,groovy]
 -----------------------------------
@@ -343,7 +361,7 @@ assert !new Predicate(value: false)
 -----------------------------------
 
 Is is also possible to use categories or ExpandoMetaClass to inject an
-asBoolean() method, or to override an existing one (even one on the
+`asBoolean()` method, or to override an existing one (even one on the
 small set of classes with special Groovy truth behavior).
 
 [[Groovy17releasenotes-Dependencyupgrades]]
@@ -373,7 +391,7 @@ classes. The new GroovyScriptEngine also uses only one compilation
 ``process'' for script compilation which solves the problem of circular
 or mutual dependencies, that caused stack overflows in the past. As a
 result the new engine can reliably handle dependencies and should be
-much faster. 
+much faster.
 
 [[Groovy17releasenotes-Groovyconsolepreferences]]
 === Groovy console preferences
@@ -405,7 +423,7 @@ editor area.
 ==== Batch updates
 
 The Groovy Sql class now features batch updates, thanks to its new
-withBatch() method, taking a closure and a statement instance:
+`withBatch()` method, taking a closure and a statement instance:
 
 [source,groovy]
 ----------------------------------------------------------------
@@ -419,7 +437,7 @@ sql.withBatch { stmt ->
 [[Groovy17releasenotes-Transactions]]
 ==== Transactions
 
-Similarly, there’s a withTransaction() method added to Sql, which works
+Similarly, there’s a `withTransaction()` method added to Sql, which works
 also with datasets:
 
 [source,groovy]

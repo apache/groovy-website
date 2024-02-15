@@ -633,7 +633,7 @@ your own classes, but must derive from `GroovyTestCase` to benefit from
 the additional assertion methods.
 
 In earlier versions of Groovy we introduced the JUnit
-4-friendly link:{DOCS_BASEURL}/html/gapi/groovy/util/GroovyAssert.html[GroovyAssert],
+4-friendly link:{DOCS_BASEURL}/html/gapi/groovy/test/GroovyAssert.html[GroovyAssert],
 which is a convenient class offering the usual assertion methods of
 `GroovyTestCase`, but in the form of static methods that you can static
 import in your test class. In Groovy 2.3, we’ve enriched `GroovyAssert`

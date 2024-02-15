@@ -134,7 +134,6 @@ documentation {
         item 'Processing YAML',                     'processing-yaml',  'yaml-userguide'
         item 'Processing TOML',                     'processing-toml',  'toml-userguide'
         item 'SQL-like querying of collections',    'using-ginq',       'ginq-userguide'
-        item 'Scripting Ant tasks',                 'scripting-ant',    'ant-builder'
         item 'Template engines',                    'templating',       'template-engines'
         item 'Creating Swing UIs',                  'swing',            'swing-builder'
         item 'Servlet support',                     'servlet',          'servlet-userguide'
