@@ -135,7 +135,6 @@ documentation {
         item 'Processing TOML',                     'processing-toml',  'toml-userguide'
         item 'SQL-like querying of collections',    'using-ginq',       'ginq-userguide'
         item 'Template engines',                    'templating',       'template-engines'
-        item 'Creating Swing UIs',                  'swing',            'swing-builder'
         item 'Servlet support',                     'servlet',          'servlet-userguide'
         item 'Working with JMX',                    'jmx',              'jmx'
     }
@@ -279,14 +278,14 @@ books {
     book('Groovy 2 Cookbook') {
         authors 'Andrey Adamovitch, Luciano Fiandeso'
         cover 'img/books/g2cook.jpg'
-        url 'https://www.packtpub.com/product/groovy-2-cookbook/9781849519366'
+        url 'https://www.packtpub.com/product/groovy-2-cookbook/9781849519366/'
         description 'Over 90 recipes that provide solutions to everyday programming challenges using the powerful features of Groovy 2'
     }
 
     book('Groovy for Domain-Specific Languages - Second Edition') {
         authors 'Fergal Dearle'
         cover 'img/books/gdsl.jpg'
-        url 'https://www.packtpub.com/product/groovy-for-domain-specific-languages/9781849695404'
+        url 'https://www.packtpub.com/product/groovy-for-domain-specific-languages/9781849695404/'
         description 'Extend and enhance your Java applications with domain-specific scripting in Groovy'
     }
 

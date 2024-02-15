@@ -624,7 +624,7 @@ compiled.
 == JUnit 4 GroovyAssert class
 
 The
-venerable link:{DOCS_BASEURL}/html/gapi/groovy/util/GroovyTestCase.html[GroovyTestCase]
+venerable link:{DOCS_BASEURL}/html/gapi/groovy/test/GroovyTestCase.html[GroovyTestCase]
 (JUnit 3 based approach) has often been used as a base class for your
 test classes — unless you’ve been using
 the link:http://www.spockframework.org/[Spock testing framework], of course.

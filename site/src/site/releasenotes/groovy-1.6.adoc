@@ -1313,10 +1313,10 @@ Please note that the `javax.script.*` APIs are available only on Java 6.
 [[Groovy16releasenotes-JMXBuilder]]
 == JMX Builder
 
-Originating as an link:http://code.google.com/p/groovy-jmx-builder/[external
-Open-Source project] hosted on Google Code, JMX Builder has been
-integrated in Groovy 1.6, to simplify the life of developers needing to
-interact or expose JMX services. JMX Builder features:
+JMX Builder started life as a separate project on Google Code
+(http://code.google.com/p/groovy-jmx-builder/), but has now been
+integrated in Groovy 1.6, to simplify the life of developers
+needing to interact or expose JMX services. JMX Builder features:
 
 * Domain Specific Language (DSL) for JMX API using Builder pattern
 * Simplified JMX API's programmability
