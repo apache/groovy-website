@@ -34,7 +34,7 @@ class CheckLinks {
     Map<Object, Object> isDead = [:]
     def baseDir
 
-    boolean checkIsDead(link, currentPath) {
+    boolean checkIsDead(String link, currentPath) {
         if (excludeFromChecks.any { link.startsWith(it) }) {
             // skip checking those links because they dramatically increase build time
             // while being most likely ok because generated through changelog parsing
