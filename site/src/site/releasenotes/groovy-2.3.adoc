@@ -534,7 +534,7 @@ internationalization, includes, as well as proposing type checked
 templates and models.
 
 More details about the
-new link:{DOCS_BASEURL}/html/documentation/markup-template-engine.html[Markup template engine]
+new link:{DOCS_BASEURL}/html/documentation/templating.html#_the_markuptemplateengine[Markup template engine]
 in the documentation, as well as in Cédric’s link:http://melix.github.io/blog/[blog], if you want to learn more
 about the "behind the scenes" stories!
 
