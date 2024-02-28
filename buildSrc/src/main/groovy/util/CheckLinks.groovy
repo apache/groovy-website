@@ -35,7 +35,7 @@ class CheckLinks {
     def baseDir
 
     boolean checkIsDead(String link, currentPath) {
-        if (excludeFromChecks.any { link.startsWith(it) }) {
+        if (excludeFromChecks.any { link.startsWith(it) || (!it.startsWith('http') && link.endsWith(it)) }) {
             // skip checking those links because they dramatically increase build time
             // while being most likely ok because generated through changelog parsing
             return false
@@ -60,9 +60,9 @@ class CheckLinks {
             if (cx instanceof HttpURLConnection) {
                 CloseableHttpClient httpclient = HttpClients.createDefault()
                 RequestConfig requestConfig = RequestConfig.custom()
-                        .setSocketTimeout(5_000)
-                        .setConnectTimeout(5_000)
-                        .setConnectionRequestTimeout(5_000)
+                        .setSocketTimeout(10_000)
+                        .setConnectTimeout(10_000)
+                        .setConnectionRequestTimeout(10_000)
                         .setCookieSpec(CookieSpecs.STANDARD)
                         .build()
                 HttpGet httpget = new HttpGet(link)
