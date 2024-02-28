@@ -529,12 +529,17 @@ layout 'layouts/main.groovy', true,
                                         }
                                         tbody {
                                             tr {
-                                                td { b '4.0 - current' }
+                                                td { b '5.0 (in alpha)' }
+                                                td 'N/A'
+                                                td '11'
+                                            }
+                                            tr {
+                                                td { b '4.0' }
                                                 td 'N/A'
                                                 td '1.8+'
                                             }
                                             tr {
-                                                td { b '3.x' }
+                                                td { b '3.0' }
                                                 td '1.8+'
                                                 td '1.8+'
                                             }
