@@ -239,7 +239,7 @@ allEvents {
             </p>
         '''
     }
-    event('Community over Code EU') {
+    event('Community over Code NA') {
         location 'Denver, Colorado'
         date 'October 7-10, 2024'
         url 'https://communityovercode.org/'
