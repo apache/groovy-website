@@ -1,6 +1,7 @@
-= Solving simple optimization problems with Groovy using Commons Math, Choco, JaCoP, Ojalgo, OptaPlanner, Timefold, and OR-Tools
+
+= Solving simple optimization problems with Groovy using Commons Math, Hipparchus, OptaPlanner, and Timefold
 Paul King
-:revdate: 2024-03-10T21:45:00+00:00
+:revdate: 2024-03-14T11:45:00+00:00
 :draft: true
 :keywords: groovy, optaplanner, timefold, ojalgo, jacop, or-tools, choco, commons math, hipparchus, linear programming
 :description: This post looks at solving simple optimization problems using Groovy.
@@ -177,7 +178,7 @@ in the fork, but other parts of the library have seen useful updates
 if you don't mind having a dependency that isn't backed by the ASF.
 
 If you don't like those options, there are many more, here are a few
-with Groovy solutions in the same repo:
+with Groovy solutions in the same repo as the above examples:
 
 * For a solution using the SCIP simplex solver in Google https://developers.google.com/optimization/lp[OR-Tools], see https://github.com/paulk-asert/groovy-constraint-programming/blob/master/subprojects/Diet/src/main/groovy/DietOrTools.groovy[DietOrTools.groovy]
 * For a solution showing Groovy support within https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.5/proc/p1x8agymll9gten1ocziihptcjzj.htm[SAS], see https://github.com/paulk-asert/groovy-constraint-programming/blob/master/subprojects/Diet/src/main/groovy/DietGroovy.sas[DietGroovy.sas]
@@ -186,6 +187,20 @@ with Groovy solutions in the same repo:
 * For a solution using the https://github.com/radsz/jacop[JaCoP] constraint programming solver, see https://github.com/paulk-asert/groovy-constraint-programming/blob/master/subprojects/Diet/src/main/groovy/DietJacopInt.groovy[DietJacopInt.groovy] for a solution using scaled integers, and https://github.com/paulk-asert/groovy-constraint-programming/blob/master/subprojects/Diet/src/main/groovy/DietJacopIntKnapsack.groovy[DietJacopIntKnapsack.groovy] for a solution utilizing a Knapsack constraint
 
 == Using OptaPlanner or Timefold
+
+OptaPlanner is an optimization library combining optimization algorithms with constraint solving.
+For most of the last 10 years the library was developed under Red Hat's guidance.
+In the last 12 months, the project and other related projects
+were donated to the https://www.apache.org/[ASF] as part of https://kie.apache.org/[Apache KIE].
+More recently, the library was forked as [Timefold].
+
+We'll use Timefold, but the code in the examples remains the same for both libraries.
+Just the Maven coordinate of the library changes along with the associated class imports.
+At this stage, it isn't clear how the two projects will evolve over time.
+
+One of the claims of the Timefold project is that it has a lighter dependency footprint.
+This can be confirmed by running the `printRuntimeClasspath` task in the associated builds.
+Timefold has 20 dependant jars compared with OptaPlanner's 55 jars.
 
 [source,groovy]
 ----
