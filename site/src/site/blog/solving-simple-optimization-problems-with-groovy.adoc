@@ -186,15 +186,31 @@ with Groovy solutions in the same repo as the above examples:
 * For a solution using the https://choco-solver.org/[Choco] constraint programming solver, see https://github.com/paulk-asert/groovy-constraint-programming/blob/master/subprojects/Diet/src/main/groovy/DietChocoInt.groovy[DietChocoInt.groovy] for a solution using scaled integers, and https://github.com/paulk-asert/groovy-constraint-programming/blob/master/subprojects/Diet/src/main/groovy/DietChocoReal.groovy[DietChocoReal.groovy] for a solution with real numbers using Ibex integration
 * For a solution using the https://github.com/radsz/jacop[JaCoP] constraint programming solver, see https://github.com/paulk-asert/groovy-constraint-programming/blob/master/subprojects/Diet/src/main/groovy/DietJacopInt.groovy[DietJacopInt.groovy] for a solution using scaled integers, and https://github.com/paulk-asert/groovy-constraint-programming/blob/master/subprojects/Diet/src/main/groovy/DietJacopIntKnapsack.groovy[DietJacopIntKnapsack.groovy] for a solution utilizing a Knapsack constraint
 
+For simple optimization problems, like our case study,
+which can be solved using a simplex solver, you generally
+need look no further. It is a very efficient approach
+to solving such problems. For an additional class of slightly
+more complex problems, they can be mapped to linear programming
+problems with a little ingenuity.
+
+For more complex problems,
+there are generally no super efficient solution approaches.
+You need to bring to bear a range of techniques for managing
+the potentially huge search space which is inherent in
+such problems. That is where optimization libraries like
+OptaPlanner (and Timefold) come into play.
+
 == Using OptaPlanner or Timefold
 
 OptaPlanner is an optimization library combining optimization algorithms with constraint solving.
 For most of the last 10 years the library was developed under Red Hat's guidance.
 In the last 12 months, the project and other related projects
 were donated to the https://www.apache.org/[ASF] as part of https://kie.apache.org/[Apache KIE].
-More recently, the library was forked as [Timefold].
+More recently, the library was forked as
+https://timefold.ai/[Timefold].
 
-We'll use Timefold, but the code in the examples remains the same for both libraries.
+In this blog, we'll use Timefold, but the code in the examples remains the same for both libraries as you can see in the
+referenced repositories.
 Just the Maven coordinate of the library changes along with the associated class imports.
 At this stage, it isn't clear how the two projects will evolve over time.
 
@@ -202,17 +218,43 @@ One of the claims of the Timefold project is that it has a lighter dependency fo
 This can be confirmed by running the `printRuntimeClasspath` task in the associated builds.
 Timefold has 20 dependant jars compared with OptaPlanner's 55 jars.
 
+While Timefold's power isn't needed for our simple problem,
+let's examine how you would use it for the same case study.
+
+First, we'll create a planning entity.
+This is a class which the solver knows will change
+over time and will contain one or more planning
+variables.
+
+In our case, we have just one planning variable,
+the `amount` property, which the solver will adjust while trying
+to find an optimal solution.
+
 [source,groovy]
 ----
 @PlanningEntity
-@ToString(includePackage = false)
+@TupleConstructor(includeFields = true)
 class Food {
-    String name
+    final String name, emoji
+    final double cost, protein, fat, carbs, calories
     @PlanningVariable(valueRangeProviderRefs = "amount")
     Integer amount // times 100
-    double cost, protein, fat, carbs, calories
 }
 ----
+
+We are using an Integer as the type for `amount`, since
+Integers are much easier for a solver to work with.
+We'll actually store the amount (as seen in the earlier example)
+multiplied by 100, but we'll divide by 100 when displaying the result.
+
+The other fields of our class are constants once defined
+during instance construction.
+
+Next, we define a planning solution class. This has all the
+information needed about any given solution including a `score`.
+The score lets us determine whether one solution is more optimal
+than another, and also whether a given solution meets all hard
+and soft constraints (explained shortly).
 
 [source,groovy]
 ----
@@ -229,19 +271,25 @@ class DietSolution {
     @PlanningScore
     HardSoftScore score
 
-    void display() {
+    String toString() {
+        var sb = new StringBuilder()
         foods.eachWithIndex { f, idx ->
-            var emoji = ['🍞', '🥛', '🧀', '🥔', '🐟', '🍶']
-            println "${emoji[idx]} $f.name: ${f.amount / 100}"
+            sb << "$f.emoji $f.name: ${f.amount / 100}\n"
         }
         for (name in ['fat', 'carbs', 'protein', 'calories', 'cost']) {
             var total = foods.sum{ f -> f."$name" * f.amount / 100 }
-            printf "Total %s: %.2f%n", name, total
+            sb << sprintf("Total %s: %.2f%n", name, total)
         }
-        println "Score: $score"
+        sb << "Score: $score"
+        sb
     }
 }
 ----
+
+Next we want to define some constraints. In general, we have hard
+constraints which must be met and soft constraints which should
+be met if possible. In our case, we'll have constraints like minimum
+and maximum values for various foods and various nutritional measures.
 
 [source,groovy]
 ----
@@ -307,35 +355,28 @@ class DietConstraintProvider implements ConstraintProvider {
 }
 ----
 
+With these helper classes in place, we are now ready to
+
 [source,groovy]
 ----
 def unsolved = new DietSolution(foods: [
-    new Food(name:  'Bread', cost:  2.0, protein: 4.0, fat: 1.0, carbs: 15.0, calories:  90),
-    new Food(name:   'Milk', cost:  3.5, protein: 8.0, fat: 5.0, carbs: 11.7, calories: 120),
-    new Food(name: 'Cheese', cost:  8.0, protein: 7.0, fat: 9.0, carbs:  0.4, calories: 106),
-    new Food(name: 'Potato', cost:  1.5, protein: 1.3, fat: 0.1, carbs: 22.6, calories:  97),
-    new Food(name:   'Fish', cost: 11.0, protein: 8.0, fat: 7.0, carbs:  0.0, calories: 130),
-    new Food(name: 'Yogurt', cost:  1.0, protein: 9.2, fat: 1.0, carbs: 17.0, calories: 180)
+        new Food('Bread' , '🍞',  2.0, 4.0, 1.0, 15.0,  90),
+        new Food('Milk'  , '🥛',  3.5, 8.0, 5.0, 11.7, 120),
+        new Food('Cheese', '🧀',  8.0, 7.0, 9.0,  0.4, 106),
+        new Food('Potato', '🥔',  1.5, 1.3, 0.1, 22.6,  97),
+        new Food('Fish'  , '🐟', 11.0, 8.0, 7.0,  0.0, 130),
+        new Food('Yogurt', '🍶',  1.0, 9.2, 1.0, 17.0, 180)
 ])
 
-def construction = new ConstructionHeuristicPhaseConfig(constructionHeuristicType: FIRST_FIT)
-def moveSelector = new UnionMoveSelectorConfig([
-        new ChangeMoveSelectorConfig(),
-        new SwapMoveSelectorConfig()
-])
-def localSearch = new LocalSearchPhaseConfig(localSearchType: VARIABLE_NEIGHBORHOOD_DESCENT,
-        moveSelectorConfig: moveSelector)
 def config = new SolverConfig()
         .withSolutionClass(DietSolution)
         .withEntityClasses(Food)
         .withConstraintProviderClass(DietConstraintProvider)
-        .withPhases(construction, localSearch)
         .withTerminationSpentLimit(Duration.ofSeconds(10))
 
 def factory = SolverFactory.create(config)
 def solver = factory.buildSolver()
-def solved = solver.solve(unsolved)
-solved.display()
+println solver.solve(unsolved)
 ----
 
 It has this output when run:
@@ -359,7 +400,34 @@ Total cost: 10.45
 Score: -1hard/-261soft
 ----
 
-It has this output when run:
+Given the amount of time we gave the solver, and using the
+default search algorithms, we couldn't even meet all hard constraints.
+The search space was so vast, that we never reached an area in the
+search space where all constraints were met.
+
+The good news is that we can provide additional guidance, so that
+the solver heads in better directions during its searching.
+Here is one possible additional configuration that we could supply,
+along with the updated `config` definition:
+
+[source,groovy]
+----
+def construction = new ConstructionHeuristicPhaseConfig(constructionHeuristicType: FIRST_FIT)
+def moveSelector = new UnionMoveSelectorConfig([
+        new ChangeMoveSelectorConfig(),
+        new SwapMoveSelectorConfig()
+])
+def localSearch = new LocalSearchPhaseConfig(localSearchType: VARIABLE_NEIGHBORHOOD_DESCENT,
+        moveSelectorConfig: moveSelector)
+def config = new SolverConfig()
+        .withSolutionClass(DietSolution)
+        .withEntityClasses(Food)
+        .withConstraintProviderClass(DietConstraintProvider)
+        .withPhases(construction, localSearch) // additional solution guidance
+        .withTerminationSpentLimit(Duration.ofSeconds(10))
+----
+
+It now has this output when run:
 
 ----
 🍞 Bread: 0
@@ -376,6 +444,8 @@ Total cost: 12.35
 Score: 0hard/-308soft
 ----
 
+We can see here that it is now close to what linear programming would give us.
+
 == Further Information
 
 * https://developers.google.com/optimization/lp[OR-Tools] linear optimization
@@ -386,4 +456,7 @@ Score: 0hard/-308soft
 == Conclusion
 
 We have looked at using Groovy and a few linear optimization
-libraries to solve a diet case study.
+libraries to solve a diet case study. Our main focus was the
+Apache Commons Math and Hipparchus libraries.
+We also explored using the more powerful Timeflow and OptaPlanner
+libraries.
