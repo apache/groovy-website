@@ -1,8 +1,7 @@
 
 = Solving simple optimization problems with Groovy using Commons Math, Hipparchus, OptaPlanner, and Timefold
 Paul King
-:revdate: 2024-03-14T11:45:00+00:00
-:draft: true
+:revdate: 2024-03-14T22:22:00+00:00
 :keywords: groovy, optaplanner, timefold, ojalgo, jacop, or-tools, choco, commons math, hipparchus, linear programming
 :description: This post looks at solving simple optimization problems using Groovy.
 
