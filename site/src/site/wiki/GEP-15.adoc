@@ -1,0 +1,207 @@
+= GEP-14: Record classes
+
+:icons: font
+
+.Metadata
+****
+[horizontal,options="compact"]
+*Number*:: GEP-15
+*Title*:: Indy2
+*Version*:: 1
+*Type*:: Improvement
+*Status*:: Draft
+*Leader*:: Jochen Theodorou
+*Created*:: 2024-03-22
+*Last modification*&#160;:: 2024-03-22
+****
+
+== Abstract
+Since invokedynamic became the default method dispatching in Groovy we
+got several complaints about increased requirements in memory and
+decreased speed in some scenarios. The aim of this GEP is a general
+overhaul of the way we use invokedynamic to improve the user experience.
+
+== Introduction
+=== Method call in Groovy in general
+In dynamic Groovy the full semantics of a method call require the following elements:
+[plantuml]
+----
+sender -> receiver  : (name, arguments*)
+----
+*sender* is class in which the callsite resides. *receiver* is the instance the method
+call is made on. It's metaclass will determine what methods are available. *name*
+is the name of the method. The runtime types of the arguments together with the name
+will be used to select a target method for the call to finally invoke that method.
+
+=== Basic method call with indy
+[plantuml]
+----
+participant CallSite << (C, #ADD1B2) >>
+participant MethodHandle << (C, #ADD1B2) >>
+activate "call site"
+== First Invocation ==
+"call site" -> "bootstrap method": (Lookup, receiverClass name, argumentClasses)
+"bootstrap method" -> "call site": CallSite instance with target method handle
+create CallSite
+"call site" -> "CallSite": get target MethodHandle
+"CallSite" -> "call site": MethodHandle
+create MethodHandle
+"call site" -> MethodHandle: final invocation part 1
+create "target method"
+MethodHandle -> "target method" : final invocation part 2
+"target method" -> "call site": return value
+== Nth Invocation ==
+"call site" -> CallSite : get target MethodHandle
+CallSite -> "call site": MethodHandle
+"call site" -> MethodHandle: final invocation part 1
+MethodHandle -> "target method": final invocation part 2
+"target method" -> "call site": return value
+deactivate "call site"
+----
+At the *call site* the compiler will produce a special bytecode instruction which will start the
+method invocation process with invokedynamic. In a first step a *bootstrap method* is called. This
+method can have a variety of signatures, here we did to stick to the longest one, which will transport
+a Lookup object, the static receiverClass, the method name and the static argument classes. The name and the classes
+provide a signature that can be used to find a method. All of this information is available at compile-time.
+In case of the static compiler we use this information to select the method we want to invoke and then create bytecode
+accordingly or refuse compilation.
+
+Noteworthy here is that the first visit of the call site is different from followup visits. In the first visit the
+bootstrap method is used ot install a CallSite with a target method. In the followup visits this CallSite object is
+used to get the target method. This target method will then be invoked. This target could be anything, even the
+bootstrap method itself. This also means that any logic of the bootstrap method and any helper constructs it creates
+may have to be done only once.
+
+=== Dynamic method call with indy
+The above mechanism is not enough for dynamic Groovy, as Groovy needs the runtime class information instead. This leads
+to a double dispatch which looks with indy like this:
+
+[plantuml]
+----
+participant CallSite << (C, #ADD1B2) >>
+participant MethodHandle << (C, #ADD1B2) >>
+activate "call site"
+== First Invocation ==
+"call site" -> "bootstrap method": (Lookup, receiverClass name, argumentClasses)
+"bootstrap method" -> "call site": CallSite instance with selector handle
+create CallSite
+"call site" -> "CallSite": get selector MethodHandle
+"CallSite" -> "call site": MethodHandle
+create MethodHandle
+"call site" -> MethodHandle: invoke selector method
+create "selector method"
+MethodHandle -> "selector method" : invoke selector method
+"selector method" -> "selector method" : select target method
+"selector method" -> "CallSite" : store new target method handle
+create "target method"
+"selector method" -> "target method" : invoke target method
+"target method" -> "call site": return value
+== Nth Invocation ==
+"call site" -> CallSite : get target MethodHandle
+CallSite -> "call site": MethodHandle
+"call site" -> MethodHandle: final invocation part 1
+MethodHandle -> "target method": final invocation part 2
+"target method" -> "call site": return value
+deactivate "call site"
+----
+This process differs from the version before by adding a *selector method*
+
+== Problems & Solutions
+
+Here following is a list of problems and possible solutions
+
+== Bootstrap I: Unstable Bootstrap method
+=== Problem
+The <<g_bootstrap, bootstrap method>> we use is currently found in a JVM Plugin. This was a required
+mechanism in Groovy version that supported Java 8 and earlier. We got already into trouble once for
+this when we removed the Java7 plugin and the IndyInterface class, which the bytecode of older
+Groovy versions is using directly. Now we have a Java8 plugin with the same problem.
+
+=== Suggestion
+Keep IndyInterface in Java7 and Java8 for the sake of having them as compatibility layer
+for older Groovy versions, but create a new indy package and move IndyInterface and related code into
+new package. A new bootstrap method should be added, which then would reside in the classic
+ScriptBytecodeAdapter (SBA) class (which also contains all the other binary interfacing method we use normally).
+
+== Bootstrap II: long time to initialize call sites
+=== Problem
+If you create a file with 100k callsites and test how long it takes to execute these in Groovy 3/4 using our old method
+and using the newer indy, you will notice that the time for this execution significantly increased. This is because
+invokedynamic is not implemented as a straight call. Instead, the handles build a tree, that will be optimized
+over time. Initially that means a lot of support structures are loaded as well, some bytecode gets generated and so on.
+Especially MethodType objects seem to weight heavy, but they are not the only contributors. In general, we can say, that
+the more different target methods we want to support the higher the loading times. Thus, it becomes important to have
+a cheap way to produce the callsites.
+
+=== Suggestion
+Currently we have an quite efficient cache in MetaClass, which will allow us to get a java.reflection.Method from a
+CachedMethod or an invocation path using the CachedMethod itself. Instead of forming a specialized handle with complex
+guards we should instead use the general logic we have in place from the callsite caching times to test the validity of
+a method call and use invokeExact to invoke the Method or CachedMethod. Since we have to cover only two cases for the
+target we can prepare and reuse handles for those. The <<g_call_site, callsite>> will still present itself with
+different types, which will also include primitive types, thus some conversion code might be needed. This will
+drastically decrease the amount of time we spend on method calls. The callsite installed handle can be combined with
+a counter to specialize the handle more later on.
+
+== Caching I:
+
+== Short Glossary
+=== call site [[g_call_site]]
+A *<<g_call_site, call site>>* of a method is the location (line of code) where the method
+is called. *CallSite* is a class in the Java implementation for invokedynamic
+representing a *<<g_call_site, call site>>* as runtime construct programmatically.
+
+Example:
+[source,groovy,linenums]
+----
+def hello() {
+    println "Hello World"
+}
+hello()
+----
+This source code snippet contains 2 *<<g_call_site, call site>>*. A call to hello in line 4
+and a cll to println in line 2. Each of these calls may be done by <<g_indy,invokedynamic>>,
+represented in the JDK by MethodHandle and CallSite.
+
+=== invokedynamic / indy [[g_indy]]
+If the terms *indy* or *invokedynamic* are used we refer to the usage of the *invokedynamic*
+implementation provided by the JDK. This usage allow the definition of the semantics of
+a method call. In theory a call hello() could then execute System.exit. Of course the
+semantics chosen here are dependent on the semantics of the Apache Groovy programming
+language and are not arbitrary.
+
+=== call site caching [[g_call_site_caching]]
+Describes a caching at the call site. Since this is a programmatic construct and the
+*<<g_call_site, call site>>* is a place, this kind of explanation may be a bit difficult
+to understand. What is really ment is the caching of a method call in the method call
+mechanism used in invoke dynamic logic especially for this call site.
+
+Example:
+[source,groovy,linenums]
+----
+def hello() {
+    println "Hello World"
+}
+hello()
+----
+There is a call site cache associated with the call site in line 2 and *another* call site cache
+associated with the cache for the call site in line 4.
+
+=== Bootstrap method [[g_bootstrap]]
+This is a method reference encoded into the bytecode as constant, which is supposed to produce a
+Callsite instance. In case of a single dispatch the Callsite would contain a target handle which
+will realize the actual method call, the bootstrap method here serves usually as the method
+selection. But of course this could be used for other things like proxies. Java is making use
+of that for lambdas. In case of double dispatch the target would contain a method that then
+does the method selection and replaces the target with the real invocation target in the process.
+The bootstrap method mechanism supports different signatures.
+
+=== Lookup class [[g_lookup]]
+The Lookup class is a class from the JDK basically representing permissions for lookups for methods.
+In Java a private method can be invoked only if the sender is of the same class, with special exceptions
+for sub classes or inner classes. To ensure these rights are handled properly the Lookup class wraps those
+rights and also contains the class it represents for.
+
+== Update history
+
+1 (2024-03-22) Initial draft
