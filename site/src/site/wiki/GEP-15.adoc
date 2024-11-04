@@ -1,4 +1,4 @@
-= GEP-14: Record classes
+= GEP-15: Invokedynamic overhaul
 
 :icons: font
 
@@ -134,7 +134,7 @@ the more different target methods we want to support the higher the loading time
 a cheap way to produce the callsites.
 
 === Suggestion
-Currently we have an quite efficient cache in MetaClass, which will allow us to get a java.reflection.Method from a
+Currently, we have a quite efficient cache in MetaClass, which will allow us to get a java.reflection.Method from a
 CachedMethod or an invocation path using the CachedMethod itself. Instead of forming a specialized handle with complex
 guards we should instead use the general logic we have in place from the callsite caching times to test the validity of
 a method call and use invokeExact to invoke the Method or CachedMethod. Since we have to cover only two cases for the
@@ -199,7 +199,7 @@ The bootstrap method mechanism supports different signatures.
 === Lookup class [[g_lookup]]
 The Lookup class is a class from the JDK basically representing permissions for lookups for methods.
 In Java a private method can be invoked only if the sender is of the same class, with special exceptions
-for sub classes or inner classes. To ensure these rights are handled properly the Lookup class wraps those
+for subclasses or inner classes. To ensure these rights are handled properly the Lookup class wraps those
 rights and also contains the class it represents for.
 
 == Update history
