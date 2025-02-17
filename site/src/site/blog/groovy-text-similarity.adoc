@@ -1082,7 +1082,11 @@ Jaccard                        22%  (2/9) 2 / 9
 JaroWinkler                    PREFIX 42% / SUFFIX 46%
 Phonetic                       Metaphone=BL 38% / Soundex=B400 25%
 Meaning                        Angle 46% / Use 40% / ConceptNet 0% / GloVe 0% / FastText 31%
-
+----
+* Since LCS is 1, [fuchsia]#the letters shared with the hidden word are in the reverse order#.
+* There were 4 inserts and 0 deletes which means [fuchsia]#the hidden word has 8 letters#.
+* Jaccard of 22% is 2 / 9. Therefore, there are 2 letters in the hidden word that are in `bail` and five that are not. [fuchsia]#There are 7 unique letters in the hidden word. It has one duplicate#.
+----
 Possible letters: a b c d e f g h i j k l m n o p q r s t u v w x y z
 Guess the hidden word (turn 2): leg
 LongestCommonSubsequence       2
@@ -1091,7 +1095,15 @@ Jaccard                        25%  (2/8) 1 / 4
 JaroWinkler                    PREFIX 47% / SUFFIX 0%
 Phonetic                       Metaphone=LK 38% / Soundex=L200 0%
 Meaning                        Angle 50% / Use 18% / ConceptNet 11% / GloVe 13% / FastText 37%
+----
+* Jaccard of 2 / 8 tells us [fuchsia]#two of the letters in 'leg' appear in the hidden word#.
+* LCS of 2 tells us that [fuchsia]#they appear in the same order as in the hidden word#.
+* JaroWinkler has a high prefix score of 47%, but a suffix score of 0%. This suggests that the two correct letters are near the beginning of the word.
+* Metaphone has picked up some similarity with the encoding LK, suggesting the hidden word has some group of consonants
+encoded to either an 'L' or 'K'.
 
+Let's try a word with 'L' and 'G' near the start:
+----
 Possible letters: a b c d e f g h i j k l m n o p q r s t u v w x y z
 Guess the hidden word (turn 3): languish
 LongestCommonSubsequence       2
@@ -1100,7 +1112,11 @@ Jaccard                        15%  (2/13) 2 / 13
 JaroWinkler                    PREFIX 50% / SUFFIX 50%
 Phonetic                       Metaphone=LNKX 34% / Soundex=L522 0%
 Meaning                        Angle 46% / Use 12% / ConceptNet -11% / GloVe -4% / FastText 25%
+----
+* 8 substitutions means [fuchsia]#none of the letters are in the same spot as 'languish'#.
 
+Let's try a word with 'L' and 'E' near the start, bringing at most two letters from `languish`:
+----
 Possible letters: a b c d e f g h i j k l m n o p q r s t u v w x y z
 Guess the hidden word (turn 4): election
 LongestCommonSubsequence       5
@@ -1109,7 +1125,14 @@ Jaccard                        40%  (4/10) 2 / 5
 JaroWinkler                    PREFIX 83% / SUFFIX 75%
 Phonetic                       Metaphone=ELKXN 50% / Soundex=E423 75%
 Meaning                        Angle 47% / Use 13% / ConceptNet -5% / GloVe -7% / FastText 26%
+----
+* Jaccard tells us we have 4 distinct letters shared with the hidden word and yet we have a LCS of 5. [fuchsia]#The duplicate 'E' must be correct and the order of all correct letters must match the hidden word.#
+* Only 4 substitutions means [fuchsia]#8-4=4 letters are in the correct position#.
+* JaroWinkler slightly favours the prefix over the suffix suggesting that the incorrect letters are probably closer to the end.
+* The phonetic metrics have increased. For example, 'languish' encodes to LNKX and scored only 34% whereas election, which encodes to ELKXN, scores 50%. Both metrics strongly suggest the hidden word starts with E.
 
+From the LCS of 2 with leg, either 'L','E' is in the hidden word or 'E','G'. Trying 'L','E':
+----
 Possible letters: a b c d e f g h i j k l m n o p q r s t u v w x y z
 Guess the hidden word (turn 5): elevator
 LongestCommonSubsequence       8
@@ -1122,69 +1145,8 @@ Meaning                        Angle 100% / Use 100% / ConceptNet 100% / GloVe 1
 Congratulations, you guessed correctly!
 ----
 
+
 === Round 3
-
-Let's take a first guess with a 10-letter (all distinct) word.
-
-----
-Possible letters: a b c d e f g h i j k l m n o p q r s t u v w x y z
-Guess the hidden word (turn 1): aftershock
-LongestCommonSubsequence       3
-Levenshtein                    Distance: 8, Insert: 1, Delete: 3, Substitute: 4
-Jaccard                        33%
-JaroWinkler                    PREFIX 56% / SUFFIX 56%
-Phonetic                       Metaphone=AFTRXK 32% / Soundex=A136 25%
-Meaning                        Angle 41% / Use 20% / ConceptNet -4% / GloVe -13% / FastText 11%
-----
-
-Tells us:
-
-* We did two more deletes than inserts, so
-[fuchsia]#the hidden word has 8 characters#.
-* If the hidden word is size 8, why would we ever do inserts, i.e. make it longer? Doing the insert (and subsequent deletes) must have made it possible to get 3 letters into the correct position.
-* Soundex tells use that it either starts with A and the other consonant
-groupings are wrong, or it doesn't start with A and one consonant grouping is correct. Metaphone of 32% means we probably have two consonant groupings correct.
-* Our guess has 10 distinct letters. Jaccard of 33% tells
-that we have 4/12 or 5/15 letters correct. If we have 5 letters correct
-there would be up to 3 letters we don't have, but adding 3 to the 10 in our guess
-doesn't give 15. So we have 4 of 12 letters. There must be up to 4 letters we don't have. Add those 4 to our 10 gives 14, but we know there is only 12 distinct letters, so the answer has two duplicates or a triple.
-I.e. [fuchsia]#the answer has 6 distinct letters#.
-
-The letters A and T are very common. Let's pick a word with
-2 of each that matches what we know from LCS.
-
-----
-Possible letters: a b c d e f g h i j k l m n o p q r s t u v w x y z
-Guess the hidden word (turn 2): patriate
-LongestCommonSubsequence       2
-Levenshtein                    Distance: 7, Insert: 0, Delete: 0, Substitute: 7
-Jaccard                        20%  (2/10) 1 / 5
-JaroWinkler                    PREFIX 47% / SUFFIX 47%
-Phonetic                       Metaphone=PTRT 38% / Soundex=P363 0%
-Meaning                        Angle 39% / Use 23% / ConceptNet 13% / GloVe 0% / FastText 27%
-
-Possible letters: a b c d e f g h i j k l m n o p q r s t u v w x y z
-Guess the hidden word (turn 3): tarragon
-LongestCommonSubsequence       3
-Levenshtein                    Distance: 5, Insert: 0, Delete: 0, Substitute: 5
-Jaccard                        71%  (5/7) 5 / 7
-JaroWinkler                    PREFIX 68% / SUFFIX 68%
-Phonetic                       Metaphone=TRKN 50% / Soundex=T625 25%
-Meaning                        Angle 46% / Use 4% / ConceptNet -7% / GloVe 5% / FastText 26%
-
-Possible letters: a b c d e f g h i j k l m n o p q r s t u v w x y z
-Guess the hidden word (turn 4): kangaroo
-LongestCommonSubsequence       8
-Levenshtein                    Distance: 0, Insert: 0, Delete: 0, Substitute: 0
-Jaccard                        100%  (6/6) 1
-JaroWinkler                    PREFIX 100% / SUFFIX 100%
-Phonetic                       Metaphone=KNKR 100% / Soundex=K526 100%
-Meaning                        Angle 100% / Use 100% / ConceptNet 100% / GloVe 100% / FastText 100%
-
-Congratulations, you guessed correctly!
-----
-
-=== Round 4
 
 ----
 Possible letters: a b c d e f g h i j k l m n o p q r s t u v w x y z
@@ -1257,39 +1219,6 @@ Levenshtein                    Distance: 0, Insert: 0, Delete: 0, Substitute: 0
 Jaccard                        100%  (5/5) 1
 JaroWinkler                    PREFIX 100% / SUFFIX 100%
 Phonetic                       Metaphone=KRT 100% / Soundex=C630 100%
-Meaning                        Angle 100% / Use 100% / ConceptNet 100% / GloVe 100% / FastText 100%
-
-Congratulations, you guessed correctly!
-----
-
-=== Round 5
-
-----
-Possible letters: a b c d e f g h i j k l m n o p q r s t u v w x y z
-Guess the hidden word (turn 1): celery
-LongestCommonSubsequence       4
-Levenshtein                    Distance: 6, Insert: 3, Delete: 1, Substitute: 2
-Jaccard                        33%  (3/9)
-JaroWinkler                    PREFIX 72% / SUFFIX 72%
-Phonetic                       Metaphone=SLR 46% / Soundex=C460 25%
-Meaning                        Angle 44% / Use 20% / ConceptNet -7% / GloVe 1% / FastText 33%
-
-Possible letters: a b c d e f g h i j k l m n o p q r s t u v w x y z
-Guess the hidden word (turn 2): explorer
-LongestCommonSubsequence       4
-Levenshtein                    Distance: 6, Insert: 0, Delete: 0, Substitute: 6
-Jaccard                        44%  (4/9)
-JaroWinkler                    PREFIX 67% / SUFFIX 58%
-Phonetic                       Metaphone=EKSPLRR 50% / Soundex=E214 50%
-Meaning                        Angle 50% / Use 14% / ConceptNet 1% / GloVe 9% / FastText 29%
-
-Possible letters: a b c d e f g h i j k l m n o p q r s t u v w x y z
-Guess the hidden word (turn 3): elevator
-LongestCommonSubsequence       8
-Levenshtein                    Distance: 0, Insert: 0, Delete: 0, Substitute: 0
-Jaccard                        100%  (7/7)
-JaroWinkler                    PREFIX 100% / SUFFIX 100%
-Phonetic                       Metaphone=ELFTR 100% / Soundex=E413 100%
 Meaning                        Angle 100% / Use 100% / ConceptNet 100% / GloVe 100% / FastText 100%
 
 Congratulations, you guessed correctly!
