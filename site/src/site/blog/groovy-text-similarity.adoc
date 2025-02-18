@@ -650,19 +650,27 @@ model is trained and optimized for greater-than-word length text, such as senten
 https://www.tensorflow.org/[TensorFlow].
 We'll use the https://djl.ai/[Deep Java Library] to load and use both of these models on the JDK.
 
-=== GloVe
+=== FastText
+Many Word2Vec libraries can read and write models to a standard file format based on the original https://github.com/tmikolov/word2vec[Google implementation].
 
-The
-https://deeplearning4j.konduit.ai/deeplearning4j/reference/word2vec-glove-doc2vec[DeepLearning4J]
-library makes it easy to use https://nlp.stanford.edu/projects/glove/[GloVe] models. The https://huggingface.co/fse/glove-wiki-gigaword-300[model we used] is pre-trained on
-2B tweets, 27B tokens, 1.2M vocab, uncased.
+For example, we can download some of the pre-trained models from the https://radimrehurek.com/gensim/models/word2vec.html[Gensim Python library], convert them to the Word2Vec format, and then open them with https://deeplearning4j.konduit.ai/deeplearning4j/reference/word2vec-glove-doc2vec[DeepLearning4J].
 
-We simply serialize the model into our word2vec representation,
+[source,python]
+----
+import gensim.downloader
+glove_vectors = gensim.downloader.load('fasttext-wiki-news-subwords-300')
+glove_vectors.save_word2vec_format("fasttext-wiki-news-subwords-300.bin", binary=True)
+----
+
+https://huggingface.co/fse/fasttext-wiki-news-subwords-300[This model] has
+1 million word vectors trained on Wikipedia 2017, UMBC webbase corpus and statmt.org news dataset (16B tokens).
+
+We simply serialize the https://fasttext.cc/[FastText] model into our Word2Vec representation,
 and can then call methods like `similarity` and `wordsNearest` as shown here:
 
 [source,groovy]
 ----
-var modelName = 'glove-wiki-gigaword-300.bin'
+var modelName = 'fasttext-wiki-news-subwords-300.bin'
 var path = Paths.get(ConceptNet.classLoader.getResource(modelName).toURI()).toFile()
 Word2Vec model = WordVectorSerializer.readWord2VecModel(path)
 String[] words = ['bull', 'calf', 'bovine', 'cattle', 'livestock', 'horse']
@@ -679,8 +687,8 @@ Nearest words in vocab: ${model.wordsNearest('cow', 4)}
 Which gives this output:
 
 ----
-GloVe similarity to cow: [bovine:0.67, cattle:0.62, livestock:0.47, calf:0.44, horse:0.42, bull:0.38]
-Nearest words in vocab: [cows, mad, bovine, cattle]
+FastText similarity to cow: [bovine:0.72, cattle:0.70, calf:0.67, bull:0.67, livestock:0.61, horse:0.60]
+Nearest words in vocab: [cows, goat, pig, bovine]
 ----
 
 We have numerous options available to us to visualize these kinds of results.
@@ -688,28 +696,28 @@ We could use the bar-charts we used previously, or something like a heat-map:
 
 image:img/AnimalSemanticSimilarity.png[animal semantic similarity,width=60%]
 
-=== FastText
+Groupings of similar words can be seen as the larger orange and red regions. We can also quickly check
+that there is a stronger relationship between `cow` and `milk` vs `cow` and `water`.
 
-We can swap to a https://fasttext.cc/[FastText] model, simply by switching to that model:
+=== GloVe
+
+We can swap to a https://nlp.stanford.edu/projects/glove/[GloVe] model, simply by changing the file we read from:
 
 [source,groovy]
 ----
-var modelName = 'fasttext-wiki-news-subwords-300.bin'
+var modelName = 'glove-wiki-gigaword-300.bin'
 ----
 
-We used https://huggingface.co/fse/fasttext-wiki-news-subwords-300[this model] which has
-1 million word vectors trained on Wikipedia 2017, UMBC webbase corpus and statmt.org news dataset (16B tokens).
-
-When run with the FastText model, the script has this output:
+With this model, the script has the following output:
 
 ----
-FastText similarity to cow: [bovine:0.72, cattle:0.70, calf:0.67, bull:0.67, livestock:0.61, horse:0.60]
-Nearest words in vocab: [cows, goat, pig, bovine]
+GloVe similarity to cow: [bovine:0.67, cattle:0.62, livestock:0.47, calf:0.44, horse:0.42, bull:0.38]
+Nearest words in vocab: [cows, mad, bovine, cattle]
 ----
 
-Again, we have numerous options to visualise the data returned from this model.
-Instead of look for nearest words or the similarity measure, we could return the actual word embeddings and then visualise
-those using principal component analysis (PCA), as shown here:
+Another way to visualise word embeddings is to display the word vectors as positions in space. However,
+the raw vectors contain far too many dimensions for us mere mortals to comprehend. We can use principal component
+analysis (PCA) to reduce the number of dimensions whilst capturing the most important information as shown here:
 
 image:img/AnimalSemanticMeaningPcaBubblePlot.png[principal component analysis of animal-related word embeddings,width=75%]
 
