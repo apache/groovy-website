@@ -980,7 +980,31 @@ for (int idx, var heart in hearts) {
 assert list.join() == '💚💛💛💜💜💜'
 ----
 
-=== String utility method
+=== Match operator support for named-capturing groups
+
+Groovy's match operator, `=~`, already provides a convenient notation for accessing regex capturing groups by index:
+
+[source,groovy]
+----
+def issueRegex = /(\w+)-(\d+)/
+def m = 'GROOVY-11701' =~ issueRegex
+assert m[0][1] == 'GROOVY'
+assert m[0][2] == '11701'
+----
+
+Groovy 5 also supports accessing groups by name using the JDKs regex support for _named-capturing groups_,
+with index access still available:
+
+[source,groovy]
+----
+def issueRegex = /(?<project>\w+)-(?<number>\d+)/
+def m = 'GROOVY-11701' =~ issueRegex
+assert m[0][1] == 'GROOVY'
+assert m[0]['project'] == 'GROOVY'
+assert m[0].number == '11701'
+----
+
+=== Ascii barchart utility method
 
 There is now a utility method to produce simple ascii-art barcharts. The following code:
 
