@@ -9,7 +9,8 @@ div(class: 'navbar navbar-default navbar-static-top', role: 'navigation') {
             }
             a(class: 'navbar-brand', href: relative('index.html')) {
                 i(class: 'fa fa-star') {}
-                yield ' Apache Groovy™'
+                yield ' Apache Groovy'
+                yieldUnescaped '&trade;'
             }
         }
         div(class: 'navbar-collapse collapse') {

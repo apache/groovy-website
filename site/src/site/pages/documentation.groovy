@@ -28,7 +28,9 @@ layout 'layouts/main.groovy', true,
                                 yield ' Documentation'
                             }
                             p {
-                                yield 'The Apache Groovy™ documentation is available as a '
+                                yield 'The Apache Groovy'
+                                yieldUnescaped '&trade;'
+                                yield ' documentation is available as a '
                                 a(href: "single-page-documentation.html", 'single-page document')
                                 yield ', or a '
                                 a(href: "https://docs.groovy-lang.org/docs/latest/html/documentation/index.pdf", 'PDF')
