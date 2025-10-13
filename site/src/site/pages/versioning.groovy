@@ -1,3 +1,5 @@
+def userSiteBase = 'https://groovy-lang.org/'
+
 layout 'layouts/main.groovy', true,
         pageTitle: 'The Apache Groovy programming language - Versioning',
         mainContent: contents {
