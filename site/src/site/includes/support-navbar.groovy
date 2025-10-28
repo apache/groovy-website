@@ -4,7 +4,7 @@ ul(class: 'nav-sidebar') {
             'support': 'Support',
             'https://groovy.apache.org/index': 'Contribute',
             'reporting-issues': 'Reporting issues',
-            'mailing-lists': 'Mailing-lists',
+            'mailing-lists': 'Mailing lists',
             'events': 'Events',
             'usergroups': 'User groups',
             'thanks': 'Thanks'

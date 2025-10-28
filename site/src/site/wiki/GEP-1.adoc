@@ -26,7 +26,7 @@ The concept of the GEP was freely inspired from Python's http://www.python.org/d
 
 == Rationale: Why a GEP?
 
-For non-trivial, complex or strategic features, discussions on mailing-lists are difficult to lead and follow, and often
+For non-trivial, complex or strategic features, discussions on mailing lists are difficult to lead and follow, and often
 don't help reach a consensus. Writing a proper document explaining the design and implications of said feature allows both
 the originator of the idea and the community at large to have a chance to provide interesting and useful feedback and
 helps better understanding the rationale, the design decisions, the impact of the proposal.
@@ -68,7 +68,7 @@ Final:: when the GEP has been integrated into a released version of Groovy and h
 
 Beyond all these metadata, as appropriate, a GEP should also:
 
-* give pointers to existing mailing-list discussions (through Nabble, Markmail or Ponymail)
+* give pointers to existing mailing list discussions (through Nabble, Markmail or Ponymail)
 * list existing papers or documentations related to this feature that provides additional material for understanding the concepts or implementation difficulties
 * provide samples showing how the feature should be used and how idiomatic Groovy the solution is
 
@@ -76,7 +76,7 @@ Beyond all these metadata, as appropriate, a GEP should also:
 
 The general workflow of a Groovy Enhancement Proposal is as follows:
 
-The inception of a GEP generally stems from a discussion on the Groovy mailing-lists about a new feature or change
+The inception of a GEP generally stems from a discussion on the Groovy mailing lists about a new feature or change
 when the Groovy Despot and the development team deem necessary to properly document and articulate this new idea,
 for further discussion and analysis. Generally, simple bug fixes and minor enhancements don't require a full-blown GEP.
 A GEP is started solely with the agreement of the Groovy PMC.

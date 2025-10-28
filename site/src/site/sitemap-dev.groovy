@@ -45,7 +45,7 @@ menu {
     }
 
     group('Socialize') {
-        item 'Discuss on the mailing-list', "${userSiteBase}mailing-lists.html",                'fa-classic fa-regular fa-envelope'
+        item 'Discuss on the mailing list', "${userSiteBase}mailing-lists.html",                'fa-classic fa-regular fa-envelope'
         item 'Groovy on X',                 'https://x.com/ApacheGroovy',                       'fa-brands fa-x-twitter'
         item 'Groovy on Bluesky',           'https://bsky.app/profile/groovy.apache.org',       'fa-brands fa-bluesky'
         item 'Groovy on Mastodon',          'https://fosstodon.org/@ApacheGroovy',              'fa-brands fa-mastodon'

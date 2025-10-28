@@ -1,5 +1,5 @@
 layout 'layouts/main.groovy', true,
-        pageTitle: 'The Apache Groovy programming language - Mailing-lists',
+        pageTitle: 'The Apache Groovy programming language - Mailing lists',
         mainContent: contents {
             div(id: 'content', class: 'page-1') {
                 div(class: 'row') {
@@ -12,7 +12,7 @@ layout 'layouts/main.groovy', true,
                             include template: 'includes/contribute-button.groovy'
                             h1 {
                                 i(class: 'fa-classic fa-regular fa-envelope') {}
-                                yield ' Mailing-lists'
+                                yield ' Mailing lists'
                             }
                             p '''The Groovy mailing lists are a great way to interact with the Groovy developers and Groovy users.'''
                             hr(class: 'divider')

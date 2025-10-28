@@ -20,7 +20,7 @@ layout 'layouts/main.groovy', true,
                                 ul {
                                     li {
                                         yield 'helping other users or discussing future language directions on the '
-                                        a(href: 'https://groovy-lang.org/mailing-lists.html', 'mailing-lists')
+                                        a(href: 'https://groovy-lang.org/mailing-lists.html', 'mailing lists')
                                     }
                                     li {
                                         yield 'contribute to discussions on '
@@ -58,12 +58,12 @@ layout 'layouts/main.groovy', true,
                                 }
                                 hr(class: 'divider')
 
-                                h2 'Discussing on the mailing-lists and forums'
+                                h2 'Discussing on the mailing lists and forums'
                                 p {
                                     yield '''
                                         If you encounter a problem, want to discuss a new feature,
                                         share interesting findings, and more, then the '''
-                                    a(href: 'https://groovy-lang.org/mailing-lists.html', 'mailing-lists')
+                                    a(href: 'https://groovy-lang.org/mailing-lists.html', 'mailing lists')
                                     yield '''
                                         are the place to go to start a conversation with the Groovy developers
                                         and other Groovy users. Discussions on the mailing list are archived.
@@ -166,7 +166,7 @@ layout 'layouts/main.groovy', true,
                                     yield '''
                                         of possible easy contributions that could get you started on your journey
                                         to become a Groovy committer. Just raise your hand on the Groovy developer '''
-                                    a(href: 'https://groovy-lang.org/mailing-lists.html', 'mailing-list')
+                                    a(href: 'https://groovy-lang.org/mailing-lists.html', 'mailing list')
                                     yield ''' to tell us about your desire to work on that ticket.'''
                                 }
                                 p '''

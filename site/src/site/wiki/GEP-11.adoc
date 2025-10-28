@@ -255,7 +255,7 @@ Differences to groovy.mop.internal.DefaultMetaProperty:
 
 * https://web.archive.org/web/20150508123746/http://docs.codehaus.org/display/GroovyJSR/GEP+11+-+Groovy+3+semantics+and+new+MOP[GEP-11: Groovy 3 semantics and new MOP] (web archive link)
 
-=== Mailing-list discussions
+=== Mailing list discussions
 
 * https://marc.info/?l=groovy-user&m=134070969008201&w=2[groovy-user: Groovy 3]
 

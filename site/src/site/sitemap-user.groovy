@@ -43,14 +43,14 @@ menu {
     }
 
     group('Socialize') {
-        item 'Discuss on the mailing-list', "mailing-lists.html",                              'fa-classic fa-regular fa-envelope'
+        item 'Discuss on the mailing list', 'mailing-lists.html',                               'fa-classic fa-regular fa-envelope'
         item 'Groovy on X',                 'https://x.com/ApacheGroovy',                       'fa-brands fa-x-twitter'
         item 'Groovy on Bluesky',           'https://bsky.app/profile/groovy.apache.org',       'fa-brands fa-bluesky'
         item 'Groovy on Mastodon',          'https://fosstodon.org/@ApacheGroovy',              'fa-brands fa-mastodon'
         item 'Groovy on LinkedIn',          'https://www.linkedin.com/company/106402668/admin/dashboard/',  'fa-brands fa-linkedin'
-        item 'Events and conferences',      "events.html",                                      'fa-classic fa-solid fa-calendar-days'
+        item 'Events and conferences',      'events.html',                                      'fa-classic fa-solid fa-calendar-days'
         item 'Source code on GitHub',       'https://github.com/apache/groovy',                 'fa-brands fa-github'
-        item 'Report issues in Jira',       "reporting-issues.html",                            'fa-classic fa-solid fa-bug'
+        item 'Report issues in Jira',       'reporting-issues.html',                            'fa-classic fa-solid fa-bug'
         item 'Stack Overflow questions',    'http://stackoverflow.com/questions/tagged/groovy', 'fa-brands fa-stack-overflow'
         item 'Slack Community',             'http://www.groovycommunity.com/',                  'fa-brands fa-slack'
     }

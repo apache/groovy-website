@@ -36,7 +36,7 @@ layout 'layouts/main.groovy', true,
                                     }
                                     li {
                                         yield "You'll frequently wish to discuss your issue first on one of the "
-                                        a(href: 'mailing-lists.html', 'mailing-lists')
+                                        a(href: 'mailing-lists.html', 'mailing lists')
                                         yield '''
                                         or in one of the forums to make sure what you believe is a bug isn't really
                                         a feature or to gather support and ideas for your feature enhancement request.
