@@ -230,7 +230,7 @@ allEvents {
 
 books {
     book('Groovy in Action, Second Edition') {
-        authors "Dierk König, Paul King, Guillaume Laforge, Hamlet D'Arcy, Cédric Champeau, Erik Pragt, and Jon Skeet"
+        authors "Dierk K&ouml;nig, Paul King, Guillaume Laforge, Hamlet D'Arcy, C&eacute;dric Champeau, Erik Pragt, and Jon Skeet"
         cover 'img/books/regina.png'
         url 'http://www.manning.com/koenig2/'
         description 'The undisputed definitive reference on the Groovy programming language, authored by core members of the development team.'
@@ -375,7 +375,7 @@ usergroups {
 
 videos {
     video('The Groovy ecosystem revisited') {
-        speaker 'Andrés Almiray'
+        speaker 'Andr&eacute;s Almiray'
         summary '''
             <p>Groovy is a well established player in the JVM since a few years ago.
             Its increased popularity across the years has spawned several projects that conform the Groovy Ecosystem.
