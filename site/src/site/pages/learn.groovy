@@ -121,7 +121,7 @@ layout 'layouts/main.groovy', true,
                                             if(video.slidesUrl || video.codeUrl) {
                                                 p(class: 'urls') {
                                                     if (video.slidesUrl) {
-                                                        i(class: 'fa-classic fa-regular fa-photo-film') {}
+                                                        i(class: 'fa-classic fa-solid fa-photo-film') {}
                                                         yield ' '
                                                         a(href: video.slidesUrl, 'slides')
                                                     }
