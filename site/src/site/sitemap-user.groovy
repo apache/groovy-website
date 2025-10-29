@@ -278,13 +278,6 @@ books {
         description "Start building powerful apps that take advantage of the dynamic scripting capabilities of the Groovy language. This book covers Groovy fundamentals, such as installing Groovy, using Groovy tools, and working with the Groovy Development Kit (GDK). You'll also learn more advanced aspects of Groovy."
     }
 
-    book("Grails 3: A Practical Guide to Application Development") {
-        authors "Eric Helgeson"
-        cover 'img/books/practical-grails-3-book-cover.png'
-        url 'https://www.grails3book.com/'
-        description "The first book dedicated to Grails 3. You will learn the concepts behind building Grails applications. Real, up-to-date code examples are provided so you can easily follow along."
-    }
-
     book('Falando de Grails') {
         authors 'Henrique Lobo Weissmann'
         cover 'img/books/weissmann_groovy_grails.png'
