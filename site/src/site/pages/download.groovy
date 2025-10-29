@@ -193,7 +193,7 @@ layout 'layouts/main.groovy', true,
                                                 }
                                                 td {
                                                     a(href: "https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips/apache-groovy-docs-${v}.zip") {
-                                                        i(class: 'fa-classic fa-regular fa-file-text fa-4x') {}
+                                                        i(class: 'fa-classic fa-regular fa-file-lines fa-4x') {}
                                                         br()
                                                         yield ' documentation'
                                                     }
