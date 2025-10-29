@@ -63,7 +63,7 @@ layout 'layouts/main.groovy', true,
                                 }
                                 hr(class: 'divider')
 
-                                h2 'Alternative mailing list archives'
+                                h2 'Alternative mailing-list archives'
                                 ul {
                                     li """
                                     You can also find archives on mail-archive.com: ${
@@ -75,7 +75,7 @@ layout 'layouts/main.groovy', true,
                                     """
 
                                     li """
-                                    You can also find some historic dev mailing list archives on MARC: ${
+                                    You can also find some historic dev mailing-list archives on MARC: ${
                                         $a(href: 'https://marc.info/?l=groovy-dev&r=1&s=groovy&q=b&w=4', 'groovy-dev')
                                     }
                                     """

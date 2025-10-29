@@ -245,7 +245,7 @@ def template() { new MarkupBuilder().html { p('Hello') } }
 * http://blackdragsview.blogspot.com/2011/10/flow-sensitive-typing.html[Flow Sensitive Typing?]
 * https://web.archive.org/web/20150508040745/http://www.jroller.com/melix/entry/groovy_static_type_checker_status[Groovy static type checker: status update] (web archive)
 
-=== Mailing list discussions
+=== Mailing-list discussions
 
 * https://marc.info/?l=groovy-dev&m=132095119732500&w=2[groovy-dev: Static compilation for Groovy]: +
 An interesting discussion where dynamic lovers explain why they do not want static compilation

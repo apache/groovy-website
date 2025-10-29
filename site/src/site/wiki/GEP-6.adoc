@@ -72,7 +72,7 @@ I guess now is a good time to also look at that option.
 
 == References and useful links
 
-=== Mailing list discussions
+=== Mailing-list discussions
 
 * https://marc.info/?l=groovy-dev&m=128540553001110&w=2[groovy-dev: OpenJDK 7 Groovy Build and NIO2 support]
 * https://docs.oracle.com/javase/8/docs/technotes/guides/io/index.html[Java I/O, NIO and NIO.2]

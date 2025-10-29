@@ -284,7 +284,7 @@ The proposed behaviour is therefore to align the instanceof case with multicatch
 * http://blackdragsview.blogspot.com/2011/10/flow-sensitive-typing.html[Flow Sensitive Typing?]
 * https://web.archive.org/web/20150508040745/http://www.jroller.com/melix/entry/groovy_static_type_checker_status[Groovy static type checker: status update] (web archive)
 
-=== Mailing list discussions
+=== Mailing-list discussions
 
 * https://marc.info/?l=groovy-user&m=131805623302039&w=2[groovy-user: [grumpy mode\] What to do on assignment?] Discussion about the expected behaviour when STC detects a potential error on assignment (for example, possible loss of precision on implicit number casts)
 

@@ -68,7 +68,7 @@ Final:: when the GEP has been integrated into a released version of Groovy and h
 
 Beyond all these metadata, as appropriate, a GEP should also:
 
-* give pointers to existing mailing list discussions (through Nabble, Markmail or Ponymail)
+* give pointers to existing mailing-list discussions (through Nabble, Markmail or Ponymail)
 * list existing papers or documentations related to this feature that provides additional material for understanding the concepts or implementation difficulties
 * provide samples showing how the feature should be used and how idiomatic Groovy the solution is
 

@@ -154,7 +154,7 @@ JSON Spec and Java implementations
 * http://tools.ietf.org/html/rfc4627[RFC-4627]
 * http://json-lib.sourceforge.net/[json-lib]
 
-=== Mailing list discussions
+=== Mailing-list discussions
 
 * https://marc.info/?l=groovy-dev&m=129623197505984&w=2[groovy-dev: Built-in JSON support in 1.8]
 

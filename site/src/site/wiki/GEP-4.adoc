@@ -113,7 +113,7 @@ There are no real drawbacks to having an opposite syntax. The number of Boo AST 
 
 == References and useful links
 
-Mailing List Discussions
+Mailing-List Discussions
 
 * groovy-dev: https://marc.info/?l=groovy-dev&m=126632536126812&w=2[Groovy AstBuilder AST Templates]
 
