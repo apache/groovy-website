@@ -1,0 +1,34 @@
+=== Breaking long lines
+
+To improve readability or comply with line length checks, Groovy allows
+expressions to be split across multiple lines.
+
+Function calls can be broken across lines:
+
+[source,groovy]
+----
+someVeryLongFunctionName(
+    firstArgument,
+    secondArgument,
+    thirdArgument
+)
+----
+
+Strings can be split using concatenation:
+
+[source,groovy]
+----
+def text = 'This is a very long string ' +
+           'that is split across multiple lines'
+----
+
+Collections can also span multiple lines:
+
+[source,groovy]
+----
+def numbers = [
+    1, 2, 3,
+    4, 5, 6
+]
+----
+
