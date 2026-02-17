@@ -296,16 +296,14 @@ usergroups {
     userGroup('Paris Groovy Grails User Group') {
          location 'Europe/France'
     }
-    userGroup('Berlin Groovy User Group') {
+    userGroup('Berlin Groovy User Group (Inactive)') {
         location 'Europe/Germany'
-        url 'http://www.meetup.com/de/Berlin-Groovy-User-Group/'
     }
     userGroup('Groovy & Grails Israel User Group') {
         location 'Europe/Israel'
     }
-    userGroup('Warsaw Groovy User Group') {
+    userGroup('Warsaw Groovy User Group (Inactive)') {
         location 'Europe/Poland'
-        url 'http://www.meetup.com/Warsaw-Groovy-User-Group/'
     }
     userGroup('Madrid Groovy User Group') {
         location 'Europe/Spain'
@@ -317,25 +315,21 @@ usergroups {
     }
 
     // North-America
-    userGroup('Austin Groovy and Grails User Group (TX)') {
+    userGroup('Austin Groovy and Grails User Group (TX) (Inactive)') {
         location 'North-America/United States'
-        url 'http://www.meetup.com/Austin-Groovy-and-Grails-Users/'
     }
-    userGroup('Boston Groovy, Grails, Spring Meetup (B2GS)') {
+    userGroup('Boston Groovy, Grails, Spring Meetup (B2GS) (Inactive)') {
         location 'North-America/United States'
-        url 'https://twitter.com/B2GSMeetup'
     }
-    userGroup('Coder Consortium of Sacramento') {
+    userGroup('Coder Consortium of Sacramento (Inactive)') {
         location 'North-America/United States'
-        url 'http://coderconsortium.com/'
     }
     userGroup('Groovy Users of Minnesota') {
         location 'North-America/United States'
         url 'https://www.meetup.com/groovymn/'
     }
-    userGroup('NYC Groovy / Grails Meetup') {
+    userGroup('NYC Groovy / Grails Meetup (Inactive)') {
         location 'North-America/United States'
-        url 'http://www.meetup.com/grails/'
     }
     userGroup('Pittsburgh Groovy Programming') {
         location 'North-America/United States'

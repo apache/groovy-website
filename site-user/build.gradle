@@ -46,7 +46,7 @@ tasks.register('copyAssets', Copy) {
         }
     }
     filesMatching('**/*.js') { f->
-        if (!f.name.contains('.min.')) {
+        if (!f.name.contains('.min.') && !f.name.contains('search')) {
             filter(JsFilter)
         }
     }
