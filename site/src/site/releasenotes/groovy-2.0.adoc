@@ -763,7 +763,7 @@ required if implementing in Java) and static (although they will be
 available on instances of that class). They will always take a first
 parameter which is actually the instance on which this method will be
 called. And then following parameters will be the parameters passed when
-calling the method. This is the same convention use for Groovy
+calling the method. This is the same convention used for Groovy
 categories. +
   +
 Say we want to add a greets() method on String, that would greet the

@@ -246,7 +246,7 @@ assert method(true) == 2
 == AST Transformations
 
 Although at times, it may sound like a good idea to extend the syntax of
-Groovy to implement new features (like this is the case for instance for
+Groovy to implement new features (as is the case, for instance, for
 multiple assignments), most of the time, we can't just add a new keyword
 to the grammar, or create some new syntax construct to represent a new
 concept. However, with the idea of AST (Abstract Syntax Tree)
@@ -1103,7 +1103,7 @@ runtime system, bringing several new capabilities into the mix.
 
 So far, Groovy POGOs (Plain Old Groovy Objects) could have a
 per-instance metaclass, but POJOs could only have one metaclass for all
-instances (i.e. a per-class metaclass). This is now not the case anymore,
+instances (i.e. a per-class metaclass). This is no longer the case,
 as POJOs can have a per-instance metaclass too. Also, setting the
 metaclass property to null will restore the default metaclass.
 

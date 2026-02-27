@@ -11,7 +11,7 @@ excellent arguments as to the benefits of a JVM solution over LangGraph and Pyth
 We won't repeat those arguments here, but we highly recommend that you read Rod's article.
 
 This blog post looks at those same examples using Groovy. Groovy is sometimes referred to
-as the Python of the JVM world. It's syntax mostly resembles Java but some of its features
+as the Python of the JVM world. Its syntax mostly resembles Java but some of its features
 will be familiar to Python programmers. So, for Python folks who want to try out some JVM
 AI frameworks, Groovy might be a nice entry point.
 Also, for Groovy folks, we want to show them how easy it is to use powerful JVM frameworks like Embabel.

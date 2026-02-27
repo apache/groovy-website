@@ -290,7 +290,7 @@ There is the Encog jar, the JSR381 VisRec API which is in a separate jar, and a 
 
 Another technology we might want to consider if performance is important to us is https://www.graalvm.org/[GraalVM]. GraalVM is a high-performance JDK distribution designed to speed up the execution of applications written in Java and other JVM languages. We'll look at creating a native version of our Iris Deep Netts application. We used GraalVM 22.1.0 Java 17 CE and Groovy 4.0.3. We'll cover just the basic steps but there are other places for additional setup info and troubleshooting help like https://e.printstacktrace.blog/graalvm-and-groovy-how-to-start/[here], https://github.com/wololock/gttp[here] and https://simply-how.com/fix-graalvm-native-image-compilation-issues[here].
 
-Groovy has two natures. It's dynamic nature supports adding methods at runtime through metaprogramming
+Groovy has two natures. Its dynamic nature supports adding methods at runtime through metaprogramming
 and interacting with method dispatch processing through missing method interception and other tricks.
 Some of these tricks make heavy use of reflection and dynamic class loading and cause problems for
 GraalVM which is trying to determine as much information as it can at compile time. Groovy's static
