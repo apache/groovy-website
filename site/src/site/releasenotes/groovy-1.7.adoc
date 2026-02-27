@@ -263,7 +263,7 @@ writers: an AST viewer and an AST builder.
 The following screenshot shows a new window that can be launched from
 the Groovy Swing Console. You can visualize the AST of a script you’re
 working on in the console: for instance, writing the code you’d like to
-create in your AST transformation. The AST viewer greatly help with
+create in your AST transformation. The AST viewer greatly helps with
 figuring out how Groovy builds its AST when compiling your Groovy
 code. +
 image:img/AstBrowser.png[image]
@@ -360,7 +360,7 @@ assert new Predicate(value: true)
 assert !new Predicate(value: false)
 -----------------------------------
 
-Is is also possible to use categories or ExpandoMetaClass to inject an
+It is also possible to use categories or ExpandoMetaClass to inject an
 `asBoolean()` method, or to override an existing one (even one on the
 small set of classes with special Groovy truth behavior).
 

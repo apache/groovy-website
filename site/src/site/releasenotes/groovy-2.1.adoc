@@ -178,7 +178,7 @@ checking your DSLs, as you shall see in the following section.
 Before moving on, let’s mention a few closing details
 about `@DelegatesTo`.
 
-`@DelegatesTo` allows to specify the receiver calls are delegated to.
+`@DelegatesTo` allows you to specify the receiver calls are delegated to.
 For instance, when a delegate calls a method or property on another
 method parameter. Imagine our `exec()` method taking
 the `Executor` argument instance as delegate:
@@ -430,7 +430,7 @@ obscure the general intent of that particular combination.
 
 To group annotations together, to make the intent clearer or to
 streamline your code, Groovy 2.1 offers a *meta-annotation system, which
-allows to combine other annotations into one "alias" annotation*.
+allows you to combine other annotations into one "alias" annotation*.
 
 Imagine we are using some annotations defining constraints on properties
 of your class, like `@NotNull`, `@Length`, or `@Pattern`, which could be

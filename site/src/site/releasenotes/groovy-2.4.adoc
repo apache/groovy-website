@@ -26,7 +26,7 @@ And discover presentations on the Android support:
 * link:https://speakerdeck.com/melix/groovy-and-android-a-winning-pair-1[Groovy and Android, a winning pair] by Cédric Champeau
 * link:https://speakerdeck.com/glaforge/groovy-on-android-groovy-grails-exchange-2014[Groovy on Android] by Guillaume Laforge
 
-The work on the Android support also lead to various optimizations in
+The work on the Android support also led to various optimizations in
 terms of bytecode generation, as explained further down, as well as, for
 instance, improving the handling of overloaded setters
 (link:https://issues.apache.org/jira/browse/GROOVY-2049[GROOVY-2049],link:https://issues.apache.org/jira/browse/GROOVY-6084[GROOVY-6084],
@@ -145,7 +145,7 @@ methods if needed
 * Clean up generated code for `@AutoExternalizable`
 (link:https://issues.apache.org/jira/browse/GROOVY-6889[GROOVY-6889]) and
 `@EqualsAndHashCode`
-(link:https://issues.apache.org/jira/browse/GROOVY-6893[GROOVY-6893]) the when
+(link:https://issues.apache.org/jira/browse/GROOVY-6893[GROOVY-6893]) when
 using `@CompileStatic`
 * `@Builder`’s default and initializer strategies improved Java
 integration (link:https://issues.apache.org/jira/browse/GROOVY-6875[GROOVY-6875])
@@ -165,7 +165,7 @@ startup (link:https://issues.apache.org/jira/browse/GROOVY-6943[GROOVY-6943])
 (link:https://issues.apache.org/jira/browse/GROOVY-6622[GROOVY-6622])
 * completion candidates in color
 (link:https://issues.apache.org/jira/browse/GROOVY-6563[GROOVY-6563])
-* with :set interpreterMode true, you can let Groovysh to let you see
+* with :set interpreterMode true, you can allow Groovysh to let you see
 and use locally-defined variables after further line executions
 (link:https://issues.apache.org/jira/browse/GROOVY-6623[GROOVY-6623])
 * the :load command supports file names containing spaces

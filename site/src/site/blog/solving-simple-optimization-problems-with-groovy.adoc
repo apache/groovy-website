@@ -216,7 +216,7 @@ At this stage, it isn't clear how the two projects will evolve over time.
 
 One of the claims of the Timefold project is that it has a lighter dependency footprint.
 This can be confirmed by running the `printRuntimeClasspath` task in the associated builds.
-Timefold has 20 dependant jars compared with OptaPlanner's 55 jars.
+Timefold has 20 dependent jars compared with OptaPlanner's 55 jars.
 
 While Timefold's power isn't needed for our simple problem,
 let's examine how you would use it for the same case study.

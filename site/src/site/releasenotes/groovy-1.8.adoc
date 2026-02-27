@@ -1342,7 +1342,7 @@ The compilation of Groovy code can be configured through the
 your sources, the base script class, the recompilation parameters, etc).
 `CompilerConfiguration` now has a new option for setting _compilation
 customizers_ (belonging to the `org.codehaus.groovy.control.customizers`
-package). Those customizers allow to customize the compilation process
+package). Those customizers allow you to customize the compilation process
 in three ways:
 
 * adding default imports with the `ImportCustomizer`: so you don’t have

@@ -427,7 +427,7 @@ assert p.dump().contains('Cat')
 
 In the case of complex computation for initializing the field, you may
 need to call some method for doing the work, instead of a value like our
-pets list. This is then possible to have the lazy evaluation being done
+pets list. It is then possible to have the lazy evaluation being done
 by a closure call, as the following example shows:
 
 [source,groovy]
