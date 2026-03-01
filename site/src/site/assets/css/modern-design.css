@@ -1,0 +1,323 @@
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
+/*
+ * Modern Design System for Apache Groovy
+ * Features: HSL Variables, Glassmorphism, Premium Typography, Micro-animations
+ */
+
+:root {
+    /* Core HSL Tokens */
+    --primary-h: 198;
+    /* Groovy Blue */
+    --primary-s: 47%;
+    --primary-l: 49%;
+
+    --accent-h: 20;
+    /* Groovy Orange/Red */
+    --accent-s: 100%;
+    --accent-l: 43%;
+
+    --bg-dark: hsl(var(--primary-h), 20%, 10%);
+    --bg-card: hsla(var(--primary-h), 20%, 15%, 0.7);
+    --text-main: hsl(var(--primary-h), 10%, 90%);
+    --text-muted: hsl(var(--primary-h), 10%, 70%);
+
+    --glass-bg: hsla(var(--primary-h), 20%, 5%, 0.9);
+    --glass-border: hsla(0, 0%, 100%, 0.1);
+
+    --shadow-soft: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --transition-standard: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Modernization */
+body {
+    background-color: var(--bg-dark) !important;
+    color: var(--text-main) !important;
+    transition: var(--transition-standard);
+    font-size: 16px !important;
+    letter-spacing: 0.01em;
+}
+
+/* Aggressive Dark Mode Nuclear Overrides */
+html,
+body,
+#st-container,
+.st-pusher,
+.st-content,
+.st-content-inner,
+#content,
+#footer,
+.sidebarblock,
+.main-content,
+.navbar,
+.navbar-default,
+.navbar-static-top,
+.navbar-collapse,
+.container,
+.container-fluid,
+.well,
+.panel,
+.panel-default,
+.panel-heading {
+    background-color: var(--bg-dark) !important;
+    background: var(--bg-dark) !important;
+    color: var(--text-main) !important;
+    border-color: var(--glass-border) !important;
+}
+
+/* Ensure all links inside main content possess good contrast */
+#content a,
+.st-content a {
+    color: hsl(var(--primary-h), 80%, 70%) !important;
+}
+
+#content a:hover,
+.st-content a:hover {
+    color: white !important;
+    text-decoration: underline !important;
+}
+
+#footer {
+    border-top: 1px solid var(--glass-border);
+}
+
+/* Glassmorphism Navbar */
+.navbar-default {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition-standard);
+}
+
+.navbar-brand {
+    font-weight: 700 !important;
+    letter-spacing: -0.02em;
+    color: white !important;
+    text-shadow: 0 0 10px hsla(var(--primary-h), 100%, 50%, 0.3);
+    padding: 15px 10px !important;
+}
+
+.navbar-nav>li>a {
+    color: var(--text-muted) !important;
+    transition: var(--transition-standard);
+    border-radius: 8px;
+    margin: 0 2px;
+    padding: 10px 8px !important;
+    font-size: 14px !important;
+}
+
+.navbar-nav>li>a:hover,
+.navbar-nav>li>a:focus,
+.navbar-nav>li>a:focus-visible {
+    background-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.2) !important;
+    color: white !important;
+    transform: translateY(-1px);
+    outline: 2px solid hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.8);
+    outline-offset: 2px;
+}
+
+/* Sidebar & Navigation Modernization */
+ul.nav-sidebar {
+    border: 1px solid var(--glass-border) !important;
+    background-color: var(--bg-card) !important;
+    border-radius: 12px;
+    padding: 10px 0 !important;
+}
+
+ul.nav-sidebar li a {
+    color: var(--text-muted) !important;
+    transition: var(--transition-standard);
+    padding: 8px 15px !important;
+}
+
+ul.nav-sidebar li a:hover,
+ul.nav-sidebar li.active a {
+    color: white !important;
+    background-color: hsla(var(--primary-h), 50%, 30%, 0.5) !important;
+}
+
+ul.nav-sidebar li.active a {
+    border-left: 4px solid hsl(var(--accent-h), var(--accent-s), var(--accent-l)) !important;
+}
+
+/* Table Modernization for Download & Docs */
+.table,
+.download-table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
+    margin: 20px 0 !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
+.table th,
+.table td,
+.download-table th,
+.download-table td {
+    background-color: transparent !important;
+    border-top: 1px solid var(--glass-border) !important;
+    padding: 12px 15px !important;
+    color: var(--text-main) !important;
+}
+
+.table thead th,
+.download-table thead th {
+    background-color: hsla(var(--primary-h), 20%, 20%, 0.5) !important;
+    border-top: none !important;
+    font-weight: 600 !important;
+}
+
+.table tbody tr:hover,
+.download-table tbody tr:hover {
+    background-color: hsla(var(--primary-h), 20%, 20%, 0.3) !important;
+}
+
+/* Premium Hero Section */
+.band {
+    background-color: hsl(var(--primary-h), 30%, 20%) !important;
+    background-image:
+        url(../img/groovy-logo-white.svg),
+        linear-gradient(135deg, hsla(var(--primary-h), 60%, 40%, 0.5) 0%, hsla(var(--primary-h), 30%, 20%, 0.7) 100%) !important;
+    background-position: 50% 30%, center center !important;
+    background-repeat: no-repeat !important;
+    background-size: auto, cover !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.band::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 70% 30%, hsla(var(--accent-h), 100%, 50%, 0.15) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* Buttons */
+#big-download-button,
+.btn-primary {
+    background-color: hsl(var(--accent-h), var(--accent-s), var(--accent-l)) !important;
+    border: none !important;
+    box-shadow: 0 4px 14px 0 hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.39);
+    transition: var(--transition-standard) !important;
+}
+
+#big-download-button:hover,
+.btn-primary:hover,
+#big-download-button:focus,
+.btn-primary:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.23);
+    background-color: hsl(var(--accent-h), var(--accent-s), 50%) !important;
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
+/* Cards & Content Blocks */
+article .content {
+    background: var(--bg-card) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px !important;
+    padding: 24px !important;
+    transition: var(--transition-standard);
+    box-shadow: var(--shadow-soft);
+}
+
+article:hover .content {
+    transform: translateY(-5px);
+    border-color: hsla(var(--primary-h), 100%, 50%, 0.3);
+}
+
+/* Typography Polish */
+h1,
+h2,
+h3 {
+    letter-spacing: -0.03em !important;
+    line-height: 1.2 !important;
+}
+
+a {
+    transition: var(--transition-standard);
+}
+
+pre {
+    background-color: hsla(0, 0%, 5%, 0.5) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 12px !important;
+    padding: 1.5em !important;
+}
+
+/* Homepage Specific Overrides */
+html body #content .colset-2-its>h1,
+html body #content .colset-2-its>p,
+html body #content .colset-2-its article>h1,
+html body #content .colset-2-its article p {
+    color: var(--text-main) !important;
+}
+
+#they-use-groovy {
+    background-color: hsla(var(--accent-h), 100%, 10%, 0.8) !important;
+    background-image: linear-gradient(135deg, hsla(var(--accent-h), 100%, 30%, 0.3) 0%, transparent 100%) !important;
+    border-top: 1px solid var(--glass-border) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    padding: 30px 0 !important;
+}
+
+#they-use-groovy .item {
+    color: var(--text-main) !important;
+}
+
+/* Protect Icon Fonts */
+.fa,
+.fa-classic,
+.fa-solid,
+.fa-regular,
+.fa-brands,
+[class^="fa-"],
+[class*=" fa-"] {
+    font-family: 'Font Awesome 6 Free', 'Font Awesome 6 Brands', 'FontAwesome', sans-serif !important;
+    font-style: normal !important;
+    background: transparent !important;
+    /* Ensure no background overrides icons */
+}
+
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    ::before,
+    ::after {
+        animation-delay: -1ms !important;
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        background-attachment: initial !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0s !important;
+        transition-delay: 0s !important;
+    }
+}
