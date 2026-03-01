@@ -23,7 +23,7 @@ TBD
 
 == Extension method additions and improvements
 
-Groovy provides over 2000 extension methods to 150+ JDK classes to enhance JDK functionality, with new methods added in Groovy 6. These methods reduce dependency on third-party libraries for common tasks, and make code more intuitive. Let's explore some highlights from those 350 new methods.
+Groovy provides over 2000 extension methods to 150+ JDK classes to enhance JDK functionality, with new methods added in Groovy 6. These methods reduce dependency on third-party libraries for common tasks, and make code more intuitive. Let's explore some highlights from those new methods.
 
 Several variants of `groupByMany` exist for grouping lists and maps of items.
 

@@ -23,7 +23,7 @@ layout 'layouts/main.groovy', true,
                                         a(href: 'https://groovy-lang.org/mailing-lists.html', 'mailing lists')
                                     }
                                     li {
-                                        yield 'contribute to discussions on '
+                                        yield 'contributing to discussions on '
                                         a(href: 'https://www.groovycommunity.com/', 'Slack')
                                         yield " - this channel is not endorsed by the Apache Software Foundation, it's run by Groovy enthusiasts in the community for casual conversations and Q&A,"
                                     }

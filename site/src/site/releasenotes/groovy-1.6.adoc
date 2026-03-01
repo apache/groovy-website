@@ -1,4 +1,25 @@
-== Overview of Groovy 1.6
+== Highlights
+
+*_Performance Improvements_*
+
+- Significant compile-time and runtime performance boosts. The compiler is 3-5x faster.
+
+*_Language Features_*
+
+- Multiple assignments (destructuring).
+- Optional return in `if`/`else` and `try`/`catch` blocks.
+- Full Java 5 annotation definition support.
+
+*_Metaprogramming & AST Transforms_*
+
+- Introduction of local and global AST transformations.
+- Built-in transforms: `@Singleton`, `@Lazy`, `@Immutable`, `@Delegate`, `@Bindable`, `@Vetoable`, and `@Grab`.
+
+*_Framework & Tooling Integration_*
+
+- New JMX builder for easy management.
+- JSR-223 scripting engine support.
+- OSGi readiness out of the box.
 
 As we shall see in this article, the main highlights of this Groovy 1.6
 release are:

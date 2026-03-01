@@ -40,8 +40,35 @@ layout 'layouts/main.groovy', true,
 
                                 h2 'What are the differences between Groovy and Java?'
                                 p {
-                                    yield 'Learn more about the '
+                                    yield 'Groovy is closely related to Java but offers many productivity features like closures, builders, and dynamic typing. Learn more about the '
                                     a(href: 'differences.html', 'differences between Groovy and Java')
+                                    yield '.'
+                                }
+
+                                h2 'Does Groovy support static typing?'
+                                p {
+                                    yield 'Yes! While Groovy is dynamic by nature, it provides `@TypeChecked` for compile-time checking and `@CompileStatic` for Java-like performance. See the '
+                                    a(href: 'releasenotes/groovy-2.0.html', 'Groovy 2.0 release notes')
+                                    yield ' for details.'
+                                }
+
+                                h2 'How do I install Groovy?'
+                                p {
+                                    yield 'The easiest way to install Groovy is via '
+                                    a(href: 'http://sdkman.io', 'SDKMAN!')
+                                    yield '. Alternatively, you can download the binary distribution from our '
+                                    a(href: 'download.html', 'download page')
+                                    yield '.'
+                                }
+
+                                h2 'Where can I get help or ask questions?'
+                                p {
+                                    yield 'You can join the '
+                                    a(href: 'mailing-lists.html', 'mailing lists')
+                                    yield ', chat with the community on '
+                                    a(href: 'https://www.groovycommunity.com/', 'Slack')
+                                    yield ', or ask questions on '
+                                    a(href: 'https://stackoverflow.com/questions/tagged/groovy', 'Stack Overflow')
                                     yield '.'
                                 }
                             }

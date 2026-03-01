@@ -1,3 +1,20 @@
+== Highlights
+
+*_Language Enhancements_*
+
+- **Full support for JDK 7 `invokedynamic`** instruction and API.
+- New **meta-annotation system** for combining annotations into custom aliases.
+
+*_DSL & Tooling Support_*
+
+- **`@DelegatesTo` annotation** for better IDE hints and static checking in closure-based DSLs.
+- **Type Checker Extensions** to customize the static type checker for domain-specific rules.
+
+*_Integration & Customisation_*
+
+- Enhanced **Compilation Customization** with base script and config script support.
+- Bundles **GPars 1.0** for advanced concurrency.
+
 With this new 2.1 release, Groovy:
 
 * has *full support for the JDK 7 `invoke dynamic`* instruction and

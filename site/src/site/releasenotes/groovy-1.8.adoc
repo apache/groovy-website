@@ -1,3 +1,29 @@
+== Highlights
+
+*_Enhanced DSL Support_*
+
+- Command chains allow method calls to read like natural English sentences, making DSLs more expressive.
+
+*_Runtime Performance_*
+
+- Significant optimisations for integer arithmetic and direct method calls.
+
+*_Concurrent & Parallel Execution_*
+
+- GPars 0.11 bundled with the distribution: Actors, Dataflow, Fork/Join, Map/Reduce, and more.
+
+*_Functional Programming_*
+
+- Closure composition, trampoline (stack-safe recursion), memoization, and currying improvements.
+
+*_First-Class JSON Support_*
+
+- `JsonSlurper` and `JsonBuilder` provide seamless JSON parsing and production.
+
+*_Compile-Time Metaprogramming_*
+
+- New AST transforms: `@Log`, `@Field`, `@AutoClone`, `@AutoExternalizable`, `@ThreadInterrupt`, `@TimedInterrupt`, `@ConditionalInterrupt`, `@ToString`, `@EqualsAndHashCode`, `@TupleConstructor`, and more.
+
 The 1.8 release of Groovy comes with many new features that greatly
 enhance
 

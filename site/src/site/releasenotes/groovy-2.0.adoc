@@ -1,3 +1,20 @@
+== Highlights
+
+*_A Static Theme for a Dynamic Language_*
+
+- Introduction of **Static Type Checking** (`@TypeChecked`) to catch errors at compile time.
+- **Static Compilation** (`@CompileStatic`) for Java-like performance and smaller bytecode.
+
+*_JDK 7 Integration_*
+
+- Support for the `invokedynamic` JVM instruction for improved performance.
+- Project Coin enhancements: binary literals, underscores in numbers, and multi-catch blocks.
+
+*_Modularity_*
+
+- Groovy JAR split into smaller, functional modules (JSON, SQL, XML, etc.).
+- **Extension Modules** for decorating existing classes (including JDK ones) with new methods.
+
 The newly released Groovy 2.0 brings key static features to the language
 with static type checking and static compilation, adopts JDK 7 related
 improvements with Project Coin syntax enhancements and the support of
@@ -23,8 +40,7 @@ expect the same kind of feedback from the Groovy compiler as the one
 given by javac. In particular, they want to get compilation errors
 (rather than runtime errors) for things like typos on variable or method
 names, incorrect type assignments and the like. That’s why Groovy 2
-features static type checking support.** +
-**
+features static type checking support.
 
 [[Groovy20releasenotes-Spottingobvioustypos]]
 ==== Spotting obvious typos
@@ -62,8 +78,7 @@ instructs the Groovy compiler to run the static type checking for that
 particular method at compilation time. We’re trying to call someMethod()
 with some obvious typos, and to print the name variable again with
 another typo, and the compiler will throw two compilation errors because
-respectively, the method and variable are not found or declared.** +
-**
+respectively, the method and variable are not found or declared.
 
 [[Groovy20releasenotes-Checkyourassignmentsandreturnvalues]]
 ==== Check your assignments and return values
@@ -103,8 +118,7 @@ from the middle of the script is also interesting, as not only does it
 complain of the wrong assignment, but also because it shows type
 inference at play, because the type checker, of course, knows that
 letters[0] is of type String, because we’re dealing with an array of
-Strings.** +
-**
+Strings.
 
 [[Groovy20releasenotes-Moreontypeinference]]
 ==== More on type inference
@@ -127,16 +141,15 @@ int method() {
    } else {
        42
    }
-} 
+}
 --------------------------------------------
 
-Given a method returning  a value of primitive type int, the type
+Given a method returning a value of primitive type int, the type
 checker is able to also check the values returned from different
 constructs like if / else branches, try / catch blocks or switch / case
 blocks. Here, in our example, one branch of the if / else blocks tries
 to return a String value instead of a primitive int, and the compiler
-complains about it.** +
-**
+complains about it.
 
 [[Groovy20releasenotes-Commontypeconversionsstillallowed]]
 ==== Common type conversions still allowed
@@ -171,7 +184,7 @@ Class classMethod() {
    "java.util.List"
 }
 
-assert classMethod() == List 
+assert classMethod() == List
 ----------------------------------------------------------
 
 The static type checker is also clever enough to do type inference:
@@ -205,8 +218,7 @@ the interpolated string, it knows it can call String’s toUpperCase()
 method, or the trim() method later one, which is a method added by the
 Groovy Development Kit decorating the String class. Last, when iterating
 over the elements of an array of primitive ints, it also understands
-that an element of that array is obviously an int.** +
-**
+that an element of that array is obviously an int.
 
 [[Groovy20releasenotes-Mixingdynamicfeaturesandstaticallytypedmethods]]
 ==== Mixing dynamic features and statically typed methods
@@ -217,8 +229,8 @@ runtime dynamic features are not allowed, as they can’t be statically
 type checked at compilation time. So adding a new method at runtime
 through the type’s metaclasses is not allowed. But when you need to use
 some particular dynamic feature, like Groovy’s builders, you can opt out
-of static type checking should you wish to.  +
-  +
+of static type checking should you wish to.
+
 The @TypeChecked annotation can be put at the class level or at the
 method level. So if you want to have a whole class type checked, put the
 annotation on the class, and if you want only a few methods type
@@ -293,8 +305,7 @@ assert test(123)   == '246'
 
 In the above example, the static type checker knows that the val
 parameter is of type String inside the if block, and of type Number in
-the else if block, without requiring any cast.** +
-**
+the else if block, without requiring any cast.
 
 [[Groovy20releasenotes-LowestUpperBound]]
 ==== Lowest Upper Bound
@@ -312,7 +323,7 @@ import groovy.transform.TypeChecked
 @TypeChecked test() {
    // an integer and a BigDecimal
    return [1234, 3.14]
-} 
+}
 ----------------------------------------------------------
 
 In this example, we return, intuitively, a list of numbers: an Integer
@@ -321,8 +332,7 @@ and a BigDecimal. But the static type checker computes what we call a
 also serializable and comparable. It’s not possible to denote that type
 with the standard Java type notation, but if we had some kind of
 intersection operator like an ampersand, it could look like List<Number
-& Serializable & Comparable>.** +
-**
+& Serializable & Comparable>.
 
 [[Groovy20releasenotes-Flowtyping]]
 ==== Flow typing
@@ -343,7 +353,7 @@ import groovy.transform.TypeChecked
 
    var = 123
    println var.toUpperCase() // error, var is int!
-} 
+}
 -----------------------------------------------------------
 
 The var variable is initialized with an int. Then, a String is assigned.
@@ -352,8 +362,8 @@ understands that the variable now holds a String, so the static type
 checker will be happy with the toInteger() method added by Groovy on top
 of String. Next, a number is put back in the var variable, but then,
 when calling toUpperCase(), the type checker will throw a compilation
-error, as there’s no toUpperCase() method on Integer. +
-  +
+error, as there’s no toUpperCase() method on Integer.
+
 There are some special cases for the flow typing algorithm when a
 variable is shared with a closure which are interesting. What happens
 when a local variable is referenced in a closure inside a method where
@@ -370,7 +380,7 @@ import groovy.transform.TypeChecked
    }
    cl()
    var.toUpperCase() // compilation error!
-} 
+}
 -------------------------------------------------------
 
 The var local variable is assigned a String, but then, var might be
@@ -397,25 +407,24 @@ class B extends A { void bar() {} }
    // var is at least an instance of A
    // so we are allowed to call method foo()
    var.foo()
-} 
+}
 --------------------------------------------
 
 In the test() method above, var is assigned an instance of A, and then
 an instance of B in the closure which is call afterwards, so we can at
-least infer that var is of type A. +
-  +
+least infer that var is of type A.
+
 All those checks added to the Groovy compiler are done at compile-time,
 but the generated bytecode is still the same dynamic code as usual — no
-changes in behavior at all.  +
-  +
+changes in behavior at all.
+
 Since the compiler now knows a lot more about your program in terms of
 types, it opens up some interesting possibilities: what about compiling
 that type checked code statically? The obvious advantage will be that
 the generated bytecode will more closely resemble the bytecode created
 by the javac compiler itself, making statically compiled Groovy code as
 fast as plain Java, among other advantages. In the next section, we’ll
-learn more about Groovy’s static compilation.** +
-**
+learn more about Groovy’s static compilation.
 
 [[Groovy20releasenotes-Staticcompilation]]
 === Static compilation
