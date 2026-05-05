@@ -1,4 +1,4 @@
-= GEP-13: Sealed classes
+= GEP-13: Sealed Types
 
 :icons: font
 
@@ -6,105 +6,385 @@
 ****
 [horizontal,options="compact"]
 *Number*:: GEP-13
-*Title*:: Sealed classes
-*Version*:: 1
+*Title*:: Sealed Types
+*Version*:: 2
 *Type*:: Feature
-*Status*:: Draft
+*Status*:: Final
 *Leader*:: Paul King
 *Created*:: 2021-07-22
-*Last modification*:: 2021-07-22
+*Last modification*:: 2026-05-05
 ****
 
-== Abstract: Sealed classes
+== Abstract
 
-Sealed classes and interfaces restrict which other classes or interfaces may extend or implement them.
-By supporting sealed classes and interfaces, the Groovy programming language
-can offer an additional mechanism for controlling class hierarchy construction.
+Sealed types — classes, interfaces, and traits — restrict the set of
+permitted direct subtypes. They sit between the unconstrained
+extensibility of public types and the absolute closure of `final`,
+enabling enumerable hierarchies suitable for algebraic data type
+modelling, compiler-checked exhaustiveness analysis, and stable API
+design where the implementation set is intentionally bounded.
 
-=== Motivation
+== Motivation
 
-Inheritance is a powerful mechanism for creating hierarchies of related class and interfaces.
-Sometimes, it is desirable to restrict the definition of children in such hierarchies.
-Modifiers already provide some mechanisms:
+Inheritance is a powerful mechanism but is binary as expressed by the
+existing modifiers: a public, non-final class invites unbounded
+extension; `final` prevents all of it. Visibility modifiers
+(`protected`, package-private) constrain extension at the cost of
+losing the parent type as a public abstraction.
 
-* If all of our classes and interfaces are public, this indicates that we want
-maximum reuse.
+Sealed types fill the gap. A sealed type is publicly accessible — it
+can be a method parameter type, a switch selector, a return type — but
+the set of types that may extend or implement it is explicitly
+enumerated. Code receiving a value of a sealed type knows the
+exhaustive list of its possible runtime shapes.
 
-* The `final` modifier offers one mechanism for restricting further inheritance at the method or class level.
-It effectively limits all further extension and indicates no further code reuse is desired.
+This makes sealed types the type-system foundation for several
+adjacent features:
 
-* By making a base class package-private we can limit extension to only classes within
-the same package. If an abstract `Shape` class is package-private, we could have
-public classes `Square` and `Circle` in the same package. This indicates that we want
-code reuse to occur only within the package. While it does limit creation of
-new shapes outside the original package, it offers no abstraction for a shape which
-could be either a square or circle since `Shape` is not public.
+* algebraic data type modelling, particularly when combined with records;
+* compiler-checked exhaustiveness in structural switch (a potential topic for GEP-19);
+* stable APIs whose implementation set is intentionally closed.
 
-* We can use `protected` visibility to limit access of members strictly to children
-but that doesn't help us solve the aforementioned problems like lack of a visible
-abstraction for `Shape` in the discussed example.
+== Specification
 
-Sealed classes or interfaces can be public but have an associated list of allowed children.
-Classes or interfaces which are not in that list cannot inherit from those sealed types.
-This indicates that we want code reuse within the hierarchy but not beyond.
-Parent classes in the hierarchy can be made _accessible_, without also making them _extensible_.
-This allows hierarchies to be created with maximum reuse within but without having
-to defensively code for arbitrary extensions added at a later time.
+=== Sealed type declarations
 
-Such classes are useful in defining Algebraic Data Types (ADTs) and in scenarios where
-we might want to reason about whether we have accounted for all possible types, e.g.&nbsp;the
-static compiler may wish to give a warning if a switch block doesn't exhaustively
-cover all possible types by respective case branches.
+A class, interface, or trait is sealed by declaring it with the
+`sealed` modifier and an optional `permits` clause:
 
-==== Initial implementation
+[source,groovy]
+----
+sealed interface Shape permits Circle, Square, Triangle {}
 
-* Provide a `@Sealed` marker annotation or AST transform which allows a list of
-permitted children to be defined. Use of this annotation will be an incubating
-feature subject to change. Explicit use may eventually be discouraged and instead
-a keyword, e.g. `sealed` would be encouraged instead. However, the annotation
-could be retained to offer support for this feature on earlier JVMs or versions
-of Groovy prior to any grammar changes.
+sealed class Vehicle permits Car, Truck, Motorcycle {}
 
-* Prohibit extension of JDK17+ sealed classes or annotated `@Sealed` classes.
-This also applies for interfaces, anonymous inner classes and traits.
+sealed trait Auditable permits LedgerEntry, JournalEntry {}
+----
 
-* Provide checks in other places where such extension might occur implicitly, e.g.:&nbsp;with `@Delegate`,
-when using type coercion, etc.
+Enums and annotation definitions cannot be sealed.
 
-* Support `non-sealed` or `unsealed` sub-hierarchies. (See JEP-409)
+The annotation form `@Sealed` is provided as an equivalent surface for
+environments where keyword grammar is inconvenient:
 
-* Allow the permitted subclasses to be inferred automatically just for the case
-where the base and all permitted subclasses are in the same file. (See JEP-409)
+[source,groovy]
+----
+@Sealed(permittedSubclasses = [Circle, Square, Triangle])
+interface Shape {}
+----
 
-* Introduce the `sealed` modifier and `permits` clause in the grammar.
+The keyword and annotation forms are interchangeable.
 
-* By default, when running on JDK17+, sealed class information is added into the bytecode.
-We refer to such classes as _native_ sealed classes.
+=== The `permits` clause
 
-* By default, when running on earlier JDKs, an annotation is added to a class to indicate that
-a class is sealed. Such classes will be recognized by Groovy 4+ compilers but not by Java.
+The `permits` clause enumerates the direct subtypes permitted to
+extend or implement the sealed type. A permitted subtype must:
 
-* The `@SealedOptions` annotation has a `mode` annotation attribute which can override the default behavior.
+* declare the sealed type as a direct supertype (via `extends` or `implements`);
+* be accessible to the compiler when the sealed type is loaded;
+* not be the sealed type itself (self-references are rejected at compile time).
 
-==== Potential extensions
+==== Inference
 
-The following potential extensions are possibly all desirable but
-are non-goals for the first implementation:
+If the `permits` clause is omitted (and `permittedSubclasses` is not
+set on `@Sealed`), the compiler infers permitted subtypes by collecting
+all direct subtypes declared in the same compilation unit. If no such
+subtypes exist, the declaration is treated as having an empty `permits`
+set, equivalent to `final`.
 
-* Require that all classes within a sealed hierarchy be compiled at the same time.
+Inference does not consult other compilation units.
 
-* Require that all classes within a sealed hierarchy belong to the same JPMS module.
+=== Permitted-subtype obligations
 
-* Add warnings to the static compiler if a switch is used for a sealed hierarchy
-and not all types are exhaustively covered.
+Every direct permitted subtype of a sealed type adopts one of three
+stances:
 
-== References and useful links
+[cols="1,2,3"]
+|===
+|Stance |Declaration |Effect
+
+|`final`
+|`final class C extends S`
+|C is closed; no further subtypes.
+
+|`sealed`
+|`sealed class C extends S permits ...`
+|C continues the closed hierarchy with its own enumerated subtypes.
+
+|Non-sealed (explicit)
+|`non-sealed class C extends S` or `@NonSealed`
+|C is open; descendants of C are unconstrained and require no marker.
+
+|Non-sealed (implicit)
+|`class C extends S` (no other sealed-related modifier)
+|Same effect as explicit `non-sealed`.
+|===
+
+==== Implicit non-sealed default
+
+Where Java requires one of `final`, `sealed`, or `non-sealed` to be
+stated, Groovy infers `non-sealed` when none is given. This is a
+deliberate divergence motivated by Groovy's preference for terse
+declarations.
+
+==== Propagation past a non-sealed boundary
+
+The `permits` constraint applies to *direct* subtypes only. Once a
+non-sealed type appears in a hierarchy descending from a sealed root,
+that branch is unconstrained: descendants of a non-sealed type require
+no sealed-related modifier and are not `permits`-restricted by virtue
+of the sealed ancestor.
+
+[source,groovy]
+----
+sealed interface Shape permits Polygon, Circle {}
+final class Circle implements Shape {}
+class Polygon implements Shape {}        // implicit non-sealed
+class RegularPolygon extends Polygon {}  // unrestricted
+class Hexagon extends RegularPolygon {}  // unrestricted
+----
+
+==== Constraint applicability
+
+A class declared `non-sealed` (whether by keyword or `@NonSealed`)
+must have a sealed direct parent. A class without a sealed parent
+cannot be marked `non-sealed`.
+
+=== Restricted identifiers
+
+`sealed`, `non-sealed`, and `permits` are *restricted identifiers*,
+not reserved keywords. They retain their identifier meaning in
+expression and identifier positions, taking on grammatical meaning
+only in type-declaration contexts. Existing code using these names as
+identifiers continues to compile.
+
+=== Anonymous classes, traits, and proxy paths
+
+The set of types extending or implementing a sealed type is enumerated
+in `permits`; no other type may do so. Specifically prohibited:
+
+* anonymous inner classes targeting a sealed type that does not permit
+  the enclosing type;
+* traits not in the `permits` set;
+* coercion-generated proxies (`x as Bar` where `Bar` is sealed and the
+  source type is not permitted);
+* delegate-generated subclasses (`@Delegate` targeting a sealed type
+  from a non-permitted enclosing class).
+
+These extension paths are checked at compile time; runtime proxy
+generation paths perform the same check at proxy-construction time.
+
+=== Bytecode representation
+
+Sealed types are represented in bytecode using one of two mechanisms,
+selected by `@SealedOptions(mode = ...)`:
+
+[cols="1,3"]
+|===
+|Mode |Behaviour
+
+|`NATIVE`
+|Emit JVM-level sealed metadata (`ACC_SEALED` access flag and
+ `PermittedSubclasses` attribute). Requires `--target 17` or later.
+
+|`EMULATE`
+|Emit `@Sealed` annotation only, recognised by the Groovy compiler.
+ Compatible with all target bytecode versions supported by the Groovy
+ compiler, but invisible to the Java compiler and to JVM-level sealed
+ checks.
+
+|`AUTO` (default)
+|`NATIVE` when target bytecode is 17 or later, otherwise `EMULATE`.
+|===
+
+The `alwaysAnnotate` attribute of `@SealedOptions` (default `true`)
+controls whether the `@Sealed` annotation is also emitted alongside
+native metadata. Setting it to `false` suppresses the annotation for
+hierarchies that are confirmed JDK-17-only and want to avoid duplicate
+metadata.
+
+=== Annotation forms
+
+The annotation forms parallel the keyword forms and exist for
+environments where keyword grammar is inconvenient.
+
+[cols="1,3"]
+|===
+|Annotation |Equivalent
+
+|`@Sealed(permittedSubclasses = [...])`
+|`sealed ... permits ...`. `permittedSubclasses` defaults to the
+ inferred set when omitted.
+
+|`@NonSealed`
+|`non-sealed`.
+
+|`@SealedOptions(mode = ..., alwaysAnnotate = ...)`
+|Fine-grained control over bytecode representation; no keyword
+ equivalent.
+|===
+
+`@Sealed` has `RUNTIME` retention; `@NonSealed` and `@SealedOptions`
+have `SOURCE` retention.
+
+=== Joint compilation and decompiled types
+
+Sealed type information flows correctly across joint Groovy/Java
+compilation:
+
+* a Groovy class extending a Java sealed class is checked against the
+  Java type's `permits` set;
+* a Java class extending a Groovy sealed class likewise honours the
+  Groovy `permits` set;
+* the implicit non-sealed rule applies on the Groovy side; Java's
+  explicit-modifier-required rule applies on the Java side; descendants
+  on either side compute non-sealed status from the immediate parent's
+  sealed flag.
+
+For a class loaded from bytecode (without source available), non-sealed
+status is computed as: *the parent is sealed* AND *this type is neither
+final nor sealed*. The JVM has no `non-sealed` flag, so this derivation
+is the canonical algorithm.
+
+== Differences from Java
+
+[cols="2,2,2"]
+|===
+|Aspect |Java |Groovy
+
+|Subtype modifier
+|One of `final` / `sealed` / `non-sealed` is mandatory
+|Defaults to implicit `non-sealed` when none is given
+
+|Compile-together enforcement
+|Required: all permitted subclasses must be available and compiled
+ together with the sealed parent
+|Not enforced; permitted-subclass references are resolved when
+ available
+
+|Module membership
+|Permitted subclasses must be in the same module (or in the unnamed
+ module within the same package)
+|Not enforced
+
+|Annotation form
+|None
+|`@Sealed`, `@NonSealed`, `@SealedOptions` are equivalent surface
+ forms
+
+|Earlier-JDK targets
+|Not supported; sealed metadata requires JDK 17+ bytecode
+|Annotation-based emulation works on earlier target bytecode and is
+ recognised by the Groovy compiler (invisible to the Java compiler
+ and to JVM-level sealed checks)
+|===
+
+== Pattern matching integration
+
+Sealed types provide the closed-set semantics that compiler-checked
+exhaustiveness analysis requires. A switch over a value of a sealed
+type whose arms cover every permitted subtype is, in principle,
+exhaustive without a `default` arm. Recursion into sealed-or-`final`
+permitted subtypes contributes to exhaustiveness; a non-sealed
+permitted subtype requires a fallback arm.
+
+The switch surface that consumes sealed types — type patterns and
+record patterns over a sealed-typed selector — already works in
+Groovy. The remaining piece is the exhaustiveness analysis itself,
+which is a potential topic for link:GEP-19.html[GEP-19]. GEP-13
+contributes the type-system primitives; any consumer that performs
+exhaustiveness analysis operates as a compile-time check on the
+consumer side and does not change sealed-type semantics, on-disk
+representation, or public API. The severity of such consumer-side
+checking — warning, opt-in error, or default error — is a consumer
+decision and is not constrained by this GEP.
+
+== Excluded and deferred features
+
+[cols="2,1,3"]
+|===
+|Feature |Status |Rationale
+
+|Mandatory compile-together enforcement
+|Deferred
+|Java's hard requirement raises the cost of using sealed types in
+ multi-module builds. May be surfaced as an opt-in compiler check.
+
+|Mandatory module-membership enforcement
+|Deferred
+|Same reasoning; cross-module sealed hierarchies are occasionally
+ useful and a hard JPMS check would block them.
+|===
+
+Any future tightening of these constraints is opt-in. See
+_Compatibility_ for the stability commitment. Severity of consumer-side
+checks (such as exhaustiveness analysis on a structural switch) is out
+of scope for this GEP — see _Pattern matching integration_.
+
+== Compatibility
+
+=== Public API surface
+
+The following are part of Groovy's public API and stable:
+
+* the `sealed` / `non-sealed` / `permits` grammar;
+* the `@Sealed`, `@NonSealed`, and `@SealedOptions` annotations,
+  including their attributes and retention;
+* `ClassNode.isSealed()` and `ClassNode.getPermittedSubclasses()`;
+* the public helpers in `SealedASTTransformation`.
+
+The annotations and public AST API shipped under `@Incubating` in
+Groovy 4.0 and remained incubating through the Groovy 5 line; they
+were promoted out of incubation in Groovy 6.0.
+
+=== Stability commitment
+
+Sealed-type semantics — declaration syntax, the `permits` contract,
+bytecode representation (native and emulated), public API surface,
+and joint-compilation interoperability — are stable. Programs that
+declare or extend sealed types under this specification continue to
+compile and produce equivalent bytecode across subsequent revisions.
+
+The deferred items in _Excluded and deferred features_ — mandatory
+compile-together enforcement and mandatory module-membership
+enforcement — are subject to this commitment: if introduced, they
+are opt-in checks (compiler flag or `@SealedOptions` attribute)
+rather than default behaviour.
+
+Compile-time checks performed by *consumers* of sealed types — most
+notably exhaustiveness analysis on a structural switch (see
+link:GEP-19.html[GEP-19]) — fall outside this commitment. Their
+severity may evolve independently and may, in a future major
+revision, default to error. Such evolution is a consumer-side
+language change, not a change to sealed types: it does not alter
+sealed-type semantics or the on-disk representation, and existing
+sealed declarations are unaffected.
+
+=== Bytecode interoperability
+
+Native sealed bytecode (`mode = NATIVE`, or `AUTO` on target 17 or
+later) is JVM-level sealed metadata. Java and Groovy compilers consume
+each other's sealed types under the standard JVM rules.
+
+The `EMULATE` mode produces an annotation that is recognised by the
+Groovy compiler but not by the Java compiler or the JVM. Mixing
+emulated sealed Groovy types with Java consumers is therefore not
+sealed-checked from the Java side; this is a known consequence of
+emulation and is the reason `AUTO` defaults to `NATIVE` whenever the
+target permits.
+
+== References
 
 * https://openjdk.org/jeps/360[JEP 360: Sealed Classes (Preview)]
 * https://openjdk.org/jeps/397[JEP 397: Sealed Classes (Second Preview)]
 * https://openjdk.org/jeps/409[JEP 409: Sealed Classes]
+* https://openjdk.org/jeps/394[JEP 394: Pattern Matching for instanceof]
+* https://openjdk.org/jeps/440[JEP 440: Record Patterns]
+* https://openjdk.org/jeps/441[JEP 441: Pattern Matching for switch]
+* https://openjdk.org/jeps/456[JEP 456: Unnamed Variables and Patterns]
+* https://openjdk.org/jeps/507[JEP 507: Primitive Types in Patterns]
 * https://kotlinlang.org/docs/sealed-classes.html[Sealed Classes] in Kotlin
 * https://github.com/scala/improvement-proposals/pull/43[Sealed Types] in Scala (withdrawn)
+* link:GEP-19.html[GEP-19: Structural Pattern Matching in switch]
 
 === Reference implementation
 
@@ -112,9 +392,20 @@ https://github.com/apache/groovy/pull/1606
 
 === JIRA issues
 
-* https://issues.apache.org/jira/browse/GROOVY-10148[GROOVY-10148: Groovy should not allow classes to extend sealed Java classes]
+* https://issues.apache.org/jira/browse/GROOVY-10148[GROOVY-10148] — Initial implementation
+* https://issues.apache.org/jira/browse/GROOVY-10193[GROOVY-10193] — `sealed` / `permits` / `non-sealed` grammar
+* https://issues.apache.org/jira/browse/GROOVY-10201[GROOVY-10201] — Proxy generation against JDK 17 sealed interfaces
+* https://issues.apache.org/jira/browse/GROOVY-10233[GROOVY-10233] — Native sealed bytecode for JDK 17+
+* https://issues.apache.org/jira/browse/GROOVY-10240[GROOVY-10240] — Record/sealed grammar consistency
+* https://issues.apache.org/jira/browse/GROOVY-10340[GROOVY-10340] — Drop system-property gating
+* https://issues.apache.org/jira/browse/GROOVY-10433[GROOVY-10433] — Restricted identifiers
+* https://issues.apache.org/jira/browse/GROOVY-10434[GROOVY-10434] — Public AST API for sealed status
+* https://issues.apache.org/jira/browse/GROOVY-10451[GROOVY-10451] — Self-reference guard in `permittedSubclasses`
+* https://issues.apache.org/jira/browse/GROOVY-10565[GROOVY-10565] — Packaged sealed type `ClassFormatError` fix
+* https://issues.apache.org/jira/browse/GROOVY-11292[GROOVY-11292], https://issues.apache.org/jira/browse/GROOVY-11750[-11750], https://issues.apache.org/jira/browse/GROOVY-11768[-11768] — Implicit non-sealed propagation across hierarchies and joint-compilation chains
 
 == Update history
 
 1 (2021-07-22) Initial draft +
-2 (2021-11-06) Update to align with 4.0.0-beta-2
+2 (2021-11-06) Update to align with 4.0.0-beta-2 +
+3 (2026-05-05) Specification rewrite: implicit non-sealed propagation, joint-compilation rules, restricted identifiers, public API stability commitment, pattern-matching integration
