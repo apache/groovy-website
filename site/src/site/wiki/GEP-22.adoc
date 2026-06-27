@@ -7,7 +7,7 @@
 [horizontal,options="compact"]
 *Number*:: GEP-22
 *Title*:: Traits
-*Version*:: 5
+*Version*:: 6
 *Type*:: Feature
 *Status*:: Final
 *Comment*:: Reflects trait semantics as of Groovy 6
@@ -319,6 +319,34 @@ trait-anchored dispatch that any `Trait.m()` caller sees from outside
 the trait. For a `@Virtual` callee, which is not promoted onto the
 interface, `T.m()` from trait code reaches the trait's default via
 the implementer-routing path.
+
+* Static methods declared in a super-trait are inherited by a
+sub-trait and may be called from the sub-trait's own body, resolved by
+the same rules as a static declared in the trait itself: an unqualified
+`m(...)` or `this.m(...)` call is declarer-bound (or, for a `@Virtual`
+callee, dispatches through the implementing class so an implementer's
+override is visible); a `Parent.m(...)` call resolves through the
+super-trait's promoted interface static (for the non-`@Virtual` statics
+that are promoted there); and `Parent.super.m(...)` reaches the
+super-trait's own copy. Argument resolution is subtype-aware — an
+argument whose static type is a subtype of the declared parameter type
+resolves just as it does for plain-class static inheritance
+(GROOVY-12106). For example:
++
+[source,groovy]
+----
+@CompileStatic
+trait ExecutesClosures {
+    static String withDelegate(Closure callable, Object delegate) { /* ... */ "for ${delegate.class.simpleName}" }
+}
+final class Argument { }
+@CompileStatic
+trait Arguable extends ExecutesClosures {
+    String handle(Argument arg) { withDelegate({ -> }, arg) }   // inherited static; arg is a subtype of Object
+}
+class C implements Arguable { }
+assert new C().handle(new Argument()) == 'for Argument'
+----
 
 * Mixing static and instance methods of the same signature across
 multiple traits is undefined behaviour and should be avoided. If
@@ -661,6 +689,12 @@ time (GROOVY-12105; previously threw `MissingMethodException`
 because the trait chain is not walked for statics). See item 4 of
 <<__this_super_and_stackable_traits,this, super, and stackable
 traits>>.
+A sub-trait can again resolve a `static` method inherited from a
+super-trait from its own body, including when an argument's static type
+is a subtype of the declared parameter type (GROOVY-12106; this had
+regressed in the 5.0.x line, where static type checking matched the
+inherited helper static by exact parameter type only). The fix is
+targeted for backport to the `GROOVY_5_0_X` line.
 |===
 
 == Non-goals and potential future extensions
@@ -769,6 +803,11 @@ rejects the `T.this.*` qualifier inside trait code at compile time
 rejects unqualified `super.m(...)` from a `static` trait method at
 compile time (previously threw `MissingMethodException` because the
 trait chain is not walked for statics).
+* https://issues.apache.org/jira/browse/GROOVY-12106[GROOVY-12106]:
+a sub-trait again resolves a `static` method inherited from a
+super-trait from its own body, including with a subtype argument
+(static type checking had matched the inherited helper static by exact
+parameter type only, regressing this in the 5.0.x line).
 
 == Update history
 
@@ -820,3 +859,12 @@ stackable traits_ now cross-references item 4 for the static-method
 restriction; the recommended alternatives are existing documented
 features (`this.m(...)` for normal dispatch and `T.super.m(...)` for
 explicit trait-anchored dispatch).
+
+6 (2026-06-28) From 6.0.0. Documented in _Static members_ that a
+sub-trait resolves a `static` method inherited from a super-trait from
+its own body by the same rules as a static it declares itself —
+unqualified/`this.` (declarer-bound, or override-visible under
+`@Virtual`), `Parent.m(...)` (via the promoted interface static), and
+`Parent.super.m(...)` — with subtype-aware argument resolution, matching
+plain-class static inheritance (GROOVY-12106; this had regressed in the
+5.0.x line). Added the corresponding cross-version and JIRA-issue entries.
