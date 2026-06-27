@@ -649,6 +649,7 @@ compile-time error. The closure call-site asymmetry, the static-field
 non-goal, and the trait-shadows-superclass quadrant are all documented
 in <<_static_members,Static members>>; no separate fork remains open
 at the time of writing.
+
 Trait-body qualifier syntax is tightened: `T.this.*` is rejected at
 compile time (GROOVY-12104; previously produced a VerifyError on 4.x
 and a ClassCastException at runtime on 5.x/6.x), and unqualified
