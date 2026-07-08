@@ -1,6 +1,7 @@
 = Groovy 6 features for formal method advocates
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2026-07-03T20:00:00+00:00
+:updated: 2026-07-08T20:00:00+00:00
 :keywords: formal methods, design by contract, verification, SMT, Z3, contracts, type checker, invariants, concurrency, rely-guarantee, information flow
 :description: Groovy 6 ships design-by-contract & type-checking extensions. The groovy-verify project turns those contracts into Dafny-style proofs with counterexamples.
 
@@ -149,6 +150,30 @@ assertion error at the boundary, not a mysterious failure three frames
 deeper. Crucially, they are also _documentation that cannot drift_, because
 the compiler weaves them into the bytecode — the contract and the code can
 never disagree without the assertion firing.
+
+The newest member of the family closes the quadrant Design-by-Contract has
+historically left to javadoc prose: *exceptional behaviour*. `@ThrowsIf`
+(GROOVY-12135, landing in the next Groovy 6 pre-release, with `woven`/`direct`
+members on `@Requires` following as GROOVY-12136) states that a method throws
+a given exception _exactly when_ a condition holds — and, by default,
+*generates the guard for you*, the general form of the pattern
+`@NullCheck` already provides for the null-check special case:
+
+[source,groovy]
+----
+@ThrowsIf(value = { b == 0 }, exception = ArithmeticException)
+int divide(int a, int b) { a.intdiv(b) }
+----
+
+One line replaces the guard-clause boilerplate every service method opens
+with; `woven = false` documents a hand-written guard instead, and an optional
+`checked` mode verifies the iff at runtime in the same assertion style as
+`@Ensures`. The distinction it makes first-class is one the ecosystem has
+lacked: a `@Requires` violation is the _caller's bug_; a `@ThrowsIf` throw is
+_defined behaviour_ callers may rely on and catch. And its pedigree is this
+post's story in miniature — the annotation was prototyped and battle-tested
+in `groovy-verify` (where the prover checks both directions of the iff), then
+contributed upstream, so the verification research fed the language itself.
 
 Alongside the contracts, Groovy 6 ships a family of *type-checking
 extensions* — opt-in static analyses activated per class or method, each
@@ -807,11 +832,40 @@ fulcrum's argmin — plus mergesort's `merge` proved sorted _and_ a permutation
 across three sequential annotated loops. Two Groovy entries (imperative and
 functional) have been submitted to the community's
 https://github.com/hwayne/lets-prove-leftpad[lets-prove-leftpad] collection.
+* *Exceptional contracts, proved.* `GroovyAssert.shouldFail(E) { m(args) }`
+is a _provable_ claim (the exceptional analogue of a unit test, discharged at
+compile time), and `@ThrowsIf` — the annotation above — is verified in both
+directions: a method that can return normally while the condition holds
+refutes, and so does a throw no arm justifies. The consumption goes further
+than the method itself: a call the program _moved past_ didn't throw, so its
+conditions were false (`Objects.checkIndex(i, n)` returning proves the index
+in range — the JDK's own guard method becomes a proof device), and entering a
+`catch` means some source threw (`catch (ArithmeticException e)` after
+`Math.floorDiv(a, b)` _knows_ `b == 0`).
+* *Specs for code you don't own.* JML's `.jml`-file idea in Groovy dialect: a
+library class re-declared as an ordinary Groovy _skeleton_ — the same
+contract annotations, empty bodies — shipped for the everyday JDK surface
+(`Math`, `Integer`, `Long`, `Character`, `Objects`, `Arrays`, `Collections`,
+`List`, `String`, `java.time`). The most idiomatic string bug in the book
+becomes a compile-time story: `indexOf` without the found-check refutes with
+the `-1` sentinel, and _with_ the check the bounds proof discharges from the
+spec. Every such spec is *trusted by definition* (nobody proves the JDK's
+bodies), so every consumption is inventoried in a trusted-facts ledger, the
+runtime rung grid-checks the specs against the live JDK, and under
+`VERIFY_EXPLAIN` each proof names exactly which trusted facts carried it:
++
+----
+explain ✓ xs[i] in bounds
+    not load-bearing: @Requires (xs != null)
+    also leaned on:   TRUSTED spec java.util.List#indexOf @Ensures
+----
 * *Encoding packs* — domain vocabularies plug in as `ServiceLoader`-discovered
 modules (packs model _libraries_, the core models the _language_): number
 theory (Fibonacci/GCD recurrences, extended with Bézout coefficients through
 which Gauss's lemma proves), the whole JSR 385 units domain, combinatorics
-(factorials and Pascal-rule binomials), and the metaprogramming pack above.
+(factorials and Pascal-rule binomials), and the metaprogramming pack above —
+and packs can now declare _spec skeletons_ of their own, so a domain library
+arrives with both its theory and its contracts.
 * *Verifying Java fragments* — since Java is largely a syntactic subset of
 Groovy, many integer/array algorithms verify by reading the Java source _as
 Groovy_ (with the honest caveat that the proof is over Groovy semantics).
@@ -868,8 +922,20 @@ unguarded `g`, it suggests `+@Requires({ 0 <= i && i < a.size() })+`, in your
 own spelling, ready to paste.
 * `VERIFY_EXPLAIN`, on a _verified_ obligation, reports which authored
 `@Requires` clauses the proof actually used (`load-bearing`) and which it
-didn't — and surfaces the structural facts a proof leaned on that you never
-wrote (a class invariant, a JVM integer bound) as `also leaned on`.
+didn't — and surfaces what you never wrote: structural facts (a class
+invariant, a JVM integer bound) and, crucially, _trusted heritage_ — every
+registry spec, survival fact, or pack axiom a proof leaned on is named with
+its provenance (`TRUSTED spec java.util.List#indexOf @Ensures`,
+`pack number-theory axiom`). A proof that rests on trust says so, per proof.
+
+For an agent, `@ThrowsIf` deserves a special mention in this story: "when
+does this method throw?" is exactly the question an agent otherwise answers
+by parsing javadoc prose or traversing bodies — unreliable, and expensive in
+context. A `@ThrowsIf` arm is one structured, _enforced_ line (condition,
+type, direction), and the shipped JDK specs mean the agent often doesn't need
+to consume it at all: write `int i = s.indexOf(c); return s.charAt(i)` and
+the *compiler* refutes with the `-1` sentinel — JDK trivia an agent might
+hallucinate becomes an obligation the build enforces.
 
 This is the practical shape of the on-ramp from the introduction. A developer
 adopts `groovy-contracts` and the in-tree checkers today. When a method
@@ -988,16 +1054,19 @@ The formal-methods world is closer to everyday Groovy than its reputation
 suggests, and the path in is gradual rather than all-or-nothing:
 
 * *Today, in Groovy 6:* `groovy-contracts` gives you executable Design by
-Contract, and the type-checking extensions give you flow-sensitive null
-safety, purity, frame conditions, and combiner/monadic shape checks. Adopt
-them now; they cost little and read like documentation that can't drift.
+Contract — now including the exceptional quadrant, with `@ThrowsIf` weaving
+your guard clauses from one declarative line — and the type-checking
+extensions give you flow-sensitive null safety, purity, frame conditions, and
+combiner/monadic shape checks. Adopt them now; they cost little and read like
+documentation that can't drift.
 * *When you want a stronger guarantee on a high-value method or class:* the
 external `groovy-verify` project reads the *same* contracts and, behind the
 *same* `@TypeChecked` extension SPI, proves them with Z3 — or refutes them
 with the exact input that breaks them. Postconditions, bounds, null,
 overflow, class invariants, loop termination, the multiset-conservation of a
 real sort, information flow, dimensional analysis, Liskov subtyping,
-algebraic laws, functional proofs by induction — and even statically-visible
+algebraic laws, functional proofs by induction, exceptional contracts in both
+directions, calls into a spec'd JDK — and even statically-visible
 metaclass programming — are all in reach for the fragment it models.
 * *Honestly:* `groovy-verify` is experimental and not part of Groovy; it is
 loudly partial, sound within its fragment and explicit about its edges; and
@@ -1045,5 +1114,6 @@ Design-by-Contract module shipped with Groovy
 
 .Update history
 ****
-*25/Jun/2026*: Initial version.
+*03/Jul/2026*: Initial version.
+*08/Jul/2026*: Added ThrowsIf and specs.
 ****
