@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1176px; height:486px; background:#10141d;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif; color:#e8edf4;
+    padding:40px 52px 30px; display:flex; flex-direction:column; overflow:hidden; }
+  .top { display:flex; justify-content:space-between; align-items:baseline; }
+  .kicker { color:#6cb6ff; font-size:15px; font-weight:700; letter-spacing:3.5px; }
+  .toplabel { color:#8b949e; font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; }
+  h1 { font-size:41px; font-weight:800; line-height:1.15; margin-top:12px; letter-spacing:-0.6px; }
+  h1 .accent { color:#6cb6ff; }
+  .byline { font-size:17px; color:#8b949e; margin-top:7px; }
+  .panels { display:flex; gap:22px; margin-top:20px; align-items:stretch; }
+  .panel { background:#161b26; border:1px solid #2a3140; border-radius:12px; padding:15px 19px; flex:1; }
+  .panel.bad { border-left:3px solid #c26049; }
+  .panel.good { border-left:3px solid #4caf7d; }
+  .pill { display:inline-block; font-size:12px; font-weight:700; letter-spacing:2.3px;
+    padding:4px 12px; border-radius:999px; margin-bottom:10px; }
+  .pill.no { color:#ffa198; border:1px solid #b25b4d; }
+  .pill.yes { color:#7ee787; border:1px solid #3f8b56; }
+  .line { font-size:15.5px; color:#b7c1cc; line-height:1.55; margin-bottom:7px; }
+  .line b { color:#e8edf4; }
+  .line code { font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14.5px; color:#e8edf4; }
+  .mut { color:#768390; }
+  .footer { display:flex; justify-content:space-between; align-items:baseline;
+    margin-top:auto; padding-top:20px; }
+  .takeaway { font-size:16px; color:#b7c1cc; max-width:930px; line-height:1.45; }
+  .takeaway b { color:#e8edf4; }
+  .site { color:#8b949e; font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; }
+</style></head><body>
+  <div class="top">
+    <div class="kicker">APACHE GROOVY 6 &#183; AHEAD-OF-TIME</div>
+    <div class="toplabel">native images &#183; incubating</div>
+  </div>
+  <h1>Dynamic Groovy, <span class="accent">compiled ahead of time</span></h1>
+  <div class="byline">Dispatch stays dynamic — the call site just links once instead of retargeting</div>
+  <div class="panels">
+    <div class="panel bad">
+      <span class="pill no">&#10007; &nbsp;THE OLD ADVICE</span>
+      <div class="line"><b>&ldquo;<code>@CompileStatic</code> everything, turn indy off.&rdquo;</b></div>
+      <div class="line">Which is to say: stop being dynamic.</div>
+      <div class="line">And it still didn't get you there — dynamically
+        compiled code in your <b>dependencies</b>, Groovy's own modules
+        included, crosses dynamic call sites you can't recompile.</div>
+    </div>
+    <div class="panel good">
+      <span class="pill yes">&#10003; &nbsp;GROOVY 6</span>
+      <div class="line"><b>Fully dynamic source. Stock compilation.</b></div>
+      <div class="line">No annotations, no flags — the AOT link mode
+        switches on when it detects an AOT build.</div>
+      <div class="line">It changes <b>linking, not compilation</b>, so
+        already-published indy-compiled jars come along
+        <b>without being recompiled</b>.</div>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="takeaway"><b>Early days.</b> This changes how Groovy links dispatch, not one AOT toolchain — more to come in Groovy 7.</div>
+    <div class="site">groovy.apache.org</div>
+  </div>
+</body></html>

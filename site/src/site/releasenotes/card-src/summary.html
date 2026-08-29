@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1176px; height:648px; background:#10141d;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif; color:#e8edf4;
+    padding:38px 52px 30px; display:flex; flex-direction:column; overflow:hidden; }
+  .top { display:flex; justify-content:space-between; align-items:baseline; }
+  .kicker { color:#6cb6ff; font-size:15px; font-weight:700; letter-spacing:3.5px; }
+  .toplabel { color:#8b949e; font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; }
+  h1 { font-size:44px; font-weight:800; line-height:1.12; margin-top:10px; letter-spacing:-0.7px; }
+  h1 .accent { color:#6cb6ff; }
+  .byline { font-size:18px; color:#8b949e; margin-top:7px; letter-spacing:0.1px; }
+  .byline b { color:#b7c1cc; font-weight:600; }
+  .stats { display:flex; gap:12px; margin-top:20px; }
+  .stat { flex:1; background:#161b26; border:1px solid #2a3140; border-radius:12px;
+    border-left:3px solid #6cb6ff; padding:12px 16px; }
+  .num { font-size:31px; font-weight:800; color:#e8edf4; letter-spacing:-0.5px; line-height:1.1; }
+  .lbl { font-size:13px; color:#8b949e; margin-top:3px; line-height:1.3; }
+  .cols { display:flex; gap:22px; margin-top:18px; flex:1; min-height:0; }
+  .col { flex:1; }
+  .item { margin-bottom:11px; }
+  .h { font-size:16.5px; font-weight:700; color:#e8edf4; }
+  .h .tag { color:#7ee787; font-weight:700; }
+  .d { font-size:14.5px; color:#8b949e; line-height:1.42; margin-top:1px; }
+  .footer { display:flex; justify-content:space-between; align-items:baseline;
+    margin-top:auto; padding-top:30px; }
+  .takeaway { font-size:16px; color:#b7c1cc; }
+  .takeaway b { color:#e8edf4; }
+  .site { color:#8b949e; font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; }
+</style></head><body>
+  <div class="top">
+    <div class="kicker">APACHE GROOVY 6</div>
+    <div class="toplabel">release highlights</div>
+  </div>
+  <h1>Bigger, better, faster &#8212; <span class="accent">for humans and AI</span></h1>
+  <div class="byline"><b>Concurrency you can read</b> &#183; <b>specifications you can check</b> &#183; <b>batteries for scripting</b></div>
+
+  <div class="stats">
+    <div class="stat"><div class="num">8</div><div class="lbl">new optional modules<br>HTTP · CSV · Markdown · Maven Grape</div></div>
+    <div class="stat"><div class="num">250+</div><div class="lbl">new GDK methods<br>and allocation-free overloads</div></div>
+    <div class="stat"><div class="num">13</div><div class="lbl">incubating features<br>shipping for feedback</div></div>
+    <div class="stat"><div class="num">17–27</div><div class="lbl">JDK versions tested<br>JDK 17 the new minimum</div></div>
+  </div>
+
+  <div class="cols">
+    <div class="col">
+      <div class="item"><div class="h">Native async/await <span class="tag">incubating</span></div>
+        <div class="d">Sequential-style concurrent code, on virtual threads. Generators, channels, structured concurrency.</div></div>
+      <div class="item"><div class="h">Integrated concurrency toolkit <span class="tag">incubating</span></div>
+        <div class="d">Agents, actors, dataflow and parallel collections in one package — callable from Java too.</div></div>
+      <div class="item"><div class="h">Designed for human and AI reasoning</div>
+        <div class="d">Contracts, <code>@Pure</code>, <code>@Modifies</code> and null checking make each method a compile-checked spec.</div></div>
+      <div class="item"><div class="h">Data and query improvements</div>
+        <div class="d">GINQ gains <code>groupby ... into</code> and SQL set operators; typed parsing across JSON, CSV, TOML, YAML and XML.</div></div>
+    </div>
+    <div class="col">
+      <div class="item"><div class="h">The safest Groovy yet</div>
+        <div class="d">Secure-by-default XML, SQL-injection checking, regex timeouts, wider <code>SecureASTCustomizer</code> coverage.</div></div>
+      <div class="item"><div class="h">Faster underneath</div>
+        <div class="d">Scoped indy invalidation, arity-cached closure calls, fewer allocations on hot paths.</div></div>
+      <div class="item"><div class="h">Sharper language ergonomics</div>
+        <div class="d"><code>val</code>, module imports, rest binders in destructuring, compound-assignment overloading.</div></div>
+      <div class="item"><div class="h">Tooling that caught up</div>
+        <div class="d">Markdown doc comments in GroovyDoc; dark mode there, in the GDK docs and in GroovyConsole; inline charts in Groovysh.</div></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="takeaway"><b>Batteries included, semantics unchanged.</b> JDK 17 minimum; tested through JDK 27.</div>
+    <div class="site">groovy.apache.org</div>
+  </div>
+</body></html>

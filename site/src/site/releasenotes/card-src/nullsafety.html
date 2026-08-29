@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1176px; height:576px; background:#10141d;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif; color:#e8edf4;
+    padding:40px 52px 30px; display:flex; flex-direction:column; overflow:hidden; }
+  .top { display:flex; justify-content:space-between; align-items:baseline; }
+  .kicker { color:#6cb6ff; font-size:15px; font-weight:700; letter-spacing:3.5px; }
+  .toplabel { color:#8b949e; font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; }
+  h1 { font-size:41px; font-weight:800; line-height:1.15; margin-top:12px; letter-spacing:-0.6px; }
+  h1 .accent { color:#6cb6ff; }
+  .byline { font-size:17px; color:#8b949e; margin-top:7px; }
+  .panels { display:flex; gap:22px; margin-top:20px; }
+  .panel { background:#161b26; border:1px solid #2a3140; border-radius:12px;
+    padding:15px 19px; flex:1; display:flex; flex-direction:column; }
+  .panel.a { border-left:3px solid #4caf7d; }
+  .panel.b { border-left:3px solid #6cb6ff; }
+  .pill { display:inline-block; font-size:12px; font-weight:700; letter-spacing:2.3px;
+    padding:4px 12px; border-radius:999px; margin-bottom:9px; align-self:flex-start; }
+  .pill.a { color:#7ee787; border:1px solid #3f8b56; }
+  .pill.b { color:#6cb6ff; border:1px solid #3f6b8b; }
+  pre { font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:13.8px; line-height:1.75;
+    color:#e8edf4; margin-top:3px; }
+  .kw { color:#79c0ff; } .ann { color:#f0b35e; } .str { color:#a5d6a1; }
+  .mut { color:#768390; } .err { color:#ff8878; }
+  .note { font-size:14px; color:#8b949e; margin-top:auto; padding-top:11px; line-height:1.45; }
+  .note b { color:#b7c1cc; }
+  .dyn { margin-top:16px; background:#161b26; border:1px solid #2a3140;
+    border-left:3px solid #f0b35e; border-radius:12px; padding:11px 18px 12px; }
+  .dyntitle { font-size:13px; font-weight:700; letter-spacing:2.3px; color:#f0b35e; margin-bottom:7px; }
+  .dynrow { font-size:14.5px; color:#8b949e; line-height:1.6; }
+  .dynrow code { font-family:ui-monospace,'SF Mono',Menlo,monospace; color:#e8edf4; font-size:14px; }
+  .dynrow b { color:#b7c1cc; }
+  .footer { display:flex; justify-content:space-between; align-items:baseline;
+    margin-top:auto; padding-top:18px; }
+  .takeaway { font-size:16px; color:#b7c1cc; }
+  .takeaway b { color:#e8edf4; }
+  .site { color:#8b949e; font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; }
+</style></head><body>
+  <div class="top">
+    <div class="kicker">APACHE GROOVY 6 &#183; NULL SAFETY</div>
+    <div class="toplabel">NullChecker &#183; contracts</div>
+  </div>
+  <h1>Null safety, <span class="accent">at the level you need</span></h1>
+  <div class="byline">Dynamic idioms that cost nothing, compile-time checking, and facts no annotation can express</div>
+  <div class="panels">
+    <div class="panel a">
+      <span class="pill a">NULLCHECKER &#183; COMPILE-TIME</span>
+<pre><span class="ann">@Nullable</span> String findBlurb() { <span class="kw">null</span> }
+String shelve(String title) { ... }
+
+String blurb = findBlurb()   <span class="err">// compile error</span>
+println shelve(findBlurb())  <span class="err">// compile error</span></pre>
+      <div class="note"><b>Non-null by default, codebase-wide.</b> With a suitable
+        compiler config script, unannotated means non-null and the strict,
+        flow-sensitive checker runs everywhere — no per-file annotations.</div>
+    </div>
+    <div class="panel b">
+      <span class="pill b">CONTRACTS &#183; RUNTIME, AND PROVABLE</span>
+<pre><span class="ann">@Requires</span>({ a != <span class="kw">null</span> || b != <span class="kw">null</span> })
+<span class="ann">@NonNull</span> <span class="kw">static</span> String pick(String a, String b) {
+    <span class="kw">if</span> (a != <span class="kw">null</span>) <span class="kw">return</span> a
+    <span class="kw">return</span> b   <span class="mut">// premise + failed guard</span>
+}                <span class="mut">// ==&gt; b != null</span></pre>
+      <div class="note"><b>There is no annotation for &ldquo;at least one of these
+        is non-null&rdquo;.</b> A precondition is just a boolean expression, so it
+        says so directly — checked at runtime, and provable ahead of it.</div>
+    </div>
+  </div>
+  <div class="dyn">
+    <div class="dyntitle">AND THE DYNAMIC STORY, UNCHANGED</div>
+    <div class="dynrow">
+      <code>null</code> is an object, not a hole &#183;&nbsp;
+      <b>Groovy truth</b> — <code>if (name)</code> checks null and emptiness at once &#183;&nbsp;
+      <b>safe navigation</b> <code>user?.address?.city</code> &#183;&nbsp;
+      <b>elvis</b> <code>name ?: 'Anonymous'</code> &#183;&nbsp;
+      <b>safe indexing</b> <code>list?[0]</code> &#183;&nbsp;
+      GDK methods tolerate <code>null</code>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="takeaway"><b>Pick your rung.</b> Nothing here is mandatory — the dynamic idioms still cost nothing.</div>
+    <div class="site">groovy.apache.org</div>
+  </div>
+</body></html>

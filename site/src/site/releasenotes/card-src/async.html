@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1176px; height:500px; background:#10141d;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif; color:#e8edf4;
+    padding:40px 52px 32px; display:flex; flex-direction:column; overflow:hidden; }
+  .top { display:flex; justify-content:space-between; align-items:baseline; }
+  .kicker { color:#6cb6ff; font-size:15px; font-weight:700; letter-spacing:3.5px; }
+  .toplabel { color:#8b949e; font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; }
+  h1 { font-size:40px; font-weight:800; line-height:1.2; margin-top:14px; letter-spacing:-0.5px; }
+  h1 .accent { color:#6cb6ff; }
+  .panels { display:flex; gap:24px; margin-top:22px; align-items:stretch; }
+  .panel { background:#161b26; border:1px solid #2a3140; border-radius:12px; padding:16px 20px; flex:1; }
+  .panel.bad { border-left:3px solid #c26049; }
+  .panel.good { border-left:3px solid #4caf7d; }
+  .pill { display:inline-block; font-size:12.5px; font-weight:700; letter-spacing:2.5px;
+    padding:4px 13px; border-radius:999px; margin-bottom:10px; }
+  .pill.no { color:#ffa198; border:1px solid #b25b4d; }
+  .pill.yes { color:#7ee787; border:1px solid #3f8b56; }
+  pre { font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:15px; line-height:1.8;
+    color:#e8edf4; margin-top:6px; }
+  .kw { color:#79c0ff; } .mut { color:#768390; } .amb { color:#f0b35e; }
+  .footer { display:flex; justify-content:space-between; align-items:baseline;
+    margin-top:auto; padding-top:20px; }
+  .takeaway { font-size:16.5px; color:#b7c1cc; max-width:960px; }
+  .takeaway b { color:#e8edf4; }
+  .site { color:#8b949e; font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; }
+</style></head><body>
+  <div class="top">
+    <div class="kicker">APACHE GROOVY 6 &#183; CONCURRENCY</div>
+    <div class="toplabel">async / await &#183; incubating</div>
+  </div>
+  <h1>Concurrent code that <span class="accent">reads top to bottom</span></h1>
+  <div class="panels">
+    <div class="panel bad">
+      <span class="pill no">&#10007; &nbsp;FUTURE CHAINS</span>
+<pre><span class="kw">def</span> future = CompletableFuture
+    .supplyAsync { loadUserProfile(id) }
+    .thenCompose { profile -&gt;
+        CompletableFuture.supplyAsync {
+            loadQuests(profile) } }
+    .thenApply { it.find { it.active } }
+
+<span class="kw">def</span> quest = future.join()</pre>
+    </div>
+    <div class="panel good">
+      <span class="pill yes">&#10003; &nbsp;GROOVY 6</span>
+<pre><span class="kw">def</span> quest = <span class="amb">await async</span> {
+    <span class="kw">def</span> profile = <span class="amb">await async</span> { loadUserProfile(id) }
+    <span class="kw">def</span> quests  = <span class="amb">await async</span> { loadQuests(profile) }
+    quests.find { it.active }
+}
+
+<span class="mut">// try/catch works -- no .exceptionally()</span></pre>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="takeaway"><b>Same concurrency, sequential shape.</b> Virtual threads do the work on JDK 21+, with a cached pool on 17&#8211;20.</div>
+    <div class="site">groovy.apache.org</div>
+  </div>
+</body></html>

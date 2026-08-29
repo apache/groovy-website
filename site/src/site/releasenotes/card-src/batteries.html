@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1176px; height:672px; background:#10141d;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif; color:#e8edf4;
+    padding:40px 52px 32px; display:flex; flex-direction:column; overflow:hidden; }
+  .top { display:flex; justify-content:space-between; align-items:baseline; }
+  .kicker { color:#6cb6ff; font-size:15px; font-weight:700; letter-spacing:3.5px; }
+  .toplabel { color:#8b949e; font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; }
+  h1 { font-size:41px; font-weight:800; line-height:1.15; margin-top:12px; letter-spacing:-0.6px; }
+  h1 .accent { color:#6cb6ff; }
+  .byline { font-size:17px; color:#8b949e; margin-top:7px; }
+  .panels { display:flex; gap:22px; margin-top:20px; flex:1; min-height:0; }
+  .panel { background:#161b26; border:1px solid #2a3140; border-radius:12px;
+    padding:15px 19px; border-left:3px solid #4caf7d; display:flex; flex-direction:column; }
+  .panel.p1 { flex:1.32; } .panel.p2 { flex:1; border-left-color:#f0b35e; }
+  .pill { display:inline-block; font-size:12px; font-weight:700; letter-spacing:2.3px;
+    padding:4px 12px; border-radius:999px; margin-bottom:9px; align-self:flex-start; }
+  .pill.a { color:#7ee787; border:1px solid #3f8b56; }
+  .pill.b { color:#f0b35e; border:1px solid #9c7a3c; }
+  pre { font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; line-height:1.72;
+    color:#e8edf4; margin-top:3px; }
+  .kw { color:#79c0ff; } .ann { color:#f0b35e; } .str { color:#a5d6a1; } .mut { color:#768390; }
+  .note { font-size:14px; color:#8b949e; margin-top:auto; padding-top:10px; line-height:1.4; }
+  .strip { display:flex; gap:10px; margin-top:16px; }
+  .chip { flex:1; background:#161b26; border:1px solid #2a3140; border-radius:10px;
+    padding:9px 14px; font-size:14px; color:#b7c1cc; }
+  .chip b { color:#e8edf4; }
+  .footer { display:flex; justify-content:space-between; align-items:baseline;
+    margin-top:auto; padding-top:20px; }
+  .takeaway { font-size:16.5px; color:#b7c1cc; }
+  .takeaway b { color:#e8edf4; }
+  .site { color:#8b949e; font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; }
+</style></head><body>
+  <div class="top">
+    <div class="kicker">APACHE GROOVY 6 &#183; NEW MODULES</div>
+    <div class="toplabel">batteries included</div>
+  </div>
+  <h1>A typed HTTP client, <span class="accent">without the framework</span></h1>
+  <div class="byline">Declarative clients and Markdown parsing, straight out of the distribution</div>
+  <div class="panels">
+    <div class="panel p1">
+      <span class="pill a">GROOVY-HTTP-BUILDER &#183; INCUBATING</span>
+<pre><span class="ann">@HttpBuilderClient</span>(<span class="str">'https://api.example.com'</span>)
+<span class="kw">interface</span> UserApi {
+    <span class="ann">@Get</span>(<span class="str">'/users/{id}'</span>)
+    User getUser(String id)        <span class="mut">// path param</span>
+    <span class="ann">@Get</span>(<span class="str">'/users'</span>)
+    List&lt;User&gt; search(String name)  <span class="mut">// ?name=...</span>
+    <span class="ann">@Post</span>(<span class="str">'/users'</span>)
+    User create(<span class="ann">@Body</span> Map user)    <span class="mut">// JSON body</span>
+}
+
+<span class="kw">def</span> user = UserApi.create().getUser(<span class="str">'42'</span>)</pre>
+      <div class="note">Implementation generated at compile time; parameters mapped by
+        convention. Responses parsed to the return type you declared.</div>
+    </div>
+    <div class="panel p2">
+      <span class="pill b">GROOVY-MARKDOWN &#183; INCUBATING</span>
+<pre><span class="kw">def</span> doc = <span class="kw">new</span> MarkdownSlurper()
+        .parseText(reply)
+
+<span class="mut">// code blocks by language,</span>
+<span class="mut">// not by counting backticks</span>
+doc.codeBlocks.findAll { it.lang == <span class="str">'groovy'</span> }
+
+<span class="mut">// the nodes under one heading</span>
+doc.section(<span class="str">'Next Steps'</span>)</pre>
+      <div class="note">Structure instead of regexes — increasingly what you want when
+        the Markdown came from an AI agent.</div>
+    </div>
+  </div>
+  <div class="strip">
+    <div class="chip"><b>groovy-csv</b> — RFC 4180, typed parsing</div>
+    <div class="chip"><b>groovy-grape-maven</b> — <code>@Grab</code> via Maven Resolver</div>
+    <div class="chip"><b>groovy-test-junit6</b> — JUnit 6 as scripts</div>
+  </div>
+  <div class="footer">
+    <div class="takeaway"><b>Eight new optional modules.</b> Reach for HTTP, CSV or Markdown without adding a framework.</div>
+    <div class="site">groovy.apache.org</div>
+  </div>
+</body></html>

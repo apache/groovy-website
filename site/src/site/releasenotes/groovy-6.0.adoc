@@ -17,6 +17,8 @@ We are currently working on beta versions of Groovy 6.0 with a goal of gathering
 Some features described here as "incubating" may become stable before 6.0.0 final is released, others are expected to remain incubating for version 6. We don’t recommend using alpha versions or incubating features for production systems.
 |===
 
+image:img/groovy6_summary.png["Groovy 6 at a glance: 8 new optional modules, 250+ new GDK methods, 13 incubating features, tested on JDK 17-27",width=800]
+
 == Highlights
 
 Groovy 6 is a big release, so the headline changes are grouped below, each linking to a fuller section further down. A few themes tie them together: closing long-standing gaps with modern Java and Kotlin, growing the batteries-included standard library and modules that make Groovy such a productive scripting language, making concurrent code readable again, and — looking ahead — turning code into specifications that people and AI tools alike can reason about.
@@ -191,10 +193,12 @@ This is the safest Groovy yet — a broad sweep of security hardening across the
 - <<xml-processing,Secure-by-default XML>> parsing (XXE/DTD protections) across the XML APIs.
 - SQL-injection defence in depth: the <<sql-injection-checker,`SqlInjectionChecker`>> at compile time plus `groovy-sql` rejection at runtime.
 - <<regex-timeout,Regex timeouts>> (`@SafeRegex`) guard against ReDoS, alongside JSON nesting-depth limits and stricter Grape coordinate validation.
-- Sandboxing without gaps: `SecureASTCustomizer` restrictions now also cover constructors, initializer blocks, field initializers and authored code relocated into generated or synthetic members; embedders can disable `@ASTTest` when compiling source they don't control.
+- Fewer sandboxing gaps: `SecureASTCustomizer` restrictions now also cover constructors, initializer blocks, field initializers and authored code relocated into generated or synthetic members (purely generated code, such as accessors and trait bridges, remains exempt); embedders can disable `@ASTTest` when compiling source they don't control.
 
 [[g6-new-modules]]
 == New Modules
+
+image:img/groovy6_batteries.png["A declarative typed HTTP client and Markdown parsing, both from the distribution",width=800]
 
 Groovy 6 ships eight new optional modules, plus two long-standing pieces
 of core (Grape's Ivy backend and the classic call-site caching runtime)
@@ -260,6 +264,8 @@ On JDK 21+, tasks automatically leverage virtual threads.
 
 See also the https://groovy.apache.org/blog/groovy-async-await[async/await blog post]
 for a detailed walkthrough.
+
+image:img/groovy6_async.png["CompletableFuture chains versus Groovy 6 async/await written in sequential style",width=800]
 
 === Before and after
 
@@ -1319,6 +1325,8 @@ including the complete static-member dispatch model.
 
 [[type-checking-extensions]]
 == Type Checking Extensions
+
+image:img/groovy6_null.png["Three levels of null handling: dynamic idioms, the NullChecker at compile time, and contracts stating facts no annotation can express",width=800]
 
 Groovy's type checking is extensible, allowing you to strengthen
 type checking beyond what the standard checker provides.
@@ -3828,6 +3836,8 @@ def r = { println 'hello' } as (Runnable & Serializable)
 
 [[native-image]]
 == Dynamic Groovy in GraalVM Native Images (incubating)
+
+image:img/groovy6_native.png["The old advice was to compile statically with indy off; Groovy 6 runs fully dynamic source ahead-of-time",width=800]
 
 Dynamic Groovy in a GraalVM native image has historically been a
 non-starter: native image restricts exactly the operations Groovy's
