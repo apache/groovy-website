@@ -7,12 +7,12 @@
 [horizontal,options="compact"]
 *Number*:: GEP-11
 *Title*:: Groovy 3 semantics and new MOP
-*Version*:: 4
+*Version*:: 5
 *Type*:: Feature
-*Status*:: Draft
+*Status*:: Rejected
 *Leader*:: Jochen "blackdrag" Theodorou
 *Created*:: 2012-06-26
-*Last modification*:: 2018-10-28
+*Last modification*:: 2026-08-31
 ****
 
 == Abstract: Groovy 3 semantics and new MOP
@@ -268,3 +268,4 @@ feature branch on GitHub
 
 3 (2013-10-11):: Version as extracted from Codehaus wiki
 4 (2018-10-28):: Numerous minor tweaks
+5 (2026-08-31):: Marked as rejected because very outdated
