@@ -1,0 +1,528 @@
+= GEP-31: Realm based dynamic semantics
+
+:icons: font
+
+.Metadata
+
+---
+
+[horizontal,options="compact"]
+*Number*:: GEP-31
+*Title*:: Realm based dynamic semantics
+*Version*:: 1
+*Type*:: Feature
+*Status*:: Draft
+*Leader*:: Jochen "blackdrag" Theodorou
+*Created*:: 2026-08-31
+*Last modification*:: 2026-08-31
+
+---
+
+== Abstract
+
+This GEP introduces realms as semantic environments for Groovy dispatch.
+
+A realm defines an ordered set of dispatch layers and an ordered set of extension method providers. A realm inherits the definition of one other realm and may replace individual properties.
+
+The default realm is `GROOVY_DYN`, which represents the current fully dynamic Groovy semantics.
+
+Realms are known to the compiler and the runtime. They allow dynamic semantics to be restricted without requiring static compilation.
+
+== Rationale
+
+Groovy dynamic dispatch currently depends on a number of mechanisms which are not explicitly scoped. Extension methods may be discovered from the compilation environment, categories may affect dynamic execution, and MetaClass changes may affect code which did not explicitly opt into them.
+
+This makes it difficult to define a stable semantic environment for library code.
+
+For example, a library may require the Groovy core extension methods and its own extensions, but not extensions which happen to be visible on the class path.
+
+A library may also require a MetaClass system which is isolated from the one used by the application.
+
+Realms provide an explicit semantic environment for such code.
+
+The realm is also available to the compiler. A fixed realm can therefore provide guarantees which allow dynamic-looking operations to be compiled to direct calls or stable invokedynamic call sites.
+
+== Realm
+
+A realm is an immutable semantic environment.
+
+A realm has one parent realm. A realm initially has all properties of its parent. A realm may replace the value of individual properties.
+
+A realm definition cannot introduce new kinds of properties.
+
+The initial properties are:
+
+* ordered dispatch layers
+* extension method set
+* MetaClass layer
+* object method MOP layer
+
+Further properties may be introduced by later GEPs.
+
+Realm inheritance is configuration inheritance. Runtime state is not inherited unless the corresponding layer is explicitly shared.
+
+== Extension method sets
+
+An extension method set is an ordered list of extension method provider classes.
+
+The order determines precedence. The first element has the highest precedence.
+
+A realm may define its extension method set explicitly:
+
+```
+extensions = [
+    MyExtensions,
+    RealmB.extensions
+]
+```
+
+An extension set reference inserts the complete effective extension set of the referenced realm at that position.
+
+An extension set may therefore be assembled from sets belonging to different realms.
+
+For example:
+
+```
+RealmB.extensions = [E2, E3, E4]
+RealmC.extensions = [E5, E4]
+
+RealmA.extensions = [E1, RealmB.extensions, RealmC.extensions]
+```
+
+produces:
+
+```
+[E1, E2, E3, E5, E4]
+```
+
+An extension provider occurs at most once in the effective extension set. Repeated occurrences are normalized so that the last occurrence determines its position.
+
+Cycles in extension-set references are not allowed.
+
+An empty extension set is valid:
+
+```
+extensions = []
+```
+
+A provider being present on the class path does not make it part of a realm's extension set.
+
+== Realm definitions
+
+A realm is declared using `@RealmDef`.
+
+For example:
+
+```
+import static GroovyLanguage.GROOVY_CORE_REALM
+import MyExtensions
+
+@RealmDef
+MY_LIBRARY_REALM = {
+    extends GROOVY_CORE_REALM
+    extensions [
+        MyExtensions,
+        GROOVY_CORE_REALM.extensions
+    ]
+}
+```
+
+`@RealmDef` is a compiler recognized local transform.
+
+The body of a realm definition is declarative. It is not executed as an ordinary closure.
+
+Referenced realms and extension providers are resolved by the compiler.
+
+A realm definition creates a realm token represented by a generated `static final` inner class.
+
+The token identifies the realm. It is not the materialized runtime realm.
+
+== Realm definition metadata
+
+Realm tokens contain the realm definition as annotations.
+
+Conceptually:
+
+```
+@RealmDefinitionVersion(1)
+@RealmDefinition(
+    extendsRealm = GROOVY_CORE_REALM.class,
+    extensions = {
+        MyExtensions.class
+    }
+)
+public static final class MY_LIBRARY_REALM {
+}
+```
+
+`RealmDefinitionVersion` identifies the version of the realm definition encoding.
+
+The realm token itself provides the semantic identity of the realm. A library may therefore define several versions:
+
+```
+LIB_X_1_1
+LIB_X_2
+LIB_X
+```
+
+A consumer may select the required version by referring to its token.
+
+The definition encoding version is independent of the semantic version represented by the token.
+
+An unknown definition encoding version must be rejected before the corresponding definition annotation is interpreted.
+
+The realm definition metadata must be readable by class file inspection and by Java reflection without initializing the realm token class.
+
+== Realm usage
+
+A realm may be selected for a package, class or method using `@Realm`.
+
+For example:
+
+```
+@Realm(MY_LIBRARY_REALM)
+class LibraryImplementation {
+    ...
+}
+```
+
+or:
+
+```
+@Realm(MY_LIBRARY_REALM)
+def method() {
+    ...
+}
+```
+
+A package-level realm declaration establishes the default realm for the package.
+
+If no realm is declared, the realm is `GROOVY_DYN`.
+
+`use(Realm)` selects the specified realm for the lexical scope of the `use` construct:
+
+```
+use(MY_LIBRARY_REALM) {
+    ...
+}
+```
+
+The realm operand must be a statically identifiable realm token. A runtime variable containing a realm cannot be used.
+
+Entering a method compiled for another realm changes the realm used by dynamic operations in that method. A caller realm is not implicitly propagated to the callee.
+
+== Lexical categories
+
+A lexical category is a temporary extension method layer.
+
+For a realm `R`:
+
+```
+R + Category
+```
+
+is a derived realm in which the category has higher precedence than the extension method set of `R`.
+
+The compiler may create a synthetic realm token for such a derived realm. The token need not be externally visible.
+
+The same derived realm definition within one class may reuse its generated token.
+
+A lexical category affects the call sites compiled in its scope. It does not modify the dynamic category context.
+
+== Dynamic categories
+
+Dynamic categories are initially supported only by `GROOVY_DYN`.
+
+A dynamic category is the current dynamic category context together with a temporary extension method layer.
+
+The current dynamic category mechanism may continue to use dynamically scoped state.
+
+A realm other than `GROOVY_DYN` does not use the dynamic category context.
+
+For example, a dynamic category active in a caller does not affect a method executing in a realm which does not use `GROOVY_DYN`.
+
+Using:
+
+```
+use(GROOVY_DYN) {
+    ...
+}
+```
+
+selects the fully dynamic Groovy semantics, including dynamic categories.
+
+== GROOVY_DYN
+
+`GROOVY_DYN` is the predefined realm representing the current fully dynamic Groovy semantics.
+
+It provides:
+
+* the open extension method environment
+* dynamic categories
+* the full object method MOP
+* the current MetaClass system
+* the current dynamic dispatch semantics
+
+`GROOVY_DYN` is the default when no realm is declared.
+
+The first implementation should preserve the current semantics of `GROOVY_DYN`.
+
+== Dispatch layers
+
+A realm contains ordered dispatch layers.
+
+Extension method sets contribute extension method layers.
+
+Lexical and dynamic categories are temporary extension method layers above the realm's declared extension method layers.
+
+The MetaClass system is represented by a MetaClass layer.
+
+The absence of a MetaClass layer means that MetaClass based dispatch is not used by the realm.
+
+A MetaClass layer is not itself a `MetaClass`. The layer defines how MetaClass state is used for dispatch.
+
+A realm may have an isolated MetaClass layer or use a shared MetaClass layer.
+
+== Object method MOP
+
+The object method MOP is separate from the MetaClass system.
+
+The initial non-`GROOVY_DYN` method MOP consists of:
+
+```
+methodMissing
+propertyMissing
+```
+
+No marker interface is required for these methods.
+
+`invokeMethod` is part of the full `GROOVY_DYN` object MOP.
+
+The semantics of other general MOP methods are not changed by this GEP.
+
+The full `GroovyObject` protocol is part of `GROOVY_DYN`.
+
+A realm which does not use the full `GroovyObject` protocol does not require a class to implement `GroovyObject` merely for realm based dispatch.
+
+`GroovyObjectSupport` remains available for Java implementations.
+
+The long term goal is to reduce the dependency of Groovy dispatch on `GroovyObject` and `GroovyObjectSupport`.
+
+== MetaClass layers
+
+A MetaClass layer defines the MetaClass system used by a realm.
+
+A realm may have no MetaClass layer.
+
+A realm may have an isolated MetaClass layer.
+
+A realm may use a shared MetaClass layer.
+
+For an isolated MetaClass layer, MetaClass state is local to the realm.
+
+For a shared MetaClass layer, the same MetaClass system may be used by multiple realms.
+
+Initially, `GROOVY_DYN` provides the shared/open MetaClass system.
+
+A MetaClass mutation changes only the MetaClass state of the realm in which the mutation is performed, unless the corresponding MetaClass layer is shared.
+
+Per-instance MetaClass state remains supported. Realm based lookup extends the existing association with a realm.
+
+Conceptually:
+
+```
+(class, instance, realm) -> MetaClass
+```
+
+`getMetaClass()` is not required as the general mechanism for obtaining realm MetaClass state.
+
+The MetaClass returned through the legacy `GroovyObject` protocol is the MetaClass seen by `GROOVY_DYN`.
+
+== GroovyObject
+
+`GroovyObject` is not required for realm based dispatch.
+
+In `GROOVY_DYN`, the current `GroovyObject` semantics remain.
+
+In another realm, a class may use the object method MOP without implementing `GroovyObject`.
+
+`getMetaClass()` and `setMetaClass()` are legacy `GROOVY_DYN` object operations.
+
+A realm which needs access to a MetaClass system does not need to expose these methods through every object.
+
+The existing `@POJO` transformation remains supported.
+
+== Compiler semantics
+
+A realm provides semantic information to the compiler.
+
+The compiler may use the realm to determine the possible dispatch targets of an operation.
+
+A realm does not imply static compilation.
+
+The compiler may decide for each operation between:
+
+* direct JVM invocation
+* stable `invokedynamic`
+* fully dynamic `invokedynamic`
+
+A direct invocation is possible if the compiler can prove that the target does not change.
+
+A realm with a fixed extension method set and no mutable MetaClass layer can provide such guarantees.
+
+An operation may still require `invokedynamic` even in a fixed realm when its target depends on runtime information.
+
+For example:
+
+```
+receiver."$name"()
+```
+
+has a runtime dependent method name.
+
+Spread arguments may similarly require `invokedynamic` because the argument list is not statically fixed.
+
+A mutable MetaClass layer may require invalidation of cached call site targets.
+
+The first implementation may use the existing full `invokedynamic` mechanism for all realm calls.
+
+== Static compilation
+
+`@CompileStatic` is independent of realm selection.
+
+When static compilation is used with a realm, static method selection uses the extension method set defined by the realm and does not use the realm's MetaClass layer.
+
+For example:
+
+```
+@CompileStatic
+@Realm(MY_LIBRARY_REALM)
+class Library {
+    ...
+}
+```
+
+The relationship between realm based partial static compilation and the existing `@CompileStatic` skip mode is intentionally not defined by this GEP.
+
+Type checking extensions remain part of static type checking and are separate from runtime extension methods.
+
+A construct such as:
+
+```
+receiver."$name"()
+```
+
+remains unsupported by static compilation.
+
+== Core extension methods
+
+The Groovy core extension methods are extension method sets and may be used explicitly by realm definitions.
+
+Different semantic environments may use different core extension implementations.
+
+This allows a core extension method to use semantics appropriate for the realm in which its implementation is compiled.
+
+For example, a collection operation which internally performs a truth test need not implicitly use the fully dynamic semantics of `GROOVY_DYN` when used from statically compiled code.
+
+The exact partitioning of core extension implementations is an implementation concern.
+
+== Extension discovery
+
+Explicit realm definitions name the extension providers which belong to the realm.
+
+`GROOVY_DYN` remains an open extension environment.
+
+The existing service mechanism continues to discover extension providers for `GROOVY_DYN`.
+
+The service mechanism is not used to discover realm definitions.
+
+A future change of the extension discovery mechanism, for example to use JPMS services, is independent of the realm model.
+
+== Runtime representation
+
+A realm token is a generated `static final` inner class.
+
+The token is passed to invokedynamic call sites.
+
+The runtime associates the token with the realm definition and may lazily materialize the corresponding runtime realm.
+
+The association is not stored as mutable state in the token.
+
+The runtime representation of a realm should be reusable and must not be recreated for every invocation.
+
+The lifetime of the token follows the lifetime of its defining class loader.
+
+The lifetime of materialized runtime state may depend on the presence of mutable MetaClass state.
+
+== Compatibility
+
+Code without a realm declaration uses `GROOVY_DYN`.
+
+Existing `use(Category)` semantics remain supported.
+
+Existing MetaClass APIs remain available.
+
+Existing `GroovyObject`, `GroovyObjectSupport`, `MetaClass`, `ExpandoMetaClass` and `ProxyMetaClass` remain supported during the transition.
+
+Realm-aware MetaClass behavior is opt-in.
+
+Code which opts into an isolated realm may no longer observe MetaClass or extension-method changes made in another realm.
+
+Extension methods which are not part of an explicitly defined extension set are not visible in that realm.
+
+== Impact
+
+Realms introduce an explicit boundary for dynamic semantics.
+
+The default behavior is unchanged.
+
+The main observable change for code using a realm is that dynamic extension methods and MetaClass state are determined by the selected realm rather than by unrelated dynamic state.
+
+The compiler gains a semantic environment which can be used for more precise method selection and later optimization.
+
+A new MOP is not required by this GEP.
+
+The existing MetaClass implementation may initially be used as a realm layer. Alternative MOP implementations may be introduced for selected realms.
+
+== Work items
+
+* introduce `Realm` and realm tokens
+* implement `@RealmDef`
+* implement `@Realm`
+* implement `@RealmDefinitionVersion` and realm definition metadata
+* make `GROOVY_DYN` the default realm
+* make invokedynamic call sites realm aware
+* define and implement ordered extension sets
+* implement lexical category realm derivation
+* adapt the existing MetaClass implementation as a realm layer
+* implement realm-local MetaClass state
+* investigate realm based direct invocation and stable call sites
+* investigate realm specific core extension implementations
+* add tests for realm inheritance and extension ordering
+* add tests for realm isolation
+* add tests for realm crossing
+* add tests for lexical categories and dynamic categories
+* add tests for incremental compilation and realm definitions in dependent JARs
+
+== Open questions
+
+The following are intentionally not defined by this GEP:
+
+* the complete final set of realm properties;
+* the detailed runtime representation of realm-local MetaClass state;
+* the exact set of methods in the non-`GROOVY_DYN` object method MOP;
+* the exact implementation of per-instance MetaClass state;
+* the exact rules for direct invocation and stable invokedynamic;
+* the final source syntax for lexical category declarations;
+* the exact set of realm specific core extension implementations.
+
+== References and useful links
+
+* https://groovy.apache.org/wiki/GEP-1.html[GEP-1: Groovy Enhancement Proposal]
+* https://groovy.apache.org/wiki/GEP-8.html[GEP-8: Static type checking]
+* https://groovy.apache.org/wiki/GEP-10.html[GEP-10: Static compilation]
+* https://groovy.apache.org/wiki/GEP-11.html[GEP-11: Groovy 3 semantics and new MOP]
+
+== Update history
+
+1 (2026-08-31):: Initial proposal
