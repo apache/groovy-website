@@ -39,6 +39,7 @@ concurrency support.
 - Unified `groovy.concurrent` package: agents, actors, dataflow variables, channels, and parallel collections.
 - `@ActiveObject` adds actor semantics to ordinary classes — no message protocols to hand-write.
 - Parallel `Collection` methods (`collectParallel`, `findAllParallel`, `eachParallel`, ...) for CPU-bound work.
+- <<channel-select,`ChannelSelect`>> covers the full CSP choice: mixed send/receive offers, `when` guards, `fair()`/`random()` policies, and timer branches — with losing branches left untouched.
 - Same APIs available to Java, Kotlin and other JVM languages via the standalone <<concurrent-java,`groovy-concurrent-java`>> module.
 
 *_New Language Features_*
@@ -95,6 +96,7 @@ Groovy 6 spends a lot of effort below the surface: dynamic dispatch that stays f
 - *<<g6-other-core-api,Dynamic property writes go through `invokedynamic`>>* by default, bringing property _writes_ in line with property _reads_.
 - *<<fat-free,Allocation-free higher-order methods>>*: `java.util.function` overloads across the GDK (`each`, `collect`, `findAll`, `inject`, ...) take a lambda or method reference directly, with no per-call `Closure` allocation.
 - *<<compound-assignment-overloading,Compound-assignment operator overloading>>* (`plusAssign`, `minusAssign`, ...) lets `a += b` mutate in place rather than allocate a new object each time.
+- *Reflection-free MOP dispatch*: once a method has been called often enough, `CachedMethod.invoke` installs a generated hidden nestmate that `INVOKE`s the target directly instead of going through `Method.invoke`, so the JIT sees a constant target where it previously saw a reflective call (https://issues.apache.org/jira/browse/GROOVY-12325[GROOVY-12325]).
 - *Faster closure calls from Java*: the `Closure.call` override cache is now an arity-indexed table, so multi-argument closure invocations from Java -- all `Map` iteration, `eachWithIndex`, `inject` -- take the cached fast path instead of full metaclass dispatch (https://issues.apache.org/jira/browse/GROOVY-12164[GROOVY-12164], https://issues.apache.org/jira/browse/GROOVY-12165[GROOVY-12165]).
 - *Smaller bytecode*: a new peephole optimizer rewrites short, local instruction sequences into cheaper equivalents, with no behavioural change.
 - *Fewer closure classes* (experimental, link:../wiki/GEP-27.html[GEP-27]): statically-compiled lambdas can be _hoisted_ to a method on the enclosing class, and eligible closures _packed_, instead of generating a class per closure — cutting class count, jar size and allocation. Both are opt-in, and the value stays a real `groovy.lang.Closure`.
@@ -177,12 +179,14 @@ The docs, shell and console catch up with modern expectations — Markdown, synt
 - <<groovydoc,GroovyDoc>> adds JEP 467 Markdown doc comments (`///`) and JEP 413 `{@snippet}` blocks for inline and external code samples. Also added is Prism.js syntax highlighting, class-hierarchy tree pages, `{@value}`/`{@inheritDoc}` support, and improved script documentation.
 - Light, dark, "follow system" and <<theming,custom themes>> for GroovyDoc, the GDK reference, and GroovyConsole.
 - <<groovysh,Groovysh>> gains an `/img` command for inline images and charts using JLine's terminal-graphics support, Markdown handling in `/slurp`.
+- <<error-format,`groovyc --error-format short`>> emits one `file:line:column: severity: message` line per diagnostic — the shape editors, CI log parsers and coding agents already understand.
 
 *_JDK/Java Integration Improvements_*
 
 Keeps Groovy a first-class citizen on today's JVM: current JDK support, one-line module imports, and cleaner interop for mixed Groovy/Java projects.
 
 - Tested across JDK 17–27; <<Groovy6.0-requirements,JDK 17>> is now the minimum supported runtime. Module import already mentioned.
+- <<java-generics,Generic type syntax>> now follows the JLS: rare types, nested parameterizations, `instanceof` reifiability and type-variable scoping all behave as `javac` does, with matching diagnostics.
 - <<joint-compilation-stubs,Joint Compilation Stub Improvements>>: AST-transform-generated members (`@Immutable`, `@Builder`, `@TupleConstructor`, `@Delegate`, ...) are now visible in generated stubs. Java code in mixed-language projects can finally call constructors and methods contributed by transforms.
 - <<native-image,GraalVM native images>>: an AOT link mode lets even _dynamic_ Groovy dispatch run ahead-of-time compiled — including already-published indy-compiled jars, without recompilation.
 
@@ -640,6 +644,105 @@ The same `for await` works against any JDK `Flow.Publisher`, Reactor
 `Flux` (via `groovy-reactor`), or RxJava `Observable` (via
 `groovy-rxjava`).
 
+[[channel-select]]
+=== Choosing among channels with `ChannelSelect`
+
+`ChannelSelect.from(a, b, ...)` waits for the first available value
+from several channels, as Go's `select` does. In Groovy 6 it grew from
+that starting point into the full choice construct of the CSP
+literature, and the underlying protocol changed to make that sound: a
+select now works by _claim_ -- the branches share one flag that a
+channel tests under its own lock immediately before handing a value
+over, so exactly one branch dequeues and the losing branches never
+touch their channels
+(https://issues.apache.org/jira/browse/GROOVY-12320[GROOVY-12320]).
+
+image:img/groovy6_select.png["Mixed send and receive offers, per-branch guards and timer branches, with a choice policy you pick",width=800]
+
+Four capabilities build on that:
+
+*Choice policy.* A ready channel completes during registration, so
+`select()` takes the channel listed first -- a priority select, under
+which a channel that always has a value waiting starves those after
+it. `fair()` rotates the registration order so every ready channel is
+taken within _n_ calls (JCSP's `fairSelect`), and `random()` shuffles
+it so every ready channel is equally likely (Go's policy). Keep the
+instance across calls for `fair()` to rotate.
+
+*Mixed offers.* A branch may _offer to send_ as well as receive -- "I
+will send my opener, or take my peer's if it sends first"
+(https://issues.apache.org/jira/browse/GROOVY-12323[GROOVY-12323]):
+
+[source,groovy]
+----
+import static groovy.concurrent.ChannelSelect.*
+
+def result = await offers(send(ping, 1), receive(pong)).select()
+if (result.send) {
+    // my opener committed: continue the ping branch
+} else {
+    // my peer opened first: result.value is the pong opener
+}
+----
+
+Exactly one offer commits; a committed send behaves exactly like
+`ping.send(1)`, while a retired one leaves no trace -- no buffered
+residue, no waiting sender.
+
+*Preconditions.* `when` writes a guard onto the offer itself, as
+occam, Ada, Erlang and Kotlin do -- the guarded choice of CSP
+(https://issues.apache.org/jira/browse/GROOVY-12326[GROOVY-12326]):
+
+[source,groovy]
+----
+def sel = offers(receive(input).when { held.size() < capacity },   // <1>
+                 receive(request).when { !held.isEmpty() })        // <2>
+def result = await sel.select()
+----
+<1> take input only while there is room
+<2> answer a request only while there is something to hand over
+
+A guarded-off offer is not registered on its channel but keeps its
+position, so `result.index` denotes the same branch either way --
+dropping the offer from the argument list instead would silently
+renumber every branch after it. The guard is a closure, consulted
+afresh on each `select()` call, so one select can be built once and
+reused as the state it guards on changes. The same preconditions can
+be passed positionally, one flag per offer, which suits a mask
+computed as a whole
+(https://issues.apache.org/jira/browse/GROOVY-12324[GROOVY-12324]);
+a flag conjoins with whatever guard its offer carries.
+
+*Timeouts as a branch.* A deadline can be a branch of the select
+rather than an exception thrown around it by `orTimeout`
+(https://issues.apache.org/jira/browse/GROOVY-12343[GROOVY-12343]).
+The timer _offer_ `after` re-arms on every round; the timer _channel_
+`AsyncChannel.after` is a fixed deadline shared by every round that
+selects on it:
+
+[source,groovy]
+----
+def sel = offers(receive(work), after(100)).fair()
+while (true) {
+    def result = await sel.select()
+    if (result.timeout) {
+        // nothing arrived within 100 ms of this call: result.value is the Instant
+    } else {
+        handle(result.value)
+    }
+}
+----
+
+A timer offer that loses its round is cancelled with the other losing
+branches, so it leaves nothing armed. Listed last, `after(0)` has
+already elapsed and so is ready at registration -- making it the
+`default` clause of Go's `select`: take a transfer if one can complete
+at once, otherwise proceed without waiting.
+
+See the dochome6:core-async-await.html[Async/Await user guide] for the
+full select API, including `result.channel` for recognising a branch
+by identity rather than position.
+
 [[concurrent-java]]
 === Java-only module: `groovy-concurrent-java`
 
@@ -709,6 +812,36 @@ access. Implements `Awaitable` and supports `then` chaining.
 Go-style multi-channel select.
 | https://issues.apache.org/jira/browse/GROOVY-11952[GROOVY-11952],
 https://issues.apache.org/jira/browse/GROOVY-11953[GROOVY-11953]
+
+| `ChannelSelect` claim protocol, `fair()`, `random()`
+| A select takes a value from exactly one channel and leaves the losing
+branches untouched, rather than consuming and re-sending. `fair()`
+rotates the scan (every ready channel taken within _n_ calls);
+`random()` chooses uniformly; the default remains priority by list
+order. See <<channel-select>>.
+| https://issues.apache.org/jira/browse/GROOVY-12320[GROOVY-12320]
+
+| `ChannelSelect` mixed offers
+| `offers(send(ch, v), receive(other))` -- a branch may offer to send as
+well as receive. Exactly one offer commits; a retired send leaves no
+buffered residue and no waiting sender.
+| https://issues.apache.org/jira/browse/GROOVY-12323[GROOVY-12323]
+
+| `ChannelSelect` preconditions
+| `receive(ch).when { ... }` guards a branch, and `select(flag, flag)`
+supplies the same guards positionally. A guarded-off branch is not
+registered but keeps its index; enabling none fails with
+`IllegalStateException`. `Result.getChannel()` names the winning channel.
+| https://issues.apache.org/jira/browse/GROOVY-12324[GROOVY-12324],
+https://issues.apache.org/jira/browse/GROOVY-12326[GROOVY-12326]
+
+| Timer branches
+| `after(millis)` is a timer _offer_ re-armed each round;
+`AsyncChannel.after(millis)` is a timer _channel_ holding a fixed
+deadline. Both accept a `Duration`, take part in the claim protocol,
+and compose with `when`, `fair()` and `random()`. `after(0)` listed
+last is the `default` clause of Go's `select`.
+| https://issues.apache.org/jira/browse/GROOVY-12343[GROOVY-12343]
 
 | Parallel collection methods
 | `collectParallel`, `findAllParallel`, `eachParallel`, `sumParallel`,
@@ -896,6 +1029,15 @@ For safety, requests -- and any redirects they follow -- are confined to
 the configured base URI, so a redirect cannot silently escape to a
 different host
 (https://issues.apache.org/jira/browse/GROOVY-12182[GROOVY-12182]).
+Where redirects are followed without confinement, `HttpBuilder` follows
+them itself and drops the caller's configured headers for good once a hop
+leaves the request's original origin, so an `Authorization` header, cookie
+or API key configured on the builder is never sent to whatever origin a
+`Location` names. Delegating this to the JDK client was not sufficient:
+whether the well-known credential headers are stripped varies by JDK
+update level, and a header the platform does not recognise is forwarded on
+every JDK
+(https://issues.apache.org/jira/browse/GROOVY-12274[GROOVY-12274]).
 
 See the dochome6:http-builder.html[HTTP client user guide]
 for the full API and configuration options.
@@ -1684,6 +1826,9 @@ def match(String input) {
 ----
 
 `millis` defaults to `1000`. Matching semantics are otherwise unchanged.
+When applied at class level, the guard reaches regexes in nested and
+anonymous inner classes as well as the enclosing class's own members
+(https://issues.apache.org/jira/browse/GROOVY-12351[GROOVY-12351]).
 
 [[human-ai-reasoning]]
 == Designed for Human and AI Reasoning
@@ -2875,7 +3020,14 @@ silently, making hardened-parser misconfigurations visible.
 | The streaming markup builders (`StreamingMarkupBuilder`,
 `StreamingDOMBuilder`) now reject processing-instruction and comment
 terminators across all output paths, closing XML-injection gaps.
-| https://issues.apache.org/jira/browse/GROOVY-12103[GROOVY-12103]
+`StreamingSAXBuilder` called neither validator, so a comment body, an
+instruction target or non-map instruction data carrying `-->` or `?>`
+closed the construct early and whatever followed was emitted as markup;
+it now applies the same checks. This rejects input that was previously
+accepted but was never well-formed XML -- see
+<<Groovy6.0-breaking,Breaking changes>>.
+| https://issues.apache.org/jira/browse/GROOVY-12103[GROOVY-12103],
+https://issues.apache.org/jira/browse/GROOVY-12338[GROOVY-12338]
 |===
 
 [[markdown]]
@@ -3834,6 +3986,53 @@ lambda:
 def r = { println 'hello' } as (Runnable & Serializable)
 ----
 
+[[java-generics]]
+=== Generic type syntax
+
+Groovy 6 closes the remaining gaps between Groovy's and Java's handling
+of generic type syntax
+(https://issues.apache.org/jira/browse/GROOVY-12319[GROOVY-12319]), so
+generic declarations copied from Java source mean the same thing in
+Groovy. Three strands:
+
+*Rare types and nested parameterizations.* The JLS 4.5 enclosing type
+is now carried on the `ClassNode` itself, so `Outer<String>.Inner` is
+distinguished from `Outer.Inner` and written into the JVMS `Signature`
+attribute in its nested form when -- and only when -- the enclosing type
+is parameterized. `Map.Entry` and `Cell.class` are recognised as type
+_names_ rather than parameterizations (JLS 15.8.2), and method and
+constructor references such as `Iterable<String>::iterator` are no
+longer mistaken for class literals.
+
+*Type variables identified by declaration.* A `GenericsType` now records
+which type-parameter section declared it, so two placeholders both named
+`T` are distinguished when they come from different declarations -- a
+method's `T` can no longer be stored in a field typed by the class's
+`T`. An unbounded type-parameter declaration no longer inherits a
+shadowed variable's erasure, and duplicate names within one
+type-parameter section are rejected.
+
+*JLS well-formedness.* Every compilation unit -- dynamic Groovy and
+scripts included -- now requires generic types to be well-formed by the
+same JLS rules Java applies. Constructs such as generic array creation
+(`new T[n]`), a generic class extending `Throwable`, a wildcard in a
+class instance creation or superinterface, a primitive type argument, a
+parameterized class literal (`Foo<String>.class`), instantiating or
+naming a type variable, and catching a type parameter (JLS 14.20) are
+compile errors where Groovy 4 and 5 accepted them by silently falling
+back to the erasure. Diagnostics for these -- and for static references
+to a type parameter, wildcard bounds, `instanceof` of rare and array
+types, and duplicate generic interfaces -- are worded to match `javac`.
+This tightening is a behaviour change; see
+<<Groovy6.0-breaking,Breaking changes>>, and the _Generics_ section of
+the dochome6:core-object-orientation.html#generics-well-formedness[object
+orientation guide] for the full table of rejected constructs with their
+workarounds.
+
+What has *not* changed is inference: dynamic Groovy still does not check
+generic invariance, inference, or unchecked conversions -- those remain
+the domain of `@TypeChecked` and `@CompileStatic`.
+
 [[native-image]]
 == Dynamic Groovy in GraalVM Native Images (incubating)
 
@@ -3892,6 +4091,53 @@ what the AOT link mode expects; forcing Groovy's runtime to initialize at
 build time instead pulls its internal state into the image heap, where
 `native-image` rejects live objects such as running threads and seeded
 `Random` instances. Leaving the flag off is both shorter and correct.
+
+[[error-format]]
+== Compiler Diagnostic Output
+
+A compiler error is read by two very different audiences, and until now
+Groovy rendered it for only one of them. Groovy 6 adds
+`CompilerConfiguration.errorFormat` to choose the rendering
+(https://issues.apache.org/jira/browse/GROOVY-12312[GROOVY-12312]).
+
+image:img/groovy6_errorformat.png["The same diagnostics rendered two ways: the FULL default with source line and caret, and one parseable line per diagnostic under SHORT",width=800]
+
+`FULL` is the default and is unchanged, byte for byte: four lines per
+diagnostic, ending in the source line and a caret under the offending
+column. It is the right thing for a person reading a terminal.
+
+`SHORT` emits one line per diagnostic in the shape every editor, CI log
+parser and coding agent already understands:
+
+[source]
+----
+Order.groovy:2:5: error: unable to resolve class Custmer
+----
+
+The gain is not only volume. Under `FULL` the position is split across
+two lines with the line number repeated and the column given only on the
+second, and no severity token appears at all -- so the format no common
+tool parses is also the one that says least per line. `SHORT` reports the
+position once, with the column, and labels each diagnostic `error` or
+`warning`. Messages that span several lines are joined, so one line per
+diagnostic holds even for the type-checking errors that embed newlines.
+
+On one source producing 14 type-checking errors, `FULL` renders 73 lines
+and `SHORT` renders 17.
+
+Set it through `CompilerConfiguration.errorFormat`, on the command line
+as `groovyc --error-format short`, or on the Ant task as
+`<groovyc errorFormat="short">` (accepted in any casing, since build
+files are written by hand). Each message contributes what it has rather
+than inventing a position: a message with no source unit drops the file
+and position instead of fabricating them, and an `ExceptionMessage` drops
+the stack trace, which `-de` still asks for. `Message` subclasses outside
+the Groovy tree keep compiling and render the full form, which degrades
+sensibly.
+
+Together with `--check` (see <<g6-other-core-api,Other Core API
+Changes>>), this gives tooling a fast, parseable compile: check without
+writing class files, and report what failed in one line each.
 
 [[g6-other-core-api]]
 == Other Core API Changes
@@ -3959,6 +4205,27 @@ type-checking errors without generating any class files. The new
 `groovyc --check` option is shorthand for exactly that, giving a faster
 feedback loop for editors, CI checks, and coding agents
 (https://issues.apache.org/jira/browse/GROOVY-12204[GROOVY-12204]).
+`--check` stops after `Phases.CLASS_GENERATION` rather than before it, so
+that the errors only class verification and bytecode generation can report
+-- duplicate method signatures, illegal modifier combinations,
+abstract/final conflicts, direct field access diagnostics -- are reported
+too. Bytecode is built in memory and discarded; the `OUTPUT` phase that
+would write the class files is what `--check` suppresses. Selecting an
+earlier phase through `setTargetPhase` (or a compiler configuration script,
+which is applied after the option and so overrides it) remains available
+for a deliberately shallower check
+(https://issues.apache.org/jira/browse/GROOVY-12311[GROOVY-12311]).
+* *Error tolerance now covers type-checking errors*. The configured
+tolerance (`groovyc -t`, `CompilerConfiguration.tolerance`) was only
+enforced for errors reported through `SourceUnit.addError`, so it had no
+effect on the most common error class in `@CompileStatic` code: errors
+reported by visitors, including the static type checker, were unbounded
+however low the tolerance was set. Both routes are now tolerance-aware
+(the temporary collectors the type checker pushes for speculative checks
+still collect without bailing out). A tolerance of zero is treated as
+_unlimited_ rather than fail-fast, and the `<groovyc>` Ant task gains a
+matching `tolerance` attribute for both its forked and in-process paths
+(https://issues.apache.org/jira/browse/GROOVY-12306[GROOVY-12306]).
 * The Parrot parser gains an optional *error-recovery* mode: instead of
 aborting at the first syntax error it collects multiple diagnostics and
 returns a partial AST, improving the IDE/tooling experience. A partial
@@ -4094,6 +4361,63 @@ and the argument-class guards on `invokedynamic` call sites gain
 fixed-arity forms for arities 1-4, avoiding the argument-array
 collection previously done on every guard check
 (https://issues.apache.org/jira/browse/GROOVY-12284[GROOVY-12284]).
+* *Reflection-free MOP dispatch*: once a `CachedMethod` has been invoked
+often enough (`groovy.cachedmethod.invoker.threshold`, default 1000,
+aligned with `groovy.indy.optimize.threshold`), `CachedMethod.invoke`
+installs a generated hidden nestmate that `INVOKE`s the target directly
+-- or `invokeExact`s a `classData` `MethodHandle` -- instead of calling
+`Method.invoke`. The JIT then sees a constant target where it previously
+saw a reflective call. This is the MOP path only: `invokedynamic` keeps
+its call-site `Lookup` and is not fed the trampoline. Set
+`-Dgroovy.cachedmethod.invoker.disable=true` to stay on `Method.invoke`
+(https://issues.apache.org/jira/browse/GROOVY-12325[GROOVY-12325]).
+* *A bounded parser DFA cache*. The shared ANTLR DFA cache had no ceiling
+out of the box, and the GC canary that dropped it is only observed on the
+parse path, so a long-lived daemon parsing across many modules could grow
+it unchecked between observations -- surfacing as time spent collecting
+rather than parsing, or as an `OutOfMemoryError` at a tight heap.
+`groovy.antlr4.cache.size` now bounds the DFA states retained across the
+shared ATN, defaulting to 20000; exceeding it drops the cache. Bounding by
+size costs nothing while the cache is small, so a project that never
+reaches the limit keeps a fully warm cache; the older parse-count
+`groovy.antlr4.cache.threshold` reverts to opt-in
+(https://issues.apache.org/jira/browse/GROOVY-12318[GROOVY-12318]). The
+threshold and the GC canary also compose rather than excluding each other:
+setting a positive threshold previously switched the canary off, so
+reaching for the documented knob to reduce memory use silently removed the
+one mechanism that responds to actual memory pressure. A negative value
+remains the explicit "never clear" escape hatch, now switching off both
+(https://issues.apache.org/jira/browse/GROOVY-12316[GROOVY-12316]).
+* *Field-backed property access is consistent across compilation modes.*
+A non-public field of a strongly encapsulated class -- a JDK class without
+`--add-opens`, say -- could be selected as a meta property and then fail
+only on read or write, with the `invokedynamic` property path escalating
+the refusal to `GroovyBugError` and attribute access leaking a raw
+`IllegalAccessException`. A field whose access cannot be established is
+now treated as absent during selection, so the normal missing-member
+handling applies (`MissingPropertyException` / `MissingFieldException`, as
+in Groovy 4) and the indy selectors degrade to the generic `MetaProperty`
+or adapter path. Fields whose access _can_ be forced (open modules,
+class-path classes, `--add-opens`) are unaffected, and the check is
+deliberately not part of member selection, so a call site with its own
+access rights can still reach such a field. `CachedField` also caches its
+deep-reflection handles and drops the synchronization around them
+(https://issues.apache.org/jira/browse/GROOVY-12314[GROOVY-12314]).
+* *Compiler-referenced ABI marker*: the new
+`@org.apache.groovy.lang.annotation.GroovyABI` annotation marks the
+internals that compiled Groovy bytecode links against directly -- call
+sites, `ScriptBytecodeAdapter`, indy bootstraps, transform helpers. It
+does not make an element public API; it records that compiled Groovy may
+outlive the compiler version that produced it, so removing or changing a
+marked element is a break for already-compiled code. A mandatory `since`
+gives the release in which the element joined the ABI, and `CLASS`
+retention keeps the marker in published jars so the build's binary
+compatibility tooling can gate the annotated subset
+(https://issues.apache.org/jira/browse/GROOVY-12256[GROOVY-12256]).
+* `ObjectUtil` is restored as a binary-compatibility facade. It was
+removed in Groovy 5, which broke Groovy 4-compiled `@Immutable` classes at
+runtime; such classes now load and run again
+(https://issues.apache.org/jira/browse/GROOVY-12257[GROOVY-12257]).
 * Compiler performance: several hot spots in the compiler itself were
 tuned -- the static type checker indexes extension methods by name and
 no longer clones non-generic method parameters
@@ -4126,6 +4450,7 @@ had dropped, restored in this release — is again available, now with
 its dispatch cost quantified in the integration guide
 (https://issues.apache.org/jira/browse/GROOVY-12281[GROOVY-12281]).
 
+[[g6-other-module-changes]]
 == Other Module Changes
 
 For the `groovy-xml` module changes (secure-by-default XML processing,
@@ -4173,6 +4498,58 @@ with the `groovy.json.maxNestingDepth` system property
 `BigInteger`, preserving full precision instead of overflowing; values
 within `long` range are unchanged
 (https://issues.apache.org/jira/browse/GROOVY-12101[GROOVY-12101]).
+* *groovy-json*: `JsonSlurper` also bounds the *length of a number token*
+(default 1000 characters, matching Jackson's `StreamReadConstraints`, so
+JSON is bounded consistently with the Jackson-backed YAML/TOML/CSV
+slurpers). Conversion of a long digit run through `BigInteger`/`BigDecimal`
+is superlinear, so an unbounded token made a few hundred KB of input cost
+seconds of CPU. Configure it per instance with `setMaxNumberLength(int)` or
+globally with `groovy.json.maxNumberLength`; a value `<= 0` disables the
+check. See <<Groovy6.0-breaking,Breaking changes>>
+(https://issues.apache.org/jira/browse/GROOVY-12329[GROOVY-12329]).
+* *groovy-json*: `JsonSlurper.setDateHandling(JsonDateHandling)` says
+_which_ type a date-like string becomes, rather than only whether to
+convert one. The four choices are `STRING`, `UTIL_DATE` (the default, and
+what a slurper has always produced), `INSTANT` and `OFFSET_DATE_TIME` --
+the only one that keeps the offset the document carried, since a `Date`
+and an `Instant` are both points on the timeline. As before, this applies
+to the `INDEX_OVERLAY` and `LAX` parser types; the other two return the
+string whichever handling is chosen, and a date carrying no time
+(`"2026-09-04"`) is left as a `String` by all four. The boolean
+`setCheckDates`/`isCheckDates` pair remains, mapping onto `UTIL_DATE` and
+`STRING`, but is deprecated and no longer has any effect once
+`setDateHandling` has been called -- in either order, so a choice made
+through the wider option is not undone by the narrower one
+(https://issues.apache.org/jira/browse/GROOVY-12352[GROOVY-12352]).
+* *groovy-xml*: `XmlParser` and `XmlSlurper` now bound element *nesting
+depth* at 1000 by default, matching `groovy-json`. Secure processing does
+not bound depth, and the JAXP limit that does
+(`jdk.xml.maxElementDepth`) defaults to unlimited. The SAX parse itself
+survives deep input -- the damage lands on the first consumer to walk the
+result recursively (`Node.text()`, `XmlNodePrinter`,
+`GPathResult.toString()`, `XmlUtil.serialize`), each of which runs a stack
+frame per level, so a 350KB document 50,000 elements deep parsed cleanly
+and then killed all of them with a `StackOverflowError` -- an `Error`, and
+so outside the `catch (Exception)` an application would reasonably use for
+a malformed document. The JDK now enforces the bound during the parse and
+names the offending element. Nothing is applied when
+`jdk.xml.maxElementDepth` has already been set explicitly
+(https://issues.apache.org/jira/browse/GROOVY-12331[GROOVY-12331]).
+* *groovy-json*: `JsonOutput.prettyPrint` gains an overload taking the
+nesting bound, and bounds the depth it will format by default
+(https://issues.apache.org/jira/browse/GROOVY-12330[GROOVY-12330]).
+* `ConfigObject.writeTo` now writes keys and values as *data* rather than
+as source. `ConfigSlurper.parse` compiles what `writeTo` produced, but
+keys were written bare unless they were Groovy keywords and values were
+rendered by `FormatHelper.inspect`, which quotes a `String` but not other
+types. The documented round trip therefore failed for keys containing
+spaces or quotes, for nested blocks under such keys, for `GString`,
+`StringBuilder` and most non-`String` values -- and a key holding a
+statement was *executed* on re-parse, so an application persisting a
+configuration with an attacker-influenced entry name would run it. Every
+key is now rendered as an identifier when it is one and as a quoted
+literal otherwise, and values are written as data
+(https://issues.apache.org/jira/browse/GROOVY-12273[GROOVY-12273]).
 * The YAML, TOML, CSV and Markdown stream parsers now decode
 `InputStream` input as UTF-8 rather than the platform default charset,
 for consistent cross-environment results; pass a `Reader` to use a
@@ -4424,6 +4801,72 @@ the default `invokedynamic` runtime needs nothing extra
 `SwitchPoint`, has been removed. Tooling that reached into that field
 must be updated; dispatch semantics are unchanged
 (https://issues.apache.org/jira/browse/GROOVY-12191[GROOVY-12191]).
+* Generic types must now be *well-formed* by the JLS rules Java applies,
+in every compilation unit -- dynamic Groovy and scripts included (see
+<<java-generics>>). Constructs that Groovy 4 and 5 accepted by silently
+falling back to the erasure are compile errors: generic array creation
+(`new T[n]`, `new List<String>[n]`), a generic class extending
+`Throwable`, a wildcard in a class instance creation or superinterface, a
+primitive type argument (`List<int>`), instantiating or naming a type
+variable (`new T()`, `T.class`), a parameterized class literal
+(`Foo<String>.class`), a non-first class bound in `<T extends A & B>`, a
+parameterized non-static member of a raw type, and catching a type
+parameter. `new List<?>[n]` remains legal -- an unbounded wildcard is
+reifiable. Two placeholders named `T` from different declarations are now
+distinguished, so a method's `T` can no longer be stored in a field typed
+by the class's `T`, and duplicate names in one type-parameter section are
+rejected. The _Generics_ section of the object orientation guide tabulates
+each rejected construct with its workaround
+(https://issues.apache.org/jira/browse/GROOVY-12319[GROOVY-12319]).
+* Field-backed property access is now consistent across compilation
+modes: a field whose access cannot be established -- a non-public field of
+a strongly encapsulated class, with no `--add-opens` -- is treated as
+absent during member selection rather than being selected and then failing
+on use. Such an access now raises `MissingPropertyException` /
+`MissingFieldException` (as in Groovy 4) where the `invokedynamic`
+property path previously escalated to `GroovyBugError` and attribute
+access leaked a raw `IllegalAccessException`. Fields whose access can be
+forced are unaffected
+(https://issues.apache.org/jira/browse/GROOVY-12314[GROOVY-12314]).
+* *groovy-json*: `JsonSlurper` rejects a number token longer than 1000
+characters with a `JsonException`, where any length previously parsed.
+Raise the bound with `setMaxNumberLength(int)` or
+`-Dgroovy.json.maxNumberLength=<n>`, or disable the check with a value
+`<= 0`, if you legitimately carry such values
+(https://issues.apache.org/jira/browse/GROOVY-12329[GROOVY-12329]).
+* *groovy-json*: date handling on `JsonSlurper` moves from a boolean to
+the `JsonDateHandling` enum (see <<g6-other-module-changes,Other Module
+Changes>>). The default is unchanged -- `UTIL_DATE`, a `java.util.Date`,
+as before -- but `setCheckDates`/`isCheckDates` are deprecated, and once
+`setDateHandling` has been called on a slurper the boolean has no further
+effect on it. In the internal `org.apache.groovy.json.internal` package,
+the four-argument `JsonParserLax` and `JsonFastParser` constructors now
+take a `JsonDateHandling` in place of the `boolean`; the deprecated
+`boolean` form of the `CharSequenceValue` constructor is retained
+(https://issues.apache.org/jira/browse/GROOVY-12352[GROOVY-12352]).
+* *groovy-xml*: `StreamingSAXBuilder` now applies the comment and
+processing-instruction validators its sibling builders already used, so a
+comment body containing `--` or ending in `-`, or a processing-instruction
+target or data containing `?>`, is rejected rather than passed to the
+`ContentHandler`. Such input was never well-formed XML -- the
+specification forbids all three -- but it was previously accepted, and
+because neither context supports escaping it closed the construct early
+and emitted whatever followed as markup
+(https://issues.apache.org/jira/browse/GROOVY-12338[GROOVY-12338]).
+* *groovy-xml*: `XmlParser` and `XmlSlurper` bound element nesting depth
+at 1000 by default, so a document deeper than that is now refused by the
+parse that reads it. Set `jdk.xml.maxElementDepth` explicitly to choose a
+different bound (or `0` for unlimited) -- Groovy applies nothing when that
+property is already set
+(https://issues.apache.org/jira/browse/GROOVY-12331[GROOVY-12331]).
+* `ConfigObject.writeTo` now emits keys and values as data rather than as
+source, so the output of a round trip through `ConfigSlurper.parse`
+differs for keys that are not plain identifiers and for values that are
+not `String`. Code that parsed `writeTo` output with something other than
+`ConfigSlurper`, or that relied on a key being written bare, needs
+adjusting; the round trip itself now holds where it previously failed or,
+for a key holding a statement, executed
+(https://issues.apache.org/jira/browse/GROOVY-12273[GROOVY-12273]).
 
 [[g6-system-properties]]
 == System Property Reference
@@ -4506,6 +4949,38 @@ aid).
 | https://issues.apache.org/jira/browse/GROOVY-12142[GROOVY-12142],
 https://issues.apache.org/jira/browse/GROOVY-12281[GROOVY-12281]
 
+| `groovy.cachedmethod.invoker.threshold`
+| `1000`
+| Invocation count after which `CachedMethod.invoke` installs a generated
+direct-invoker trampoline in place of `Method.invoke` (MOP path only).
+| https://issues.apache.org/jira/browse/GROOVY-12325[GROOVY-12325]
+
+| `groovy.cachedmethod.invoker.disable`
+| `false`
+| `true` keeps `CachedMethod.invoke` on `Method.invoke`, never generating a
+trampoline.
+| https://issues.apache.org/jira/browse/GROOVY-12325[GROOVY-12325]
+
+| `groovy.hidden.classes.disable`
+| `false`
+| `true` defines Groovy's runtime-generated helper classes through the
+classic `defineClass` path instead of JEP 371 hidden classes.
+| https://issues.apache.org/jira/browse/GROOVY-12223[GROOVY-12223]
+
+| `groovy.antlr4.cache.size`
+| `20000`
+| Ceiling on DFA states retained across the shared parser ATN; exceeding it
+drops the cache. A value `<= 0` removes the ceiling.
+| https://issues.apache.org/jira/browse/GROOVY-12318[GROOVY-12318]
+
+| `groovy.antlr4.cache.threshold`
+| `0`
+| Parse count after which the shared parser DFA cache is cleared (opt-in;
+`0` leaves the size ceiling and the GC canary to do the work). A negative
+value switches off both the counter and the canary.
+| https://issues.apache.org/jira/browse/GROOVY-12316[GROOVY-12316],
+https://issues.apache.org/jira/browse/GROOVY-12318[GROOVY-12318]
+
 | `groovy.target.lambda.hoist`
 | `false`
 | _Experimental (GEP-27)_: hoist eligible statically-compiled lambdas to
@@ -4536,6 +5011,12 @@ for packing, with the reason.
 | Maximum nesting depth for `JsonSlurper`; a value `<= 0` disables the
 check.
 | https://issues.apache.org/jira/browse/GROOVY-12064[GROOVY-12064]
+
+| `groovy.json.maxNumberLength`
+| `1000`
+| Maximum length in characters of a JSON number token for `JsonSlurper`;
+a value `<= 0` disables the check.
+| https://issues.apache.org/jira/browse/GROOVY-12329[GROOVY-12329]
 
 | `groovy.markdown.maxNestingDepth`
 | `1000`

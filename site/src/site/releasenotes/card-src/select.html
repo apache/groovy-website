@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1176px; height:636px; background:#10141d;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif; color:#e8edf4;
+    padding:40px 52px 30px; display:flex; flex-direction:column; overflow:hidden; }
+  .top { display:flex; justify-content:space-between; align-items:baseline; }
+  .kicker { color:#6cb6ff; font-size:15px; font-weight:700; letter-spacing:3.5px; }
+  .toplabel { color:#8b949e; font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; }
+  h1 { font-size:41px; font-weight:800; line-height:1.15; margin-top:12px; letter-spacing:-0.6px; }
+  h1 .accent { color:#6cb6ff; }
+  .byline { font-size:17px; color:#8b949e; margin-top:7px; }
+  .panels { display:flex; gap:22px; margin-top:20px; }
+  .panel { background:#161b26; border:1px solid #2a3140; border-radius:12px;
+    padding:15px 19px; flex:1; display:flex; flex-direction:column; }
+  .panel.a { border-left:3px solid #4caf7d; }
+  .panel.b { border-left:3px solid #6cb6ff; }
+  .pill { display:inline-block; font-size:12px; font-weight:700; letter-spacing:2.3px;
+    padding:4px 12px; border-radius:999px; margin-bottom:9px; align-self:flex-start; }
+  .pill.a { color:#7ee787; border:1px solid #3f8b56; }
+  .pill.b { color:#6cb6ff; border:1px solid #3f6b8b; }
+  pre { font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:13.8px; line-height:1.75;
+    color:#e8edf4; margin-top:3px; }
+  .kw { color:#79c0ff; } .amb { color:#f0b35e; } .str { color:#a5d6a1; }
+  .mut { color:#768390; }
+  .note { font-size:14px; color:#8b949e; margin-top:auto; padding-top:11px; line-height:1.45; }
+  .note b { color:#b7c1cc; }
+  .dyn { margin-top:16px; background:#161b26; border:1px solid #2a3140;
+    border-left:3px solid #f0b35e; border-radius:12px; padding:11px 18px 12px; }
+  .dyntitle { font-size:13px; font-weight:700; letter-spacing:2.3px; color:#f0b35e; margin-bottom:7px; }
+  .dynrow { font-size:14.5px; color:#8b949e; line-height:1.6; }
+  .dynrow code { font-family:ui-monospace,'SF Mono',Menlo,monospace; color:#e8edf4; font-size:14px; }
+  .dynrow b { color:#b7c1cc; }
+  .footer { display:flex; justify-content:space-between; align-items:baseline;
+    margin-top:auto; padding-top:18px; }
+  .takeaway { font-size:16px; color:#b7c1cc; }
+  .takeaway b { color:#e8edf4; }
+  .site { color:#8b949e; font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; }
+</style></head><body>
+  <div class="top">
+    <div class="kicker">APACHE GROOVY 6 &#183; CHANNEL SELECT</div>
+    <div class="toplabel">ChannelSelect &#183; incubating</div>
+  </div>
+  <h1>Wait on many channels, <span class="accent">commit to exactly one</span></h1>
+  <div class="byline">Offers that send as readily as they receive, a precondition on any branch, and deadlines that are branches too</div>
+  <div class="panels">
+    <div class="panel a">
+      <span class="pill a">MIXED OFFERS &#183; SEND OR RECEIVE</span>
+<pre><span class="kw">import static</span> groovy.concurrent.ChannelSelect.*
+
+<span class="kw">def</span> r = <span class="amb">await</span> <span class="amb">offers</span>(<span class="amb">send</span>(ping, 1),
+                     <span class="amb">receive</span>(pong)).<span class="amb">select</span>()
+
+<span class="kw">if</span> (r.send) commit()  <span class="mut">// my opener went</span>
+<span class="kw">else</span>        read(r.value)  <span class="mut">// peer's did</span></pre>
+      <div class="note"><b>&ldquo;I will send my opener, or take my peer&rsquo;s if it
+        sends first.&rdquo;</b> The mixed choice of CSP, and the send cases of
+        Go&rsquo;s <code>select</code>.</div>
+    </div>
+    <div class="panel b">
+      <span class="pill b">GUARDS &amp; TIMERS &#183; PER BRANCH</span>
+<pre><span class="kw">def</span> sel = <span class="amb">offers</span>(
+    <span class="amb">receive</span>(work).<span class="amb">when</span> { held.size() &lt; cap },
+    <span class="amb">after</span>(100)).<span class="amb">fair</span>()
+
+<span class="kw">def</span> r = <span class="amb">await</span> sel.<span class="amb">select</span>()
+<span class="kw">if</span> (r.timeout) idle()  <span class="mut">// quiet 100 ms</span></pre>
+      <div class="note"><b>A guarded-off branch keeps its index</b>, so
+        <code>r.index</code> means the same thing either way. Listed last,
+        <code>after(0)</code> is Go&rsquo;s <code>default</code> clause.</div>
+    </div>
+  </div>
+  <div class="dyn">
+    <div class="dyntitle">AND YOU PICK WHICH READY BRANCH WINS</div>
+    <div class="dynrow">
+      <b>priority</b> — the first listed, and the default &#183;&nbsp;
+      <b>fair()</b> — rotates, so every ready branch is taken within <i>n</i> calls &#183;&nbsp;
+      <b>random()</b> — uniform, as Go chooses &#183;&nbsp;
+      guards conjoin with the positional flags of <code>select(boolean...)</code>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="takeaway"><b>Exactly one branch commits.</b> The losing branches are left untouched — nothing taken, nothing put back.</div>
+    <div class="site">groovy.apache.org</div>
+  </div>
+</body></html>

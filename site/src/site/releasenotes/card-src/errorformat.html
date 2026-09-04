@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1176px; height:690px; background:#10141d;
+    font-family:-apple-system,'Segoe UI',Roboto,sans-serif; color:#e8edf4;
+    padding:40px 52px 30px; display:flex; flex-direction:column; overflow:hidden; }
+  .top { display:flex; justify-content:space-between; align-items:baseline; }
+  .kicker { color:#6cb6ff; font-size:15px; font-weight:700; letter-spacing:3.5px; }
+  .toplabel { color:#8b949e; font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; }
+  h1 { font-size:41px; font-weight:800; line-height:1.15; margin-top:12px; letter-spacing:-0.6px; }
+  h1 .accent { color:#6cb6ff; }
+  .byline { font-size:17px; color:#8b949e; margin-top:7px; }
+  .panels { display:flex; gap:22px; margin-top:20px; }
+  .panel { background:#161b26; border:1px solid #2a3140; border-radius:12px;
+    padding:15px 19px; flex:1; display:flex; flex-direction:column; }
+  .panel.human { border-left:3px solid #6cb6ff; }
+  .panel.tool { border-left:3px solid #4caf7d; }
+  .pill { display:inline-block; font-size:12px; font-weight:700; letter-spacing:2.3px;
+    padding:4px 12px; border-radius:999px; margin-bottom:9px; align-self:flex-start; }
+  .pill.human { color:#6cb6ff; border:1px solid #3f6b8b; }
+  .pill.tool { color:#7ee787; border:1px solid #3f8b56; }
+  pre { font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:13.6px; line-height:1.75;
+    color:#e8edf4; margin-top:3px; }
+  .loc { color:#6cb6ff; } .err { color:#ff8878; } .noise { color:#5f6b7a; }
+  .caret { color:#8b949e; }
+  .note { font-size:14px; color:#8b949e; margin-top:auto; padding-top:11px; line-height:1.45; }
+  .note b { color:#b7c1cc; }
+  .dyn { margin-top:16px; background:#161b26; border:1px solid #2a3140;
+    border-left:3px solid #f0b35e; border-radius:12px; padding:11px 18px 12px; }
+  .dyntitle { font-size:13px; font-weight:700; letter-spacing:2.3px; color:#f0b35e; margin-bottom:7px; }
+  .dynrow { font-size:14.5px; color:#8b949e; line-height:1.6; }
+  .dynrow code { font-family:ui-monospace,'SF Mono',Menlo,monospace; color:#e8edf4; font-size:14px; }
+  .dynrow b { color:#b7c1cc; }
+  .footer { display:flex; justify-content:space-between; align-items:baseline;
+    margin-top:auto; padding-top:18px; }
+  .takeaway { font-size:16px; color:#b7c1cc; }
+  .takeaway b { color:#e8edf4; }
+  .site { color:#8b949e; font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:14px; }
+</style></head><body>
+  <div class="top">
+    <div class="kicker">APACHE GROOVY 6 &#183; COMPILER DIAGNOSTICS</div>
+    <div class="toplabel">groovyc --error-format</div>
+  </div>
+  <h1>The same diagnostics, <span class="accent">in the shape the reader needs</span></h1>
+  <div class="byline">A person reading a terminal and a log parser reading a build want different things from an error</div>
+  <div class="panels">
+    <div class="panel human">
+      <span class="pill human">FULL &#183; THE DEFAULT, UNCHANGED</span>
+<pre>Order.groovy: 2: unable to resolve class Custmer
+<span class="noise"> @ line 2, column 5.
+       Custmer customer
+</span><span class="caret">       ^</span>
+
+Order.groovy: 3: unable to resolve class BigDecmal
+<span class="noise"> @ line 3, column 5.
+       BigDecmal total
+</span><span class="caret">       ^</span></pre>
+      <div class="note"><b>Four lines each, and the caret earns them.</b> But the
+        line number is repeated, the column arrives only on the second line, and
+        no severity token appears at all.</div>
+    </div>
+    <div class="panel tool">
+      <span class="pill tool">SHORT &#183; ONE LINE PER DIAGNOSTIC</span>
+<pre><span class="loc">Order.groovy:2:5:</span> <span class="err">error:</span> unable to resolve class Custmer
+<span class="loc">Order.groovy:3:5:</span> <span class="err">error:</span> unable to resolve class BigDecmal</pre>
+      <div class="note"><b><code>file:line:column: severity: message</code></b> — the
+        form editors, CI log parsers and coding agents already understand. The
+        position is structural, so it is given once, with the column.</div>
+    </div>
+  </div>
+  <div class="dyn">
+    <div class="dyntitle">MEASURED &#183; 14 TYPE-CHECKING ERRORS IN ONE SOURCE</div>
+    <div class="dynrow">
+      <b>73 lines</b> under <code>FULL</code> &#8594; <b>17</b> under <code>SHORT</code> &#183;&nbsp;
+      set it with <code>CompilerConfiguration.errorFormat</code>, <code>groovyc --error-format short</code>,
+      or <code>&lt;groovyc errorFormat="short"&gt;</code>
+    </div>
+  </div>
+  <div class="footer">
+    <div class="takeaway"><b>FULL remains the default, byte for byte.</b> SHORT is for whatever reads the log next.</div>
+    <div class="site">groovy.apache.org</div>
+  </div>
+</body></html>

@@ -1,6 +1,6 @@
 # Release-notes card sources
 
-The four `groovy6_*.png` cards in the parent directory are HTML pages
+The `groovy6_*.png` cards in the parent directory are HTML pages
 screenshotted with headless Chrome:
 
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
@@ -18,6 +18,8 @@ height that matches:
 | `batteries.html` | `groovy6_batteries.png` | 1176x672    |
 | `native.html`    | `groovy6_native.png`    | 1176x486    |
 | `nullsafety.html`| `groovy6_null.png`      | 1176x576    |
+| `select.html`    | `groovy6_select.png`    | 1176x636    |
+| `errorformat.html`| `groovy6_errorformat.png` | 1176x690  |
 
 Palette matches the blog cards: background `#10141d`, panel `#161b26`,
 border `#2a3140`, accent `#6cb6ff`, good `#7ee787`/`#4caf7d`,
