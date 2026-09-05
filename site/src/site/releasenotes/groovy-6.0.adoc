@@ -13,8 +13,10 @@ In addition, it incorporates numerous new features and streamlines various legac
 |===
 a| NOTE: _WARNING:_
 Material on this page is still under development!
-We are currently working on beta versions of Groovy 6.0 with a goal of gathering feedback on the language changes from our community. In addition, early versions assist other projects and tool vendors within the Groovy ecosystem to begin assessing the impact of moving to/supporting Groovy 6.0. Caution should be exercised if using new features as the details may change before final release.
-Some features described here as "incubating" may become stable before 6.0.0 final is released, others are expected to remain incubating for version 6. We don’t recommend using alpha versions or incubating features for production systems.
+We are currently finalising Groovy 6.0. Caution should be exercised
+if using incubating features as the details may change before final release.
+We are also making changes based on feedback - please get your feedback in as early as possible.
+Apologies for those trying these early versions if certain aspects change before the final release.
 |===
 
 image:img/groovy6_summary.png["Groovy 6 at a glance: 8 new optional modules, 250+ new GDK methods, 13 incubating features, tested on JDK 17-27",width=800]
