@@ -2,7 +2,7 @@
 = Solving simple optimization problems with Groovy&trade; using Commons Math, Hipparchus, OptaPlanner, and Timefold
 Paul King
 :revdate: 2024-03-14T22:22:00+00:00
-:updated: 2024-12-10T18:45:00+00:00
+:updated: 2026-09-05T08:00:00+00:00
 :keywords: groovy, optaplanner, timefold, ojalgo, jacop, or-tools, choco, commons math, hipparchus, linear programming
 :description: This post looks at solving simple optimization problems using Groovy.
 
@@ -17,6 +17,8 @@ function subject to one or more linear equality and inequality constraints.
 
 We'll look at such a problem and some libraries
 and tools which can be used to solve them.
+
+image:img/diet_optimization.png["Six foods, six constraints: simplex and Timefold solutions to the diet problem in Groovy",width=800]
 
 == Case Study: Diet Optimization
 
@@ -98,8 +100,8 @@ We'll start with a little helper method for defining our constraints:
 
 [source,groovy]
 ----
-static scalar(coeffs, rel, double val) {
-    new LinearConstraint(coeffs as double[], rel, val)
+static scalar(coeffs, rel, double value) {
+    new LinearConstraint(coeffs as double[], rel, value)
 }
 ----
 
@@ -107,18 +109,21 @@ Next we define our individual constraints and the combined set:
 
 [source,groovy]
 ----
-var milk_max   = scalar([0, 1, 0, 0, 0, 0], LEQ, 1)
-var fish_min   = scalar([0, 0, 0, 0, 1, 0], GEQ, 0.5)
-var protein    = scalar([4.0, 8.0, 7.0, 1.3, 8.0, 9.2],     LEQ, 10)
-var fat        = scalar([1.0, 5.0, 9.0, 0.1, 7.0, 1.0],     GEQ, 8)
-var carbs      = scalar([15.0, 11.7, 0.4, 22.6, 0.0, 17.0], GEQ, 10)
-var calories   = scalar([90, 120, 106, 97, 130, 180],       GEQ, 300)
+val milk_max   = scalar([0, 1, 0, 0, 0, 0], LEQ, 1)
+val fish_min   = scalar([0, 0, 0, 0, 1, 0], GEQ, 0.5)
+val protein    = scalar([4.0, 8.0, 7.0, 1.3, 8.0, 9.2],     LEQ, 10)
+val fat        = scalar([1.0, 5.0, 9.0, 0.1, 7.0, 1.0],     GEQ, 8)
+val carbs      = scalar([15.0, 11.7, 0.4, 22.6, 0.0, 17.0], GEQ, 10)
+val calories   = scalar([90, 120, 106, 97, 130, 180],       GEQ, 300)
 
 LinearConstraintSet constraints = [milk_max, fish_min, protein, fat, carbs, calories]
 ----
 
 Each individual constraint has a coefficient for each food,
 a relationship, and a value.
+We're using Groovy 6's `val` keyword for these declarations.
+It is the immutable companion to `var`; on earlier Groovy versions,
+`var` or `def` work just as well.
 
 Next, we define our cost function, and an additional constraint
 to indicate that we can't buy a negative amount of any food.
@@ -127,26 +132,30 @@ equivalent, like `fish_min` but with a minimum of `0`, for each food.
 
 [source,groovy]
 ----
-var cost = new LinearObjectiveFunction([2.0, 3.5, 8.0, 1.5, 11.0, 1.0] as double[], 0)
+val cost = new LinearObjectiveFunction([2.0, 3.5, 8.0, 1.5, 11.0, 1.0] as double[], 0)
 
-var zeroOrMore = new NonNegativeConstraint(true)
+val zeroOrMore = new NonNegativeConstraint(true)
 ----
 
 Now, our solution is found by creating a new solver, and asking
 it to optimize using our cost function and the constraints.
-We then print our solution out:
+We then print our solution out, one line per food that made the cut.
+The `bar` helper is a small addition in Groovy 5 which renders a value
+as an ascii bar; here the bars are scaled so that 2 units fill the width:
 
 [source,groovy]
 ----
-var solution = new SimplexSolver().optimize(cost, constraints, zeroOrMore)
+import static org.codehaus.groovy.util.StringUtil.bar
 
-static pretty(int idx, double d) {
-    d ? [sprintf('%s %.2f', ['🍞', '🥛', '🧀', '🥔', '🐟', '🍶'][idx], d)] : []
+val solution = new SimplexSolver().optimize(cost, constraints, zeroOrMore)
+
+static pretty(int idx, BigDecimal d) {
+    d ? [sprintf('%s %s %.2f', ['🍞', '🥛', '🧀', '🥔', '🐟', '🍶'][idx], bar(d, 0, 2, 20), d)] : []
 }
 
 if (solution != null) {
     printf "Cost: %.2f%n", solution.value
-    println solution.point.indexed().collectMany(this::pretty).join(', ')
+    println solution.point.indexed().collectMany(this::pretty).join('\n')
 }
 ----
 
@@ -154,7 +163,10 @@ When run, it gives the following output:
 
 ----
 Cost: 12.08
-🥛 0.05, 🧀 0.45, 🥔 1.87, 🐟 0.50
+🥛 ▋ 0.05
+🧀 ████▌ 0.45
+🥔 ██████████████████▊ 1.87
+🐟 █████▏ 0.50
 ----
 
 This is the same solution as what we saw when using the spreadsheet.
@@ -165,14 +177,15 @@ and changing a few import statements. This may change in future versions,
 but for now:
 
 * Using `org.apache.commons:commons-math3:3.6.1` gives an older stable version
-of Commons Math, starting to show its age at 8 years old.
+of Commons Math, now a decade old.
 * Using `org.apache.commons:commons-math4-legacy:4.0-beta1`
 gives the latest version of these classes from Apache Commons Math.
 The naming possibly deserves some explanation. There has been ongoing
 effort to modularise Commons Math and there are numerous components
 delivered as a result. The optimisation classes haven't
-been worked on yet and are available in the aforementioned artifact.
-* Using `org.hipparchus:hipparchus-optim:3.1` gives classes from the forked
+been worked on yet and are available in the aforementioned artifact,
+which hasn't seen a new release since late 2022.
+* Using `org.hipparchus:hipparchus-optim:4.0.3` gives classes from the forked
 project. For the classes we are using, there is essentially no difference
 in the fork, but other parts of the library have seen useful updates
 if you don't mind having a dependency that isn't backed by the ASF.
@@ -203,20 +216,28 @@ OptaPlanner (and Timefold) come into play.
 == Using OptaPlanner or Timefold
 
 OptaPlanner is an optimization library combining optimization algorithms with constraint solving.
-For most of the last 10 years the library was developed under Red Hat's guidance.
-In the last 12 months, the project and other related projects
-were donated to the https://www.apache.org/[ASF] as part of https://kie.apache.org/[Apache KIE].
-More recently, the library was also forked as
+For about a decade the library was developed under Red Hat's guidance.
+In 2023, the project and other related projects
+were donated to the https://www.apache.org/[ASF] as part of https://kie.apache.org/[Apache KIE] (incubating).
+The library was also forked as
 https://timefold.ai/[Timefold].
 
-In this blog, we'll use Timefold, but the code in the examples remains the same for both libraries as you can see in the
-referenced repositories.
-Just the Maven coordinate of the library changes along with the associated class imports.
-At this stage, it isn't clear how the two projects will evolve over time.
+The two projects have since drifted apart. OptaPlanner continues
+under Apache KIE, with version 10 being current at the time of writing.
+Timefold Solver 2.0 (April 2026) was its first major release since the fork:
+it removed the previously deprecated APIs, so it is no longer source-compatible
+with OptaPlanner, and it requires JDK 21 or later.
+Some score-analysis and explainability features also moved to Timefold's
+commercial edition, though nothing we use here.
+
+In this blog, we'll use Timefold. The OptaPlanner version of the same
+example lives alongside it in the referenced repository and is nearly identical:
+apart from the Maven coordinate and imports, a handful of API details differ,
+which we'll point out as we go.
 
 One of the claims of the Timefold project is that it has a lighter dependency footprint.
 This can be confirmed by running the `printRuntimeClasspath` task in the associated builds.
-Timefold has 20 dependent jars compared with OptaPlanner's 55 jars.
+Timefold has 22 dependent jars compared with OptaPlanner's 57 jars.
 
 While Timefold's power isn't needed for our simple problem,
 let's examine how you would use it for the same case study.
@@ -264,7 +285,7 @@ class DietSolution {
     List<Food> foods
 
     @ValueRangeProvider(id = "amount")
-    CountableValueRange<Integer> getAmount() {
+    ValueRange<Integer> getAmount() {
         ValueRangeFactory.createIntValueRange(0, 200, 5)
     }
 
@@ -272,12 +293,12 @@ class DietSolution {
     HardSoftScore score
 
     String toString() {
-        var sb = new StringBuilder()
-        foods.eachWithIndex { f, idx ->
+        val sb = new StringBuilder()
+        for (f in foods) {
             sb << "$f.emoji $f.name: ${f.amount / 100}\n"
         }
         for (name in ['fat', 'carbs', 'protein', 'calories', 'cost']) {
-            var total = foods.sum{ f -> f."$name" * f.amount / 100 }
+            val total = foods.sum{ f -> f."$name" * f.amount / 100 }
             sb << sprintf("Total %s: %.2f%n", name, total)
         }
         sb << "Score: $score"
@@ -285,6 +306,10 @@ class DietSolution {
     }
 }
 ----
+
+The value range gives the solver the allowed amounts: 0 to 200 in steps of 5.
+Timefold 2 simplified its value range API to a single `ValueRange` type;
+OptaPlanner (and Timefold 1.x) call this `CountableValueRange`.
 
 Next we want to define some constraints. In general, we have hard
 constraints which must be met and soft constraints which should
@@ -307,12 +332,12 @@ class DietConstraintProvider implements ConstraintProvider {
         }
     }
 
-    private static int amountOf(Food f, String name) {
-        (f."$name" * f.amount).toInteger()
+    private static long amountOf(Food f, String name) {
+        (f."$name" * f.amount).toLong()
     }
 
     private static Constraint minField(ConstraintFactory factory, String fieldName, double minAmount) {
-        ToIntFunction<Food> amount = f -> amountOf(f, fieldName)
+        ToLongFunction<Food> amount = f -> amountOf(f, fieldName)
         factory.forEach(Food)
                 .groupBy(sum(amount))
                 .filter(fs -> fs < minAmount * 100)
@@ -321,7 +346,7 @@ class DietConstraintProvider implements ConstraintProvider {
     }
 
     private static Constraint maxField(ConstraintFactory factory, String fieldName, double maxAmount) {
-        ToIntFunction<Food> amount = f -> amountOf(f, fieldName)
+        ToLongFunction<Food> amount = f -> amountOf(f, fieldName)
         factory.forEach(Food)
                 .groupBy(sum(amount))
                 .filter(fs -> fs > maxAmount * 100)
@@ -343,8 +368,8 @@ class DietConstraintProvider implements ConstraintProvider {
                 .asConstraint("Max $foodName")
     }
 
-    private static ToIntFunction<Food> totalCost = f ->
-        (f.cost * f.amount).toInteger()
+    private static ToLongFunction<Food> totalCost = f ->
+        (f.cost * f.amount).toLong()
 
     private static Constraint minCost(ConstraintFactory factory) {
         factory.forEach(Food)
@@ -356,11 +381,18 @@ class DietConstraintProvider implements ConstraintProvider {
 }
 ----
 
-With these helper classes in place, we are now ready to
+The `sum` collector groups the foods and adds up a per-food amount.
+Timefold 2 dropped the `int` variants of its collectors, so the amounts
+are supplied as `ToLongFunction`s; the OptaPlanner version uses `ToIntFunction`.
+
+With these helper classes in place, we are now ready to define our
+problem and solve it:
 
 [source,groovy]
 ----
-def unsolved = new DietSolution(foods: [
+import module ai.timefold.solver.core
+
+val unsolved = new DietSolution(foods: [
         new Food('Bread' , '🍞',  2.0, 4.0, 1.0, 15.0,  90),
         new Food('Milk'  , '🥛',  3.5, 8.0, 5.0, 11.7, 120),
         new Food('Cheese', '🧀',  8.0, 7.0, 9.0,  0.4, 106),
@@ -369,36 +401,43 @@ def unsolved = new DietSolution(foods: [
         new Food('Yogurt', '🍶',  1.0, 9.2, 1.0, 17.0, 180)
 ])
 
-def config = new SolverConfig()
+val config = new SolverConfig()
         .withSolutionClass(DietSolution)
         .withEntityClasses(Food)
         .withConstraintProviderClass(DietConstraintProvider)
         .withTerminationSpentLimit(Duration.ofSeconds(10))
 
-def factory = SolverFactory.create(config)
-def solver = factory.buildSolver()
+val factory = SolverFactory.create(config)
+val solver = factory.buildSolver()
 println solver.solve(unsolved)
 ----
+
+Timefold 2 ships as a proper Java module, so the `import module` line,
+a Groovy 6 feature mirroring Java's JEP 511, replaces the half-dozen imports
+we would otherwise need for the solver, its configuration classes and the
+algorithm enums. (`Duration` needs no import at all since Groovy 5
+auto-imports `java.time`.)
 
 It has this output when run:
 
 ----
-08:17:05.202 [main] INFO  a.t.s.core.impl.solver.DefaultSolver - Solving started: time spent (25), best score (-6init/0hard/0soft), environment mode (REPRODUCIBLE), move thread count (NONE), random (JDK with seed 0).
-08:17:05.385 [main] INFO  a.t.s.c.i.c.DefaultConstructionHeuristicPhase - Construction Heuristic phase (0) ended: time spent (210), best score (-1hard/-521soft), score calculation speed (1355/sec), step total (6).
-08:17:15.175 [main] INFO  a.t.s.c.i.l.DefaultLocalSearchPhase - Local Search phase (1) ended: time spent (10000), best score (-1hard/-261soft), score calculation speed (155967/sec), step total (1030).
-08:17:15.176 [main] INFO  a.t.s.core.impl.solver.DefaultSolver - Solving ended: time spent (10000), best score (-1hard/-261soft), score calculation speed (152685/sec), phase total (2), environment mode (REPRODUCIBLE), move thread count (NONE).
-🍞 Bread: 0.6
-🥛 Milk: 0.6
-🧀 Cheese: 0
-🥔 Potato: 0.4
+07:29:52.936 [main] INFO  a.t.s.core.impl.solver.DefaultSolver - Solving started: time spent (2), best score (0hard/0soft), environment mode (PHASE_ASSERT), move thread count (NONE), random (seed 0).
+07:29:52.938 [main] INFO  a.t.s.core.impl.solver.DefaultSolver - Problem scale: genuine entity count (6), genuine variable count (6), approximate value count (40), approximate problem scale (4,096,000,000).
+07:29:52.998 [main] INFO  a.t.s.c.i.c.DefaultConstructionHeuristicPhase - Construction Heuristic phase (0) ended: time spent (64), best score (-1hard/-521soft), move evaluation speed (4067/sec), step total (6).
+07:30:02.935 [main] INFO  a.t.s.c.i.l.DefaultLocalSearchPhase - Local Search phase (1) ended: time spent (10001), best score (-1hard/-281soft), move evaluation speed (419407/sec), step total (613).
+07:30:02.936 [main] INFO  a.t.s.core.impl.solver.DefaultSolver - Solving ended: time spent (10001), best score (-1hard/-281soft), move evaluation speed (416747/sec), phase total (2), environment mode (PHASE_ASSERT), move thread count (NONE).
+🍞 Bread: 0.45
+🥛 Milk: 0.8
+🧀 Cheese: 0.1
+🥔 Potato: 0.65
 🐟 Fish: 0.5
-🍶 Yogurt: 1.05
-Total fat: 8.19
-Total carbs: 42.91
-Total protein: 21.38
-Total calories: 418.80
-Total cost: 10.45
-Score: -1hard/-261soft
+🍶 Yogurt: 0.3
+Total fat: 9.22
+Total carbs: 35.94
+Total protein: 16.51
+Total calories: 329.15
+Total cost: 11.28
+Score: -1hard/-281soft
 ----
 
 Given the amount of time we gave the solver, and using the
@@ -413,16 +452,16 @@ along with the updated `config` definition:
 
 [source,groovy]
 ----
-def construction = new ConstructionHeuristicPhaseConfig(
+val construction = new ConstructionHeuristicPhaseConfig(
         constructionHeuristicType: FIRST_FIT)
-def moveSelector = new UnionMoveSelectorConfig([
+val moveSelector = new UnionMoveSelectorConfig([
         new ChangeMoveSelectorConfig(),
         new SwapMoveSelectorConfig()
 ])
-def localSearch = new LocalSearchPhaseConfig(
+val localSearch = new LocalSearchPhaseConfig(
         localSearchType: VARIABLE_NEIGHBORHOOD_DESCENT,
         moveSelectorConfig: moveSelector)
-def config = new SolverConfig()
+val config = new SolverConfig()
         .withSolutionClass(DietSolution)
         .withEntityClasses(Food)
         .withConstraintProviderClass(DietConstraintProvider)
@@ -430,7 +469,7 @@ def config = new SolverConfig()
         .withTerminationSpentLimit(Duration.ofSeconds(10))
 ----
 
-It now has this output when run:
+It now has this output when run (log lines omitted):
 
 ----
 🍞 Bread: 0
@@ -455,17 +494,19 @@ We can see here that it is now close to what linear programming would give us.
 * A related but more elaborate example based on the https://developers.google.com/optimization/lp/stigler_diet[Stigler Diet] problem using Google OR-Tools
 * A Python https://www.kaggle.com/code/nbuhagiar/diet-optimization-with-or-tools[Diet example] also using Google OR-Tools
 * GitHub repos containing sample code: +
-https://github.com/paulk-asert/groovy-constraint-programming/tree/master/subprojects/Diet[Diet] https://github.com/paulk-asert/groovy-constraint-programming/tree/master/subprojects/DietOptaPlanner[DietOptaPlanner] https://github.com/paulk-asert/groovy-constraint-programming/tree/master/subprojects/DietTimefold[DietTimeflow]
+https://github.com/paulk-asert/groovy-constraint-programming/tree/master/subprojects/Diet[Diet] https://github.com/paulk-asert/groovy-constraint-programming/tree/master/subprojects/DietOptaPlanner[DietOptaPlanner] https://github.com/paulk-asert/groovy-constraint-programming/tree/master/subprojects/DietTimefold[DietTimefold]
 
 == Conclusion
 
 We have looked at using Groovy and a few linear optimization
 libraries to solve a diet case study. Our main focus was the
 Apache Commons Math and Hipparchus libraries.
-We also explored using the more powerful Timeflow and OptaPlanner
+We also explored using the more powerful Timefold and OptaPlanner
 libraries.
 
 .Update history
 ****
+*05/Sep/2026*: Updated to Groovy 6, Timefold 2.6.0 (which requires JDK 21),
+OptaPlanner 10.2.0 and Hipparchus 4.0.3. +
 *10/Dec/2024*: Updated to OptaPlanner 10.0.0 and Timefold 1.16.0.
 ****
