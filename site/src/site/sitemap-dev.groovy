@@ -103,13 +103,14 @@ downloads {
             a(href: 'versioning.html', 'version')
             yield ' of Groovy designed for JDK11+.'
         }
+        version('5.1.2') {
+            stable true
+//            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-5.1.2/'
+        }
         version('5.1.1') {
             stable true
-//            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-5.1.1/'
-        }
-        version('5.1.0') {
-            stable true
-            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-5.1.0/'
+            archive true
+            windowsInstaller 'https://groovy.jfrog.io/artifactory/dist-release-local/groovy-windows-installer/groovy-5.1.1/'
         }
     }
     distribution('Groovy 5.0') {
