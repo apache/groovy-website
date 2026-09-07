@@ -17,6 +17,13 @@ We are currently finalising Groovy 6.0. Caution should be exercised
 if using incubating features as the details may change before final release.
 We are also making changes based on feedback - please get your feedback in as early as possible.
 Apologies for those trying these early versions if certain aspects change before the final release.
+
+NOTE for RC-1: RC-1 defaults to turning on a reflective cold dispatch tier.
+This is a setting currently needed for native images like GraalVM but changes
+what stack frames would be visible to logging libraries. This tier will be
+opt-in only for future releases. Users outside native scenarios may want to set
+the flag to opt-out for RC-1, or use the other workarounds mentioned like @CompileStatic.
+See https://issues.apache.org/jira/browse/GROOVY-12354[GROOVY-12354] for more details.
 |===
 
 image:img/groovy6_summary.png["Groovy 6 at a glance: 8 new optional modules, 250+ new GDK methods, 13 incubating features, tested on JDK 17-27",width=800]
@@ -4094,6 +4101,17 @@ build time instead pulls its internal state into the image heap, where
 `native-image` rejects live objects such as running threads and seeded
 `Random` instances. Leaving the flag off is both shorter and correct.
 
+A note on caller location: inside a native image, dynamically dispatched
+calls leave GraalVM's method-handle interpreter and reflection frames
+visible to `StackWalker` and stack traces, whichever dispatch path is
+used, so loggers report the runtime rather than the calling method as the
+source. `java.util.logging` needs the packages Groovy and GraalVM insert
+listed in `jdk.logger.packages` _at image build time_ (a run-time `-D` is
+ignored), Logback needs them added to its framework packages, and Log4j2
+has no equivalent hook; statically compiled code is unaffected. The
+invokedynamic guide has the exact settings
+(https://issues.apache.org/jira/browse/GROOVY-12354[GROOVY-12354]).
+
 [[error-format]]
 == Compiler Diagnostic Output
 
@@ -4373,6 +4391,27 @@ saw a reflective call. This is the MOP path only: `invokedynamic` keeps
 its call-site `Lookup` and is not fed the trampoline. Set
 `-Dgroovy.cachedmethod.invoker.disable=true` to stay on `Method.invoke`
 (https://issues.apache.org/jira/browse/GROOVY-12325[GROOVY-12325]).
+* *Reflective cold dispatch tier off by default on the JVM*: the
+experimental tier that dispatches a plain method call through
+`Method.invoke` until its call site has been hit
+`groovy.indy.optimize.threshold` times
+(https://issues.apache.org/jira/browse/GROOVY-12137[GROOVY-12137]) is
+now used only by AOT-linked call sites (GraalVM native images, where it
+is the steady state, or `-Dgroovy.indy.aot.link=true`). While a site is
+on the tier, reflection and Groovy runtime frames sit between the caller
+and the target, so logging frameworks (`%C`/`%M`/`%L`, the JUL source
+class and method), `StackWalker` and stack traces report the runtime as
+the caller until the site promotes -- forever for a rarely hit `warn` or
+`error`. Groovy 5 reported the caller correctly from the first call, so
+on a JVM the tier is now opt-in via `-Dgroovy.indy.cold.reflection=true`.
+_6.0.0-RC-1 shipped with the tier on by default_: RC-1 users can pass
+`-Dgroovy.indy.cold.reflection=false` as a JVM argument to get the 5.x
+behaviour back. Calls the runtime dispatches through the metaclass, such
+as a dynamic method name (`log."$level"(msg)`) or an explicit
+`invokeMethod`, show runtime frames on every Groovy version; the
+invokedynamic guide documents the JUL and Logback settings that cover
+those, on a JVM and in native images
+(https://issues.apache.org/jira/browse/GROOVY-12354[GROOVY-12354]).
 * *A bounded parser DFA cache*. The shared ANTLR DFA cache had no ceiling
 out of the box, and the GC canary that dropped it is only observed on the
 parse path, so a long-lived daemon parsing across many modules could grow
@@ -4939,6 +4978,16 @@ deoptimization.
 once, permanently, with cache freshness via a global stamp. Detected
 automatically inside GraalVM native images (see <<native-image>>).
 | https://issues.apache.org/jira/browse/GROOVY-12234[GROOVY-12234]
+
+| `groovy.indy.cold.reflection`
+| unset
+| Reflective cold dispatch tier for plain method calls. Unset: used only
+by AOT-linked call sites (native images). `true` enables it on a JVM,
+at the cost of loggers and stack walkers seeing runtime frames while a
+call site is cold; `false` disables it everywhere. 6.0.0-RC-1 defaulted
+to `true`.
+| https://issues.apache.org/jira/browse/GROOVY-12137[GROOVY-12137],
+https://issues.apache.org/jira/browse/GROOVY-12354[GROOVY-12354]
 
 | `groovy.use.classvalue`
 | `true`
