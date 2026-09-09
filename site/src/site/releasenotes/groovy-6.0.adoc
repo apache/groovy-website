@@ -4090,6 +4090,37 @@ hidden classes for its runtime-generated helpers (see
 <<g6-other-core-api,Other Core API Changes>>), environments that
 forbid runtime class definition fall back transparently
 (https://issues.apache.org/jira/browse/GROOVY-12223[GROOVY-12223]).
+* *Reachability metadata ships in the jars*: building an image of a
+dynamic Groovy program used to require a native-image agent run just to
+capture what Groovy's own runtime reflects over; without it the image
+built and then failed initialising `GroovySystem`. The groovy jar now
+carries that metadata under `META-INF/native-image/org.apache.groovy/groovy/`,
+where `native-image` and the GraalVM build plugins find it: a
+`native-image.properties` pinning run-time initialisation for the
+runtime classes that decide how dispatch links
+(https://issues.apache.org/jira/browse/GROOVY-12366[GROOVY-12366]),
+the resources the runtime reads, and a `reachability-metadata.json`
+that the build generates from what the runtime is known to do rather
+than from a recording: the metaclass registry's bootstrap, the method
+handles the invokedynamic machinery obtains, the Groovy-owned types
+that get a metaclass, and the `BeanInfo`/`Customizer` probes the
+runtime expects not to find. Every entry is conditional on the class
+performing the access being reached, so an image pays only for what it
+uses. The default Groovy method adapters (`dgm$N`) are now constructed
+directly through a generated factory instead of being loaded by name,
+so all of them are reachable without metadata; `-Dgroovy.dgm.factory=false`
+passed to `native-image` restores name-based loading and keeps only the
+adapters an agent recording saw, for a smaller image. Modules that
+register extension methods (`groovy-nio`, `groovy-xml`, `groovy-sql`,
+`groovy-swing` and others) ship their own metadata alongside. The agent
+is still the way to record what depends on the application, its own
+classes and the JDK types it calls dynamically; run it with
+`-Dgroovy.indy.aot.link=true` so the JVM links call sites as the image
+will. A native probe under `subprojects/tests-native` and a CI check
+keep the shipped metadata in step with the runtime. GraalVM for JDK
+25.0.4 or later is required; earlier releases carry a substitution
+targeting a method Groovy 6 no longer has
+(https://issues.apache.org/jira/browse/GROOVY-12365[GROOVY-12365]).
 
 A note on class-initialization policy: recipes written for earlier Groovy
 versions often passed a blanket `--initialize-at-build-time` (with no
@@ -4978,6 +5009,14 @@ deoptimization.
 once, permanently, with cache freshness via a global stamp. Detected
 automatically inside GraalVM native images (see <<native-image>>).
 | https://issues.apache.org/jira/browse/GROOVY-12234[GROOVY-12234]
+
+| `groovy.dgm.factory`
+| `true`
+| `false` makes default Groovy method adapters load by class name
+(pre-6 behaviour) instead of through the generated factory. Only
+meaningful when passed to `native-image` at build time, where it prunes
+adapters an agent recording did not see (see <<native-image>>).
+| https://issues.apache.org/jira/browse/GROOVY-12365[GROOVY-12365]
 
 | `groovy.indy.cold.reflection`
 | unset
