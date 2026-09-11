@@ -1,6 +1,7 @@
 = Groovy 6 features for Functional Programmers
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2026-06-01T08:00:00+00:00
+:updated: 2026-09-11T20:00:00+00:00
 :keywords: functional programming, monoid, semigroup, monad, purity, type checker, property-based testing, null checker, immutability, invariants
 :description: Groovy's functional programming stance: like Java, but with checked algebra, verified purity, monadic comprehensions, and machine-actionable annotations.
 
@@ -84,7 +85,9 @@ sections — the `WIRE` DSL and the SMT-backed checker — are *companion
 prototypes*: spikes built on the same public extension SPI the Groovy
 team uses for the in-tree checkers, included here to show how far that
 SPI reaches, not as Groovy 6 features. Each is flagged again where it
-appears.
+appears. The SMT spike has since grown into the separate
+https://github.com/paulk-asert/groovy-verify[`groovy-verify`] project,
+which the monoid section also draws on; it too is external to Groovy.
 
 == What Groovy already gave you
 
@@ -215,7 +218,57 @@ lifting `add` into a wrapper and unlifting the result.
 
 The `Monoid`/`Semigroup` types from FunctionalJava and HighJ are also
 recognised, which means existing FJ-shaped combiners flow through
-`sumParallel` without rewriting.
+`sumParallel` without rewriting. Recognised, though, means _trusted_:
+`CombinerChecker` checks the shape of the call site, not the algebra
+inside the carrier. That is true of the wrapper libraries too. A
+`Monoid<Integer>` built from subtraction type-checks in FunctionalJava,
+just as a lawless `Monoid` instance compiles in Haskell or Cats, where
+the laws are left to property-based tests.
+
+The external, experimental
+https://github.com/paulk-asert/groovy-verify[`groovy-verify`] project,
+which grew out of the SMT spike <<proof-grade,later in this post>>,
+closes that gap when the carrier is built from a lambda it can see:
+
+[source,groovy]
+----
+import fj.F2
+import fj.Monoid
+
+@TypeChecked(extensions = ['groovy.typecheckers.CombinerChecker', 'verification.VerifyChecker'])
+class Totals {
+    @Requires({ xs != null })
+    static int total(List<Integer> xs) {
+        Monoid<Integer> add = Monoid.monoid({ int a, int b -> a + b } as F2<Integer, Integer, Integer>, 0)   // proves
+        xs.sumParallel(add::sum)
+    }
+
+    @Requires({ xs != null })
+    static int diff(List<Integer> xs) {
+        Monoid<Integer> sub = Monoid.monoid({ int a, int b -> a - b } as F2<Integer, Integer, Integer>, 0)   // refutes
+        xs.sumParallel(sub::sum)
+    }
+}
+----
+
+`add` proves both laws, associativity and the identity `0`, without a
+word. `sub` fails the compile, pointing at the lambda:
+
+----
+[Static type checking] - Cannot prove Monoid associativity for combiner sub
+    law: sub(sub(a, b), c) == sub(a, sub(b, c))
+    counterexample: a = 0, b = 0, c = -1
+----
+
+`CombinerChecker` still accepts both call sites; each checker reports
+only its own kind of error. A `Monoid<Double>` built from `+` refutes
+too, because floating-point addition is not associative, which tends
+to surprise anyone who has shipped one. And a carrier with no body in
+sight, such as the library constant `Monoid.intAdditionMonoid`, is not
+quietly waved through: it is recorded in groovy-verify's trust ledger
+as `[opaque carrier] … its associativity and identity are assumed, not
+proven`, printed with `VERIFY_TRUST=report`, and `VERIFY_TRUST=deny:carrier`
+turns it into a build failure.
 
 == Purity and frame conditions — Groovy's answer to `IO` / `State`
 
@@ -565,9 +618,14 @@ class MonoidLawsTest {
 }
 ----
 
-The agent never reads the body of `add` or `merge`. The compile-time
-`CombinerChecker` is the guarantee that the annotation is trustworthy
-enough to treat as a specification.
+The agent never reads the body of `add` or `merge`. `CombinerChecker`
+guarantees the annotation is _present_ wherever a parallel reduction
+relies on it, so the claim can't silently go missing; the generated
+properties then test that the claim is _true_, and groovy-verify can
+go a step further and prove it. A FunctionalJava `Monoid` value has no
+annotation to derive a property from, so its laws are either tested by
+hand or, when it is built from a visible lambda, proved as shown in the
+monoid section.
 
 The same idea applies elsewhere:
 
@@ -872,6 +930,7 @@ No compiler change, no GEP. The pattern this post has been describing
 — transfers cleanly to library authors using only the SPI hooks the
 Groovy team uses to build the in-tree checkers.
 
+[[proof-grade]]
 == From contract-grade to proof-grade: an SMT-backed precondition, postcondition, and loop checker
 
 The previous demo wrote a *structural* checker — names, arity, field
@@ -1118,6 +1177,13 @@ annotation proof-grade, for a fragment, with counterexamples, today.
 A hat-tip to Dafny for setting the counterexample-UX bar and to
 OpenJML for the loud-unknown discipline this spike borrows wholesale.
 
+The spike has since grown into its own project,
+https://github.com/paulk-asert/groovy-verify[`groovy-verify`], which
+now reaches well beyond the linear-integer fragment described here,
+including the monoid laws shown earlier. The
+https://groovy.apache.org/blog/groovy6-formal-methods[formal-methods post]
+covers it in depth.
+
 == How it stacks up
 
 For a JVM-resident FP audience, the comparison set is FunctionalJava,
@@ -1330,6 +1396,11 @@ following the same two-layer pattern used elsewhere in this post.
 counterexample UX the contract annotations and the SMT spike echo
 * https://www.openjml.org[OpenJML] — JML + SMT for Java; source of the
 diagnostic taxonomy and the loud-"unknown"-over-silent-pass discipline
+* https://github.com/paulk-asert/groovy-verify[groovy-verify] — the external
+verifier the SMT spike grew into; proves the monoid laws of `@Reducer`
+methods and of lambda-built FunctionalJava, Palatable and Purefun carriers
+* https://groovy.apache.org/blog/groovy6-formal-methods[Groovy 6 features for formal method advocates] —
+the companion post covering groovy-verify in depth
 * https://github.com/paulk-asert/groovy6-functional[Companion code for this post] — the `wire-*`
 subprojects covering the macro form (shown above) plus the
 builder and builder-with-checker variants, and the `verification`
@@ -1337,6 +1408,13 @@ builder and builder-with-checker variants, and the `verification`
 
 .Update history
 ****
+*11/Sep/2026*: The monoid section now shows the external `groovy-verify`
+project proving, or refuting with a counterexample, the laws of a
+FunctionalJava `Monoid` value built from a lambda, including the classic
+subtraction monoid that type-checks in every FP library. Clarified that
+`CombinerChecker` guarantees an associativity claim is present, not that
+it is true, and noted that the SMT spike has since grown into groovy-verify.
+
 *01/Jun/2026*: Added `pbt-fj` and `pbt-vavr` subprojects to the companion repo, which generate the same property-based tests as the main `pbt` subproject but using the `functionaljava-quickcheck` and `vavr-test` libraries respectively.
 
 *30/May/2026*: Added "From contract-grade to proof-grade" section — a
