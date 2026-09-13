@@ -189,6 +189,7 @@ The docs, shell and console catch up with modern expectations — Markdown, synt
 - Light, dark, "follow system" and <<theming,custom themes>> for GroovyDoc, the GDK reference, and GroovyConsole.
 - <<groovysh,Groovysh>> gains an `/img` command for inline images and charts using JLine's terminal-graphics support, Markdown handling in `/slurp`.
 - <<error-format,`groovyc --error-format short`>> emits one `file:line:column: severity: message` line per diagnostic — the shape editors, CI log parsers and coding agents already understand.
+- <<syntax-errors,Clearer syntax error messages>> for the mistakes people actually make: unclosed strings and comments reported where they opened, an illegal escape in a Windows path named as one, invisible pasted Unicode shown as `+\u200b+` rather than as nothing at all, missing punctuation named (`Missing '('`), and reserved words answered with the Groovy spelling (`'const' is not supported; use 'val' or 'static final' instead`).
 
 *_JDK/Java Integration Improvements_*
 
@@ -198,6 +199,7 @@ Keeps Groovy a first-class citizen on today's JVM: current JDK support, one-line
 - <<java-generics,Generic type syntax>> now follows the JLS: rare types, nested parameterizations, `instanceof` reifiability and type-variable scoping all behave as `javac` does, with matching diagnostics.
 - <<joint-compilation-stubs,Joint Compilation Stub Improvements>>: AST-transform-generated members (`@Immutable`, `@Builder`, `@TupleConstructor`, `@Delegate`, ...) are now visible in generated stubs. Java code in mixed-language projects can finally call constructors and methods contributed by transforms.
 - <<native-image,GraalVM native images>>: an AOT link mode lets even _dynamic_ Groovy dispatch run ahead-of-time compiled — including already-published indy-compiled jars, without recompilation.
+- <<non-hotspot,Non-HotSpot runtimes>>: the runtime no longer assumes it is running on a HotSpot JVM built from a current JDK — version detection, accessibility rules, hidden classes, `ScopedValue` and the indy exception handlers all degrade instead of failing, which is what it takes to come up on Android's ART.
 
 *_Security & Hardening_*
 
@@ -206,6 +208,7 @@ This is the safest Groovy yet — a broad sweep of security hardening across the
 - <<xml-processing,Secure-by-default XML>> parsing (XXE/DTD protections) across the XML APIs.
 - SQL-injection defence in depth: the <<sql-injection-checker,`SqlInjectionChecker`>> at compile time plus `groovy-sql` rejection at runtime.
 - <<regex-timeout,Regex timeouts>> (`@SafeRegex`) guard against ReDoS, alongside JSON nesting-depth limits and stricter Grape coordinate validation.
+- Path containment and least privilege across the tooling: GroovyDoc writes only inside its destination directory and never follows a symbolic link out of `doc-files/`, `grape uninstall` deletes only inside the module cache, `deleteDir` treats a Windows junction as a leaf instead of entering it, the `groovy.ast=xml` dump inherits the source file's permissions rather than the umask, and a failing groovlet no longer returns internals to the client.
 - Fewer sandboxing gaps: `SecureASTCustomizer` restrictions now also cover constructors, initializer blocks, field initializers and authored code relocated into generated or synthetic members (purely generated code, such as accessors and trait bridges, remains exempt); embedders can disable `@ASTTest` when compiling source they don't control.
 
 [[g6-new-modules]]
@@ -2919,7 +2922,29 @@ Date and time values (including legacy `java.util.Date`/`Calendar`) are
 written as ISO-8601 strings, not numeric timestamps. The *untyped*
 slurper path (`parseText`/`parse`) returns temporal values as `String`;
 use the typed `parseAs`/`parseTextAs` API for `java.time` fidelity.
+
+On the untyped path, `YamlSlurper` and `TomlSlurper` now offer the same
+`setDateHandling(JsonDateHandling)` choice `JsonSlurper` has, so a
+date-like string can become a `Date`, an `Instant` or an
+`OffsetDateTime` rather than only a `String`. The default is unchanged --
+`STRING`, which is what these slurpers have always produced -- and a
+date carrying no time (`"2026-09-04"`) stays a `String` whatever is
+chosen. Choosing anything other than `STRING` switches the underlying
+parser to `INDEX_OVERLAY` so the conversion takes effect, which means a
+map with more than a handful of entries no longer iterates in document
+order
+(https://issues.apache.org/jira/browse/GROOVY-12357[GROOVY-12357]).
 ====
+
+NOTE: `YamlSlurper` does not resolve YAML anchors and aliases -- an alias
+arrives as a plain string holding the anchor's *name*, and a merge key
+(`+<<+`) is left as a literal entry rather than merging anything. That comes
+from the Jackson YAML backend, where it is a long-standing deliberate
+limitation, and it is now documented rather than left to be discovered. The
+Processing YAML guide shows both ways round it: `@JsonIdentityInfo` on the
+referenced class for the typed `parseAs` path, and SnakeYAML's
+`SafeConstructor` used directly where a document really does rely on anchors
+(https://issues.apache.org/jira/browse/GROOVY-12358[GROOVY-12358]).
 
 [[xml-processing]]
 == XML Processing Improvements
@@ -3269,6 +3294,14 @@ resolver, `warn` (the default) to log it and add the resolver anyway, or
 `ignore` to skip the check; roots naming a loopback host are exempt under
 every policy. The check applies to both engines, since every route to
 adding a resolver passes through the same facade.
+* `grape uninstall` no longer deletes outside the module cache. The jar to
+delete was `new File(jardir, name)` with `name` taken from the module's
+cached Ivy descriptor unchecked, so a descriptor whose artifact name carried
+a path separator or a `..` segment deleted a file above the module's jars
+directory. Deletion is now skipped, with a warning, unless the resolved file
+is inside that directory, checked on canonical paths so a `..` or a symbolic
+link along the way cannot carry it out
+(https://issues.apache.org/jira/browse/GROOVY-12369[GROOVY-12369]).
 
 [[platform-logging]]
 == Platform Logging
@@ -3311,6 +3344,48 @@ Loggers are organised by module (Core, Grape, Ant, Console, GroovyDoc,
 JSON, Servlet, Swing, Testing) -- see the
 https://groovy-lang.org/logging.html[logging guide]
 for the full list of logger names and their levels.
+
+=== Compile-time caller locations with `@Log4j2`
+
+Application logging has the opposite problem: a logging framework finds
+the caller of a log statement by walking the stack, and every frame
+Groovy's runtime inserts between the two -- metaclass dispatch, the
+reflective cold dispatch tier, GraalVM's method-handle interpreter in a
+native image -- makes that answer wrong, so a pattern using `%C`/`%M`/`%L`
+names the runtime rather than the code that logged. Log4j2 offers no skip
+list to configure, but it does let a caller *supply* the location, and an
+AST transform knows that location exactly, because it is the one writing
+the call.
+
+gapi:groovy.util.logging.Log4j2[`@Log4j2`] gains a `staticLocation`
+option that does just that
+(https://issues.apache.org/jira/browse/GROOVY-12378[GROOVY-12378]):
+
+[source,groovy]
+----
+@Log4j2(staticLocation = true)
+class OrderService {
+    void place(Order order) {
+        log.info "placing $order"
+    }
+}
+----
+
+The statement is emitted as
+`log.atInfo().withLocation(loc).log("placing $order")`, where `loc` is a
+`StackTraceElement` for that statement held in a synthetic static field. So
+`%C`, `%M` and `%L` report `OrderService.place` and its line however the
+call was dispatched -- and Log4j2 skips its stack walk altogether, which is
+the expensive part of resolving a location. A leading `Marker` or trailing
+`Throwable` argument is routed through `withMarker`/`withThrowable` at run
+time, since the builder does not extract a message's throwable itself.
+
+It is opt-in because the call shape changes and `LogBuilder` requires
+Log4j 2.13+, which the transform checks at compile time. For the wider
+picture of which dispatch paths make the caller invisible, and the
+`java.util.logging` and Logback settings that compensate on the paths a
+transform cannot rewrite, see the invokedynamic guide and
+<<g6-other-core-api,Other Core API Changes>>.
 
 [[joint-compilation-stubs]]
 == Joint Compilation Stub Improvements (incubating)
@@ -3782,6 +3857,23 @@ Javadoc layouts
 parse, so CI jobs fail rather than silently succeed
 (https://issues.apache.org/jira/browse/GROOVY-9057[GROOVY-9057])
 
+| Output stays inside the destination
+| A generated class or package page is written only where the normalised
+path resolves within `destdir`. The old check rejected only absolute
+names, so a package path picking up a `..` segment from the source path
+could write a page above the destination directory
+(https://issues.apache.org/jira/browse/GROOVY-12360[GROOVY-12360])
+
+| `doc-files/` copies do not follow links
+| The verbatim mirror of a package's `doc-files/` and `snippet-files/`
+used `Files.copy`, which follows a symbolic link and copies the content
+of its target -- so a link pointing outside the source tree published
+that outside content. A link, or other reparse point such as a Windows
+junction, is now skipped with a warning; destination paths are also
+normalised to `/` so a copied asset is not stored under a backslash key
+on Windows
+(https://issues.apache.org/jira/browse/GROOVY-12370[GROOVY-12370])
+
 | Miscellaneous fixes
 | No spurious `Foo.1.html` pages for enums with per-constant
 bodies
@@ -4121,6 +4213,29 @@ keep the shipped metadata in step with the runtime. GraalVM for JDK
 25.0.4 or later is required; earlier releases carry a substitution
 targeting a method Groovy 6 no longer has
 (https://issues.apache.org/jira/browse/GROOVY-12365[GROOVY-12365]).
+* *The module metadata covers more than extension registration*:
+`groovy-nio` ships the `WatchEvent$Modifier` entry that `Path` introspection
+needs, which a JVM agent run cannot record and so has to be hand-listed
+(https://issues.apache.org/jira/browse/GROOVY-12394[GROOVY-12394]), and
+`groovy-concurrent-java` -- which repackages the async runtime classes
+without the groovy jar, and so without the groovy jar's metadata -- carries
+its own copy of the entries registering the virtual-thread executor and the
+`ScopedValue` lookups, so a pure-Java image gets them too
+(https://issues.apache.org/jira/browse/GROOVY-12380[GROOVY-12380]). The
+native probe builds its image over `groovy-nio`, `groovy-xml` and
+`groovy-json` alongside core, which is what surfaced `groovy-xml`'s JAXP
+`ServiceLoader` lookups and `groovy-json`'s service-loaded string service as
+gaps in the first place
+(https://issues.apache.org/jira/browse/GROOVY-12379[GROOVY-12379]).
+* *Image frames are recognised as runtime frames*: inside a native image
+GraalVM runs dynamically built `MethodHandle` chains in its own interpreter
+and reflects through its own accessors, so `com.oracle.svm.*` frames sit
+between a Groovy call and its real caller.
+`ReflectionUtils.getCallingClass` -- which is how `getBundle` and Grape find
+the calling class -- and `StackTraceUtils.sanitize` now treat those as
+runtime frames, so a resource bundle resolves against the caller that asked
+for it and a sanitized stack trace is not padded with image internals
+(https://issues.apache.org/jira/browse/GROOVY-12362[GROOVY-12362]).
 
 A note on class-initialization policy: recipes written for earlier Groovy
 versions often passed a blanket `--initialize-at-build-time` (with no
@@ -4142,6 +4257,117 @@ ignored), Logback needs them added to its framework packages, and Log4j2
 has no equivalent hook; statically compiled code is unaffected. The
 invokedynamic guide has the exact settings
 (https://issues.apache.org/jira/browse/GROOVY-12354[GROOVY-12354]).
+
+A note on the JDK's own AOT cache: JDK 25's AOT cache (JEP 514) is a
+different mechanism that applies to Groovy programs on an ordinary JVM, and
+needs nothing configured in Groovy -- the recipe is the JDK's own training
+run plus `-XX:AOTCache`. Measured on the small dynamic program the build uses
+to check native images, nearly every class comes from the cache rather than
+the jars, the hidden classes for the lambdas in the runtime's own classes
+come with them, and startup plus run drops by roughly 40%. What it does not
+cover is dispatch: Groovy's call sites are bootstrapped by `IndyInterface`
+and JDK 25 archives only sites the JDK's own bootstrap methods link, so every
+dynamic site still links on its first call in each run. Three JDK
+constraints bite in practice -- the class path must be jars rather than
+directories, it must be unchanged between the training run and the cached
+runs, and classes the Groovy compiler defines at run time cannot be archived,
+so compile with `groovyc` into a jar rather than running a script. The
+invokedynamic guide has the full recipe
+(https://issues.apache.org/jira/browse/GROOVY-12381[GROOVY-12381]).
+
+[[non-hotspot]]
+== Running on Non-HotSpot Runtimes
+
+The work on native images turned up a second, related assumption: Groovy's
+runtime had grown a handful of dependencies on being a HotSpot JVM built from
+a current JDK. Those matter for any runtime that implements the Java class
+library without being a JDK -- Android's ART most of all, which is where most
+of the following surfaced. Groovy 6 removes them, so the runtime comes up and
+dispatches dynamically on such a runtime rather than failing during class
+initialisation.
+
+None of this makes Groovy 6 a fully-supported, tested Android platform.
+What changed is that these are no longer in the way. While you can build
+Android apps using Groovy 6 with a shim architecture,
+we anticipate full support in a future Groovy version.
+
+[cols="1,3", options="header"]
+|===
+| Change | Description
+
+| Java version detection
+| `Runtime.version()` is a Java 9 API that a runtime built on the JDK class
+library need not provide. The new `JavaFeatureVersion.current()` parses
+`java.specification.version` where it is missing, and assumes the lowest
+release Groovy supports when that is unusable; `VMPluginFactory` and
+`CompilerConfiguration`'s default `targetBytecode` go through it
+(https://issues.apache.org/jira/browse/GROOVY-12382[GROOVY-12382])
+
+| Accessibility without a module system
+| The VM plugin's accessibility rules consulted `Module`/`Layer`. Where the
+module system is absent, they now fall back to the Java 8 rules instead of
+failing
+(https://issues.apache.org/jira/browse/GROOVY-12383[GROOVY-12383])
+
+| Type-use annotations without `AnnotatedType`
+| The Java 8 plugin reads type-use annotations through `AnnotatedType`, which
+not every reflection implementation carries. It is now skipped rather than
+assumed
+(https://issues.apache.org/jira/browse/GROOVY-12389[GROOVY-12389])
+
+| Hidden classes
+| The direct invokers (see <<g6-other-core-api,Other Core API Changes>>)
+check for Android *before* touching `HiddenClassDefiner`, so a runtime with
+no hidden-class support never loads the definer at all
+(https://issues.apache.org/jira/browse/GROOVY-12384[GROOVY-12384])
+
+| `ScopedValue` detection
+| `ScopedLocal` decided whether `ScopedValue` was available from the runtime
+version; it now probes for the type
+(https://issues.apache.org/jira/browse/GROOVY-12385[GROOVY-12385])
+
+| `catchException` on ART
+| ART does not run the handler in a `MethodHandles.catchException` combinator
+for an exception constructed without a writable stack trace -- which is
+exactly what Groovy's control-flow exceptions are, so `null.foo()` surfaced a
+no-stack `MissingMethodException` instead of the `NullPointerException` from
+`NullObject.invokeMethod`, and no-stack exceptions escaped unwrapped. The
+`GroovyObject` fallback and the unwrapper are now available as plain Java
+`try`/`catch` handlers, used only when running on Android; the JVM path is
+untouched
+(https://issues.apache.org/jira/browse/GROOVY-12387[GROOVY-12387])
+
+| Lazy `System.Logger` in `groovy-json`
+| `System.Logger` was obtained in static initialisers, so a runtime without a
+usable `LoggerFinder` failed initialising classes that never log. It is now
+obtained lazily
+(https://issues.apache.org/jira/browse/GROOVY-12386[GROOVY-12386])
+
+| Compiler types out of the runtime
+| `GStringImpl`'s constant-value check reached into the compiler's
+`ClassHelper` via `ImmutablePropertyUtils`, pulling a slice of the compiler
+into any program that used a `GString`. The type knowledge moved to a
+runtime-only `ImmutableTypes`
+(https://issues.apache.org/jira/browse/GROOVY-12390[GROOVY-12390])
+
+| DGM adapter initialisers
+| The generated `dgm$N` adapters held `MethodType` constants in their static
+initialisers, which a runtime with a narrower constant-pool implementation
+cannot resolve; they are now built without them
+(https://issues.apache.org/jira/browse/GROOVY-12388[GROOVY-12388])
+
+| R8 keep rules
+| `IndyCatchCompat` obtained its handles by name, which a shrinker cannot
+see, so R8 needed a keep rule to avoid removing them. The lookups are now
+direct references
+(https://issues.apache.org/jira/browse/GROOVY-12395[GROOVY-12395])
+
+| `grooid` jar repackaging
+| The `grooid` build rewrites `java.beans.*` references to `openbeans`, and
+was rewriting `java.beans.Transient` -- a type openbeans never had -- to a
+class that does not exist. The rewrite now leaves it alone
+(https://issues.apache.org/jira/browse/GROOVY-12391[GROOVY-12391])
+|===
 
 [[error-format]]
 == Compiler Diagnostic Output
@@ -4189,6 +4415,75 @@ sensibly.
 Together with `--check` (see <<g6-other-core-api,Other Core API
 Changes>>), this gives tooling a fast, parseable compile: check without
 writing class files, and report what failed in one line each.
+
+[[syntax-errors]]
+== Clearer Syntax Error Messages
+
+Groovy 6 continues the work begun on unbalanced delimiters
+(https://issues.apache.org/jira/browse/GROOVY-12169[GROOVY-12169],
+https://issues.apache.org/jira/browse/GROOVY-12171[GROOVY-12171]) and gives
+the rest of the everyday mistakes a message that names what is wrong, with a
+caret on the token that caused it, in the shape `javac` uses
+(https://issues.apache.org/jira/browse/GROOVY-12353[GROOVY-12353]).
+
+An unterminated string or comment is reported where it *opened*, rather than
+at whatever the lexer eventually tripped over:
+
+[source]
+----
+Unclosed string literal @ line 1, column 9.
+   println 'Hello
+           ^
+----
+
+A *closed* literal carrying a backslash that is not a Groovy escape -- the
+Windows path everyone writes at least once -- is the illegal escape it
+actually is, not an unclosed quote, and the caret sits on the backslash:
+
+[source]
+----
+Illegal escape character: '\U' @ line 1, column 8.
+   x = "C:\Users\me"
+          ^
+----
+
+A character that cannot appear in source is now printed as an escape rather
+than emitted raw, which is the difference between a message you can read and
+a message with a hole in it. A zero-width space, a BOM, a no-break space, a
+curly quote or an em dash pasted in from a document or a chat window each
+name themselves -- `+Unexpected character: '\u200b'+` -- where previously the
+message embedded the invisible character itself.
+
+Missing punctuation is named rather than described as unexpected input:
+`Missing '('` for `if true { x = 1 }`, `Missing ':'` for an incomplete
+ternary, `Missing '>'` for an unclosed type-argument list, and `Missing ']'`
+for an unclosed index -- including the safe-index form, where `a?[0` reports
+the bracket and `?[0]` with nothing in front of it reports
+`'?[' requires an expression before it`.
+
+A word that is reserved but not supported says so, and offers the Groovy
+spelling where there is one:
+
+[source]
+----
+'const' is not supported; use 'val' or 'static final' instead @ line 1, column 1.
+   const x = 1
+   ^
+----
+
+`goto` and `threadsafe` report likewise, and a control-flow keyword in the
+wrong place is named for what it is rather than for the parse it broke:
+`'else' without 'if'`, `'catch' without 'try'`, `'finally' without 'try'`,
+`'case' outside of switch`, `'default' outside of switch`. Lexical and
+structural mistakes get the same treatment -- `Number ending with
+underscores is invalid`, `Invalid octal number`, `Shebang comment should
+appear at the first line`, `Unexpected end of input` for a truncated
+statement, and a var-arg parameter that is not last reported by name.
+
+These compose with the rest of the diagnostics work: `--error-format short`
+(see <<error-format>>) renders each of them as one parseable line, and parser
+error recovery collects several from a single parse rather than stopping at
+the first.
 
 [[g6-other-core-api]]
 == Other Core API Changes
@@ -4442,7 +4737,29 @@ as a dynamic method name (`log."$level"(msg)`) or an explicit
 `invokeMethod`, show runtime frames on every Groovy version; the
 invokedynamic guide documents the JUL and Logback settings that cover
 those, on a JVM and in native images
-(https://issues.apache.org/jira/browse/GROOVY-12354[GROOVY-12354]).
+(https://issues.apache.org/jira/browse/GROOVY-12354[GROOVY-12354]). Log4j2
+has no equivalent setting, so `@Log4j2` gains a `staticLocation` option that
+supplies the location from the compiler instead of leaving it to a stack
+walk -- see <<platform-logging,Platform Logging>>.
+* *`deleteDir` treats a junction as a leaf.* Since GROOVY-12125 a symbolic
+link inside a tree being deleted is removed as the link rather than entered,
+but the guard was `Files.isSymbolicLink`, which does not report a Windows
+directory junction -- the link form that matters most there, since
+`mklink /J` needs no privilege where a Windows symbolic link needs one most
+users do not hold. `File.deleteDir` and the `groovy-nio` `Path.deleteDir`
+now read each node's attributes without following links and treat anything
+that is neither a regular file nor a directory as a leaf, so a junction or
+other reparse point, a pipe, a socket or a device is removed as the node it
+is and never entered. On POSIX the visible behaviour is unchanged
+(https://issues.apache.org/jira/browse/GROOVY-12359[GROOVY-12359]).
+* The `groovy.ast=xml` debug option writes a serialized AST to
+`<source>.xml` beside the source. It was created at the process umask, so a
+source the developer had kept private produced a world-readable dump of its
+AST. The dump is now created with the source file's own permissions, and
+owner-only where there is no source file to match -- created *with* the
+permissions rather than created and then adjusted, so its contents are never
+briefly readable by anyone those permissions exclude
+(https://issues.apache.org/jira/browse/GROOVY-12368[GROOVY-12368]).
 * *A bounded parser DFA cache*. The shared ANTLR DFA cache had no ceiling
 out of the box, and the GC canary that dropped it is only observed on the
 parse path, so a long-lived daemon parsing across many modules could grow
@@ -4649,6 +4966,42 @@ keeps the familiar DSL while smoothing over the legacy `Date`/`Calendar`
 rough edges. The original `groovy.time.TimeCategory` remains for backwards
 compatibility
 (https://issues.apache.org/jira/browse/GROOVY-12124[GROOVY-12124]).
+* *groovy-sql*: `Sql`'s prepared-statement cache is now bounded and
+thread-safe. It was an unbounded `HashMap` keyed on the SQL text and mutated
+without synchronization, so it grew without limit whenever the text varied
+rather than the parameters -- `inList` expands to a different placeholder
+count per list size, so a caller sizing the list minted a distinct cached
+statement each time, held open until the `Sql` was closed -- and a shared
+`Sql` used from more than one thread could corrupt the map. It is now a
+synchronized, access-ordered cache that evicts the least recently used
+statement past a cap and closes it on the way out, so bounding it does not
+leak the cursor it drops. The cap is `statementCacheSize`, default 256, also
+settable with `groovy.sql.statement.cache.size`; `0` or less keeps the old
+unbounded behaviour. Statement creation stays outside the lock, so preparing
+one does not serialize other callers. Where a single `Sql` really is shared
+across threads, size the cache above the working set: a bound below it can
+now evict and close a statement another thread was about to reuse
+(https://issues.apache.org/jira/browse/GROOVY-12371[GROOVY-12371]).
+* *groovy-servlet*: gapi:groovy.servlet.GroovyServlet[GroovyServlet] no longer sends error detail to the
+client. A failing groovlet put the script path, the exception message and the
+top stack frame in the 500 response body -- the same detail already written
+to the servlet and application logs -- which discloses internals to callers
+and, since the response is `text/html` carrying a request-derived script
+path, is a reflected-content risk where the container does not escape the
+`sendError` message. The client now gets a generic 500 and the full detail
+still goes to the logs. A protected `isVerboseErrors()` hook, defaulting to
+the `groovy.servlet.verbose.errors` system property, restores the detailed
+responses for debugging
+(https://issues.apache.org/jira/browse/GROOVY-12373[GROOVY-12373]).
+* *groovy-swing*: gapi:groovy.swing.LookAndFeelHelper[LookAndFeelHelper]'s Metal `theme` attribute treated an
+unrecognised string as a class name and resolved, initialised and
+instantiated it before discovering whether it was even a `MetalTheme` -- the
+cast failed only afterwards -- and resolved through its own class loader, so
+an application- or `@Grab`-supplied theme was not found at all. The class is
+now resolved without initialising it, through the thread context class
+loader, and confirmed to be a `MetalTheme` before construction;
+anything else raises `IllegalArgumentException` without being initialised
+(https://issues.apache.org/jira/browse/GROOVY-12376[GROOVY-12376]).
 
 [[Groovy6.0-breaking]]
 == Breaking changes
@@ -4670,6 +5023,47 @@ Groovy 5 still includes such support on JDK versions that support it.
 
 === Other changes
 
+* *The command-line launchers no longer add the current directory to a
+classpath you supplied.* `groovy`, `groovyc`, `groovysh` and friends appended
+`.` to whatever came from `-cp`/`-classpath` or the `CLASSPATH` environment
+variable, which the `java` launcher does not do. An explicit classpath is now
+honoured as-is; only a bare invocation with no classpath given falls back to
+the current directory. If you relied on the implicit `.` -- running a script
+that loads a class from the working directory while also passing `-cp` for a
+library jar -- add `.` to the classpath yourself, e.g. `-cp lib.jar:.`
+(`-cp lib.jar;.` on Windows)
+(https://issues.apache.org/jira/browse/GROOVY-12374[GROOVY-12374]).
+* *String-to-`Class` coercion no longer runs the class's static
+initializer.* `'com.example.Foo' as Class`, and the `(Class)` cast the
+compiler routes through `ShortTypeHandling.castToClass`, now *resolve* the
+named class without *initializing* it: `Class.forName(name, false, loader)`
+in place of the single-argument `Class.forName(name)`, with the same class
+loader as before. The class is still initialized lazily on first real use, as
+the JVM always does. Code that relied on the coercion for the side effect --
+most commonly the legacy JDBC idiom `'com.mysql.jdbc.Driver' as Class` to
+register a driver -- should call `Class.forName(name)` explicitly; modern
+JDBC drivers auto-register through `ServiceLoader` and need none of it. The
+signature is unchanged, so this is a behavioural change only
+(https://issues.apache.org/jira/browse/GROOVY-12375[GROOVY-12375]).
+* *`decodeBase64` rejects malformed padding.* The decoder set a done flag on
+`=` but never checked that the padding filled its group, so it accepted a
+single `=` where two were needed (`YQ=`), an extra `=` past a full group
+(`YQ===`), and padding on an already complete group (`YWJj=`) -- each
+decoding as if the padding were correct, so distinct malformed strings mapped
+to the same bytes. Padding is now valid only when it fills its
+four-character group exactly and the group already holds at least two data
+characters; any other shape throws. Deliberately unchanged: *missing*
+padding still decodes (`YQ` and `YWJj` both work, as with
+`java.util.Base64`), whitespace and the newlines of a chunked encoding are
+still ignored so `encodeBase64(chunked: true)` round-trips, and
+non-canonical trailing bits are still accepted
+(https://issues.apache.org/jira/browse/GROOVY-12372[GROOVY-12372]).
+* `GroovyServlet` no longer includes the script path, exception message and
+top stack frame in the 500 response body; the client gets a generic error and
+the detail goes to the logs. Set `-Dgroovy.servlet.verbose.errors=true` (or
+override `isVerboseErrors()`) to restore the detailed responses for
+debugging. See <<g6-other-module-changes,Other Module Changes>>
+(https://issues.apache.org/jira/browse/GROOVY-12373[GROOVY-12373]).
 * `val` is now a contextual keyword for declaring final variables
 (see <<val-keyword>>). A few pre-existing edge cases around the
 sibling `var` keyword now apply to `val` as well -- chiefly a field
@@ -5140,6 +5534,20 @@ they do not control without executing its compile-time closures
 `groupBy(MutableList)` (see <<g6-extension-disable,Selectively Disabling
 Extension Methods>>).
 | https://issues.apache.org/jira/browse/GROOVY-11892[GROOVY-11892]
+
+| `groovy.sql.statement.cache.size`
+| `256`
+| Maximum prepared statements `Sql` keeps in its cache before evicting and
+closing the least recently used one; `0` or less restores the pre-6
+unbounded cache. Also settable per instance as `statementCacheSize`.
+| https://issues.apache.org/jira/browse/GROOVY-12371[GROOVY-12371]
+
+| `groovy.servlet.verbose.errors`
+| `false`
+| `true` puts the script path, exception message and top stack frame back in
+a groovlet's 500 response body (a debugging aid; the detail always goes to
+the logs).
+| https://issues.apache.org/jira/browse/GROOVY-12373[GROOVY-12373]
 |===
 
 NOTE: The `SqlInjectionChecker` compile-time check
