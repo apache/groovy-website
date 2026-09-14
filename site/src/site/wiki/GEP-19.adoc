@@ -185,13 +185,18 @@ switch (obj) {
 ----
 
 Bare `+_+` is permitted inside `Type(...)` because record-pattern
-component grammar is not expression grammar. One carve-out results:
-a call label whose sole argument is `_` — in practice only
-`case foo(_) \->` with `_` in scope as a variable — reparses as a
-record pattern with a wildcard component. Call labels with any other
-argument shapes (`case foo()`, `case foo(bar)`, `case lower('ABC')`)
-keep their legacy `isCase` semantics; record patterns are only
-recognised when every component is pattern-shaped.
+component grammar is not expression grammar. A call-shaped label is
+read as a record pattern only when its arguments are pattern-shaped,
+so `case foo()`, `case foo(bar)` and `case lower('ABC')` keep their
+legacy `isCase` semantics.
+
+One narrow carve-out results. Argument forms such as `var x` do not
+parse today, so claiming them breaks nothing; bare `_` does, because it
+is an ordinary identifier. A label spelled `case Foo(_) \->`, where the
+name is capitalised and `_` is in scope as a variable, therefore changes
+meaning: it called `Foo(_)` before and is now read as a record pattern
+on the type `Foo`. The lower-case spelling `case foo(_) \->` is
+unaffected and still calls `foo`.
 
 A value deconstructs positionally if it is a record — native or
 emulated, Groovy or Java — or if it provides a `toList()` method,
@@ -300,10 +305,11 @@ case [:]  -> "empty map"
 The legacy `isCase` semantics for these — never matching anything,
 because `[].contains(x)` and `[:].get(x)` are always false / null —
 have no practical use, so claiming the pattern interpretation removes
-no functionality. Since patterns require the arrow form, the
-colon-form spellings `case []:` and `case [:]:` — previously
-compiling, never-matching dead code — become compile-time errors
-rather than silently keeping their useless legacy meaning.
+no functionality. Because patterns require the arrow form, the
+reinterpretation applies to `case [] \->` and `case [:] \->` only; the
+colon-form spellings `case []:` and `case [:]:` keep their legacy
+never-matching meaning, so nothing that compiles today stops
+compiling.
 
 === Wildcards
 
@@ -841,6 +847,8 @@ syntactic forms that currently fail to parse:
 |`case [name: 'x'] ->`                     |Yes — legacy `Map.isCase`, unchanged
 |`case [_] ->`                             |Yes — legacy (list containing `_`)
 |`case foo() ->` / `case foo(bar) ->`      |Yes — legacy call label, unchanged
+|`case foo(_) ->` (lower case)             |Yes — legacy call label, unchanged
+|`case []:` / `case [:]:` (colon form)     |Yes — legacy, never matched, unchanged
 |`case [var h, var... t] ->`               |No — new, claims unused grammar
 |`case [def h, def... t] ->`               |No — new (Groovy-native equivalent)
 |`case [... t] ->` / `case [...] ->`       |No — new (`...` shortcut / flipper)
@@ -864,15 +872,19 @@ parse today and change meaning — is:
   identifier): previously a chained comparison expression
   (`(List < String) > l`), now a type pattern. The legacy parse
   cannot usefully evaluate (it compares a class against a class).
-* `case foo(_) \->` with `_` in scope as a variable: previously a
-  method-call label passing `_`, now a record pattern with a wildcard
-  component (see _Record patterns_).
-* Colon-form `case []:` and `case [:]:` (and colon-form pattern-shaped
-  labels generally): previously compiling, now compile-time errors,
-  since patterns require the arrow form. The legacy colon forms could
-  never match.
+* `case Foo(_) \->`, where `Foo` names a method rather than a type and
+  `_` is in scope as a variable: previously a call label passing `_`,
+  now a record pattern on the type `Foo` (see _Record patterns_). Only
+  the capitalised spelling is affected; `case foo(_) \->` still calls
+  `foo`, and other argument shapes such as `var x` do not parse today
+  so they claim no existing meaning.
 
-No realistic program relies on any of these legacy meanings; they are
+That is the complete list. Colon-form labels are deliberately not on
+it: a pattern requires the arrow form, so a colon-form label is never
+read as a pattern and keeps whatever it means today, including the
+never-matching `case []:` and `case [:]:`.
+
+No realistic program relies on either legacy meaning; they are
 itemised for completeness.
 
 === `_` semantics across forms
