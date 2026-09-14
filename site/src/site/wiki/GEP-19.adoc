@@ -15,16 +15,22 @@
 *Last modification*:: 2026-09-14
 ****
 
-[width="80%",align="center"]
-|===
-a| NOTE: _WARNING:_
+[NOTE]
+____
+_WARNING:_
 Material on this page is still under development!
 We are currently working Groovy 6.0 and this proposal targets Groovy 7.0.
 The final version of this proposal may differ significantly from the current draft,
 but having this draft available allows us to gather early feedback, future align design
 decisions in Groovy 6 as best we can, and iterate on the design.
 We welcome feedback and discussion, but please keep in mind that the details are not yet finalized.
-|===
+
+A reference implementation of the `switch` and `instanceof` pattern features exists
+and is kept ported to current Groovy master; learnings from that work are folded into
+this document. It is a draft: where this page describes what the implementation does,
+that records where the work has got to rather than a settled decision.
+Bracket-form assignment is deferred pending further review (see below).
+____
 
 == Abstract
 
@@ -35,11 +41,14 @@ pattern-matching trajectory (JEPs 440, 441, 456, 507).
 The proposal adds list patterns (`[var h, var... t]`), map patterns
 (`[name: var n, var... rest]`), record patterns (`Type(var x, var y)`),
 type patterns with binding (`String s`), guard clauses (`when`), and a
-unified wildcard form (`_` inside record patterns; `var _` elsewhere). The same pattern grammar is also accepted
-in `def [...] = ...` bracket-form declarations, providing a consistent
+unified wildcard form (`_` inside record patterns; `var _` elsewhere).
+The same pattern grammar is additionally proposed for
+`def [...] = ...` bracket-form declarations, providing a consistent
 destructuring grammar between switch case labels and assignment for
-users who want it. The everyday parens form (`def (...) = ...`) is
-covered separately by GEP-20 and ships in Groovy 6.x.
+users who want it; that part of the proposal is deferred pending
+further review (see _Bracket-form assignment_). The everyday parens
+form (`def (...) = ...`) is covered separately by GEP-20 and ships in
+Groovy 6.x.
 
 All existing `switch` semantics are preserved: legacy `isCase` matching
 (constants, ranges, regex, classes, collections, maps, closures) compiles
@@ -109,11 +118,13 @@ keeps Groovy forward-compatible without paying for it twice.
   convention and GEP-20), and rest slots accept the shortcut `...`
   (or `... ident`) for `var... _` (or `var... ident`).
 
-* *Shared bracket-form grammar with assignment* — the pattern grammar
-  is accepted by `def [...] = expr` declarations as by
-  `case [...] ->` labels. The parens form (`def (...) = ...`) covered
-  by GEP-20 remains the canonical surface for everyday destructuring;
-  the bracket form is the opt-in bridge to switch pattern grammar.
+* *Shared bracket-form grammar with assignment (deferred)* — the
+  pattern grammar would be accepted by `def [...] = expr` declarations
+  as by `case [...] ->` labels. The parens form (`def (...) = ...`)
+  covered by GEP-20 remains the canonical surface for everyday
+  destructuring; the bracket form would be the opt-in bridge to switch
+  pattern grammar. This feature is deferred pending further review
+  (see _Bracket-form assignment_).
 
 * *Forward-compatible lowering* — list and map patterns desugar through
   an internal `Deconstructable` strategy. When Java's deconstructor JEP
@@ -122,6 +133,19 @@ keeps Groovy forward-compatible without paying for it twice.
   change needed.
 
 == Features
+
+Pattern case labels are supported in the arrow form (`case ... \->`)
+only; a pattern with a colon label is a compile-time error. Pattern
+and legacy labels may mix freely within a single (arrow-form) switch,
+each label keeping its own semantics.
+
+Patterns never match `null`: a `null` subject simply falls through to
+the next arm (or `default`). Groovy's `switch` thus keeps its existing
+null-friendliness — a `null` subject is not an error, and the legacy
+`case null` label still matches it — where Java's pattern switch
+throws `NullPointerException` for an unmatched `null`. Within a
+pattern, a typed element does not match a `null` value, while `var` /
+`def` bindings and `_` wildcards do.
 
 === Type patterns with binding
 
@@ -161,8 +185,18 @@ switch (obj) {
 ----
 
 Bare `+_+` is permitted inside `Type(...)` because record-pattern
-component grammar is not expression grammar — there is no collision
-with `_` as an identifier in expression position.
+component grammar is not expression grammar. One carve-out results:
+a call label whose sole argument is `_` — in practice only
+`case foo(_) \->` with `_` in scope as a variable — reparses as a
+record pattern with a wildcard component. Call labels with any other
+argument shapes (`case foo()`, `case foo(bar)`, `case lower('ABC')`)
+keep their legacy `isCase` semantics; record patterns are only
+recognised when every component is pattern-shaped.
+
+A value deconstructs positionally if it is a record — native or
+emulated, Groovy or Java — or if it provides a `toList()` method,
+which is the current spelling of the `Deconstructable` strategy (see
+_Compilation_).
 
 === List patterns
 
@@ -197,19 +231,33 @@ Element count rules:
   single position. Multiple rest bindings at the same level are a
   compile error.
 
+Matching rules:
+
+* Literal elements (e.g. `1` in `[1, var x, ...]`) match their
+  corresponding element by Groovy equality (`==`).
+* Typed elements and typed rest bindings are runtime type tests: a
+  mismatching (or `null`) element fails the match rather than casting.
+* A rest binding always binds a new `List` holding the collected
+  elements; array and other `Iterable` inputs are materialised, and a
+  matched `List` is never aliased by a rest binding.
+
 Type rules:
 
-* For `List<T>` input, untyped element bindings are inferred as `T`,
-  the rest binding as `List<T>`.
-* For `T[]` input, the rest binding is inferred as `T[]`.
-* For other `Iterable<T>` input, the iterable is materialised as a list
-  once for matching.
-* For `Object` input, bindings fall back to `Object` and `List`.
+* An `Iterable<T>` input that is not a `List` is materialised as a
+  list once for matching, so it must be traversable non-destructively.
+* Untyped bindings are dynamically typed. For `List<T>` input, the
+  static type checker may in future infer untyped element bindings as
+  `T` and the rest binding as `List<T>` (a planned refinement);
+  bindings are otherwise `Object` and `List`.
 
 === Map patterns
 
 Map patterns destructure `Map` values by key. Keys are compile-time
-constant expressions; values are arbitrary patterns:
+constants — identifier keys, string or number literals; a computed key
+(a parenthesised expression or GString) is a compile-time error in a
+map pattern, though it remains valid in a legacy map label. Values are
+arbitrary patterns; literal values (e.g. `'circle'` below) match by
+Groovy equality (`==`):
 
 [source,groovy]
 ----
@@ -231,8 +279,11 @@ these keys" — is expressed via a guard:
 case [name: var n] when ((Map) m).size() == 1 -> ...
 ----
 
-The rest binding `var... rest` in a map pattern binds a `Map` of the
-entries not matched by named keys.
+The rest binding `var... rest` in a map pattern binds a new `Map` of
+the entries not matched by named keys (the matched map is never
+aliased). A named key whose value pattern is a wildcard still requires
+the key to be present: `[name: var _]` matches a map with a `name` key
+whatever its value (even `null`), but not a map lacking one.
 
 === Empty literals
 
@@ -249,7 +300,10 @@ case [:]  -> "empty map"
 The legacy `isCase` semantics for these — never matching anything,
 because `[].contains(x)` and `[:].get(x)` are always false / null —
 have no practical use, so claiming the pattern interpretation removes
-no functionality.
+no functionality. Since patterns require the arrow form, the
+colon-form spellings `case []:` and `case [:]:` — previously
+compiling, never-matching dead code — become compile-time errors
+rather than silently keeping their useless legacy meaning.
 
 === Wildcards
 
@@ -356,6 +410,12 @@ Guards may reference any binding from the same pattern. Guards are
 evaluated once after pattern matching succeeds; arms with failing
 guards fall through to the next arm.
 
+`when` guards apply to pattern labels only. A guard on a
+legacy-shaped label (e.g. `case [1, 2, 3] when g \->`, where the
+literal has no binding form) is a compile-time error rather than
+silently choosing between containment and equality semantics; adding
+a binding form makes the label a pattern.
+
 === Patterns in `instanceof`
 
 Type patterns and record patterns extend to `instanceof`, mirroring
@@ -374,6 +434,15 @@ if (point instanceof Point(int x, int y)) {
 List and map patterns are not valid in `instanceof` because they have
 no type at the head. To test "is this value shaped like ...", use a
 single-arm `switch` expression returning a boolean.
+
+One divergence from Java in `instanceof` position: a primitive-typed
+record component (e.g. `x` in `instanceof Point(int x, _)`) binds its
+wrapper type (`Integer`), because the `instanceof` lowering lives in
+expression context where the primitive re-declaration used by the
+switch lowering is unavailable. In `switch` case labels the declared
+primitive type is bound, matching Java (JEP 440). The difference is
+only visible to the static type checker (e.g. overload selection);
+values are identical.
 
 === Disambiguation rule
 
@@ -412,11 +481,28 @@ expression position — `case [_] \->` therefore retains its legacy
 meaning. Users wanting a single-element wildcard pattern write
 `case [var _] \->`.
 
+A nested `[...]` element inside a pattern follows the same rule: a
+pattern-shaped nested literal is a nested pattern, while a plain
+nested literal (e.g. the inner `[1, 2]` in `[[1, 2], var x]`) is a
+literal element matched by equality.
+
 === Bracket-form assignment
 
-In Groovy 7.0, `def [...] = expr` accepts the same pattern grammar as
-switch case labels. This is the bridge between switch and assignment
-destructuring:
+NOTE: This feature is *deferred pending further review* and is not
+part of the reference implementation. Relative to the rest of this
+proposal it adds the least over the shipped GEP-20 parens form
+(nested patterns, runtime type tests and strict arity are the only
+deltas), it forks rest-binding semantics between switch and
+assignment contexts (see the lowering below), it introduces a second
+declaration-destructuring syntax with the opposite failure philosophy
+to the parens form (strict `IllegalArgumentException` vs null
+padding), and Java's anticipated statement-level ("let") patterns may
+yet suggest an aligned surface and failure semantics. The design
+below is retained as the current straw-man for that review.
+
+In Groovy 7.0, `def [...] = expr` would accept the same pattern
+grammar as switch case labels. This is the bridge between switch and
+assignment destructuring:
 
 [source,groovy]
 ----
@@ -551,12 +637,13 @@ the trigger would reject working code. See <<remaining-work,Remaining work>>.
 |`IllegalArgumentException`
 |===
 
-A `null` selector matches no constant or type label, so in statement
-position it falls through and in expression position it raises
-`IllegalStateException`. Java instead throws `NullPointerException`
-unless a `case null` label is present; Groovy's labels match through
-`isCase`, for which `null` is an ordinary value that simply matches
-nothing, so the Java behaviour is not adopted.
+A `null` subject is not an error, as set out under _Features_: it
+matches no constant or type label, so in statement position it falls
+through and in expression position it raises `IllegalStateException`,
+while a legacy `case null` label still matches it. Java instead throws
+`NullPointerException` unless a `case null` label is present. Groovy's
+labels match through `isCase`, for which `null` is an ordinary value
+that simply matches nothing, so the Java behaviour is not adopted.
 
 == Compilation
 
@@ -578,20 +665,50 @@ When Java's deconstructor JEP ships, surface forms like
 `case Map.of("name", var n) \->` are accepted as additional spellings
 that lower to the same `Deconstructable` calls — no re-architecture.
 
-Implementation considerations:
+In the reference implementation, everything is parse-time desugaring:
+no new AST node kinds and no bytecode-format changes. A value
+deconstructs positionally if it is a record — native or emulated,
+Groovy or Java, with components resolved reflectively and invoked
+through the meta-object protocol so both kinds behave identically —
+or if it provides a `toList()` method. Runtime support lives in the
+`@Incubating` classes `RecordPatternSupport`, `ListPatternSupport`
+and `MapPatternSupport`.
 
-* Switch dispatch on JDK 21+ should evaluate
-  `java.lang.runtime.SwitchBootstraps.typeSwitch` as the dispatch path
-  for arms whose patterns admit it, on parity with how Java compiles
-  pattern switch.
-* Bindings live in synthetic locals; the static type checker propagates
-  narrowed types into them.
-* For dynamic Groovy, bindings are typed `Object` and runtime checks
-  dominate; for `@CompileStatic`, narrowed types let the JIT see
-  through.
+Implementation considerations (reflecting the reference
+implementation):
+
+* A switch whose case labels are all patterns lowers each arm to
+  nested `instanceof` checks and binding declarations in a per-arm
+  scope — no per-arm closure is allocated, pattern variable names may
+  repeat across arms, and a matched value is destructured exactly
+  once, with the `when` guard as the innermost check. Measured against
+  closure-based `isCase` dispatch this is roughly 6x faster under
+  `@CompileStatic` (arms become plain `INSTANCEOF` branches) and 1.4x
+  faster in dynamic code. Switches mixing patterns with legacy labels
+  retain closure-based labels for the pattern arms.
+* Emitting `java.lang.runtime.SwitchBootstraps.typeSwitch`
+  invokedynamic dispatch — on parity with how Java compiles pattern
+  switch — remains future work for when a JDK 21+ bytecode target is
+  available; the nested-`instanceof` shape above is what that
+  bootstrap degenerates to for small label counts.
+* Bindings are ordinary local variables (the `instanceof` binding
+  machinery from JEP 394 support); the static type checker propagates
+  narrowed types into them. For dynamic Groovy, untyped bindings are
+  dynamically typed and runtime checks dominate; for `@CompileStatic`,
+  narrowed types let the JIT see through.
+* The static type checker additionally reports an *error* for a
+  pattern that provably cannot match the switch subject's static type
+  and for a record pattern whose arity disagrees with the record, and
+  *warns* for an arm dominated by a preceding label (unreachable).
+  A non-exhaustive switch is currently an error, following what Groovy
+  6 already does for switch expressions; whether that is the right
+  severity is open, and is discussed under <<remaining-work,Remaining work>>.
+  A `default` branch, an unconditional pattern, or full
+  sealed-hierarchy coverage each satisfy exhaustiveness. These are
+  static-typing diagnostics only; dynamic Groovy remains permissive.
 * Iterable inputs that are not `List` or array are materialised as a
-  list once per match attempt; this is observable for iterators with
-  side effects.
+  list once per match attempt; this is observable for sources with
+  side effects, which must be traversable non-destructively.
 
 == Java alignment
 
@@ -624,9 +741,10 @@ Implementation considerations:
 
 |Primitive patterns (JEP 507)
 |Preview
-|Included in the reference implementation, ahead of this text. Groovy
- already coerces, so the surface form costs little; whether to ship it
- before the JEP finalises is open
+|Supported (incubating): `case int i` tests the wrapper type and binds
+ the primitive, matching JEP 507's semantics for a reference-typed
+ subject (an `Integer` matches `int`; no widening or narrowing).
+ Semantics may be tweaked if JEP 507 shifts before finalising
 
 |Deconstructors for arbitrary classes
 |Draft
@@ -644,6 +762,15 @@ Implementation considerations:
 [cols="2,1,3"]
 |===
 |Feature |Status |Rationale
+
+|Bracket-form assignment (`def [...] = expr`)
+|Deferred
+|Largely overlaps the shipped GEP-20 parens form (nested patterns,
+type tests and strict arity are the only deltas); strict-match
+(`IllegalArgumentException`) vs null-padding philosophies and
+switch-vs-assignment rest semantics diverge; no Java
+statement-pattern anchor yet. Held for further review — see
+_Bracket-form assignment_.
 
 |`*name` / `*_` rest sugar (in bracket-form patterns / switch)
 |Deferred
@@ -702,8 +829,9 @@ the design space open for a future relaxation if usage warrants it.
 === Backwards compatibility
 
 Every program valid in Groovy 6 compiles with identical semantics in
-Groovy 7. The disambiguation rule is purely parser-local and is
-triggered only by syntactic forms that currently fail to parse:
+Groovy 7, with the narrow carve-outs itemised below. The
+disambiguation rule is purely parser-local and is triggered only by
+syntactic forms that currently fail to parse:
 
 [cols="3,1"]
 |===
@@ -712,6 +840,7 @@ triggered only by syntactic forms that currently fail to parse:
 |`case [1, 2, 3] ->`                       |Yes — legacy `isCase`, unchanged
 |`case [name: 'x'] ->`                     |Yes — legacy `Map.isCase`, unchanged
 |`case [_] ->`                             |Yes — legacy (list containing `_`)
+|`case foo() ->` / `case foo(bar) ->`      |Yes — legacy call label, unchanged
 |`case [var h, var... t] ->`               |No — new, claims unused grammar
 |`case [def h, def... t] ->`               |No — new (Groovy-native equivalent)
 |`case [... t] ->` / `case [...] ->`       |No — new (`...` shortcut / flipper)
@@ -728,11 +857,23 @@ Two `[...]` forms have legacy semantics that never usefully match —
 and empty-map patterns respectively. No existing program depends on
 these never-matching legacy forms.
 
-One carve-out is not purely additive. A parameterised type label such as
-`case List<String> l` parses today as a legacy `isCase` label followed by
-comparison operators, and is reinterpreted as a type pattern. The legacy
-reading is not useful, but unlike the forms above it does parse, so it is
-called out rather than folded into the table.
+Beyond the empty literals, the full list of carve-outs — forms that
+parse today and change meaning — is:
+
+* `case List<String> l \->` (a generic type followed by an
+  identifier): previously a chained comparison expression
+  (`(List < String) > l`), now a type pattern. The legacy parse
+  cannot usefully evaluate (it compares a class against a class).
+* `case foo(_) \->` with `_` in scope as a variable: previously a
+  method-call label passing `_`, now a record pattern with a wildcard
+  component (see _Record patterns_).
+* Colon-form `case []:` and `case [:]:` (and colon-form pattern-shaped
+  labels generally): previously compiling, now compile-time errors,
+  since patterns require the arrow form. The legacy colon forms could
+  never match.
+
+No realistic program relies on any of these legacy meanings; they are
+itemised for completeness.
 
 === `_` semantics across forms
 
@@ -751,7 +892,7 @@ warning in Groovy 7.
 |`def (..., _, ...) = expr` (parens form, GEP-20)
 |Identifier — unchanged from today
 
-|`def [var _, ...] = expr` (bracket form)
+|`def [var _, ...] = expr` (bracket form, deferred)
 |Wildcard — bind-and-discard
 
 |`case [var _, ...] ->` (list pattern in switch)
