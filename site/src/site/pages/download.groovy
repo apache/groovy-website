@@ -157,7 +157,7 @@ layout 'layouts/main.groovy', true,
                                     }
                                     def apacheDistUrl = { pkg, type ->
                                         def v = pkg.version
-                                        pkg.archive ? archiveUrl('src', 'sources', v) : "https://www.apache.org/dyn/closer.lua/groovy/${v}/distribution/apache-groovy-$type-${v}.zip?action=download"
+                                        pkg.archive ? archiveUrl(type, 'distribution', v) : "https://www.apache.org/dyn/closer.lua/groovy/${v}/distribution/apache-groovy-$type-${v}.zip?action=download"
                                     }
                                     def srcUrl = { pkg ->
                                         def v = pkg.version
