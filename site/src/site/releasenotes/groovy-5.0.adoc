@@ -1325,7 +1325,7 @@ Groovy 5 has been tested on JDK versions 11 through 25.
 [[Groovy5.0-more-info]]
 == More information
 
-You can browse all the link:../changelogs/changelog-5.0.0-unreleased.html[tickets closed for Groovy 5.0 in JIRA].
+You can browse all the link:../changelogs/changelog-5.0.0.html[tickets closed for Groovy 5.0 in JIRA].
 
 [[Groovy5.0releasenotes-5.0.7]]
 == Addendum for 5.0.7

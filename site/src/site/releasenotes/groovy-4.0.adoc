@@ -1287,7 +1287,7 @@ Groovy has been tested on JDK versions 8 through 17.
 [[Groovy4.0-more-info]]
 == More information
 
-You can browse all the link:../changelogs/changelog-4.0.0-unreleased.html[tickets closed for Groovy 4.0 in JIRA].
+You can browse all the link:../changelogs/changelog-4.0.0.html[tickets closed for Groovy 4.0 in JIRA].
 
 [[Groovy4.0releasenotes-4.0.2]]
 == Addendum for 4.0.2

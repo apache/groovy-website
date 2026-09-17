@@ -102,4 +102,4 @@ and additionally on early access builds of JDK 26 and 27.
 [[Groovy5.1-more-info]]
 == More information
 
-You can browse all the link:../changelogs/changelog-5.1.0-unreleased.html[tickets closed for Groovy 5.1 in JIRA].
+You can browse all the link:../changelogs/changelog-5.1.0.html[tickets closed for Groovy 5.1 in JIRA].
