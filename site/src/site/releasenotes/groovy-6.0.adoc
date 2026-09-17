@@ -197,6 +197,7 @@ Keeps Groovy a first-class citizen on today's JVM: current JDK support, one-line
 
 - Tested across JDK 17–27; <<Groovy6.0-requirements,JDK 17>> is now the minimum supported runtime. Module import already mentioned.
 - <<java-generics,Generic type syntax>> now follows the JLS: rare types, nested parameterizations, `instanceof` reifiability and type-variable scoping all behave as `javac` does, with matching diagnostics.
+- <<switch-alignment,`switch` follows Java's rule>> that the arrow decides fall-through and the position decides whether a value is produced -- so an arrow `switch` used as a statement no longer has to be exhaustive. Statically compiled switch _statements_ also gain `tableswitch`/`lookupswitch` dispatch and the duplicate-label diagnostic that expressions already had.
 - <<joint-compilation-stubs,Joint Compilation Stub Improvements>>: AST-transform-generated members (`@Immutable`, `@Builder`, `@TupleConstructor`, `@Delegate`, ...) are now visible in generated stubs. Java code in mixed-language projects can finally call constructors and methods contributed by transforms.
 - <<native-image,GraalVM native images>>: an AOT link mode lets even _dynamic_ Groovy dispatch run ahead-of-time compiled — including already-published indy-compiled jars, without recompilation.
 - <<non-hotspot,Non-HotSpot runtimes>>: the runtime no longer assumes it is running on a HotSpot JVM built from a current JDK — version detection, accessibility rules, hidden classes, `ScopedValue` and the indy exception handlers all degrade instead of failing, which is what it takes to come up on Android's ART.
@@ -1958,6 +1959,26 @@ because a comment claimed it. A Groovy 6 codebase is therefore not only
 easier for humans and AI to _read_ -- it is a verified specification
 they can reliably _build on_.
 
+=== A closed, citable grammar
+
+The user guide gains a new *Grammar* chapter: a complete EBNF projection
+of `src/antlr/GroovyLexer.g4` and `src/antlr/GroovyParser.g4`, covering
+every parser rule, lexer token, fragment and mode recognised at
+compilation phase `PARSING`. It is written for readers who need a closed
+grammar to cite rather than examples to follow -- tool authors,
+implementers, language researchers, and the AI assistants increasingly
+asked "is this valid Groovy?"
+
+Groovy's surface syntax is not a pure context-free grammar, and the
+chapter says so explicitly, specifying it in three layers: the lexical
+context machine (lexer modes, grouping stack, newline hiding, token-type
+rewrites), a CFG skeleton in EBNF, and the semantic predicates and
+restrictions that constrain it. It also documents where the EBNF
+over-approximates the real language, what is intentionally excluded, and
+a production index. The `.g4` files remain the implementation source of
+truth: where a production and a rule disagree, the rule wins until the
+chapter is updated.
+
 [[val-keyword]]
 == `val` Keyword for Final Declarations
 
@@ -2253,6 +2274,153 @@ assert p.copyWith { }.is(p)                     // empty block: identity
 
 The same nested map and block forms work for record-in-record graphs and
 mixed `@Immutable`/`@RecordType` hierarchies.
+
+[[switch-alignment]]
+== Switch: Position Decides, Not the Arrow
+
+Groovy 4 introduced Java's arrow form for `switch`, and Groovy 6 compiles
+switch expressions as first-class AST (see
+<<Groovy6.0-breaking,Breaking changes>>,
+https://issues.apache.org/jira/browse/GROOVY-12255[GROOVY-12255]).
+Groovy 6 completes that work by adopting Java's rule (JEP 361) for which
+of the two a given `switch` is: *the arrow decides fall-through; the
+position decides whether a value is produced.*
+
+That rule is also the foundation the draft
+link:../wiki/GEP-19.html#switch-position[GEP-19: Structural Pattern
+Matching in `switch`] builds on -- pattern matching inherits the position
+rule rather than introducing one of its own -- though pattern matching
+itself is not part of 6.0.
+
+=== A switch whose value is unused is a statement
+
+A `switch` in statement position is a statement whatever its arms look
+like (https://issues.apache.org/jira/browse/GROOVY-12399[GROOVY-12399],
+https://issues.apache.org/jira/browse/GROOVY-12408[GROOVY-12408]).
+Nothing is thrown when no arm matches, and no `default` is required:
+
+[source,groovy]
+----
+def r
+switch (i) {
+    case 1 -> r = 'one'
+}                       // i == 2: nothing happens, as the colon form always did
+----
+
+A `switch` that ends a method, closure or script body is a statement too,
+and Groovy's implicit return does to it what it does to any other
+statement -- so the value of the matched arm still comes back:
+
+[source,groovy]
+----
+String describe(int i) {
+    switch (i) {
+        case 1 -> 'one'
+        case 2 -> 'two'
+    }
+}
+assert describe(1) == 'one'
+assert describe(3) == null      // unmatched: null, not an exception
+----
+
+A primitive-returning method whose bare `switch` matches nothing yields
+the type's default, exactly as `int f(int i) { if (i == 1) return 1 }`
+and the colon form always have.
+
+Expression positions -- a declaration, a `return`, an argument, the arm
+of an enclosing switch expression -- keep the strict rules: an unmatched
+selector throws `IllegalStateException`, and under `@TypeChecked` /
+`@CompileStatic` a non-exhaustive switch expression is a compile-time
+error:
+
+[source,groovy]
+----
+def s = switch (i) { case 1 -> 'one' }   // IllegalStateException when unmatched
+----
+
+The same question is asked of a nested `switch`: a `switch` written as
+the sole expression of an arrow arm produces a value only when the
+`switch` owning that arm does, so a statement switch does not force
+strictness on the switches inside it.
+
+=== Jump-table dispatch for statically compiled switch statements
+
+A statically compiled switch _expression_ already emitted `tableswitch` /
+`lookupswitch`; a switch _statement_ never had, in any Groovy release, so
+the colon form compiled to a chain of `isCase` calls linear in the number
+of arms. Statements now get the same dispatch
+(https://issues.apache.org/jira/browse/GROOVY-12405[GROOVY-12405]):
+
+[source,groovy]
+----
+@CompileStatic
+String m(int i) {
+    String r = 'many'
+    switch (i) {
+        case 1: r = 'one'; break
+        case 2: r = 'two'; break
+        case 3: r = 'three'; break
+    }
+    r
+}
+// was: three ScriptBytecodeAdapter.isCase calls; now: one tableswitch
+----
+
+The jump table is emitted only where the inferred selector type and every
+label agree and the labels are constants `javac` would switch on --
+int-family, `String` and enum constants. Anything else keeps the
+sequential chain. Statement semantics are preserved: arms are laid out in
+source order so one that does not jump falls into the next, `break` /
+`continue` / `return` / `throw` compile as before, and a null selector
+takes the default.
+
+=== Duplicate case labels are reported
+
+https://issues.apache.org/jira/browse/GROOVY-12289[GROOVY-12289] rejected
+a repeated constant case label in a switch expression but left statements
+out. Java rejects a duplicate in either position, and so does Groovy 6 now
+(https://issues.apache.org/jira/browse/GROOVY-12406[GROOVY-12406]):
+
+[source,groovy]
+----
+@CompileStatic
+def m(int x) {
+    switch (x) {
+        case 1: return 'a'
+        case 1: return 'b'   // dead: the first arm always wins -- now a compile error
+        default: return 'c'
+    }
+}
+----
+
+Only labels whose value is statically known are compared -- the same set
+the jump-table optimizers key on. A label the compiler cannot evaluate,
+such as a variable or a call, is left to first-match-wins dispatch. This
+is a type-checking diagnostic: dynamic Groovy is unchanged and still
+takes the first matching arm.
+
+=== Case labels resolve the same way in either position
+
+Under `@CompileStatic` a switch expression called the `isCase` method the
+type checker selected, while a switch statement dispatched on the label's
+runtime type, so the same label could give two different answers. Both
+positions now use the target the type checker selects
+(https://issues.apache.org/jira/browse/GROOVY-12407[GROOVY-12407]):
+
+[source,groovy]
+----
+private static Object hidden() { Integer }   // defeats flow typing
+Object label = hidden()
+
+switch (x) { case label -> r = 'y'; default -> r = 'n' }  // was 'y'
+return switch (x) { case label -> 'y'; default -> 'n' }   // was 'n'
+----
+
+A label with no applicable `isCase` stays a compile error in a switch
+expression but keeps the dynamic call in a switch statement, so code that
+has always compiled still does. `case null` likewise keeps the dynamic
+comparison. Dynamic Groovy is untouched, and jump-table dispatch still
+takes precedence where it applies.
 
 [[sealed-types]]
 [[g6-stabilised]]
@@ -3577,6 +3745,50 @@ Highlight-style names supplied to `/print -s <FORMAT>` (and the
 `JSON`, and `Json` all select the same nanorc grammar
 (https://issues.apache.org/jira/browse/GROOVY-12018[GROOVY-12018]).
 
+=== Embedding groovysh
+
+Applications that host groovysh -- a domain-specific console, for
+example -- no longer need to copy `Main`.
+`Main.start(GroovyshOptions, String[])` is a programmatic entry point that does not call `System.exit`, and
+`GroovyshOptions.builder()` carries the supported hooks
+(https://issues.apache.org/jira/browse/GROOVY-12403[GROOVY-12403]). The
+API is incubating, and mirrors JLine's `ShellBuilder` name for name
+wherever an equivalent exists, so that a later move onto
+`org.jline.shell` need not break it:
+
+[source,groovy]
+----
+int rc = Main.start(GroovyshOptions.builder()
+    .terminal(terminal)                            // host-supplied terminal
+    .showBanner(false)                             // the host prints its own
+    .prompt { 'gremlin> ' }
+    .onReaderReady { reader, registry ->           // key bindings, completion
+        reader.completer = new AggregateCompleter(registry.completer(), myCompleter)
+    }
+    .historyFile(Path.of(System.getProperty('user.home'), '.myapp_history'))
+    .binding('answer', 42)                         // visible to evaluated code
+    .groups(new SimpleCommandGroup('MyApp', new AbstractCommand('/ping') {
+        @Override Object execute(CommandSession session, String[] args) { 'pong' }
+    }))
+    .resultHandler { printer, result -> ... }      // render values your way
+    .errorHandler { error, defaultTrace -> defaultTrace.accept(error) }
+    .build(), '-e', 'answer')
+----
+
+Command groups are resolved _before_ groovysh's own, so a host may
+override a built-in command name, and the `onReaderReady` callback fires
+once the reader and the registry are both wired -- which is what makes
+whole-line completion of a host's own domain language reachable, rather
+than only the arguments of its commands. Compile-time customizers go on
+the engine: `new GroovyEngine(config)` takes a `CompilerConfiguration`,
+and `GroovyEngine.getClassLoader()` is the public accessor for the engine
+class loader. Binding maps stay what they always were -- variables
+visible to evaluated scripts -- and are not the place for embedding
+hooks. The published API no longer names JLine types deprecated since
+JLine 4.0, and the POSIX-style console commands move out of `Main` into a
+reusable `ExtraConsoleCommands` registry, each with its own `/help`
+description. The groovysh chapter of the user guide documents each hook.
+
 [[theming]]
 == Theming Improvements
 
@@ -4480,6 +4692,27 @@ underscores is invalid`, `Invalid octal number`, `Shebang comment should
 appear at the first line`, `Unexpected end of input` for a truncated
 statement, and a var-arg parameter that is not last reported by name.
 
+The remaining everyday parse failures are named the same way
+(https://issues.apache.org/jira/browse/GROOVY-12401[GROOVY-12401]).
+Array creation says which half is wrong -- `Array dimension missing;
+specify a size or add an initializer '{}'`, `Cannot specify an array size
+after an empty dimension`, `Cannot combine an array size with an array
+initializer`. A `do` block reports `Missing 'while'`, or, when a `while`
+does follow, the real problem: `do-while body must be a single statement;
+wrap multiple statements in '{ }'`. Structural slips get their own
+sentence too -- `';' expected after the last enum constant`, `'import' is
+only allowed at the beginning of a compilation unit`, `'default' cannot
+follow a method header; put 'default' before the method name`, and
+`Method definition not expected here`. A closer or separator with nothing
+to close is named rather than described as unexpected input: `Unexpected
+')'`, `Unexpected ']'`, `Unexpected '}'`, `Unexpected ','`, `Unexpected
+';'`.
+
+`Missing '>'` is also now decided from the token _after_ the `<`, which
+must look like a type argument. A comparison never has a closing `>`
+either, so `if (MAX < x)` followed by an unrelated syntax error was
+previously rewritten as an unclosed type-argument list; it no longer is.
+
 These compose with the rest of the diagnostics work: `--error-format short`
 (see <<error-format>>) renders each of them as one parseable line, and parser
 error recovery collects several from a single parse rather than stopping at
@@ -4838,6 +5071,18 @@ fallback (`groovy.use.classvalue=false`) — an escape hatch Groovy 5.0
 had dropped, restored in this release — is again available, now with
 its dispatch cost quantified in the integration guide
 (https://issues.apache.org/jira/browse/GROOVY-12281[GROOVY-12281]).
+
+* AST nodes built by the parser carry accurate source positions
+(`lineNumber` / `columnNumber` / `lastLineNumber` / `lastColumnNumber`;
+1-based, with an exclusive end column), including annotations, and a
+synthetic child no longer overwrites an authored parent's end position.
+`-1` is now reserved for genuinely synthetic or generated nodes -- a
+`ModuleNode`, a script's wrapping `BlockStatement`, the implicit
+`return null`, `EmptyExpression.INSTANCE` / `EmptyStatement.INSTANCE`,
+try-with-resources desugaring, `@Trait` and `<clinit>` -- so tooling can
+tell authored code from generated code by `lineNumber > 0`, which is what
+`SecureASTCustomizer.isFromSource` does
+(https://issues.apache.org/jira/browse/GROOVY-12401[GROOVY-12401]).
 
 [[g6-other-module-changes]]
 == Other Module Changes
@@ -5228,8 +5473,31 @@ collection, closure) -- and `tableswitch`/`lookupswitch` dispatch is
 emitted when the selector and labels are constants Java could switch
 on. AST transforms and visitors that assumed the old closure-call
 shape need to handle the new nodes; `GroovyCodeVisitor` supplies
-default methods so existing visitors keep compiling
+default methods so existing visitors keep compiling. Only a switch whose
+value is used is an expression: see <<switch-alignment,Switch: Position
+Decides, Not the Arrow>>
 (https://issues.apache.org/jira/browse/GROOVY-12255[GROOVY-12255]).
+* A `switch` whose value is not used is a switch _statement_, whatever
+its arms look like. In Groovy 6.0.0-RC-1 and RC-2 a `switch` with `+->+`
+arms was compiled as a switch expression wherever it appeared, so an
+unmatched selector threw `IllegalStateException` and, under
+`@TypeChecked` / `@CompileStatic`, a missing `default` was a compile
+error even where the value was discarded. Position now decides, as in
+Java: in statement position an unmatched selector does nothing and no
+`default` is required; in expression position the strict rules are
+unchanged. A `switch` that ends a method, closure or script body is a
+statement whose matched arm value is returned by Groovy's implicit
+return, with `null` -- or the primitive default -- when nothing matched,
+which is what 4.x and 5.x did. AST transforms see a `SwitchStatement` in
+that position. See <<switch-alignment>>
+(https://issues.apache.org/jira/browse/GROOVY-12399[GROOVY-12399],
+https://issues.apache.org/jira/browse/GROOVY-12408[GROOVY-12408]).
+* A duplicate constant `case` label in a switch _statement_ is now a
+compile-time error under `@TypeChecked` / `@CompileStatic`, as it already
+was in a switch expression and as it is in Java. Only statically known
+labels are compared -- int-family, `String` and enum constants. Dynamic
+Groovy is unchanged and still takes the first matching arm
+(https://issues.apache.org/jira/browse/GROOVY-12406[GROOVY-12406]).
 * Method-level type-checking annotations now override a class-level
 `SKIP`: a method (or constructor) whose own `@TypeChecked` or
 `@CompileStatic` annotation has the default non-`SKIP` mode is type
@@ -5333,6 +5601,18 @@ not `String`. Code that parsed `writeTo` output with something other than
 adjusting; the round trip itself now holds where it previously failed or,
 for a key holding a statement, executed
 (https://issues.apache.org/jira/browse/GROOVY-12273[GROOVY-12273]).
+* *groovy-typecheckers*: `CheckingVisitor.findTargetVariable` is a
+`protected` instance method, where 5.x had it implicitly public and
+`static`. A third-party checker compiled against 5.x fails with
+`NoSuchMethodError`, since the call site was an `invokestatic`, and
+source that calls it qualified -- `CheckingVisitor.findTargetVariable(...)`
+-- no longer compiles. A subclass calling it unqualified, which is how
+the checkers Groovy ships use it, is unaffected. Static and instance
+methods cannot share a signature, so no compatibility shim is possible:
+recompile against 6.x, and inline the lookup in a caller that is not a
+subclass. `groovy-typecheckers` was incubating in 5.x, so this is
+migration guidance rather than a broken guarantee
+(https://issues.apache.org/jira/browse/GROOVY-12237[GROOVY-12237]).
 
 [[g6-system-properties]]
 == System Property Reference
