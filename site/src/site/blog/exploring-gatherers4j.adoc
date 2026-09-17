@@ -1,7 +1,8 @@
 = Exploring Gatherers4J with Groovy&trade;
 Paul King
 :revdate: 2025-05-06T20:30:00+00:00
-:keywords: gatherers, jdk24, chop, collate, inject, streams, fold, scan
+:updated: 2026-09-17T14:00:00+00:00
+:keywords: gatherers, jdk24, jdk25, jdk27, gatherers4j, graalvm, native, chop, collate, inject, streams, fold, scan
 :description: This post looks at using Gatherers4J (relies on JDK24 stream gatherer API) with Groovy as well as similar Iterator extension methods.
 
 :start-green: pass:[<div style="background-color: #ddeedd">]
@@ -30,8 +31,8 @@ your own gatherer equivalents for chop, collate and other built-in Groovy functi
 Other folks have also been looking at useful gatherers and libraries
 are starting to emerge.
 https://tginsberg.github.io/gatherers4j/[Gatherers4J]
-is one such library. We'll use 0.11.0, Groovy 5 snapshot (pre-release),
-and JDK 24.
+is one such library. We'll use 0.14.0, Groovy 6, and JDK 27.
+The gatherers API itself is JDK 24, but Gatherers4J 0.14.0 needs JDK 25 or later.
 
 Let's now look at numerous other gatherers (and their Groovy iterator equivalents)
 in the https://tginsberg.github.io/gatherers4j/[Gatherers4J] library.
@@ -716,19 +717,19 @@ assert ('A'..'G').stream()
 ----
 
 Groovy doesn't have a specific method for taking/dropping the nth element
-but you either use `findAllLazy` with `withIndex`, or `tapEvery`:
+but you either use `findingAll` with `withIndex`, or `tapEvery`:
 
 [source,groovy,subs="+macros,+attributes"]
 ----
 {start-blue}
 // drop every 3rd
 assert ('A'..'G').iterator().withIndex()
-    .findAll { next, i -> i % 3 }
+    .findingAll { next, i -> i % 3 }
     *.first == ['B', 'C', 'E', 'F']
 
 // take every 3rd
 assert ('A'..'G').iterator().withIndex()
-    .findAll { next, i -> i % 3 == 0 }
+    .findingAll { next, i -> i % 3 == 0 }
     *.first == ['A', 'D', 'G']
 
 // also take every 3rd
@@ -800,15 +801,15 @@ assert abcde.stream()
 {end}
 ----
 
-Groovy doesn't have an all-in-one equivalent, but you can use `withIndex` plus `findAllLazy`:
+Groovy doesn't have an all-in-one equivalent, but you can use `withIndex` plus `findingAll`:
 
 [source,groovy,subs="+macros,+attributes"]
 ----
 {start-blue}
 assert abcde.iterator().withIndex()
-    .findAll { s, n -> n % 2 == 0 }*.first == ['A', 'C', 'E']
+    .findingAll { s, n -> n % 2 == 0 }*.first == ['A', 'C', 'E']
 assert abcde.iterator().withIndex()
-    .findAll { s, n -> n < 2 || s == 'E' }*.first == ['A', 'B', 'E']
+    .findingAll { s, n -> n < 2 || s == 'E' }*.first == ['A', 'B', 'E']
 {end}
 ----
 
@@ -848,7 +849,7 @@ assert mixed.stream()
 
 Groovy doesn't have an exact equivalent but does have an eager `grep`
 which lets you do similar things, and other functionality like matching
-regex patterns. You can also use `findAllLazy` in combination with
+regex patterns. You can also use `findingAll` in combination with
 `getClass()` or `instanceof` as needed:
 
 [source,groovy,subs="+macros,+attributes"]
@@ -859,7 +860,7 @@ assert mixed.iterator().grep(Integer) == [3]
 assert mixed.iterator().grep(Number) == [1, 2, 3, 4, 5.0, 6.0]
 assert mixed.iterator().grep(~/\d/).toString() == '[1, 2, 3, 4, 7]'
 assert mixed.iterator()
-    .findAllLazy{ it.getClass() in [Integer, Short] }
+    .findingAll{ it.getClass() in [Integer, Short] }
     .toList() == [2, 3]
 {end}
 ----
@@ -952,6 +953,98 @@ assert ['A', 'B', 'C', 'A'].iterator()
 {end}
 ----
 
+== Using Gatherers4J with GraalVM native images
+
+Gatherers4J and Groovy both work inside a GraalVM native image, and the
+https://github.com/paulk-asert/groovy-gatherers[example repo] builds every example in this
+post as its own native image. A native image resolves reflection at build time, so it needs to be
+told what will be looked up at run time. For Groovy that is mostly handled already: the
+Groovy jars ship reachability metadata for what the runtime does on its own behalf, and
+`native-image` picks it up from the jars with no configuration.
+
+What is left is what your own code does, recorded with the tracing agent. One thing the
+agent cannot see is worth knowing about when using a library like Gatherers4J. When a
+closure is passed where a functional interface is expected, Groovy coerces it through a
+`java.lang.reflect.Proxy`, and the agent does not observe that, so the proxy has to be
+registered by hand. Writing the argument as a lambda or a method reference makes no
+difference by itself: in dynamic Groovy `Integer::sum` is a `MethodClosure`, and it is
+coerced the same way. The gatherer factories take several such arguments at once, so for
+the examples in this post the list is:
+
+[source]
+----
+java.util.function.Function
+java.util.function.BiFunction
+java.util.function.Predicate
+java.util.function.BiPredicate
+java.util.function.Supplier
+java.util.function.Consumer
+java.util.function.BiConsumer
+java.util.function.BinaryOperator
+java.util.function.UnaryOperator
+java.util.Comparator
+com.ginsberg.gatherers4j.IndexedAccumulatorFunction
+----
+
+That last one is the library's own functional interface, used by its `*Indexed`
+factories. The `java.util.function` ones cover the closures the factories take, and the
+four that `Gatherer.ofSequential` itself takes: a `Supplier` initialiser, an `Integrator`,
+a `BinaryOperator` combiner and a `BiConsumer` finisher. Writing your own gatherers rather
+than using the library, you would also need `java.util.stream.Gatherer$Integrator` and
+`java.util.stream.Gatherer$Integrator$Greedy`.
+
+Each becomes a `{"type": {"proxy": ["..."]}}` entry in `reachability-metadata.json`.
+You discover them one at a time: the image builds, then fails on the first missing one with
+a `MissingReflectionRegistrationError` naming the interface. Listing interfaces that turn
+out not to be needed is harmless, so it is reasonable to add the whole signature of the
+factories you use in one go.
+
+There is a way to avoid those proxy entries altogether, and it depends on how the code is
+compiled rather than on how the argument is written. The coercion happens because a dynamic
+Groovy closure is not itself an implementation of the target interface. Under
+`@CompileStatic`, where the target type is known, both a lambda and a method reference
+compile through `LambdaMetafactory` into a real implementation of that interface, exactly as
+Java would, so no proxy is involved:
+
+[source,groovy,subs="+macros,+attributes"]
+----
+{start-green}
+@CompileStatic
+class Stat {
+    static void main(String[] args) {
+        var result = (1..5).stream()
+            .gather(Gatherers4j.filterIndexed((Integer n, Integer s) -> n % 2 == 0))
+            .toList()
+        assert result == [1, 3, 5]
+    }
+}
+{end}
+----
+
+Built as a native image, that version needs no hand-written proxy entries at all: the agent
+records none, and the image builds and runs as is. The same holds for a method reference:
+`Arrays.parallelPrefix(nums, Integer::sum)` needs a `BinaryOperator` proxy entry when
+compiled dynamically and none at all under `@CompileStatic`. So if you are targeting native
+images and are willing to annotate the types, static compilation removes this whole category
+of configuration. The dynamic examples in this post keep their proxy list.
+
+Two other things help. Record with `-Dgroovy.indy.aot.link=true` so the JVM links call sites
+the way the image will, which creates the same metaclasses the image will need. And when
+trimming Groovy's own entries out of your recording, drop only what the Groovy jars already
+ship rather than everything in a `groovy.*` package: a third-party class can live in such a
+package, and a Groovy API class your own dynamic code reaches is yours to record.
+
+The payoff is the usual one. For the examples in this post, built with GraalVM for JDK 25, the image is 42 MB and starts in
+well under a tenth of a second against a bit over a second on the JVM, with identical output:
+
+[source]
+----
+$ ./native-build.sh --only Gatherers4jExamples
+...
+Finished generating 'Gatherers4jExamples' in 37.6s.
+  OK, output identical to the JVM run
+----
+
 == Further information
 
 * https://openjdk.org/jeps/461[JEP 461: Stream Gatherers (Preview in JDK 22)]
@@ -959,8 +1052,9 @@ assert ['A', 'B', 'C', 'A'].iterator()
 * https://openjdk.org/jeps/485[JEP 485: Stream Gatherers (JDK 24)]
 * https://nipafx.dev/inside-java-newscast-57/[Better Java Streams with Gatherers - Inside Java Newscast #57]
 * https://nipafx.dev/implementing-gatherers/[Implementing New Java Stream Operations]
-* https://github.com/paulk-asert/groovy-gatherers[Source code on GitHub]
+* https://github.com/paulk-asert/groovy-gatherers[Source code on GitHub] (including `native-build.sh`, which builds each example as a native image)
 * https://tginsberg.github.io/gatherers4j/[Gatherers4J GitHub site]
+* https://www.graalvm.org/latest/reference-manual/native-image/metadata/[GraalVM reachability metadata]
 * https://timyates.github.io/groovy-stream/[Groovy-stream GitHub site]
 
 == Conclusion
@@ -971,4 +1065,8 @@ Gatherers4j works well with Groovy, offering additional stream functionality not
 .Update history
 ****
 *06/May/2025*: Initial version +
+*17/Sep/2026*: Updated for Gatherers4J 0.14.0, Groovy 6 and JDK 27.
+Renamed `findAllLazy` to `findingAll`, the name the lazy iterator methods
+shipped under in Groovy 6 (GROOVY-11606).
+Added a section on using Gatherers4J with GraalVM native images.
 ****

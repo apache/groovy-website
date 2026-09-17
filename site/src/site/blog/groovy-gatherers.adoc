@@ -1,8 +1,8 @@
 = Using Gatherers with Groovy&trade;
 Paul King
 :revdate: 2023-12-09T15:30:00+00:00
-:updated: 2025-03-19T14:00:00+00:00
-:keywords: gatherers, jdk24, chop, collate, inject, ginq, streams, jep461, fold, scan
+:updated: 2026-09-15T14:00:00+00:00
+:keywords: gatherers, jdk24, jdk25, chop, collate, inject, ginq, streams, jep461, fold, scan
 :description: This post looks at using Gatherers (JEP 461, JEP 473, JEP 485) with Groovy.
 
 ++++
@@ -25,7 +25,10 @@ This blog looks at using that feature with Groovy.
 Like many JDK enhancements, Groovy provides automatic gatherer support without needing
 any changes.
 
-The examples in this blog were tested with Groovy 4.0.26. The Gatherer examples used JDK version 24.0.0, other examples are tested with JDKs 8, 17 and 24.
+The examples in this blog were tested with Groovy 6.0.0 and JDKs 17, 21 and 25.
+The Gatherer examples need JDK 24 or later, where the gatherers API is final.
+The Groovy collection equivalents shown alongside them also work with earlier
+Groovy and JDK versions, including JDK 8 with Groovy 4.
 
 == Understanding Gatherers
 
@@ -87,7 +90,7 @@ select specific elements from a collection:
 assert (1..8)[0..2] == [1, 2, 3]                   // index by closed range
 assert (1..8)[3<..<6] == [5, 6]                    // index by open range
 assert (1..8)[0..2,3..4,5] == [1, 2, 3, 4, 5, 6]   // index by multiple ranges
-assert (1..8)[0..2,3..-1] == 1..8                  // ditto
+assert (1..8)[0..2,3..7] == 1..8                   // ditto
 assert (1..8)[0,2,4,6] == [1,3,5,7]                // select odd numbers
 assert (1..8)[1,3,5,7] == [2,4,6,8]                // select even numbers
 ----
@@ -641,5 +644,6 @@ likely pick whichever style makes sense.
 ****
 *09/Dec/2023*: Initial version +
 *18/Jan/2024*: Updated with a scan/cumulative sum example. +
-*19/Mar/2025*: Updated for JDK24.
+*19/Mar/2025*: Updated for JDK24. +
+*15/Sep/2026*: Updated for Groovy 6 and JDK 25.
 ****
