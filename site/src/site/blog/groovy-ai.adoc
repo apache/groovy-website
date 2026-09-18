@@ -1,9 +1,9 @@
 = Exploring AI with Groovy&trade;
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2025-10-15T07:06:20+00:00
-:updated: 2025-11-14T20:05:00+00:00
-:keywords: groovy, ai, ollama4j, langchain4j, spring-ai, embabel, micronaut-ai, quarkus-ai
-:description: A tour of using Groovy with modern AI libraries including Ollama4j, LangChain4j, Spring AI, Embabel, Micronaut, and Quarkus.
+:updated: 2026-09-18T20:00:00+00:00
+:keywords: groovy, ai, ollama4j, langchain4j, spring-ai, embabel, micronaut-ai, quarkus-ai, graalvm, native-image
+:description: A tour of using Groovy with modern AI libraries including Ollama4j, LangChain4j, Spring AI, Embabel, Micronaut, and Quarkus, including native Micronaut.
 
 == Introduction
 
@@ -26,7 +26,7 @@ unchanged, but feel free to try other models and see what results you get.
 Some of the examples also use the `qwen3:8b` model. It seems to give better results when using tools.
 See the example repo for how to run the needed services using docker,
 or within GitHub actions if you don't have Ollama already running locally.
-We also used Groovy 5 and JDK 25, but the examples should work on other Groovy and Java versions.
+We also used Groovy 6 and JDK 25, but the examples should work on other Groovy and Java versions.
 
 == Using Ollama4j
 
@@ -56,7 +56,7 @@ Now we can send our prompt to the model:
 [source,groovy]
 ----
 var prompt = 'What are 4 interesting things to do while I am on vacation in Caloundra?'
-var builder = OllamaChatRequestBuilder.builder()
+var builder = OllamaChatRequest.builder()
     .withModel('mistral:7b')
 
 var request = builder
@@ -117,7 +117,7 @@ var chatModel = OllamaChatModel.builder()
     .build()
 
 String prompt = 'What are 4 interesting things to do while I am on vacation in Caloundra?'
-println "Response: " + chatModel.chat(prompt)
+println "Response:\n" + chatModel.chat(prompt)
 ----
 
 The output might look something like:
@@ -251,8 +251,9 @@ var bot = AiServices.builder(HolidayBot)
     .build()
 
 var prompt = '''
-What are 4 interesting things to do for a long weekend vacation in Caloundra?
-Provide location, and suggested non-overlapping day and time for each activity.
+What are 4 interesting things to do for a weekend away in Caloundra?
+Return holiday activity suggestions as structured JSON matching Itinerary.
+Give a description, location, day of weekend, and suggested time of day for each of the four activities.
 '''
 var response = bot.extractActivitiesFrom(prompt)
 
@@ -287,13 +288,13 @@ The output might look something like:
 
 ----
 Four things:
-Activity(Visit Australia Zoo, Beerwah, Queensland (Approx. 30 minutes drive from Caloundra), Day 1 - Friday, 9:00 AM - 5:00 PM)
-Activity(Explore Kings Beach and the Coastal Walk, Caloundra, Queensland, Day 2 - Saturday, 8:00 AM - Afternoon)
-Activity(Relax at Bulcock Beach Market, Bulcock Street, Caloundra, Day 3 - Sunday, 6:00 AM - 1:00 PM)
-Activity(Explore the Glass House Mountains, Glass House Mountains, Queensland (Approx. 45 minutes drive from Caloundra), Day 4 - Monday, 9:00 AM - 3:00 PM)
+Activity(Visit Kings Beach, Kings Beach, Caloundra, Saturday, Morning/Afternoon)
+Activity(Explore the Coastal Walk from Bulcock Beach to Shelly Beach, Bulcock Beach to Shelly Beach, Caloundra, Saturday, Early Afternoon/Late Afternoon)
+Activity(Relax at the Day Spa on Golden Beach, Golden Beach, Caloundra, Sunday, Morning/Afternoon)
+Activity(Enjoy Sunset Dinner Cruise, Pelican Waters or Mooloolaba, Caloundra, Sunday, Late Afternoon/Evening)
 
 Best thing:
-Activity(Relax at Bulcock Beach Market, Bulcock Street, Caloundra, Sunday, 6:00 AM - 1:00 PM)
+Activity(Relax at the Day Spa on Golden Beach, Golden Beach, Caloundra, Sunday, Morning)
 ----
 
 `AiServices` also supports tools. Tools allow the LLM to query for information
@@ -356,7 +357,7 @@ $response
 ----
 
 We switched to the `qwen3:8b` model. It is slightly larger to download but does
-a more reliable job calling tools correctly. The tools are annotation with `@Tools`
+a more reliable job calling tools correctly. The tools are annotated with `@Tool`
 and will be automatically found.
 
 The `getWeather` tool has return type `Weather` which is another domain object:
@@ -455,7 +456,7 @@ void main() {
     try(var context = SpringApplication.run(Holiday)) {
         var chatClient = context.getBean(ChatClient.Builder).build()
         var response = chatClient
-                .prompt("What are some interesting things to do while I am on vacation in Caloundra?")
+                .prompt("What are some interesting things to do while over a long weekend in Caloundra?")
                 .call()
                 .entity(Itinerary)
         println "Response:\n" + response.display()
@@ -510,7 +511,7 @@ Factor in expected weather when making recommendations. Do not hallucinate weath
         var chatClient = context.getBean(ChatClient.Builder).build()
         var weekend = context.getBean(WeekendTool)
         var weather = context.getBean(WeatherTool)
-        var options = OllamaChatOptions.builder().model('qwen3:8b').build()
+        var options = OllamaChatOptions.builder().model('qwen3:8b')
         println chatClient
                 .prompt(prompt)
                 .options(options)
@@ -520,6 +521,9 @@ Factor in expected weather when making recommendations. Do not hallucinate weath
     }
 }
 ----
+
+Note that as of Spring AI 2.0, the `options` method takes the options _builder_ rather than
+the built options, so we no longer call `build()` ourselves.
 
 And the output might look like this:
 
@@ -630,15 +634,15 @@ class ItineraryAgent {
     @Action
     Alternatives generateItineraries(UserInput userInput, OperationContext context) {
         context.ai()
-            .withLlm('mistral:7b')
-            .createObject("Generate 5 sets of: An itinerary of things to do while on $userInput.content?", Alternatives)
+            .withLlm('qwen3:8b')
+            .createObject("Generate 5 alternative sets of: $userInput.content?", Alternatives)
     }
 
     @Action
     RatedAlternatives rateItineraries(Alternatives alternatives, OperationContext context) {
         new RatedAlternatives(alternatives.content.collect { itinerary ->
             var rating = context.ai()
-                .withLlm('qwen3:8b')
+                .withLlm('mistral:7b')
                 .createObject("Rate this itinerary on variety and number of activities: $itinerary?", Rating)
             new RatedItinerary(itinerary, rating)
         })
@@ -661,7 +665,7 @@ void main() {
 }
 ----
 
-Here we are using two different models for different tasks — `mistral:7b` for generating itineraries and `qwen3:8b` for rating them. Embabel provides richer ways to control and configure the models, but this simple approach works well for our example.
+Here we are using two different models for different tasks — `qwen3:8b` for generating itineraries and `mistral:7b` for rating them. Embabel provides richer ways to control and configure the models, but this simple approach works well for our example.
 The `@AchievesGoal` annotation makes use of Embabel's goal-oriented action planning (GOAP) capabilities.
 
 The output might look something like (slightly formatted here for readability):
@@ -669,12 +673,18 @@ The output might look something like (slightly formatted here for readability):
 ----
 RatedItinerary[
     itinerary=Itinerary[itinerary=[
-        Activity(Visit Kings Beach, Caloundra, Friday, All day),
-        Activity(Sunset at Mooloolaba Beach, Mooloolaba, Friday, Evening),
-        Activity(Explore Bulcock Beach Markets, Caloundra, Saturday, Morning to Early Afternoon),
-        Activity(Snorkeling at Dicky Beach, Dicky Beach, Saturday, Afternoon),
-        Activity(Relax at Shelly Beach, Caloundra, Sunday, All day)]],
-    rating=Rating[percentage=80.0]]
+        Activity(Arrival, Caloundra, Friday, Afternoon),
+        Activity(Kings Beach Leisure Park, Kings Beach, Friday, Evening),
+        Activity(Dinner at Bulcock Street Tavern, Caloundra, Friday, Night),
+        Activity(Explore Powerboat Racing Complex, Caloundra, Saturday, Morning),
+        Activity(Lunch at Point Cartwright, Point Cartwright, Saturday, Afternoon),
+        Activity(Sunset Yoga on Mooloolaba Beach, Mooloolaba Beach, Saturday, Evening),
+        Activity(Dinner at Ricky's River Bar & Restaurant, Eumundi, Saturday, Night),
+        Activity(Visit the Ginger Factory, Yandina, Sunday, Morning),
+        Activity(Relax at Golden Beach, Golden Beach, Sunday, Afternoon),
+        Activity(Farewell Dinner, Caloundra, Sunday, Evening),
+        Activity(Departure, Caloundra, Monday, Morning)]],
+    rating=Rating[percentage=90.0]]
 ----
 
 This demonstrates how Embabel’s agent model and Groovy’s expressive syntax can work together to orchestrate multiple AI calls with minimal boilerplate.
@@ -772,6 +782,45 @@ Activity(Hike up Mount Eden, Auckland, Day 2, 9:00 AM - 12:00 PM)
 Activity(Visit Waiheke Island and its vineyards, Waiheke Island, Day 2, 1:00 PM - 6:00 PM)
 ----
 
+== Micronaut native images
+
+Groovy 6 improves support for GraalVM
+https://www.graalvm.org/latest/reference-manual/native-image/[native image],
+and the Micronaut examples can be compiled ahead-of-time into native executables.
+Micronaut is a good fit here, since its dependency injection and the
+LangChain4j AI service implementations are generated at compile time rather than
+being created reflectively at runtime.
+
+The build applies the `org.graalvm.buildtools.native` plugin and registers one
+native binary per script. The example repo has three Micronaut scripts:
+the two we just saw, plus a `Tools` variant which adds weather and weekend tools.
+Each gets a compile task, so building and running the tools example looks like this:
+
+[source,bash]
+----
+./gradlew :micronaut:nativeToolsCompile
+micronaut/build/native/nativeToolsCompile/tools
+----
+
+Use GraalVM 25.2 or later to run the build. Earlier versions fail with
+`Could not find target method ... invalidateSwitchPoints`; they substitute a Groovy
+method which current Groovy versions no longer have.
+
+Native image needs to be told about anything reached reflectively.
+For our examples, that metadata lives in
+`micronaut/src/main/resources/META-INF/native-image`. If you change the examples,
+you can regenerate it by running them with the native-image agent
+and copying the result:
+
+[source,bash]
+----
+./gradlew run.micronaut.Holiday run.micronaut.Structured run.micronaut.Tools -Pagent
+./gradlew :micronaut:metadataCopy
+----
+
+New entries are merged into the existing metadata, so delete it first if you want
+to drop stale entries.
+
 == Using Quarkus LangChain4j
 
 The
@@ -830,6 +879,8 @@ Answer:  1. Explore the Minneapolis Sculpture Garden: This 11-acre outdoor museu
 Groovy’s interoperability, concise syntax, and powerful DSL capabilities make it an excellent language for prototyping and composing AI workflows on the JVM.
 Whether you’re chatting with Ollama, integrating via Spring, Micronaut, or Quarkus,
 or orchestrating agents with Embabel, Groovy keeps your code clear and compact.
+And thanks to Groovy 6's native image support, those examples don't have to stay
+on the JVM — the Micronaut ones compile to native executables.
 Feel free to experiment with different models and prompts to see what interesting results you can achieve!
 
 You can find the full source for all these examples at: +
@@ -839,6 +890,7 @@ https://github.com/danvega/groovyai
 
 .Update history
 ****
-*15/Oct/2023*: Initial version +
-*14/Nov/2025*: Updated with Micronaut, Quarkus, and AI tools examples.
+*15/Oct/2025*: Initial version +
+*14/Nov/2025*: Updated with Micronaut, Quarkus, and AI tools examples. +
+*18/Sep/2026*: Updated for the latest library versions and added Micronaut native image examples.
 ****
