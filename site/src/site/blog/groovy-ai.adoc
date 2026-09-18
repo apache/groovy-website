@@ -1,7 +1,7 @@
 = Exploring AI with Groovy&trade;
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2025-10-15T07:06:20+00:00
-:updated: 2026-09-18T20:00:00+00:00
+:updated: 2026-09-19T20:00:00+00:00
 :keywords: groovy, ai, ollama4j, langchain4j, spring-ai, embabel, micronaut-ai, quarkus-ai, graalvm, native-image
 :description: A tour of using Groovy with modern AI libraries including Ollama4j, LangChain4j, Spring AI, Embabel, Micronaut, and Quarkus, including native Micronaut.
 
@@ -55,7 +55,7 @@ Now we can send our prompt to the model:
 
 [source,groovy]
 ----
-var prompt = 'What are 4 interesting things to do while I am on vacation in Caloundra?'
+var prompt = 'What are 4 interesting things to do while I am on vacation in Glasgow?'
 var builder = OllamaChatRequest.builder()
     .withModel('mistral:7b')
 
@@ -71,13 +71,17 @@ It will respond with something like:
 
 ----
 Four things:
- 1. Visit the beautiful beaches: Caloundra is famous for its stunning beaches, including Kings Beach, Moffat Beach, and Bulcock Beach. Spend your days soaking up the sun, swimming, or surfing.
+ 1. Visit the Glasgow Cathedral: This historic cathedral is a must-see in Glasgow. It's one of the 5 great medieval churches
+ of Scotland and offers a glimpse into the city's rich history. The adjoining Necropolis cemetery also provides stunning views of the city.
 
-2. Explore the UnderWater World SeaLife Aquarium: This marine attraction offers a unique opportunity to interact with various sea creatures. You can even have a close encounter with sharks and turtles!
+2. Explore the Kelvingrove Art Gallery and Museum: This world-class museum houses over 8,000 objects, including works by
+artists like Botticelli, Monet, and Rembrandt. It's a great place to spend a day learning about art, history, and science.
 
-3. Visit the Glastonbury Estate: For those who love history, this beautiful estate is worth a visit. It was built in the 1920s and features a variety of artifacts and memorabilia from World War I and II.
+3. Stroll through Glasgow Green Park: One of the city's oldest parks, Glasgow Green offers beautiful landscapes,
+a bandstand, a skate park, and even a mini-golf course. It's a perfect spot for a picnic or a leisurely walk.
 
-4. Take a day trip to the Australia Zoo: Made famous by the Crocodile Hunter, Steve Irwin, the Australia Zoo is just a short drive from Caloundra. It's home to a wide variety of Australian wildlife, including kangaroos, koalas, and crocodiles. Don't miss the daily wildlife shows!
+4. Take a tour of The Tenement House: This well-preserved Victorian dwelling provides a unique insight into the lives of
+Glasgow's middle class during the early 20th century. The guided tours are informative and engaging, offering a glimpse into a bygone era.
 ----
 
 AI chat calls are stateless, but we can simulate continuing the conversation by
@@ -99,7 +103,12 @@ The output might be:
 
 ----
 Best thing:
- If you only have half a day and can choose just one activity, I would recommend visiting the beautiful Kings Beach in Caloundra. It offers a lovely stretch of sandy beach, perfect for swimming, sunbathing, or simply taking a leisurely stroll along the shoreline. The beach also has various amenities like picnic areas, BBQ facilities, and a playground for children. Plus, it provides stunning views of the Pacific Ocean and the Glass House Mountains in the distance. It's the perfect place to relax and soak up the sun on your vacation!
+Given that you have only half a day and want to see a mix of history, culture, and local life, I would recommend visiting
+the Kelvingrove Art Gallery and Museum. It's centrally located, easily accessible, and offers an extensive collection of
+art and artifacts that provide a fascinating glimpse into Glasgow's past and present. Plus, it's free to enter, making it
+a great value for your time.
+If you prefer outdoor activities or want to experience the local vibe, Glasgow Green Park is another excellent choice.
+You can take a leisurely stroll through the park, enjoy the scenery, and even grab a bite at one of the nearby cafes or food trucks.
 ----
 
 == Using LangChain4j
@@ -782,6 +791,96 @@ Activity(Hike up Mount Eden, Auckland, Day 2, 9:00 AM - 12:00 PM)
 Activity(Visit Waiheke Island and its vineyards, Waiheke Island, Day 2, 1:00 PM - 6:00 PM)
 ----
 
+Micronaut supports tools too. We'll reuse the idea of a fake weather service from earlier,
+but ask about New Zealand destinations this time.
+
+Our tools are singleton beans with `@Tool` annotated methods:
+
+[source,groovy]
+----
+@Singleton
+class WeekendTool {
+    @Tool("The LocalDate of the coming weekend")
+    LocalDate getWeekend() {
+        LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY))
+    }
+}
+
+@Singleton
+class WeatherTool {
+    @Tool('Gets the expected weather forecast including temperature for a given city and LocalDate')
+    Weather getWeather(String city, LocalDate date) {
+        println "Looking up weather for $city on $date"
+        var fakeWeather = [Auckland: new Weather('sunny', 16, 26),
+                           'Mt Hutt': new Weather('hot', 30, 38)]
+        fakeWeather[city]
+    }
+}
+----
+
+Rather than passing tool instances to a builder, as we did with LangChain4j and Spring AI,
+we name the tool classes in the `@AiService` annotation, and explain in the system message
+how we'd like them used:
+
+[source,groovy]
+----
+@AiService(tools = [WeatherTool, WeekendTool])
+interface WeatherAwareBot {
+    @SystemMessage('''
+    You are a travel planning assistant that helps users plan activities for their holidays.
+    Before finalizing the itinerary, use the WeatherTool tool for each destination city and each day of the itinerary.
+    Use the WeatherTool by creating a JSON object:
+    { "tool": "getWeather", "arguments": { "city": "...", "date": "YYYY-MM-DD" } }
+    Only after getting results from the tool, produce final Itinerary JSON.
+    Use the WeekendTool to work out the date for "the coming weekend".
+    Use the tool information to adjust your activity suggestions accordingly.
+    Return only an Itinerary JSON structure.
+    ''')
+    Itinerary chat(String userMessage)
+}
+----
+
+For the `@Tool` methods to be callable at runtime, we need the
+`micronaut-langchain4j-processor` annotation processor on our compile classpath.
+It marks those methods as executable and arranges for them to be registered at startup,
+so no additional wiring is needed in our script:
+
+[source,groovy]
+----
+try(var context = ApplicationContext.run()) {
+    var bot = context.getBean(WeatherAwareBot)
+    println bot
+        .chat('Four great things to see in Auckland this coming weekend.')
+        .display()
+    println bot
+        .chat('A few things to do in Mt Hutt this coming weekend.')
+        .display()
+}
+----
+
+The second question is the interesting one. Mt Hutt is a ski field,
+but our fake forecast says it will be hot, so we don't want to be offered skiing.
+
+For Auckland, the output might look like:
+
+----
+Activity(Auckland Museum, 155 Queen Street, Auckland, 2025-11-14, 10:00 AM)
+Activity(Beachside Stroll, Mission Bay Beach, 2025-11-14, 3:00 PM)
+Activity(Harbour Bridge Walk, Auckland Harbour Bridge, 2025-11-15, 9:00 AM)
+Activity(Sky Tower Panorama, Sky Tower, 666 Queen Street, 2025-11-15, 2:00 PM)
+----
+
+And for Mt Hutt:
+
+----
+Activity(Mt Hutt Summit Walk, Mt Hutt Summit Track, 2025-11-15, 9:00 AM)
+Activity(Lake Hutt Picnic, Lake Hutt, 2025-11-15, 1:00 PM)
+Activity(Scenic Drive to Tutea Valley, Tutea Valley, Mt Hutt, 2025-11-16, 10:00 AM)
+Activity(Water Activities at Lake Hutt, Lake Hutt, 2025-11-16, 2:00 PM)
+----
+
+Sure enough, no skiing.
+
 == Micronaut native images
 
 Groovy 6 improves support for GraalVM
@@ -792,8 +891,7 @@ LangChain4j AI service implementations are generated at compile time rather than
 being created reflectively at runtime.
 
 The build applies the `org.graalvm.buildtools.native` plugin and registers one
-native binary per script. The example repo has three Micronaut scripts:
-the two we just saw, plus a `Tools` variant which adds weather and weekend tools.
+native binary for each of the three Micronaut scripts we've just seen.
 Each gets a compile task, so building and running the tools example looks like this:
 
 [source,bash]
@@ -892,5 +990,5 @@ https://github.com/danvega/groovyai
 ****
 *15/Oct/2025*: Initial version +
 *14/Nov/2025*: Updated with Micronaut, Quarkus, and AI tools examples. +
-*18/Sep/2026*: Updated for the latest library versions and added Micronaut native image examples.
+*19/Sep/2026*: Updated for the latest library versions and added Micronaut tools and native image examples.
 ****
