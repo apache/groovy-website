@@ -9,23 +9,6 @@
 Groovy 6 builds upon existing features of earlier versions of Groovy.
 In addition, it incorporates numerous new features and streamlines various legacy aspects of the Groovy codebase.
 
-[width="80%",align="center"]
-|===
-a| NOTE: _WARNING:_
-Material on this page is still under development!
-We are currently finalising Groovy 6.0. Caution should be exercised
-if using incubating features as the details may change before final release.
-We are also making changes based on feedback - please get your feedback in as early as possible.
-Apologies for those trying these early versions if certain aspects change before the final release.
-
-NOTE for RC-1: RC-1 defaults to turning on a reflective cold dispatch tier.
-This is a setting currently needed for native images like GraalVM but changes
-what stack frames would be visible to logging libraries. This tier will be
-opt-in only for future releases. Users outside native scenarios may want to set
-the flag to opt-out for RC-1, or use the other workarounds mentioned like @CompileStatic.
-See https://issues.apache.org/jira/browse/GROOVY-12354[GROOVY-12354] for more details.
-|===
-
 image:img/groovy6_summary.png["Groovy 6 at a glance: 8 new optional modules, 250+ new GDK methods, 13 incubating features, tested on JDK 17-27",width=800]
 
 == Highlights
