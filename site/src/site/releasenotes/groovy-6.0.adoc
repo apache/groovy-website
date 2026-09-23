@@ -5837,4 +5837,4 @@ version, ahead of that JDK's general release
 [[Groovy6.0-more-info]]
 == More information
 
-You can browse all the link:../changelogs/changelog-6.0.0-unreleased.html[tickets closed for Groovy 6.0 in JIRA].
+You can browse all the link:../changelogs/changelog-6.0.0.html[tickets closed for Groovy 6.0 in JIRA].
