@@ -1,13 +1,13 @@
 = Exploring AI with Groovy&trade;
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2025-10-15T07:06:20+00:00
-:updated: 2026-09-19T20:00:00+00:00
-:keywords: groovy, ai, ollama4j, langchain4j, spring-ai, embabel, micronaut-ai, quarkus-ai, graalvm, native-image
-:description: A tour of using Groovy with modern AI libraries including Ollama4j, LangChain4j, Spring AI, Embabel, Micronaut, and Quarkus, including native Micronaut.
+:updated: 2026-10-18T09:00:00+00:00
+:keywords: groovy, ai, ollama4j, langchain4j, spring-ai, embabel, micronaut-ai, quarkus-ai, graalvm, native-image, openrouter, llmao, decision-models, markdown
+:description: Using Groovy with Ollama4j, LangChain4j, Spring AI, Embabel, Micronaut (also native), and Quarkus, also OpenRouter, ASF llmao gateway, and decision models.
 
 == Introduction
 
-> [blue]#In this post, we’ll look at several ways to integrate Groovy with AI tools, including `Ollama4j`, `LangChain4j`, `Spring AI`, `Embabel`, `Micronaut LangChain4j`, and `Quarkus LangChain4j`.#
+> [blue]#In this post, we’ll look at several ways to integrate Groovy with AI tools, including `Ollama4j`, `LangChain4j`, `Spring AI`, `Embabel`, `Micronaut LangChain4j`, and `Quarkus LangChain4j`. We’ll also reach hosted models through `OpenRouter` and the ASF `llmao` gateway, and try a _decision_ model, which answers typed questions with probabilities rather than prose.#
 
 image:img/bulcock_beach_sunset.jpg[Bulcock Beach at Sunset looking towards Pumicestone Passage, 400, float="right"]
 
@@ -24,6 +24,7 @@ sometimes just by changing a line or two of config in a properties file.
 The examples mostly use the `mistral:7b` model, which you'll need to download to run the examples
 unchanged, but feel free to try other models and see what results you get.
 Some of the examples also use the `qwen3:8b` model. It seems to give better results when using tools.
+One example uses `tev1`, which is a _decision_ model rather than a chat model.
 See the example repo for how to run the needed services using docker,
 or within GitHub actions if you don't have Ollama already running locally.
 We also used Groovy 6 and JDK 25, but the examples should work on other Groovy and Java versions.
@@ -401,6 +402,124 @@ Safe travels! 🌊📚
 ----
 
 Note that it gave accurate recommendations that include our two fake weather forecasts.
+
+== Markdown as a structured format
+
+Our structured output example above asked for JSON, and needed a model advertising the
+`RESPONSE_FORMAT_JSON_SCHEMA` capability. If your model doesn't support that, there is
+another format every chat model is fluent in: Markdown. Groovy 6 adds a `MarkdownSlurper`,
+completing the family alongside `JsonSlurper` and `XmlSlurper`.
+
+So let's ask for a table instead of JSON:
+
+[source,groovy]
+----
+var prompt = '''
+What are 4 interesting things to do for a weekend away in Caloundra?
+Reply with nothing but a Markdown table with these column headings:
+Activity, Location, Day, Time
+'''
+var answer = chatModel.chat(prompt)
+----
+
+Then we slurp the reply. Each row arrives as a map keyed by the table's headings,
+which is exactly the shape our `Activity` record needs:
+
+[source,groovy]
+----
+var tables = new MarkdownSlurper().enableTables(true).parseText(answer).tables
+assert tables, 'expected the model to reply with a Markdown table'
+
+var activities = tables.first().rows.collect {
+    new Activity(it.Activity, it.Location, it.Day, it.Time)
+}
+----
+
+The model's reply, and the records we get from it:
+
+----
+| Activity                  | Location              | Day      | Time               |
+|---------------------------|-----------------------|----------|--------------------|
+| Glasshouse Mountains Hike | Mount Tibrogargan     | Saturday | 8:00 AM - 12:00 PM |
+| Bulcock Beach Picnic      | Bulcock Beach         | Sunday   | 11:00 AM - 2:00 PM |
+| visit Australia Zoo       | Australia Zoo         | Saturday | 9:00 AM - 5:00 PM  |
+| Sunset Cruise             | Marina Park Caloundra | Saturday | 6:00 PM - 8:30 PM  |
+
+Activities:
+Activity(Glasshouse Mountains Hike, Mount Tibrogargan, Saturday, 8:00 AM - 12:00 PM)
+Activity(Bulcock Beach Picnic, Bulcock Beach, Sunday, 11:00 AM - 2:00 PM)
+Activity(visit Australia Zoo, Australia Zoo, Saturday, 9:00 AM - 5:00 PM)
+Activity(Sunset Cruise, Marina Park Caloundra, Saturday, 6:00 PM - 8:30 PM)
+----
+
+As well as `tables`, `MarkdownSlurper` exposes `headings`, `links`, `codeBlocks`
+and `section(name)`. It comes from the `groovy-markdown` module; table support
+additionally needs `org.commonmark:commonmark-ext-gfm-tables`, which isn't
+pulled in transitively.
+
+== Typed decisions instead of chat
+
+Everything so far has been a chat model: we send prose and get prose back.
+A _decision model_ works differently. A single request carries a state and several
+named, typed questions, and each answer comes back with probabilities and a
+calibrated confidence. There is no conversation, no tool calling, and no streaming.
+
+This model class was popularised by https://typesafe.ai[TypeSafe AI]'s _System One_
+API and its `Jev` model, and LangChain4j 1.22 added a provider-neutral `DecisionModel`
+abstraction for it. Ollama serves the same API locally at `/v1/systemone` from version
+0.35, with decision models such as `tev1`, `nimble` and `clef`. Since LangChain4j's
+TypeSafe integration already targets that path by default, aiming it at a local
+decision model needs no extra configuration:
+
+[source,groovy]
+----
+var decisionModel = TypeSafeDecisionModel.builder()
+    .baseUrl('http://localhost:11434')
+    .apiKey('ollama')  // local Ollama ignores this, but the builder expects a key
+    .modelName('tev1')
+    .timeout(Duration.ofMinutes(5))
+    .build()
+----
+
+We'll reuse our fake weather forecast as the state, and ask three questions covering
+the three available kinds: a yes/no question, a choice between candidate activities,
+and a score on an ordered scale:
+
+[source,groovy]
+----
+var response = decisionModel.decide(DecisionRequest.builder()
+    .input([saturday: saturday.toString(), sunday: sunday.toString()])
+    .question('beachDay', YesNoQuestion.of('Is the Saturday weather good for the beach?'))
+    .question('sundayPick', ChoiceQuestion.of('Which activity suits the Sunday weather best?', activities))
+    .question('effort', ScaleQuestion.of('How much physical effort does a summit hike need?',
+        ['Easy: a flat stroll', 'Moderate: some walking and climbing', 'Hard: a steep summit climb']))
+    .build())
+----
+
+Which gives us numbers rather than prose:
+
+----
+Beach on Saturday?  yes (probability 0.684)
+Pick for Sunday?    gallery  "Browsing the Caloundra Regional Gallery"
+                    beach=0.001, gallery=0.993, hike=0.006
+                    confidence 0.957
+Effort for a hike?  1.71 on a 0..2 scale
+Tokens used:        496 in, 0 out
+----
+
+The model gave the gallery 0.993 for the wet Sunday, and the beach 0.684 for the hot
+Saturday. A score is the probability-weighted average of the levels, so 1.71 sits
+between _Moderate_ and _Hard_. Note that no output tokens were used: nothing is
+generated, only scored. Repeated runs against a loaded model give the same numbers,
+which suits this model class to classification, routing and gating, where a chat
+model's variability is a liability.
+
+Two caveats. The `langchain4j-typesafe` module is published as a beta
+(`1.22.0-beta32` pairs with core `1.22.0`), and `tev1` is a 4.4GB download, so the
+example repo runs it separately from the other LangChain4j examples. There is also a
+higher-level declarative API, using `@Decide` on an interface in the style of the AI
+services we saw earlier; we use the lower-level API here since all three question
+kinds work with it against Ollama.
 
 == Using Spring AI
 
@@ -972,11 +1091,106 @@ Answer:  1. Explore the Minneapolis Sculpture Garden: This 11-acre outdoor museu
 4. Attend a concert or sporting event: Minneapolis is home to several major sports teams, including the Minnesota Vikings (NFL), Minnesota Timberwolves (NBA), and Minnesota Twins (MLB). The city also has a thriving music scene, with venues like First Avenue and the Orpheum Theatre hosting concerts by popular artists. Additionally, the Walker Art Center offers free outdoor performances during the summer months at its Sculpture Garden.
 ----
 
+== Hosted models with an OpenAI-compatible API
+
+Our examples so far ran against local models, but most hosted services now expose an
+OpenAI-compatible API, which means the same code can reach them by changing a base URL,
+a key, and a model name. Two we'll use here:
+
+* https://openrouter.ai[OpenRouter] is a gateway sitting in front of hundreds of models
+(Claude, GPT, Gemini, Llama, Mistral and more), including some free ones.
+* https://github.com/apache/tooling-llmao[llmao] is the ASF LLM gateway at
+`llm.apache.org`, giving Apache committers access to Foundation-sanctioned models
+such as `qwen3.8-27b`.
+
+Local Ollama speaks the same protocol at `http://localhost:11434/v1`, so a small record
+is enough to describe any of the three:
+
+[source,groovy]
+----
+record Provider(String name, String baseUrl, String apiKey, String model, Map<String, Object> extraBody) {
+}
+----
+
+Since this is just HTTP and JSON, we can use Groovy 6's new declarative HTTP client.
+The interface _is_ the client: an AST transform generates the implementation, serializes
+the request body as JSON, parses the response back into a `Map`, and turns any 4xx or 5xx
+into an exception carrying the provider's error message:
+
+[source,groovy]
+----
+@HttpBuilderClient('http://localhost:11434/v1')
+interface ChatApi {
+    @Post('chat/completions')
+    Map chatCompletion(@Body Map request)
+}
+
+var api = ChatApi.create {
+    baseUri "$provider.baseUrl/"
+    header 'Authorization', "Bearer $provider.apiKey"
+    requestTimeout Duration.ofMinutes(5)
+}
+
+var json = api.chatCompletion([
+    model: provider.model,
+    messages: [[role: 'user', content: prompt]]
+] + provider.extraBody)
+
+println "Served by: $json.model"
+println "Response:\n" + json.choices[0].message.content
+----
+
+That replaces the JDK `HttpClient` plumbing, the `JsonOutput`/`JsonSlurper` calls, and
+the manual status check we'd otherwise write by hand. A gateway can route a request to
+a different model than the one asked for, so it pays to print what actually answered.
+
+== Asking several providers at once
+
+Each provider is a separate endpoint, so there is no reason to wait for one before asking
+the next. Groovy 6's new concurrency support makes the fan-out a one-liner, and its new
+`System.timed` method measures it:
+
+[source,groovy]
+----
+var parallel = System.timed {
+    ParallelScope.withPool(providers.size()) {
+        providers.collectParallel(ask)
+    }
+}
+----
+
+`withPool` keeps these blocking calls off the CPU-sized common pool, and
+`collectParallel` preserves order, so the answers still line up with the providers that
+gave them. Asking llmao, OpenRouter and local Ollama the same question:
+
+----
+Asking 3 provider(s): llmao, OpenRouter, Ollama
+all 3 in parallel: 7,285 ms
+one at a time    : 11,539 ms
+
+llmao (asked qwen3.8-27b, served by qwen3.8-27b):
+  You must visit Coolum Beach because it offers stunning, wide sands ideal for swimming, walking, and watching vibrant sunsets.
+
+OpenRouter (asked nvidia/nemotron-3-super-120b-a12b:free, served by nvidia/nemotron-3-super-120b-a12b:free):
+  The Kings Beach promenade is a must-see attraction in Caloundra because it offers stunning ocean views, a safe swimming area, and a lively foreshore perfect for walking, picnicking, and watching the sunset.
+
+Ollama (asked mistral:7b, served by mistral:7b):
+  The must-see attraction in Caloundra is Kings Beach, renowned for its picturesque seaside setting, vibrant cafe culture, and family-friendly amenities, providing a perfect blend of relaxation and recreation along the Sunshine Coast.
+----
+
+Three endpoints answered in a little over the time the slowest one needed, rather than
+the sum of all three. The gain only shows up with genuinely separate endpoints though:
+fanning several requests at a single local Ollama instance doesn't help, since it serves
+them one model at a time.
+
 == Conclusion
 
 Groovy’s interoperability, concise syntax, and powerful DSL capabilities make it an excellent language for prototyping and composing AI workflows on the JVM.
 Whether you’re chatting with Ollama, integrating via Spring, Micronaut, or Quarkus,
 or orchestrating agents with Embabel, Groovy keeps your code clear and compact.
+Groovy 6 adds to that: a declarative HTTP client for services with no dedicated library,
+`MarkdownSlurper` for pulling structure out of ordinary prose replies,
+and parallel collection methods for asking several providers at once.
 And thanks to Groovy 6's native image support, those examples don't have to stay
 on the JVM — the Micronaut ones compile to native executables.
 Feel free to experiment with different models and prompts to see what interesting results you can achieve!
@@ -990,5 +1204,6 @@ https://github.com/danvega/groovyai
 ****
 *15/Oct/2025*: Initial version +
 *14/Nov/2025*: Updated with Micronaut, Quarkus, and AI tools examples. +
-*19/Sep/2026*: Updated for the latest library versions and added Micronaut tools and native image examples.
+*19/Sep/2026*: Updated for the latest library versions and added Micronaut tools and native image examples. +
+*18/Oct/2026*: Added hosted model examples (OpenRouter, llmao), Groovy 6's declarative HTTP client and parallel provider comparison, `MarkdownSlurper` structured output, and a decision model example.
 ****
