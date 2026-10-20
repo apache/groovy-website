@@ -1,0 +1,408 @@
+= GEP-32: Restricted Compiler Profile
+
+:icons: font
+
+.Metadata
+****
+[horizontal,options="compact"]
+*Number*:: GEP-32
+*Title*:: Restricted Compiler Profile
+*Version*:: 1
+*Type*:: Feature
+*Status*:: Draft
+*Leader*:: Paul King
+*Created*:: 2026-10-19
+*Last modification*:: 2026-10-19
+****
+
+[width="80%",align="center"]
+|===
+a| NOTE: _WARNING:_
+This proposal is a *draft* for discussion. It does not change Groovy's threat model. Compiling or running
+code from an untrusted author remains out of model (THREAT_MODEL.md §3), and the features this GEP combines
+remain on the threat model's "false friends" list (§9). The profile is *risk reduction for code you have
+chosen to run*, not a sandbox. The name, API and defaults are proposals, not commitments.
+|===
+
+== Abstract
+
+This GEP proposes a single, named, documented and tested compiler configuration, the *restricted profile*,
+for compiling code that the host did not write by hand but has decided to run. Typical examples are an AI
+agent's output in an edit-compile-check loop, cells written by an agent in a notebook, generated scripts,
+and in-house plugin or rules scripts.
+
+The profile combines mechanisms Groovy already has with one new checker:
+
+* *No execution at compile time:* `@Grab`, `@ASTTest` and unexpected global AST transformations are off,
+  so compiling a candidate runs nothing.
+* *Static compilation forced*, so every call has a resolved target the checkers can see.
+* *A new effect checker*, `RestrictedEffectsChecker`, a type-checking extension that refuses reflection,
+  dynamic dispatch, metaclass access, class loading, process execution, dynamic evaluation and raw I/O,
+  including their GDK forms (`"cmd".execute()`, `file.text`, `url.text`), unless the host grants them.
+* *Existing checkers* (strict `NullChecker` by default) and a cooperative runaway guard (`ThreadInterrupt`).
+
+It is delivered as a preset that hosts extend, a refused-snippet test suite that defines what "restricted"
+means, documentation of the limits, and a row in the threat model.
+
+== Motivation
+
+=== Code nobody wrote by hand is now compiled constantly
+
+AI coding agents generate Groovy, compile it, read the diagnostics and try again. Notebook kernels,
+MCP servers and agent harnesses compile snippets they received from a model. The person running these
+tools has chosen to run the code, but has not read every line. Today the question "how do I restrict what
+this script can do?" gets a scattered answer: SecureASTCustomizer javadoc, system properties in the threat
+model's §5a table, and mailing-list posts. Each answer comes with a warning that it is not a sandbox, and
+none comes with tests.
+
+=== "We only compiled it" is not a safety argument
+
+`@Grab` resolves and downloads dependencies, `@ASTTest` runs code and global AST transformations on the
+classpath run during compilation. An agent loop that compiles a hundred candidates should be able to do so
+without running any of them. The switches exist (`groovy.grape.enable`, `groovy.asttest.enable`,
+`CompilerConfiguration#setDisabledGlobalASTTransformations`). What is missing is one place that turns them
+all off and a test that proves it.
+
+=== SecureASTCustomizer cannot do the job alone
+
+SecureASTCustomizer runs at `CANONICALIZATION`, before static type checking has inferred any types.
+Probes against Groovy 6.0.0, with `@CompileStatic` forced and `Class`, `Runtime`, `ProcessBuilder`
+and `System` denied as receivers:
+
+[options="header",cols="3,1,3"]
+|===
+| Snippet | Result | Why
+| `Class.forName("java.lang.Runtime")` | refused | literal receiver class
+| `Runtime.getRuntime().exec("ls")` | refused | indirect import check
+| `"a".getClass().getMethods()` | *compiles* | receiver type not yet inferred
+| `"ls".execute().text` | *compiles* | a GDK method on `String`; denying `String` is not an option
+| `"a".invokeMethod("toUpperCase", null)` | *runs* | dynamic dispatch survives `@CompileStatic`
+| `String.metaClass.trim = { -> "x" }` | refused | static compilation: no property `trim` on `MetaClass`
+|===
+
+A check that runs during type checking sees the inferred receiver of every call and the resolved target of
+every GDK method. That is where the existing checkers in `groovy-typecheckers` already work, and it is
+where the effect rules belong. SecureASTCustomizer stays useful as a cheap early layer for imports.
+
+=== Static compilation is the enabler, not the control
+
+The threat model is right that `@CompileStatic` is not a security control. Statically compiled code is
+just as privileged. Its value here is visibility: with dispatch resolved at compile time, a checker can
+say what a snippet touches. The profile uses static compilation for that reason and makes no other claim
+for it.
+
+== Design
+
+=== Layers
+
+[options="header",cols="2,3,3"]
+|===
+| Layer | Mechanism | Status
+| No compile-time execution | Grab transform disabled per compilation, Grab annotations refused, `@ASTTest` disabled, other global transforms disabled or a host-controlled compile classpath | existing switches, plus a small refusal customizer
+| Static compilation | `ASTTransformationCustomizer(CompileStatic, extensions: [...])` | existing
+| Effect rules | `RestrictedEffectsChecker` (below) | *new*
+| Import layer | SecureASTCustomizer `disallowedImports`, `disallowedStarImports`, `indirectImportCheckEnabled` | existing
+| Correctness checkers | strict `NullChecker` by default; `PurityChecker` and others opt-in | existing
+| Runaway guard | `ThreadInterrupt`, optionally `TimedInterrupt`; cooperative, robustness only | existing
+| Typed binding (REPL hosts) | optional extension, specified separately | see _Related work_
+|===
+
+=== `RestrictedEffectsChecker`
+
+An opt-in type-checking extension in `groovy-typecheckers`, usable on its own or through the preset.
+It reports a static type error when a resolved call, constructor call, property access or method pointer
+targets one of these categories:
+
+[options="header",cols="2,4"]
+|===
+| Category | Examples (non-exhaustive)
+| Reflection and handles | `java.lang.Class` members beyond name and simple-name queries, `java.lang.reflect.*`, `java.lang.invoke.*`
+| Dynamic dispatch and the MOP | `invokeMethod`, `getProperty`/`setProperty` by name, `getMetaClass`, `groovy.lang.MetaClass`, `GroovySystem`
+| Class loading and evaluation | `ClassLoader`, `GroovyClassLoader`, `GroovyShell`, `Eval`, `javax.script.*`, `groovy.grape.*`
+| Process and system | `Runtime`, `ProcessBuilder`, `System` (except time and line-separator queries), `ProcessGroovyMethods`
+| Ambient I/O | `java.io.File`, `java.nio.file.*`, `java.net.*`, `ResourceGroovyMethods`
+| Threads | `Thread` creation, executors (optional; on by default)
+|===
+
+Rules are written against resolved owners and GDK provider classes, not method names alone. The GDK's
+split already follows authority: `ResourceGroovyMethods` makes authority from a name (`File`, `URL`),
+`ProcessGroovyMethods` starts processes, while `IOGroovyMethods` works on streams the code was already
+handed. The last stays allowed by default, so a host can pass in a `Reader` and the snippet can use
+`eachLine` on it.
+
+==== Grants
+
+Hosts widen the profile by naming grants, not by deleting rules:
+
+[source,groovy]
+----
+def config = RestrictedProfile.builder()
+    .grant(RestrictedProfile.Grant.THREADS)
+    .grant(RestrictedProfile.Grant.FILE_READ)   // java.nio.file read operations only
+    .checkers('NullChecker(strict: true)', 'PurityChecker')
+    .build()                                     // a CompilerConfiguration
+----
+
+Grants are categories, not paths. Granting a category says "this code may use files". Which files is a
+runtime question for the host, which passes in the `Path` or stream it is willing to share. Path-scoped and
+capability-scoped grants are deferred (see _Excluded and deferred features_).
+
+==== Deny list or allow list
+
+The default is a *deny list*: ordinary computation code compiles, and the refused categories are easy to
+explain. An *allow-list mode* (`.allowListOnly()`) admits only `java.lang` value types, `java.util`,
+`java.time`, `java.math`, `java.util.function`, `java.util.stream` and the GDK without its effect providers,
+plus anything granted. This is closer to the "safe mode" of the TACIT work for Scala. The same test suite
+runs against both modes.
+
+==== Shared lists with `PurityChecker`
+
+`PurityChecker` already classifies I/O, logging, metrics and non-determinism by type prefix. The two
+checkers should share those lists from one source so they cannot drift apart. They answer different
+questions: purity asks whether a method has an effect, while the profile asks whether the code may reach
+that kind of effect at all.
+
+=== The preset
+
+`RestrictedProfile` is a small builder returning a configured `CompilerConfiguration`. Because REPL hosts
+(notebook kernels, `groovysh`, MCP servers) add their own customizers, the profile must be a preset hosts
+extend in code, not only a `groovyc --configscript` file. A config script that applies the default profile
+is also shipped, for the command line and for `groovyc --check`.
+
+The preset sets, in addition to the layers above:
+
+* `groovy.grape.GrabAnnotationTransformation` disabled for its compilations, through
+  `setDisabledGlobalASTTransformations`, together with all other global AST transformations except those
+  the host lists explicitly;
+* a refusal, reported as a compile error, of `@Grab`, `@GrabConfig`, `@GrabResolver` and `@GrabExclude`, so
+  the snippet's author learns that dependencies are unavailable, rather than meeting "unable to resolve
+  class" later;
+* `@ASTTest` disabled.
+
+==== Why Grape is disabled per compilation
+
+There are three ways to turn Grape off. Only one is scoped to a compilation:
+
+[options="header",cols="2,2,3"]
+|===
+| Mechanism | Scope | Behaviour (6.0.0 probes)
+| Keep `groovy-grape-ivy` and `groovy-grape-maven` off the classpath | the JVM | `@Grab` is skipped with only a "Grapes disabled" warning. `@GrabConfig(systemProperties = ...)` *still sets the JVM system property at runtime*, because its generated initializer checks only `groovy.grape.enable`.
+| `groovy.grape.enable=false` or `Grape.setEnableGrapes(false)` | the JVM, read once into a static | Also turns off Grape for the host's own code, for example a notebook kernel's normal mode in the same JVM.
+| Disable `GrabAnnotationTransformation` in the profile's `CompilerConfiguration` | one compilation | `@Grab` and `@GrabConfig` have no effect. No property is set, and the host's own Grape stays enabled.
+|===
+
+The profile cannot control the host's classpath, and a JVM-wide switch is too broad for hosts that use
+Grape themselves. The per-compilation switch is therefore the mechanism. Keeping the engines off the
+classpath remains good defence in depth for hosts that run in a dedicated JVM, such as a guarded kernel,
+an MCP server or a CI step running `groovyc --check`, and the documentation recommends it there.
+
+Disabling the transform does not cover a direct runtime call such as `Grape.grab(group: ..., module: ...,
+version: ...)`, which still resolves and loads the dependency. `groovy.grape.*` is therefore in the effect
+checker's class-loading category.
+
+The `@GrabConfig(systemProperties)` behaviour without an engine looks unintended. It is proposed as a
+separate core ticket, https://issues.apache.org/jira/browse/GROOVY-12461[GROOVY-12461]: the generated initializer should also be skipped when no engine is available.
+
+=== Per-method scope
+
+By default the profile covers a whole compilation. Some generated code, though, lives inside hand-written
+source. A spec-sync tool, for example, writes a generated method body into an existing class (see _Spec sync
+and `@Spec`_ below). For that case the effect rules can be limited to methods carrying a marker annotation.
+`@Spec` is the expected marker; a host may name another.
+
+[source,groovy]
+----
+def config = RestrictedProfile.builder()
+    .scopeToMethodsAnnotatedWith('groovy.transform.Spec')
+    .build()
+----
+
+In this mode:
+
+* the preset adds `@CompileStatic` to the marked methods only, so the rest of the class keeps its own
+  compilation mode;
+* `RestrictedEffectsChecker` checks the marked method's body, including closures, lambdas and local or
+  anonymous classes declared in it;
+* the compile-time layers (Grab, `@ASTTest`, global transforms) stay compilation-wide, because they cannot
+  be applied per method;
+* calls from a marked method to unmarked methods written by the host are allowed, as calls into trusted
+  library code are. A generated body can therefore reach an effect through a helper the host wrote. That is
+  the host's choice and is documented. An optional strict setting refuses such calls unless the callee is
+  itself marked or is `@Pure` under `PurityChecker`.
+
+The refused-snippet suite gains per-method variants of its cases, including an unmarked helper that does
+what the marked method may not.
+
+==== Probe results (Groovy 6.0.0)
+
+A prototype used a `CONVERSION` customizer that adds `@CompileStatic(extensions = ...)` to `@Spec` methods,
+with a toy extension that refuses `execute`:
+
+[options="header",cols="3,2"]
+|===
+| Case | Result
+| unmarked method in a dynamic class calls `"cmd".execute()` and uses dynamic dispatch | compiles and runs as before
+| marked method makes a dynamic call | refused by static type checking
+| marked method calls `execute()` directly, in a closure, or in an anonymous inner class | refused in all three
+| marked method calls an unmarked helper that calls `execute()` | allowed, as designed
+| marked method in a class that is already `@CompileStatic` | the extension still applies to it
+| marked method in a script | refused as expected
+| unfilled marked method (empty body), with a small `@Spec` transform | throws `UnsupportedOperationException` instead of returning `null`
+| marked method reads a `def` property of its dynamic class (`x + 1`) | refused: the property is `Object`
+|===
+
+The last row is a usability cost rather than a hole. Generated bodies in dynamic classes meet untyped fields.
+The sync tool sees the diagnostic and can add a cast or a typed local, but declaring field types is the better
+fix.
+
+==== Loops and local declarations
+
+`@Spec` can also mark a smaller hole. With `@ExtendedTarget(ExtendedElementType.LOOP)` it is accepted on
+`for`, `while` and `do-while` loops, and with `ElementType.LOCAL_VARIABLE` on local declarations. The
+`@Spec` transform receives the loop statement or the declaration as its target node, so an unfilled loop
+body can be made to throw just as an unfilled method does. Neither kind is ever written to the class file,
+so such specs exist only in source. That is enough for the sync tool, which works on source, but they are
+invisible to reflection and to documentation built from compiled classes.
+
+`@CompileStatic` cannot be applied to a single statement. Restricting a loop therefore means statically
+compiling its enclosing method and limiting the effect checker to statements inside `@Spec` loops. A
+prototype did this: `execute()` inside the loop was refused, and `execute()` elsewhere in the same method was
+allowed. The cost is that the rest of that method must also type-check statically, so a dynamic call
+elsewhere in it is now refused. The profile should support loop scope on these terms, and the sync tool
+should prefer method-level holes where the surrounding code is dynamic.
+
+=== The refused-snippet test suite
+
+The suite *defines* the profile. It has two halves:
+
+* *must refuse:* every row of the motivation table, every category above, and known SecureASTCustomizer
+  bypasses (indirect class references, aliases, method pointers, `with`/`tap` delegation, string-to-class
+  coercion, code relocated into constructors, initializers and synthetic methods);
+* *must compile:* representative data-processing, collection, string, date and math code, so the profile
+  stays usable.
+
+It follows the style of the existing "refuted" test module: each snippet carries the reason it is refused,
+and a regression in either half fails the build.
+
+== Positioning and the threat model
+
+THREAT_MODEL.md gains a §5a row and a §9 pointer. Suggested wording:
+
+____
+*Restricted profile (`RestrictedProfile`).* For code you would otherwise run with no restriction, such as
+your own agent's output, generated scripts or in-house plugins, the profile removes compile-time execution
+and refuses reflection, dynamic dispatch, process execution, dynamic evaluation and ambient I/O unless
+granted. It combines features listed under _False friends_ without changing their status. It is not a
+sandbox: for code from an untrusted author it is one layer beneath process or OS isolation, and §3 still
+applies.
+____
+
+The name says "restricted", not "secure" or "safe", for this reason.
+
+== Related work in Groovy
+
+=== GEP-31: Realm based dynamic semantics
+
+GEP-31 lets a realm define its extension method set, its MetaClass layer and its object MOP, and states
+that static method selection uses the realm's extension set. A *restricted realm* that drops
+`ProcessGroovyMethods` and `ResourceGroovyMethods`, has no MetaClass layer and excludes `invokeMethod` would
+express the GDK and dispatch rules of this profile structurally. `"ls".execute()` would simply not resolve,
+and the rule would hold for dynamically compiled code as well. If GEP-31 lands, the profile should define
+such a realm and shrink `RestrictedEffectsChecker` to the JDK-type rules. This GEP does not depend on
+GEP-31. It is a concrete use case for it.
+
+=== GEP-25: Data-flow security
+
+GEP-25 tracks where values go: taint inward, sensitive values outward. This GEP restricts what code may do
+at all. They are complementary and kept separate so that neither waits on the other. Later agent-harness
+work is expected to combine them, with GEP-25's sensitive-value carrier used from snippets compiled under
+this profile.
+
+=== Typed binding for REPL hosts (GROOVY-12462)
+
+Under forced static compilation, a REPL snippet that reads a session variable from its `Binding` (`x + 1`)
+is refused as undeclared. https://issues.apache.org/jira/browse/GROOVY-12462[GROOVY-12462] proposes three small parts that REPL hosts add to their
+configuration:
+
+* *resolve:* an `unresolvedVariable` type-checking extension looks names up in a session map of name to
+  type;
+* *export:* top-level declarations stay ordinary locals while compiling, so flow typing applies, and are
+  copied into the binding at the end of the snippet;
+* *record:* after type checking, the inferred type of each exported declaration, generics included, is
+  stored in the session map for later snippets.
+
+A prototype on Groovy 6.0.0 compiled `n + names.size()` statically against recorded types `int` and
+`ArrayList<String>`, and refused `names.first().foo()` and incompatible reassignments. Resolving from runtime
+classes alone loses generics, which is why the record step reads inferred types instead. This is useful
+without the profile, as an optional static mode for `groovysh` and notebook kernels. The preset can include
+it when it exists, and LACUNA-style holes filled at runtime would need it.
+
+=== Spec sync and `@Spec` (outside core)
+
+Martin Odersky's Scala Days 2026 keynote shows program holes filled ahead of time: a method with a typed
+signature, a prose spec string and `???`, whose body an agent writes into the source during a "sync" step.
+The Groovy form under discussion is `@Spec('''...''')` on a method with an empty body, next to `@Requires`
+and `@Ensures`. A sync tool, starting outside core in groovy-verify or a small module, fills the body,
+checks it against the contracts and writes it back. Two points concern this GEP:
+
+* filling must be a tool step, never an AST transform that calls a model, so that compiling still runs
+  nothing;
+* the tool compiles each candidate under this profile in per-method scope, with `@Spec` as the marker, so
+  generated bodies are restricted while the hand-written code around them is not.
+
+=== `PurityChecker` closure parameters (GROOVY-12460)
+
+The ticket letting `@Pure` apply to closure and SAM parameters is independent. Hosts that enable
+`PurityChecker` under the profile benefit from it. GROOVY-12464 closes a related gap: mutation through operators
+(`<<`, subscript assignment, and GEP-15 `*Assign` methods such as `plusAssign`) is not yet
+detected, while the equivalent method calls are.
+
+== Excluded and deferred features
+
+* *A sandbox.* Out of scope by design; see _Positioning_.
+* *Runtime enforcement.* The profile is compile-time only. Libraries on the classpath may do anything
+  internally; a granted or allowed library call is trusted. Hosts that need more use process isolation.
+* *Resource limits.* Memory, CPU and output size are host concerns. `TimedInterrupt` is offered for
+  accidental loops only.
+* *Path-scoped and capability grants.* Scoped grants such as "read under `/work` only", and a check that a
+  granted handle does not escape the block it was given in, are deferred to a later GEP or ticket that builds
+  on the grant vocabulary here.
+* *Dynamic code.* Without static compilation the checker cannot see dispatch targets. The profile forces
+  static compilation; a realm (GEP-31) is the path to restricting dynamic code.
+
+== Compatibility
+
+Purely additive. Nothing changes for code not compiled with the profile or the checker. Users who already
+combine SecureASTCustomizer with `@CompileStatic` can keep doing so.
+
+== Risks, maintenance and status
+
+* *Being mistaken for a sandbox.* The largest risk. It is mitigated by the name, the warning box, the
+  threat-model wording and documentation that points to process isolation on every page.
+* *Coverage gaps.* A type-checking extension sees only what the compiler resolves. The suite exists to make
+  gaps visible; each newly found bypass becomes a test.
+* *List maintenance.* The deny list needs updating as the JDK and GDK grow. Sharing lists with
+  `PurityChecker` and, later, a realm definition keeps it to one place.
+* *Usability.* A profile nobody can use is no profile. The must-compile half of the suite guards this.
+
+Status: *Draft*. The suggested order of work is the refused-snippet suite first, as failing tests; then the
+checker until the suite passes; then the preset, documentation and threat-model row. The typed-binding
+ticket proceeds in parallel, prototyped in the groovy-jupyter kernel.
+
+== References
+
+* THREAT_MODEL.md §3 (scope), §5a (operational knobs), §9 (false friends), in the Groovy repository
+* https://docs.groovy-lang.org/latest/html/gapi/org/codehaus/groovy/control/customizers/SecureASTCustomizer.html[SecureASTCustomizer]
+* https://docs.groovy-lang.org/latest/html/documentation/type-checking-extensions.html[Type checking extensions]
+* link:GEP-8.html[GEP-8: Static type checking]
+* link:GEP-10.html[GEP-10: Static compilation]
+* link:GEP-25.html[GEP-25: Data-flow Security]
+* link:GEP-31.html[GEP-31: Realm based dynamic semantics]
+* https://arxiv.org/abs/2603.00991[TACIT: capability-safe agent code in Scala] (safe mode and scoped capabilities)
+* https://github.com/lampepfl/tacit[lampepfl/tacit]
+* https://www.youtube.com/watch?v=jlJyuJhDnlc[Martin Odersky, "The End of Programming?", Scala Days 2026 keynote] (spec holes filled ahead of time)
+
+== Update history
+
+1 (2026-10-19):: Initial draft, including Grape probe results, per-method scope, the revised typed binding
+  design and the relation to spec sync, with per-method and loop scope probe results
