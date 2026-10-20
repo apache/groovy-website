@@ -5884,11 +5884,6 @@ NOTE: The `SqlInjectionChecker` compile-time check
 (<<sql-injection-checker>>) is not a system property; it can be suppressed
 at a call site with `@SuppressWarnings("groovy.sql.injection")`.
 
-== Under exploration (before GA release)
-
-* Further performance improvements
-* Further improvements to the language specification documentation
-
 [[Groovy6.0-requirements]]
 == JDK requirements
 
