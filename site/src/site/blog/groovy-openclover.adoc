@@ -137,7 +137,7 @@ core. The Gradle plugin (`com.bmuschko.clover`) was last released in
 
 That's less of a problem than it sounds. OpenClover's own Ant tasks are
 small and well-defined, and Gradle can call Ant directly. The companion repo has
-a convention plugin, `openclover.gradle`, of around 130 lines. The heart of it
+a convention plugin, `openclover.gradle`, of around 150 lines. The heart of it
 compiles main and test sources through an instrumenting `<groovyc>`:
 
 [source,groovy]
@@ -367,50 +367,71 @@ Here it is on the same one-line change:
 $ ./gradlew -q :affectedTests
 src/main/groovy/coffee/Pricing.groovy:32             line               3 test(s)
 
-Run: ./gradlew :test --tests 'coffee.ReceiptSpec.a receipt lists each drink and the total' --tests 'coffee.PricingTest.extraShot' --tests 'coffee.PricingTest.priceIncludesExtras'
+  coffee.ReceiptSpec.a receipt lists each drink and the total
+  coffee.PricingTest.extraShot
+  coffee.PricingTest.priceIncludesExtras
+Run: ./gradlew -q :testAffected
 ----
 
-Running those three tests gives three failures. Running the full suite
-also gives three failures, the same three. The other eight tests never
-executed the changed line, and they all pass.
+The `testAffected` task asks the same script for the selection and
+applies it as a test filter, so one command picks the tests and runs them:
 
-The suggested command runs the _ordinary_ uninstrumented tests, so the fast
+----
+$ ./gradlew -q :testAffected
+Running 3 test(s)
+
+ReceiptSpec > a receipt lists each drink and the total FAILED
+    org.spockframework.runtime.SpockComparisonFailure at ReceiptSpec.groovy:30
+PricingTest > priceIncludesExtras() FAILED
+    org.codehaus.groovy.runtime.powerassert.PowerAssertionError at PricingTest.groovy:45
+PricingTest > extraShot() FAILED
+    org.codehaus.groovy.runtime.powerassert.PowerAssertionError at PricingTest.groovy:40
+3 tests completed, 3 failed
+----
+
+Running the full suite also gives three failures, the same three. The other
+eight tests never executed the changed line, and they all pass.
+
+`testAffected` runs the _ordinary_ uninstrumented tests, so the fast
 feedback loop costs no instrumentation overhead. Only rebuilding the
 map runs instrumented.
 
 == Telling the agent
 
-For an agent, `-Pjson` gives machine-readable output:
+For an agent, `testAffected` is usually all it needs. When it wants to look
+before running anything, `-Pjson` gives a machine-readable summary:
 
 [source,json]
 ----
 {
     "baseline": {
-        "commit": "06b42e72f9308d7b9eb3683dd4844f171d646fdb",
+        "commit": "92c182ff1de6ce5136eaf0fb7c1fde1cee6dbc98",
         "dirty": false
     },
     "runAll": false,
-    "tests": [
-        "coffee.ReceiptSpec.a receipt lists each drink and the total",
-        "coffee.PricingTest.extraShot",
-        "coffee.PricingTest.priceIncludesExtras"
-    ],
+    "testCount": 3,
+    "testClasses": ["coffee.ReceiptSpec", "coffee.PricingTest"],
     "uncovered": [],
-    "command": "./gradlew :test --tests 'coffee.ReceiptSpec.a receipt lists each drink and the total' --tests 'coffee.PricingTest.extraShot' --tests 'coffee.PricingTest.priceIncludesExtras'",
+    "run": "./gradlew -q :testAffected",
     "hunks": [
         { "location": "src/main/groovy/coffee/Pricing.groovy:32", "level": "line", "tests": 3 }
     ]
 }
 ----
 
-The `uncovered` list is arguably as valuable as the test list. If an
+The summary deliberately gives counts and classes rather than every test
+name. As we'll see shortly, a long list costs an agent more than you
+might expect.
+
+The `uncovered` list is arguably as valuable as the selection. If an
 agent changes a line that no test executes, it learns that immediately and
 can write a test, rather than reporting a green build that never
-exercised its change.
+exercised its change. `testAffected` prints the same information as
+`No test covers: <file:lines>`.
 
 The companion repo includes an `AGENTS.md` with instructions for coding
-agents: run `affectedTests -Pjson` after an edit, run the `command`,
-add tests for anything in `uncovered`, and run the full suite once
+agents: run `testAffected` after an edit, add tests for anything
+reported as uncovered, and run the full suite once
 before finishing. That last step matters. Selection is a fast feedback
 loop, not a proof. A change can affect a test that never executed the
 old line: a new branch that previously didn't exist, a constant read
@@ -465,11 +486,12 @@ A few things stood out:
 * Accuracy improved more than cost did. Without the map, agents sometimes
   picked plausible tests that never executed the changed code, ran them,
   and reported success while a real failure went unnoticed.
-* The output format matters. Our first version of the tool printed every
-  selected test, twice. With hundreds of tests selected, agents had to
-  re-parse the output, and the map group used _more_ tokens than the group
-  without it. Adding a mode that runs the selection directly and reports
-  counts rather than names gave the numbers above.
+* The output format matters. In an extra round where the tool's JSON listed
+  every selected test by name, and again inside a ready-to-run Gradle command,
+  agents faced with hundreds of tests had to re-parse the output, and the map
+  group used _more_ tokens than the group without it. The numbers above come
+  from running the selection directly, as `testAffected` does, and summarising
+  it with counts rather than names, as `-Pjson` does.
 * Selection was not much smaller than an agent's own guesses. A change
   to parser code that almost every test exercises selects hundreds of
   tests. What the map adds is that the selection is _right_.
