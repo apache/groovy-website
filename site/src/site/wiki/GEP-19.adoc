@@ -7,12 +7,12 @@
 [horizontal,options="compact"]
 *Number*:: GEP-19
 *Title*:: Structural Pattern Matching in switch
-*Version*:: 2
+*Version*:: 3
 *Type*:: Feature
 *Status*:: Draft
 *Leader*:: Paul King
 *Created*:: 2026-04-25
-*Last modification*:: 2026-09-14
+*Last modification*:: 2026-10-21
 ****
 
 [NOTE]
@@ -584,6 +584,15 @@ https://issues.apache.org/jira/browse/GROOVY-12408[GROOVY-12408]).
   assignment, an argument, or the value of an arrow arm — is a switch
   expression.
 
+Position also decides control transfer, as in Java. In a
+statement-position arrow switch, `return` is an ordinary return, `break`
+leaves the switch and `continue` targets the enclosing loop; a switch
+expression rejects all three, including inside a statement switch nested
+in one of its arms. Groovy rejected them in every arrow arm until the
+reference implementation lifted the restriction for statements. That
+matters here because pattern labels are arrow-only: without it there
+would be no way to return out of a matching arm.
+
 === Exhaustiveness
 
 [cols="2,1,3"]
@@ -594,14 +603,14 @@ https://issues.apache.org/jira/browse/GROOVY-12408[GROOVY-12408]).
 |Always
 |Settled in Groovy 6
  (https://issues.apache.org/jira/browse/GROOVY-12255[GROOVY-12255]),
- independently of patterns. A `default`, a complete set of enum
- constants, an unconditional pattern, or type tests covering a sealed
- hierarchy all satisfy it.
+ independently of patterns: a compile-time error under `@TypeChecked` /
+ `@CompileStatic`, whatever the labels.
 
 |Statement, with a pattern label
 |Yes
 |Matches JEP 441, which requires exhaustiveness of a statement only where
- it uses a pattern label.
+ it uses a pattern label. The reference implementation makes this an
+ error too; see <<remaining-work,Remaining work>>.
 
 |Statement, without a pattern label
 |No
@@ -615,6 +624,44 @@ requirement is a pattern label and nothing else; what *satisfies* it is
 any coverage the compiler can prove, so a class-literal label can help
 satisfy a check that a pattern has triggered without being able to
 trigger one itself.
+
+Any of the following satisfies it:
+
+* a `default`;
+* all constants of an enum;
+* an unguarded type pattern whose type covers the selector type, such as
+  `case Object o`. A bare class-literal label such as `case Object` does
+  not, since it is an ordinary `isCase` test;
+* labels that together cover a closed sealed hierarchy. Following
+  https://issues.apache.org/jira/browse/GROOVY-12447[GROOVY-12447], only
+  a *native* sealed type counts as closed (an emulated one does not); a
+  concrete sealed class needs a label for itself; and a permitted subtype
+  that is itself an abstract sealed class or sealed interface may instead
+  be covered through its own permitted subtypes.
+
+A pattern counts toward coverage only when it provably matches every
+value of its type:
+
+[cols="3,1"]
+|===
+|Pattern |Counts?
+
+|Unguarded type pattern `case T t` |Yes, for `T`
+|Record pattern whose components are all `var` / `def` bindings or `_`,
+ e.g. `case Circle(var r)` |Yes, for the record
+|Record pattern with a typed component on a *primitive* record component
+ of the same type, e.g. `case Circle(double r)` |Yes: the component can
+ never be `null`
+|Record pattern with a typed component on a *reference* record component,
+ e.g. `case Box(Object o)` |No: a typed element does not match a `null`
+ component. Java counts this case; see <<remaining-work,Remaining work>>
+|Record pattern with a nested pattern, or over a non-record `toList()`
+ deconstructable (arity unknown at compile time) |No
+|List pattern `[...]` or `[var... rest]` |Yes, when the selector is
+ statically a list, array or `Iterable`
+|Any other list pattern; any map pattern |No
+|Any pattern with a `when` guard |No
+|===
 
 Whether `case null` should also trigger the requirement, as it does in
 Java, is left open. Java has that rule because `case null` is itself new
@@ -633,20 +680,28 @@ the trigger would reject working code. See <<remaining-work,Remaining work>>.
 |Expression
 |`IllegalStateException` naming the selector
 
-|Exhaustive enum expression, where a constant was added after the switch
- was compiled
-|`IncompatibleClassChangeError`. Java throws `MatchException` here since
- JEP 441; Groovy cannot while its baseline predates Java 21 (see
- <<remaining-work,Remaining work>>)
+|Expression proven exhaustive without a `default`, where an enum
+ constant or sealed subtype was added after the switch was compiled
+|On a Java 21+ target, `java.lang.MatchException`, as in Java (JEP 441).
+ On a 17 target, `IncompatibleClassChangeError` for the enum case and
+ `IllegalStateException` otherwise
 
 |Bracket-form declaration
 |`IllegalArgumentException`
 |===
 
-A `null` subject is not an error, as set out under _Features_: it
-matches no constant or type label, so in statement position it falls
-through and in expression position it raises `IllegalStateException`,
-while a legacy `case null` label still matches it. Java instead throws
+The `MatchException` choice is made from the *target bytecode*, not from
+the JDK running the compiler or the program. The exception is referenced
+by name in the generated code, so a class compiled for 21 throws it on
+every JDK it can load on, and a class compiled for 17 never does. This
+needs no change to Groovy's minimum JDK. Neither exception is meant to be
+caught; a `default` arm that throws gives a defined exception on every
+target.
+
+A `null` subject is not an error, as set out under _Features_: it is
+matched only by an explicit `case null` label, and otherwise in statement
+position it falls through and in expression position it raises
+`IllegalStateException`, on every target. Java instead throws
 `NullPointerException` unless a `case null` label is present. Groovy's
 labels match through `isCase`, for which `null` is an ordinary value
 that simply matches nothing, so the Java behaviour is not adopted.
@@ -694,9 +749,13 @@ implementation):
   retain closure-based labels for the pattern arms.
 * Emitting `java.lang.runtime.SwitchBootstraps.typeSwitch`
   invokedynamic dispatch — on parity with how Java compiles pattern
-  switch — remains future work for when a JDK 21+ bytecode target is
-  available; the nested-`instanceof` shape above is what that
-  bootstrap degenerates to for small label counts.
+  switch — remains future work. Like `MatchException` it needs a Java
+  21+ *target*, not a higher minimum JDK: the bootstrap is referenced by
+  name, as record codegen already does for `ObjectMethods`, and a 17
+  target would keep the nested-`instanceof` shape above, which is what
+  the bootstrap degenerates to for small label counts. Its labels are
+  limited to classes, strings, integers and enum constants, so only a
+  switch whose arms are all type or record patterns could use it.
 * Bindings are ordinary local variables (the `instanceof` binding
   machinery from JEP 394 support); the static type checker propagates
   narrowed types into them. For dynamic Groovy, untyped bindings are
@@ -706,11 +765,11 @@ implementation):
   pattern that provably cannot match the switch subject's static type
   and for a record pattern whose arity disagrees with the record, and
   *warns* for an arm dominated by a preceding label (unreachable).
-  A non-exhaustive switch is currently an error, following what Groovy
-  6 already does for switch expressions; whether that is the right
-  severity is open, and is discussed under <<remaining-work,Remaining work>>.
-  A `default` branch, an unconditional pattern, or full
-  sealed-hierarchy coverage each satisfy exhaustiveness. These are
+  A non-exhaustive switch is an error, as Groovy 6 already does for
+  switch expressions; for a pattern switch *statement* that severity is
+  still open, see <<remaining-work,Remaining work>>. What satisfies
+  exhaustiveness is set out under
+  <<switch-position,position and exhaustiveness>>. These are
   static-typing diagnostics only; dynamic Groovy remains permissive.
 * Iterable inputs that are not `List` or array are materialised as a
   list once per match attempt; this is observable for sources with
@@ -733,8 +792,9 @@ implementation):
 |Pattern matching for `switch` (JEP 441, 21)
 |Shipped
 |Arrow-form `switch`, this proposal. Exhaustiveness follows JEP 441's
- split between statement and expression position; `MatchException` and
- `case null` are not adopted, see <<switch-position,position and exhaustiveness>>
+ split between statement and expression position; `MatchException` is
+ adopted on a Java 21+ target; Java's `case null` rules are not adopted,
+ see <<switch-position,position and exhaustiveness>>
 
 |`when` guards (Java 21)
 |Shipped
@@ -821,13 +881,11 @@ the design space open for a future relaxation if usage warrants it.
  `default \->` or `case var _ \->`
 
 |Exhaustiveness enforcement severity
-|Open
-|Whether a non-exhaustive switch is an error or a warning is not
- settled. Erroring matches Java and matches what Groovy 6 already does
- for switch expressions; warning is safer while the coverage analysis
- is incomplete, since a pattern the compiler cannot prove exhaustive is
- rejected even where Java accepts it. A split by how much the compiler
- knows is proposed in <<remaining-work,Remaining work>>
+|Open (statements only)
+|For switch expressions this is settled by Groovy 6: a non-exhaustive
+ expression is an error under the type checker. What remains open is the
+ severity for a pattern switch *statement*; see
+ <<remaining-work,Remaining work>>
 |===
 
 == Compatibility
@@ -925,40 +983,42 @@ These are open for discussion rather than settled. A reference
 implementation exists and informs the notes below, but it is a draft and
 its current behaviour should not be read as a decision.
 
-=== Severity, and what the compiler can actually prove
+Several items earlier drafts listed here are now settled: severity for
+switch expressions (an error, from Groovy 6), coverage by record and
+total list patterns, `MatchException` on a Java 21+ target, and
+`return` / `break` / `continue` in statement-position arrow arms. Each is
+described in <<switch-position,position and exhaustiveness>>. None of
+them needs a higher minimum JDK for Groovy 7.
 
-The coverage analysis is deliberately conservative in one place: record,
-list and map patterns never contribute to it, because a deconstruction
-can fail on arity or on a component even when its head type matches. The
-consequence is that a switch Java accepts as exhaustive can be rejected
-here. For example, with `sealed interface S permits P` and
+=== Severity for pattern switch statements
+
+The reference implementation reports a non-exhaustive pattern switch
+statement as an error, following JEP 441. The alternatives are a warning,
+or no check at all, so that an unmatched value falls through silently as
+in every other Groovy statement. Erroring costs no compatibility, since
+pattern syntax is new, and matches Java. Whichever is chosen applies only
+to type-checked code: dynamic Groovy has no exhaustiveness analysis, so a
+non-exhaustive pattern statement falls through there either way.
+
+=== Typed components on reference-typed record components
+
+This is the one place where the coverage analysis still rejects a switch
+Java accepts. With `sealed interface S permits P` and
 `record P(Object o)`, the single arm `case P(Object o) \->` covers `S` in
-Java but not in the current analysis.
+Java, because there a nested type pattern that is total for the
+component type also matches `null`. Under this proposal a typed element
+does not match a `null` component (see _Features_), so the pattern can
+fail and a `default` is required. Adopting Java's rule would mean a typed
+element matches `null` exactly when its type is total for the component,
+which is a decision about null semantics inside patterns rather than
+about exhaustiveness.
 
-That argues against a single severity for every case:
+=== Dominance
 
-[cols="3,1,2"]
-|===
-|What the compiler knows |Analysis |Suggested
-
-|Explicit `default`, or an unconditional type pattern covering the
- selector
-|Complete
-|No diagnostic
-
-|A sealed hierarchy covered by simple type patterns; all constants of an
- enum
-|Complete
-|Error
-
-|Any record, list or map pattern present
-|Incomplete by construction
-|Warning, until component coverage is implemented
-|===
-
-Implementing recursive component coverage — a record pattern is
-unconditional for its type when all of its component patterns are —
-would let the third row move up to error.
+A pattern dominated by an earlier label is a warning here and an error in
+Java. GROOVY-12447 already makes an exact duplicate type label an error,
+so `case Circle` after `case Circle` is an error while `case Circle c`
+after `case Shape s` is a warning. The two should probably agree.
 
 === `case null` as an exhaustiveness trigger
 
@@ -966,35 +1026,6 @@ Discussed in <<switch-position,position and exhaustiveness>>. Adopting
 Java's rule would reject working Groovy code; not adopting it leaves a
 visible difference from Java. Either way it should be a decision rather
 than an omission.
-
-=== `return`, `break` and `continue` in arrow arms
-
-Groovy rejects all three inside a statement-position arrow arm, and has
-since the 4.0 parser; Java allows them. For constant labels the colon
-form is a workaround, but *pattern labels require the arrow form*, so
-under this proposal there is no way to return out of a matching arm. This
-is not caused by pattern matching, but pattern matching is what makes it
-hard to live with, so it should be fixed alongside.
-
-=== Minimum JDK for Groovy 7
-
-Two items depend on it and neither is available below Java 21:
-
-* `java.lang.runtime.MatchException`, which JEP 441 specifies when an
-  exhaustive pattern switch matches nothing at runtime. Below 21 Groovy
-  must keep using `IncompatibleClassChangeError` for the enum case.
-* `java.lang.runtime.SwitchBootstraps.typeSwitch`, the indy dispatch path
-  the Compilation section describes as desirable. The reference
-  implementation defers it for the same reason.
-
-=== Pattern arms and statement position
-
-The reference implementation now checks exhaustiveness of a pattern
-switch statement, which was previously happening only by accident: before
-position became decisive, every arrow switch was an expression and so was
-checked on that path. The trigger deliberately keys on pattern labels
-alone, since reusing the expression check would demand a `default` from
-every switch statement in existence.
 
 == References
 
@@ -1009,3 +1040,4 @@ every switch statement in existence.
 * https://issues.apache.org/jira/browse/GROOVY-12255[GROOVY-12255: first-class switch expressions]
 * https://issues.apache.org/jira/browse/GROOVY-12399[GROOVY-12399: position decides statement or expression]
 * https://issues.apache.org/jira/browse/GROOVY-12408[GROOVY-12408: a trailing switch is a statement]
+* https://issues.apache.org/jira/browse/GROOVY-12447[GROOVY-12447: a complete native sealed type-case set is an exhaustive switch expression]
