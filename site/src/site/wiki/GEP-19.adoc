@@ -12,7 +12,7 @@
 *Status*:: Draft
 *Leader*:: Paul King
 *Created*:: 2026-04-25
-*Last modification*:: 2026-10-21
+*Last modification*:: 2026-10-23
 ****
 
 [NOTE]
@@ -190,13 +190,36 @@ read as a record pattern only when its arguments are pattern-shaped,
 so `case foo()`, `case foo(bar)` and `case lower('ABC')` keep their
 legacy `isCase` semantics.
 
-One narrow carve-out results. Argument forms such as `var x` do not
+A record with no components is matched by empty parentheses:
+
+[source,groovy]
+----
+sealed interface Opt permits Some, None {}
+record Some(Object value) implements Opt {}
+record None() implements Opt {}
+
+switch (opt) {
+    case Some(var v) -> "some $v"
+    case None()      -> 'none'
+}
+----
+
+Empty parentheses form a pattern only after a capitalised type name,
+optionally qualified (`case Opt.None() \->`), so `case foo()` remains a
+call.
+
+Two narrow carve-outs result. Argument forms such as `var x` do not
 parse today, so claiming them breaks nothing; bare `_` does, because it
 is an ordinary identifier. A label spelled `case Foo(_) \->`, where the
 name is capitalised and `_` is in scope as a variable, therefore changes
 meaning: it called `Foo(_)` before and is now read as a record pattern
-on the type `Foo`. The lower-case spelling `case foo(_) \->` is
-unaffected and still calls `foo`.
+on the type `Foo`. Likewise `case Foo() \->`, where `Foo` names a
+zero-argument method, called `Foo()` before and is now a zero-component
+record pattern. The lower-case spellings `case foo(_) \->` and
+`case foo() \->` are unaffected and still call `foo`. To keep a call to
+a capitalised method, quote its name or give it a receiver:
+`case 'Foo'() \->` or `case this.Foo() \->`. A GString name, as in
+`case "$name"() \->`, is always a call.
 
 A value deconstructs positionally if it is a record — native or
 emulated, Groovy or Java — or if it provides a `toList()` method,
@@ -648,7 +671,8 @@ value of its type:
 
 |Unguarded type pattern `case T t` |Yes, for `T`
 |Record pattern whose components are all `var` / `def` bindings or `_`,
- e.g. `case Circle(var r)` |Yes, for the record
+ e.g. `case Circle(var r)`, or that has no components, e.g. `case None()`
+ |Yes, for the record
 |Record pattern with a typed component on a *primitive* record component
  of the same type, e.g. `case Circle(double r)` |Yes: the component can
  never be `null`
@@ -906,6 +930,9 @@ syntactic forms that currently fail to parse:
 |`case [_] ->`                             |Yes — legacy (list containing `_`)
 |`case foo() ->` / `case foo(bar) ->`      |Yes — legacy call label, unchanged
 |`case foo(_) ->` (lower case)             |Yes — legacy call label, unchanged
+|`case Foo() ->` (capitalised)             |Yes — now a zero-component record pattern (carve-out)
+|`case 'Foo'() ->` / `case this.Foo() ->`  |Yes — legacy call label, unchanged
+|`case Foo():` (colon form)                |Yes — legacy call label, unchanged
 |`case []:` / `case [:]:` (colon form)     |Yes — legacy, never matched, unchanged
 |`case [var h, var... t] ->`               |No — new, claims unused grammar
 |`case [def h, def... t] ->`               |No — new (Groovy-native equivalent)
@@ -936,14 +963,25 @@ parse today and change meaning — is:
   the capitalised spelling is affected; `case foo(_) \->` still calls
   `foo`, and other argument shapes such as `var x` do not parse today
   so they claim no existing meaning.
+* `case Foo() \->`, where `Foo` names a zero-argument method rather
+  than a type: previously a call label, now a zero-component record
+  pattern on the type `Foo` (see _Record patterns_). Unlike the other
+  carve-outs this one is plausible in real code, so it fails loudly:
+  with no type `Foo` in scope the label is a compile-time error
+  ("unable to resolve class Foo") rather than a silent change of
+  meaning. Only a capitalised name is affected; `case foo() \->` still
+  calls `foo`, and `case 'Foo'() \->` or `case this.Foo() \->` keeps the
+  call.
 
 That is the complete list. Colon-form labels are deliberately not on
 it: a pattern requires the arrow form, so a colon-form label is never
 read as a pattern and keeps whatever it means today, including the
-never-matching `case []:` and `case [:]:`.
+never-matching `case []:` and `case [:]:`, and `case Foo():`, which is
+still a call in a switch statement or a switch expression.
 
-No realistic program relies on either legacy meaning; they are
-itemised for completeness.
+No realistic program relies on the first two legacy meanings; they are
+itemised for completeness. The third is the one with real exposure,
+which is why it is a compile-time error rather than a silent change.
 
 === `_` semantics across forms
 
