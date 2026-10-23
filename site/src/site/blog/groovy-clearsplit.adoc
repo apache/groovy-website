@@ -37,11 +37,7 @@ can use it, we put three front ends over the very same core:
 * a desktop app using the proposed *groovy-fx* module,
 * and an *Android* app in dynamic Groovy.
 
-image:img/clearsplit-web.png["The Grails app: balances for Alice, Bob and Carol summing to $0.00",width=520]
-image:img/clearsplit-fx.png["The GroovyFX app: a bar chart of the same balances",width=340]
-image:img/clearsplit-android-balances.png["The Android app: the same balances with bars",width=190]
-
-Same group, same history, same numbers, three apps.
+All three show the same group, the same history and the same numbers.
 
 This is a spike, not a product. Several of the pieces are snapshots or
 previews: Grails 9 isn't released, groovy-fx is still a pull request, and
@@ -302,6 +298,8 @@ app's job is then small: turn user input into a `Group`, catch the
 
 == The web app: Grails 9
 
+image:img/clearsplit-web.png["The Grails app: balances for Alice, Bob and Carol summing to $0.00",width=520]
+
 Grails 8 runs on Groovy 5, but groovy-verify needs Groovy 6, and so does
 everything else in this post. So the web app uses a Grails 9.0.0-SNAPSHOT,
 which brings Groovy 6.0.0 and Spring Boot 4.1. Apart from bumping the
@@ -340,6 +338,8 @@ The snapshot worked without surprises for this app, which is good news for
 anyone keen to try Groovy 6 on Grails.
 
 == The desktop app: groovy-fx
+
+image:img/clearsplit-fx.png["The GroovyFX app: a bar chart of the same balances",width=340]
 
 https://github.com/apache/groovy/pull/2989[Pull request #2989]
 (https://issues.apache.org/jira/browse/GROOVY-11434[GROOVY-11434]) proposes
@@ -396,7 +396,8 @@ UI tested in CI with no display is a nice thing to have.
 
 == The Android app
 
-image:img/clearsplit-android-expense.png["The Android app's expense form: a taxi paid by Carol, split between Bob and Carol",width=240,float='right']
+image:img/clearsplit-android-balances.png["The Android app: the same balances with bars",width=220]
+image:img/clearsplit-android-expense.png["The Android app's expense form: a taxi paid by Carol, split between Bob and Carol",width=220]
 
 The Android app follows the recipe from the
 https://groovy.apache.org/blog/groovy-android-tictactoe[tic-tac-toe post]:
