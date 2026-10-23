@@ -2,7 +2,9 @@
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2026-10-23T08:00:00+00:00
 :keywords: groovy 6, formal methods, verification, groovy-verify, design by contract, dafny, lemmascript, grails, groovyfx, javafx, android
-:description: Porting ClearSplit, a verified expense splitter from Dafny and LemmaScript, to Groovy 6: proofs with groovy-verify, then a Grails 9 web app, a GroovyFX desktop app and an Android app over the same verified core.
+:description: Porting a Dafny/LemmaScript expense splitter to groovy-verify. A Grails 9 web app, a GroovyFX desktop app & an Android app share the same verified core.
+
+image:img/clearsplit-hero.png["ClearSplit: one verified core, three Groovy 6 apps. The conservation theorem, proved at compile time with groovy-verify and Z3, beside the Grails, groovy-fx and Android apps showing balances that sum to $0.00",width=800]
 
 == Introduction
 
