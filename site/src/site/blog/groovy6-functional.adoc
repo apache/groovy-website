@@ -1,7 +1,7 @@
 = Groovy 6 features for Functional Programmers
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2026-06-01T08:00:00+00:00
-:updated: 2026-09-11T20:00:00+00:00
+:updated: 2026-10-24T08:00:00+00:00
 :keywords: functional programming, monoid, semigroup, monad, purity, type checker, property-based testing, null checker, immutability, invariants
 :description: Groovy's functional programming stance: like Java, but with checked algebra, verified purity, monadic comprehensions, and machine-actionable annotations.
 
@@ -14,8 +14,10 @@ Groovy starts by inheriting Java's answer in full. `Optional`, `Stream`,
 virtual threads — every JDK carrier and combinator is available, with
 the usual Groovy sugar on top (closures, GINQ, parallel collections,
 `Awaitable`, async/await). Groovy brings along most of Java's
-pattern/decomposition story with some enhancements and minor gaps
-being addressed in GEP-20 targeted for Groovy 7.
+pattern/decomposition story with some enhancements — multi-assignment
+destructuring (link:../wiki/GEP-20.html[GEP-20]) shipped in 6.0 — and the
+remaining gap, structural patterns in `switch`, is
+link:../wiki/GEP-19.html[GEP-19], targeted for Groovy 7.
 For a lot of workaday code, that is already enough.
 
 When you want more discipline than the JDK ships with — applicative
@@ -78,14 +80,21 @@ https://github.com/paulk-asert/groovy6-functional[`groovy6-functional`]
 holds runnable versions of every example in this post.
 
 One framing note before we start. Most of what
-follows is *core Groovy 6* — shipped or stabilising features like
-`NullChecker`, `DO`, `val` and the contract annotations. A few pieces
-are *incubating* and may still shift before release. And the final two
-sections — the `WIRE` DSL and the SMT-backed checker — are *companion
-prototypes*: spikes built on the same public extension SPI the Groovy
-team uses for the in-tree checkers, included here to show how far that
-SPI reaches, not as Groovy 6 features. Each is flagged again where it
-appears. The SMT spike has since grown into the separate
+follows is *core Groovy 6*, released as 6.0.0 in September 2026.
+`val`, destructuring, nested `copyWith` and the `groovy-contracts`
+module are stable. The rest of the checked toolkit — `DO` and
+`@Monadic`, the type checkers in `groovy-typecheckers` (`NullChecker`,
+`CombinerChecker`, `PurityChecker`, `ModifiesChecker`,
+`MonadicChecker`, `MonadicShapeChecker`), `@Associative`/`@Reducer`,
+and the loop-level `@Invariant`/`@Decreases` and `@Modifies` frame
+conditions — shipped as *incubating*: usable today, with the usual
+licence to refine the details during the 6.x line. Where Groovy 7
+work already touches a feature, it is noted in that section. And the
+final two sections — the `WIRE` DSL and the SMT-backed checker — are
+*companion prototypes*: spikes built on the same public extension SPI
+the Groovy team uses for the in-tree checkers, included here to show
+how far that SPI reaches, not as Groovy 6 features. Each is flagged
+again where it appears. The SMT spike has since grown into the separate
 https://github.com/paulk-asert/groovy-verify[`groovy-verify`] project,
 which the monoid section also draws on; it too is external to Groovy.
 
@@ -330,6 +339,16 @@ return a wrapped value. The familiar half is that the compiler knows
 what each method may and may not do, and a reader (or an AI agent) can
 work from the signature alone.
 
+One limitation in 6.0 is that purity stops at the method boundary:
+a closure passed to a `@Pure` method is opaque to the checker. Groovy 7
+work already on `master`
+(link:https://issues.apache.org/jira/browse/GROOVY-12460[GROOVY-12460])
+lets `@Pure` sit on parameters and local variables, so a higher-order
+pure method can require a pure closure argument, and accepts the
+closure-taking GDK and `java.util.stream` methods (`collect`, `inject`,
+`findAll`, `map`, `filter`, ...) inside a pure body when the closure
+they are given is itself pure.
+
 == Monadic comprehensions: `DO`
 
 GEP-23 introduces `DO` — a comprehension macro that desugars to the
@@ -436,7 +455,11 @@ What `DO` does *not* do: it does not introduce higher-kinded types, it
 does not mix carriers in one comprehension (nest for that), and it does
 not synthesise a `pure`/`return` — the body must explicitly yield a
 carrier value. That is the deliberate non-goal list in
-link:../wiki/GEP-23.html[GEP-23].
+link:../wiki/GEP-23.html[GEP-23], which shipped in 6.0.0 as incubating.
+The one piece of the GEP deferred to Groovy 7 is user-configurable
+carrier registration: until that lands, a third-party carrier
+participates structurally (it has `flatMap`/`map`), by carrying
+`@Monadic`, or by being named in the core allow-list.
 
 == Linting native chains: `MonadicShapeChecker`
 
@@ -715,6 +738,17 @@ annotations. The annotations are an investment the library author
 makes once; every downstream codebase running the matching checker
 recovers the value of it on every build.
 
+Groovy 7 extends the producer side in another direction. The
+`@Spec` annotation
+(link:https://issues.apache.org/jira/browse/GROOVY-12468[GROOVY-12468],
+on `master` for 7.0.0-alpha-1) records a prose specification next to
+the typed signature and any `@Requires`/`@Ensures` contracts — findable
+by tools where a comment is not, and with an *unfilled hole*
+(an annotated method, loop or local with no code yet) failing loudly
+at runtime instead of silently returning `null`. For agent-generated
+code it closes the loop: the informal intent, the formal contract and
+the implementation sit on the same declaration.
+
 link:../wiki/GEP-24.html[GEP-24] is the natural extension of this
 story to errors: a candidate for Groovy 7 sketching library-side
 `@Raises` plus consumer-side `ExceptionChecker` for the declaration
@@ -988,7 +1022,7 @@ ordinary code. Here is a call that *looks* guarded:
 @TypeChecked(extensions = 'verification.VerifyChecker')
 static int go(int n) {
     if (n != 0) {
-        return ISqrt.isqrt(n)   // looks safe — but n could be -1
+        return ISqrt.isqrt(n)   // looks safe — but n could be negative
     }
     0
 }
@@ -1005,12 +1039,17 @@ the model is the counterexample:
 ----
 [Static type checking] - Cannot prove precondition of isqrt at this call site
     required: (x >= 0)
-    counterexample: n = -1, x = -1
+    counterexample: n = -2147483648
+    fails on: go(-2147483648)
 ----
 
-That last line is the whole point. The diagnostic does not say
-"constraint not satisfied"; it says *with `n = -1` it fails*, as Dafny
-does if you ask it (via `--counterexample`). Tighten the guard and the
+Those last two lines are the whole point. The diagnostic does not say
+"constraint not satisfied"; it says *with `n = Integer.MIN_VALUE` it
+fails*, as Dafny does if you ask it (via `--counterexample`), and turns
+the model into the concrete call that breaks — a ready-made regression
+test. (Z3 is free to pick any negative `n`; the JVM's 32-bit bounds
+are part of what it reasons about, so the extreme value is as good a
+witness as `-1`.) Tighten the guard and the
 obligation discharges; the same code now compiles clean:
 
 [source,groovy]
@@ -1050,9 +1089,11 @@ shapes compiles because Z3 discharges `x >= 0`:
 | Linear arithmetic over a literal multiplier, under `k > 0`.
 |===
 
-And the rejections all arrive with a refuting model: the bare literal
-`isqrt(-1)` (`x = -1`), the unguarded `isqrt(n)` (`n = -1`), and the
-contradictory `if (n < 0) isqrt(n)` (`n = -1`).
+And the rejections all arrive with a refutation: the unguarded
+`isqrt(n)` and the contradictory `if (n < 0) isqrt(n)` with a
+counterexample and failing call (`n = -2147483648`), and the bare
+literal `isqrt(-1)`, which has no free variables to model, with just the
+failing call.
 
 === Postconditions, too
 
@@ -1071,11 +1112,18 @@ static int max(int a, int b) {
 }
 ----
 
+One diagnostic per broken return path, each with its own witness:
+
 [source]
 ----
 [Static type checking] - Cannot prove postcondition of max holds on this return path
     ensured: ((result >= a) && (result >= b))
-    counterexample: a = 0, b = 1
+    counterexample: a = 1, b = 0
+    fails on: max(1, 0)
+[Static type checking] - Cannot prove postcondition of max holds on this return path
+    ensured: ((result >= a) && (result >= b))
+    counterexample: a = -1, b = 0
+    fails on: max(-1, 0)
 ----
 
 Swap the branches back to `if (a > b) a else b` and it verifies. The
@@ -1112,7 +1160,8 @@ static int countUp(int n) {
 ----
 [Static type checking] - Cannot prove loop invariant is preserved by the loop body in countUp
     invariant: ((0 <= i) && (i <= n))
-    counterexample: i = 0, n = 1
+    counterexample: n = 1
+    fails on: countUp(1)
 ----
 
 Restore `i = i + 1` and all four obligations discharge; weaken the
@@ -1159,15 +1208,18 @@ and none needs a compiler change.
 
 === Where the code lives
 
-The code lives in two subprojects under
-https://github.com/paulk-asert/groovy6-functional[`groovy6-functional`]:
-`verification/` (the Groovy-to-SMT encoder, the `VerifyChecker`
+The checker itself — the Groovy-to-SMT encoder, the `VerifyChecker`
 extension, the Z3 backend, and a `CONVERSION`-phase transform that
-captures each stock `@groovy.contracts` contract's source text — the
+captures each stock `@groovy.contracts` contract's source text (the
 built-in annotation keeps only a generated closure class, so the text
-would otherwise be gone) and `verification-demo/` (the `ISqrt`,
-`MinMax`/`BadEnsures` and `Loops`/`BadLoops` worked examples). See the
-repo for the full breakdown.
+would otherwise be gone) — started life as a `verification/` subproject
+of the companion repo and now lives in
+https://github.com/paulk-asert/groovy-verify[`groovy-verify`]. The
+`verification-demo/` subproject under
+https://github.com/paulk-asert/groovy6-functional[`groovy6-functional`]
+consumes it as a Gradle composite build and holds the `ISqrt`,
+`MinMax`/`BadEnsures` and `Loops`/`BadLoops` worked examples. See the
+repos for the full breakdown.
 
 This is a spike, not a product — in the same spirit as WireCat, it
 demonstrates *reach*, not a finished tool. But the reach is the
@@ -1379,8 +1431,9 @@ following the same two-layer pattern used elsewhere in this post.
 
 == References
 
-* link:../wiki/GEP-23.html[GEP-23 — Monadic comprehensions]
-* link:../wiki/GEP-24.html[GEP-24 — Errors as values: compile-time `Try` without the wrapper] (Groovy 7 candidate)
+* link:../wiki/GEP-23.html[GEP-23 — Monadic comprehensions] (Final; shipped in 6.0.0 as incubating)
+* link:../wiki/GEP-24.html[GEP-24 — Errors as values: compile-time `Try` without the wrapper] (Draft; Groovy 7 candidate)
+* link:../wiki/GEP-19.html[GEP-19 — Structural pattern matching in `switch`] (Draft; targets Groovy 7)
 * link:../releasenotes/groovy-6.0.html#type-checking-extensions[Groovy 6 release notes — type checking extensions]
 * link:../releasenotes/groovy-6.0.html#human-ai-reasoning[Groovy 6 release notes — Designed for Human and AI Reasoning]
 * link:../wiki/GEP-16.html[GEP-16 — `val` keyword]
@@ -1403,11 +1456,24 @@ methods and of lambda-built FunctionalJava, Palatable and Purefun carriers
 the companion post covering groovy-verify in depth
 * https://github.com/paulk-asert/groovy6-functional[Companion code for this post] — the `wire-*`
 subprojects covering the macro form (shown above) plus the
-builder and builder-with-checker variants, and the `verification`
-/ `verification-demo` subprojects for the SMT-backed precondition spike
+builder and builder-with-checker variants, and the `verification-demo`
+subproject consuming groovy-verify for the SMT-backed checks
 
 .Update history
 ****
+*24/Oct/2026*: Updated for the Groovy 6.0.0 release: the framing note
+now says which features shipped stable and which incubating, the
+pattern-matching gap is attributed to GEP-19 (GEP-20 destructuring
+shipped in 6.0), and the GEP-23 piece deferred to Groovy 7
+(user-configurable carrier registration) is called out. Added notes on
+Groovy 7 work already on `master`: `@Pure` on parameters and locals
+(GROOVY-12460) and the `@Spec` prose-contract annotation (GROOVY-12468).
+The companion repo now builds against Groovy 6.0.0 from Maven Central
+and consumes the SMT checker from groovy-verify rather than its retired
+`verification` subproject; the diagnostics quoted in the proof-grade
+section are refreshed to the current groovy-verify output, which adds
+a `fails on:` line naming a concrete failing call.
+
 *11/Sep/2026*: The monoid section now shows the external `groovy-verify`
 project proving, or refuting with a counterexample, the laws of a
 FunctionalJava `Monoid` value built from a lambda, including the classic
