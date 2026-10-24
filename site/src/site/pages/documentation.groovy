@@ -1,5 +1,5 @@
 layout 'layouts/main.groovy', true,
-        pageTitle: 'The Apache Groovy&trade; programming language - Documentation',
+        pageTitle: 'The Apache Groovy&reg; programming language - Documentation',
         mainContent: contents {
             div(id: 'content', class: 'page-1') {
                 div(class: 'row') {
@@ -29,7 +29,7 @@ layout 'layouts/main.groovy', true,
                             }
                             p {
                                 yield 'The Apache Groovy'
-                                yieldUnescaped '&trade;'
+                                yieldUnescaped '&reg;'
                                 yield ' documentation is available as a '
                                 a(href: "single-page-documentation.html", 'single-page document')
                                 yield ', or a '

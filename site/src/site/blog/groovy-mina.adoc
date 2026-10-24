@@ -1,4 +1,4 @@
-= Streaming Servers with Apache MINA and Groovy&trade; 6
+= Streaming Servers with Apache MINA and Groovy&reg; 6
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2026-04-30T12:00:00+00:00
 :keywords: groovy, mina, async, await, channels, broadcast, activeobject, structured concurrency, virtual threads, networking

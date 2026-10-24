@@ -1,4 +1,4 @@
-= Exploring Gatherers4J with Groovy&trade;
+= Exploring Gatherers4J with Groovy&reg;
 Paul King
 :revdate: 2025-05-06T20:30:00+00:00
 :updated: 2026-09-17T14:00:00+00:00

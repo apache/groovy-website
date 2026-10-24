@@ -1,4 +1,4 @@
-= Testing your Java with Groovy&trade;, Spock, JUnit5, Jacoco, Jqwik and Pitest
+= Testing your Java with Groovy&reg;, Spock, JUnit5, Jacoco, Jqwik and Pitest
 Paul King
 :revdate: 2022-07-15T08:26:15+00:00
 :keywords: groovy, java, spock, testing, jqwik, pitest, junit, jacoco

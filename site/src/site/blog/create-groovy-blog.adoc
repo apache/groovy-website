@@ -1,4 +1,4 @@
-= Creating a Groovy&trade; Blog Post
+= Creating a Groovy&reg; Blog Post
 Paul King
 :revdate: 2023-05-25T23:35:00+00:00
 :description: This post looks at the steps to create a blog post.

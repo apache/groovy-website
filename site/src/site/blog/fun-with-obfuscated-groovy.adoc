@@ -1,4 +1,4 @@
-= Fun with obfuscated Groovy&trade;
+= Fun with obfuscated Groovy&reg;
 Paul King
 :revdate: 2022-12-08T00:40:23+00:00
 :keywords: groovy, java, obfuscated, commons math

@@ -1,4 +1,4 @@
-= Matrix calculations with Groovy&trade;, Apache Commons Math, ojAlgo, Nd4j and EJML
+= Matrix calculations with Groovy&reg;, Apache Commons Math, ojAlgo, Nd4j and EJML
 Paul King
 :revdate: 2022-08-18T13:41:03+00:00
 :updated: 2026-08-26T12:00:00+00:00

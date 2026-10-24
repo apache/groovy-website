@@ -10,7 +10,7 @@ div(class: 'navbar navbar-default navbar-static-top', role: 'navigation') {
             a(class: 'navbar-brand', href: relative('index.html')) {
                 i(class: 'fa-classic fa-solid fa-star') {}
                 yield ' Apache Groovy'
-                yieldUnescaped '&trade;'
+                yieldUnescaped '&reg;'
             }
         }
         div(class: 'navbar-collapse collapse') {

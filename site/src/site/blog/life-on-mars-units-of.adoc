@@ -1,4 +1,4 @@
-= Life on Mars: Units of Measurement systems, Groovy&trade;, and domain specific languages (DSLs)
+= Life on Mars: Units of Measurement systems, Groovy&reg;, and domain specific languages (DSLs)
 Paul King
 :revdate: 2022-08-13T06:31:47+00:00
 :keywords: domain specific languages, groovy, jsr385, units of measurement

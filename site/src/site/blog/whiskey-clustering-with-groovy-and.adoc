@@ -1,4 +1,4 @@
-= Whiskey Clustering with Groovy&trade; and Apache Ignite
+= Whiskey Clustering with Groovy&reg; and Apache Ignite
 Paul King
 :revdate: 2022-10-27T11:13:37+00:00
 :keywords: data science, groovy, ignite, kmeans, clustering, whisky, whiskey

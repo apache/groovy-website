@@ -1,4 +1,4 @@
-= ChatGPT meets Groovy&trade; one-liners
+= ChatGPT meets Groovy&reg; one-liners
 Paul King
 :revdate: 2023-10-19T18:00:00+00:00
 :keywords: groovy, chatgpt, one-liners

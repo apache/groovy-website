@@ -1,4 +1,4 @@
-= Comparators and Sorting in Groovy&trade;
+= Comparators and Sorting in Groovy&reg;
 Paul King
 :revdate: 2022-07-21T15:51:31+00:00
 :description: This post looks at Groovy functionality for making your classes comparable and/or sortable.

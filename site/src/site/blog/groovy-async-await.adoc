@@ -1,4 +1,4 @@
-= Async/await for Groovy&trade;
+= Async/await for Groovy&reg;
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2026-03-27T16:30:00+00:00
 :updated: 2026-07-12T00:00:00+00:00

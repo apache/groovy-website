@@ -1,4 +1,4 @@
-= Converting natural language into actions with NLPCraft and Groovy&trade;
+= Converting natural language into actions with NLPCraft and Groovy&reg;
 Paul King
 :revdate: 2023-03-10T19:22:57+00:00
 :updated: 2023-03-13T13:32:50+00:00

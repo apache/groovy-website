@@ -1,4 +1,4 @@
-= Groovy&trade; Haiku processing
+= Groovy&reg; Haiku processing
 Paul King
 :revdate: 2023-03-25T19:22:00+00:00
 :keywords: groovy, eclipse collections, streams

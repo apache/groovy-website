@@ -1,4 +1,4 @@
-= Groovy&trade; Dates And Times Cheat Sheet
+= Groovy&reg; Dates And Times Cheat Sheet
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2022-10-24T07:27:25+00:00
 :keywords: calendar, date, groovy, jsr310, time

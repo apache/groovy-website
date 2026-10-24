@@ -1,4 +1,4 @@
-= Reading and Writing CSV files with Groovy&trade;
+= Reading and Writing CSV files with Groovy&reg;
 Paul King
 :revdate: 2022-07-25T14:26:20+00:00
 :updated: 2026-08-26T10:00:00+00:00

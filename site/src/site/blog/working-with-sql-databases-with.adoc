@@ -1,4 +1,4 @@
-= Working with SQL databases with Groovy&trade; and GraalVM
+= Working with SQL databases with Groovy&reg; and GraalVM
 Paul King
 :revdate: 2022-07-29T14:07:41+00:00
 :keywords: graalvm, groovy, jvm, native, sql, h2

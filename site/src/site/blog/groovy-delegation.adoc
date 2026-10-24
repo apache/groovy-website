@@ -1,4 +1,4 @@
-= Using the Delegation Pattern with Groovy&trade;
+= Using the Delegation Pattern with Groovy&reg;
 Paul King
 :revdate: 2024-01-28T20:08:00+00:00
 :keywords: delegation, design pattern

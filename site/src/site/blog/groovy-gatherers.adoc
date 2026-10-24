@@ -1,4 +1,4 @@
-= Using Gatherers with Groovy&trade;
+= Using Gatherers with Groovy&reg;
 Paul King
 :revdate: 2023-12-09T15:30:00+00:00
 :updated: 2026-09-15T14:00:00+00:00

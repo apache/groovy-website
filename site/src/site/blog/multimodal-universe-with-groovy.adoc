@@ -1,4 +1,4 @@
-= Exploring the Multimodal Universe with Groovy&trade;
+= Exploring the Multimodal Universe with Groovy&reg;
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2026-07-01T11:00:00+00:00
 :keywords: groovy, groovysh, huggingface, astronomy, astrophysics, data science, sixel, jfreechart, spectrum

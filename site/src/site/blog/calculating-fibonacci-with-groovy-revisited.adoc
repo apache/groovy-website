@@ -1,4 +1,4 @@
-= Calculating Fibonacci with Groovy&trade; revisited
+= Calculating Fibonacci with Groovy&reg; revisited
 Paul King
 :revdate: 2022-09-08T10:59:56+00:00
 :description: This post looks at various ways to calculate Fibonacci numbers such as recursion and iteration \

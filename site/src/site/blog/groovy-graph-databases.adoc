@@ -1,4 +1,4 @@
-= Using Graph Databases with Groovy&trade;
+= Using Graph Databases with Groovy&reg;
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2024-09-02T22:18:00+00:00
 :updated: 2026-01-22T14:00:00+00:00

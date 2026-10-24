@@ -1,4 +1,4 @@
-= Deck of cards with Groovy&trade;, JDK collections and Eclipse Collections
+= Deck of cards with Groovy&reg;, JDK collections and Eclipse Collections
 Paul King
 :revdate: 2022-09-23T10:18:36+00:00
 :updated: 2022-09-25T11:15:32+00:00

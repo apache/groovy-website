@@ -1,4 +1,4 @@
-= Design by contract with Groovy&trade;: loop invariants
+= Design by contract with Groovy&reg;: loop invariants
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2026-03-24T16:30:00+00:00
 :keywords: design-by-contract, groovy, dafny, loop invariants

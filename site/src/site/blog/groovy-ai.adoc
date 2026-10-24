@@ -1,4 +1,4 @@
-= Exploring AI with Groovy&trade;
+= Exploring AI with Groovy&reg;
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2025-10-15T07:06:20+00:00
 :updated: 2026-10-18T09:00:00+00:00

@@ -1,5 +1,5 @@
 layout 'layouts/main.groovy', true,
-        pageTitle: 'The Apache Groovy&trade; programming language - Contribute',
+        pageTitle: 'The Apache Groovy&reg; programming language - Contribute',
         mainContent: contents {
             div(id: 'content', class: 'page-1') {
                 section(class: 'row') {
@@ -12,7 +12,7 @@ layout 'layouts/main.groovy', true,
                             }
                             article {
                                 p '''
-                                    Would you like to help us make the Groovy&trade; programming language even better? 
+                                    Would you like to help us make the Groovy&reg; programming language even better? 
                                     There are many ways in which you can get involved, make a difference and help
                                     the Groovy development team to make Groovy even, well, groovier?
                                     We really appreciate and welcome contributions and you can help us by:

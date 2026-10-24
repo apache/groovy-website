@@ -1,4 +1,4 @@
-= Set Operators with Groovy&trade;
+= Set Operators with Groovy&reg;
 Paul King
 :revdate: 2023-11-14T15:22:57+00:00
 :keywords: groovy, emoji, set

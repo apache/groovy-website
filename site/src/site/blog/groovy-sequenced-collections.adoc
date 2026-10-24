@@ -1,4 +1,4 @@
-= Groovy&trade; and Sequenced Collections (JEP-431)
+= Groovy&reg; and Sequenced Collections (JEP-431)
 Paul King
 :revdate: 2023-04-29T09:00:00+00:00
 :keywords: groovy, jep431, collections

@@ -23,7 +23,7 @@ footer(id: 'footer') {
                 div('text-align':'right') {
                     img(src: 'https://www.apache.org/img/asf_logo.png', title: 'The Apache Software Foundation', alt: 'The Apache Software Foundation', style:'width:60%')
                 }
-                p "Apache, Apache Groovy, Groovy, and the ASF logo are either registered trademarks or trademarks of The Apache Software Foundation."
+                p "Apache, Apache Groovy, Groovy, and the ASF logo are registered trademarks of The Apache Software Foundation."
             }
         }
         div(class: 'clearfix', "&copy; 2003-${java.time.Year.now().value} The Apache Software Foundation &mdash; " +

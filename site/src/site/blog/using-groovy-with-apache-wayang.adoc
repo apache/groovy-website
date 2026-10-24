@@ -1,4 +1,4 @@
-= Using Groovy&trade; with Apache Wayang and Apache Spark&trade;
+= Using Groovy&reg; with Apache Wayang and Apache Spark&trade;
 Paul King <paulk-asert|PMC_Member>
 :source-highlighter: pygments
 :pygments-style: emacs

@@ -1,4 +1,4 @@
-= Apache Groovy&trade; committer Graeme Rocher receives Oracle Groundbreaker award
+= Apache Groovy&reg; committer Graeme Rocher receives Oracle Groundbreaker award
 Paul King
 :revdate: 2018-10-24T23:33:37+00:00
 :keywords: groovy, award

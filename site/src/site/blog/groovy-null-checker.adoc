@@ -1,4 +1,4 @@
-= Compile-time null safety for Groovy&trade;
+= Compile-time null safety for Groovy&reg;
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2026-04-02T10:00:00+00:00
 :keywords: null safety, type checking, static analysis, annotations

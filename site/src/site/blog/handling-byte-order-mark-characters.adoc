@@ -1,4 +1,4 @@
-= Handling Byte-Order-Mark Characters in Groovy&trade;
+= Handling Byte-Order-Mark Characters in Groovy&reg;
 Paul King
 :revdate: 2024-07-11T20:00:00+00:00
 :keywords: groovy, bom_chars, unicode, encoding

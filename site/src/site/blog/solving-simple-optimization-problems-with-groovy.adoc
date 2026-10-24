@@ -1,5 +1,5 @@
 
-= Solving simple optimization problems with Groovy&trade; using Commons Math, Hipparchus, OptaPlanner, and Timefold
+= Solving simple optimization problems with Groovy&reg; using Commons Math, Hipparchus, OptaPlanner, and Timefold
 Paul King
 :revdate: 2024-03-14T22:22:00+00:00
 :updated: 2026-09-05T08:00:00+00:00

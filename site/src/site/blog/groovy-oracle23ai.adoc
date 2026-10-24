@@ -1,4 +1,4 @@
-= Using the Oracle 23ai Vector data type with Groovy&trade; to classify Iris flowers
+= Using the Oracle 23ai Vector data type with Groovy&reg; to classify Iris flowers
 Paul King
 :revdate: 2024-06-30T23:21:10+00:00
 :keywords: oracle, jdbc, groovy, classification

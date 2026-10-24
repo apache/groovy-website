@@ -1,4 +1,4 @@
-= Playing with Groovy&trade; and Android
+= Playing with Groovy&reg; and Android
 Paul King
 :revdate: 2026-09-18T14:00:00+00:00
 :keywords: android, groovy 6, tic-tac-toe, minimax, invokedynamic, art, dynamic groovy, preview

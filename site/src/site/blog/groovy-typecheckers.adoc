@@ -1,4 +1,4 @@
-= Groovy&trade; Type Checkers
+= Groovy&reg; Type Checkers
 Paul King
 :revdate: 2024-01-20T20:30:00+00:00
 :keywords: type checking, printf, regex, format

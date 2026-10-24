@@ -15,7 +15,7 @@ layout 'layouts/main.groovy', true,
                                 yield ' Support'
                             }
                             article {
-                                p 'There are numerous ways to get help with Groovy&trade;: '
+                                p 'There are numerous ways to get help with Groovy&reg;: '
                                 ul {
                                     li "discuss language usage or direction with other Groovy users and developers through the ${$a(href: 'mailing-lists.html', 'mailing lists')} - this is the place for all official discussions"
                                     li "discuss matters on ${$a(href: 'https://www.groovycommunity.com/', 'Slack')}; it's run by Groovy enthusiasts in the community for casual conversations and Q&A"

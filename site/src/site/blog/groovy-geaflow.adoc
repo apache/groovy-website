@@ -1,4 +1,4 @@
-= Graph Computing with Groovy&trade; and Apache GeaFlow (Incubating)
+= Graph Computing with Groovy&reg; and Apache GeaFlow (Incubating)
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2026-08-13T21:00:00+00:00
 :keywords: geaflow, apache geaflow, graph computing, streaming graph, pagerank, vertex-centric, pregel, tugraph, gql, groovy

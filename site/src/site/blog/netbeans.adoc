@@ -1,4 +1,4 @@
-= Using Apache NetBeans with Apache Groovy&trade;
+= Using Apache NetBeans with Apache Groovy&reg;
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2025-02-25T22:15:00+00:00
 :keywords: netbeans, groovy, apache, debug, gradle

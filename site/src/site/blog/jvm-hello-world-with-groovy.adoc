@@ -1,4 +1,4 @@
-= JVM Hello World with Groovy&trade;
+= JVM Hello World with Groovy&reg;
 Paul King
 :revdate: 2022-12-22T14:24:07+00:00
 :keywords: groovy, bytecode, byte buddy, proguardcore, asm, jvmadvent

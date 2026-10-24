@@ -1,4 +1,4 @@
-= Groovy&trade; Processing Nulls In Lists
+= Groovy&reg; Processing Nulls In Lists
 Paul King
 :revdate: 2023-02-06T00:00:00+00:00
 :updated: 2026-08-03T10:00:00+00:00

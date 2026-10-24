@@ -1,4 +1,4 @@
-= Groovy&trade;, Embabel, and Agentic Design Patterns
+= Groovy&reg;, Embabel, and Agentic Design Patterns
 Paul King
 :revdate: 2025-11-07T23:00:00+00:00
 :keywords: groovy, spring ai, embabel, agentic
