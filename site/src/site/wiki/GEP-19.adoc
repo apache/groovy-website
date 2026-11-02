@@ -12,7 +12,7 @@
 *Status*:: Draft
 *Leader*:: Paul King
 *Created*:: 2026-04-25
-*Last modification*:: 2026-10-23
+*Last modification*:: 2026-11-02
 ****
 
 [NOTE]
@@ -25,10 +25,12 @@ but having this draft available allows us to gather early feedback, future align
 decisions in Groovy 6 as best we can, and iterate on the design.
 We welcome feedback and discussion, but please keep in mind that the details are not yet finalized.
 
-A reference implementation of the `switch` and `instanceof` pattern features exists
-and is kept ported to current Groovy master; learnings from that work are folded into
-this document. It is a draft: where this page describes what the implementation does,
-that records where the work has got to rather than a settled decision.
+A reference implementation of the `switch` and `instanceof` pattern features is
+under review as https://github.com/apache/groovy/pull/3055[apache/groovy#3055]
+(https://issues.apache.org/jira/browse/GROOVY-12641[GROOVY-12641]); learnings from
+that work are folded into this document. It is a draft: where this page describes
+what the implementation does, that records where the work has got to rather than a
+settled decision.
 Bracket-form assignment is deferred pending further review (see below).
 ____
 
@@ -632,8 +634,9 @@ would be no way to return out of a matching arm.
 |Statement, with a pattern label
 |Yes
 |Matches JEP 441, which requires exhaustiveness of a statement only where
- it uses a pattern label. The reference implementation makes this an
- error too; see <<remaining-work,Remaining work>>.
+ it uses a pattern label. Proposed as a compile-time error under
+ `@TypeChecked` / `@CompileStatic`, as for an expression; see
+ <<remaining-work,Remaining work>>.
 
 |Statement, without a pattern label
 |No
@@ -750,27 +753,47 @@ When Java's deconstructor JEP ships, surface forms like
 `case Map.of("name", var n) \->` are accepted as additional spellings
 that lower to the same `Deconstructable` calls — no re-architecture.
 
-In the reference implementation, everything is parse-time desugaring:
-no new AST node kinds and no bytecode-format changes. A value
-deconstructs positionally if it is a record — native or emulated,
-Groovy or Java, with components resolved reflectively and invoked
-through the meta-object protocol so both kinds behave identically —
-or if it provides a `toList()` method. Runtime support lives in the
-`@Incubating` classes `RecordPatternSupport`, `ListPatternSupport`
-and `MapPatternSupport`.
+In the reference implementation a pattern is represented explicitly on
+the AST and lowered in one pass; there are no bytecode-format changes.
+The parser builds a `PatternExpression` holding a `MatchPattern`, a
+sealed model of the pattern forms in
+`org.apache.groovy.ast.pattern`, both for a pattern case label and for
+the right operand of `instanceof`, including the plain JEP 394 form
+`o instanceof T t`. The variables a pattern binds are owned by the
+pattern, so resolution and scoping work on the pattern directly, and
+every AST transform, compilation customizer and tool that runs before
+instruction selection (the console AST browser, the language server)
+sees the pattern as written. `PatternLowering`, the first operation of
+instruction selection, then rewrites each pattern into ordinary
+`instanceof` tests, local declarations and labelled breaks, which is
+all the static type checker and the bytecode writers see. A transform
+that creates a pattern during or after instruction selection lowers
+the class it changed itself.
+
+A value deconstructs positionally if it is a record or if it provides
+a `toList()` method. A record whose components are known at compile
+time (a native Groovy record, or a Java record) is read through its
+accessor methods, so under `@CompileStatic` a record arm is a type test
+followed by direct accessor calls. Any other value, including an
+emulated Groovy record, which declares no record components, is
+deconstructed at run time through its `toList()` method. Runtime
+support lives in the `@Incubating` classes `RecordPatternSupport`,
+`ListPatternSupport` and `MapPatternSupport`, the only members the
+generated code links to.
 
 Implementation considerations (reflecting the reference
 implementation):
 
-* A switch whose case labels are all patterns lowers each arm to
-  nested `instanceof` checks and binding declarations in a per-arm
-  scope — no per-arm closure is allocated, pattern variable names may
-  repeat across arms, and a matched value is destructured exactly
-  once, with the `when` guard as the innermost check. Measured against
-  closure-based `isCase` dispatch this is roughly 6x faster under
-  `@CompileStatic` (arms become plain `INSTANCEOF` branches) and 1.4x
-  faster in dynamic code. Switches mixing patterns with legacy labels
-  retain closure-based labels for the pattern arms.
+* Each pattern arm lowers to nested `instanceof` checks and binding
+  declarations in a per-arm scope — no per-arm closure is allocated,
+  pattern variable names may repeat across arms, and the `when` guard
+  is the innermost check. A record's components are read in order and
+  only as far as the match proceeds; a `toList()` deconstructable is
+  deconstructed once per arm tried. Measured against closure-based
+  `isCase` dispatch this is roughly 6x faster under `@CompileStatic`
+  (arms become plain `INSTANCEOF` branches) and 1.4x faster in dynamic
+  code. Switches mixing patterns with legacy labels lower their pattern
+  arms the same way; the legacy labels keep their `isCase` tests.
 * Emitting `java.lang.runtime.SwitchBootstraps.typeSwitch`
   invokedynamic dispatch — on parity with how Java compiles pattern
   switch — remains future work. Like `MatchException` it needs a Java
@@ -789,15 +812,17 @@ implementation):
   pattern that provably cannot match the switch subject's static type
   and for a record pattern whose arity disagrees with the record, and
   *warns* for an arm dominated by a preceding label (unreachable).
-  A non-exhaustive switch is an error, as Groovy 6 already does for
-  switch expressions; for a pattern switch *statement* that severity is
-  still open, see <<remaining-work,Remaining work>>. What satisfies
+  A non-exhaustive switch expression is an error, as in Groovy 6, and
+  so is a non-exhaustive switch *statement* that uses a pattern label,
+  as in Java; see <<remaining-work,Remaining work>>. What satisfies
   exhaustiveness is set out under
   <<switch-position,position and exhaustiveness>>. These are
   static-typing diagnostics only; dynamic Groovy remains permissive.
 * Iterable inputs that are not `List` or array are materialised as a
-  list once per match attempt; this is observable for sources with
-  side effects, which must be traversable non-destructively.
+  list at most once per evaluation of the switch, by the first list
+  pattern arm tried, and reused by the others; this is observable for
+  sources with side effects, which must be traversable
+  non-destructively. A `List` is matched in place.
 
 == Java alignment
 
@@ -1030,13 +1055,17 @@ them needs a higher minimum JDK for Groovy 7.
 
 === Severity for pattern switch statements
 
-The reference implementation reports a non-exhaustive pattern switch
-statement as an error, following JEP 441. The alternatives are a warning,
-or no check at all, so that an unmatched value falls through silently as
-in every other Groovy statement. Erroring costs no compatibility, since
-pattern syntax is new, and matches Java. Whichever is chosen applies only
-to type-checked code: dynamic Groovy has no exhaustiveness analysis, so a
-non-exhaustive pattern statement falls through there either way.
+Groovy 6 already decides the other two positions: a non-exhaustive switch
+expression is an error, and a statement without pattern labels needs no
+`default`. What remains is to confirm the proposed rule for a statement
+that uses a pattern label: a compile-time error under `@TypeChecked` /
+`@CompileStatic`, following JEP 441, which is what the reference
+implementation reports. The alternatives are a warning, or no check at
+all, so that an unmatched value falls through silently as in every other
+Groovy statement. Erroring costs no compatibility, since pattern syntax
+is new, and matches Java. Whichever is chosen applies only to type-checked
+code: dynamic Groovy has no exhaustiveness analysis, so a non-exhaustive
+pattern statement falls through there either way.
 
 === Typed components on reference-typed record components
 
