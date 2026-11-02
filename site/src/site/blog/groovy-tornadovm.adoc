@@ -341,7 +341,7 @@ Groovy issues:
   `@Parallel` loop, and works out its bounds, when the loop has javac's shape. Otherwise it reports
   `TC-E3103 the bounds of the @Parallel loops are not compile-time constants`.
 
-Fixes for all three are expected in upcoming Groovy releases. The third makes Groovy's bytecode
+All three are fixed for the upcoming Groovy 6.0.1 and 7.0.0-alpha-1 releases. The third makes Groovy's bytecode
 smaller and closer to javac's in general, not just for TornadoVM. With a Groovy build that includes
 them, the `@Parallel` versions of both examples run on Metal and OpenCL. They give the same results as
 the `KernelContext` versions, at 17–21 ms per Mandelbrot image. TornadoVM turns each `@Parallel`
@@ -382,8 +382,8 @@ harmless on the JVM but not on a GPU without double precision. A small AST trans
 takes care of both and keeps the kernel code readable. The result renders a 3840&#215;3200 Mandelbrot
 image in well under 20 ms on an Apple M4 Pro GPU, and the same code runs unchanged on an NVIDIA T4 through CUDA.
 
-The more Java-like `@Parallel` loops need three Groovy fixes, which should arrive in upcoming
-releases, and those fixes make Groovy's bytecode a little more javac-like along the way.
+The more Java-like `@Parallel` loops need three Groovy fixes, coming in Groovy 6.0.1,
+and those fixes make Groovy's bytecode a little more javac-like along the way.
 
 == Further information
 
