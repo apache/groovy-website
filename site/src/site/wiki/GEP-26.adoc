@@ -14,7 +14,7 @@
 *Comment*:: Builds on the existing GINQ collection provider and the `groupby...into` group model; strictly additive and opt-in. Version 2 aligns the document with the reference implementation (see _Reference implementation_).
 *Leader*:: Paul King
 *Created*:: 2026-06-28
-*Last modification*:: 2026-07-04
+*Last modification*:: 2026-11-04
 ****
 
 [width="80%",align="center"]
@@ -542,10 +542,12 @@ Mixed mode provides a graceful boundary, modelled on LINQ-to-SQL's `AsEnumerable
 . bring the partial result back as a `Queryable<GroovyRowResult>`;
 . finish the remaining operations in memory using the collection provider.
 
-Mixed mode is opt-in and not yet part of the reference implementation. The default for the
-SQL providers is *strict*: an untranslatable construct is a compile-time error, so users
-never get a silent, surprising performance cliff. Enabling mixed mode trades that
-strictness for completeness.
+Mixed mode is opt-in and is implemented in the reference implementation
+(https://github.com/apache/groovy/pull/3155[apache/groovy#3155]): the SQL-translatable
+prefix runs via the SQL provider, and the remainder is evaluated in memory by the
+collection provider. The default for the SQL providers is *strict*: an untranslatable
+construct is a compile-time error, so users never get a silent, surprising performance
+cliff. Enabling mixed mode trades that strictness for completeness.
 
 == Compilation
 
@@ -597,7 +599,7 @@ those who want it.
 |Window functions |No |Deferred
 |Dialect differences |ANSI only (+ SPI) |30+ databases
 |Function mapping |Common cases |Common cases, dialect-spelled by JOOQ
-|Mixed-mode fallback |Planned (phase 5) |Planned (phase 5)
+|Mixed-mode fallback |Yes (opt-in) |Yes (opt-in)
 |Result type |`Queryable<GroovyRowResult>` |`Queryable<GroovyRowResult>`
 |External dependency |None |JOOQ (compile classpath only)
 |===
@@ -631,8 +633,10 @@ provider is selected.
 
 A reference implementation exists as
 https://github.com/apache/groovy/pull/2658[apache/groovy#2658], covering phases 1–4 below
-plus the first tranche of phase 5's function mapping (mixed-mode execution is the main
-remaining item). It is covered by unit, generated-SQL, and end-to-end tests against the H2
+plus the first tranche of phase 5's function mapping, and is continued by
+https://github.com/apache/groovy/pull/3155[apache/groovy#3155], which adds opt-in
+mixed-mode execution (SQL-translatable prefix via the SQL provider; remainder in memory)
+and finishes phase 5 polish. It is covered by unit, generated-SQL, and end-to-end tests against the H2
 in-memory database (test-only dependency; jOOQ dialect tests use jOOQ's H2 dialect, and
 can target additional open-source databases as available), and is documented in an
 incubating section of the GINQ user guide. Version 2 of this document records the design
@@ -674,7 +678,7 @@ visitor is the hardest part here, and each individual renderer is comparatively 
 |2 |Joins + `GROUP BY`/aggregates + set operations (native) |Multi-table queries, aggregation via classic `groupby` and `groupby...into`, `UNION`/`INTERSECT`/`EXCEPT` |Done
 |3 |JOOQ provider (reuses the shared IR) |Phases 1–2 for free, plus dialect-aware rendering |Done
 |4 |Subqueries, `in`-subquery, `exists` |Nested queries in both providers, including correlated expression-position subqueries |Done
-|5 |Mixed-mode fallback, function mapping, polish |Graceful degradation for untranslatable expressions |Function mapping partly done; mixed mode not started
+|5 |Mixed-mode fallback, function mapping, polish |Graceful degradation for untranslatable expressions |Done (mixed mode opt-in; window functions remain deferred)
 |===
 
 Phase 1 already delivers something useful with zero external dependencies. Phases 2 and 3
@@ -755,6 +759,7 @@ compile such queries.
 == References
 
 * https://github.com/apache/groovy/pull/2658[apache/groovy#2658 — reference implementation]
+* https://github.com/apache/groovy/pull/3155[apache/groovy#3155 — mixed-mode and phase 5 continuation]
 * link:GEP-18.html[GEP-18: Integrated Concurrency and Parallel Processing] — home for the deferred asynchronous/streaming data sources
 * https://issues.apache.org/jira/browse/GROOVY-8258[GROOVY-8258: original GINQ proposal and implementation]
 * https://issues.apache.org/jira/browse/GROOVY-11915[GROOVY-11915: groupby...into redesign and first-class group results]
