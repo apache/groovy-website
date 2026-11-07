@@ -1,8 +1,8 @@
 = Using Apache Pekko actors and Groovy&reg; 6 actors
 Paul King
 :revdate: 2023-07-17T23:24:56+00:00
-:updated: 2026-08-22T00:00:00+00:00
-:keywords: concurrency, groovy, actors, pekko, groovy.concurrent, gpars
+:updated: 2026-11-08T00:00:00+00:00
+:keywords: concurrency, groovy, actors, pekko, groovy.concurrent, gpars, groovy-verify, contracts
 :description: This post looks at using Apache Pekko Actors and Groovy 6's built-in groovy.concurrent Actors.
 
 image:https://pekko.apache.org/assets/images/pekko_logo.png[pekko logo,100,float="right"]
@@ -56,7 +56,7 @@ to tell it the maximum number of times to echo the message before stopping.
 
 == A Pekko implementation in Groovy
 
-This example uses Groovy 6.0.0-beta-2 and Pekko 1.7.0.
+This example uses Groovy 6.0.0 and Pekko 2.0.0 (which requires JDK 17 or later).
 It was tested with JDK 21 and 25.
 
 The Pekko documentation gives Java and Scala implementations.
@@ -425,11 +425,143 @@ toolkit rather than learning separate APIs. See the
 https://groovy.apache.org/blog/groovy-async-await[Async/await for Groovy] post
 for the bigger picture.
 
+== Checking actor code at compile time
+
+Actors remove a whole class of bugs: state touched only by its own actor,
+one message at a time, needs no locks. They don't remove all bugs, though.
+Each handler still has to keep the actor's state sensible, and actors that
+wait on one another can still deadlock.
+
+The experimental
+https://github.com/paulk-asert/groovy-verify[`groovy-verify`] project,
+covered in the
+https://groovy.apache.org/blog/groovy6-formal-methods[Groovy 6 features for formal method advocates]
+post, can help with both. It is a type-checking extension, backed by the Z3
+SMT solver, that turns Groovy 6's `groovy.contracts` annotations into proofs,
+or into compile errors with counterexamples. It is not part of Apache Groovy.
+The examples below were checked with Groovy 6.0.0 and `groovy-verify` 0.1.0.
+
+=== The bot's invariant
+
+Our `@ActiveObject` bot keeps a counter which should never exceed its
+maximum. We can say that with a class invariant. `groovy-verify` reasons
+about sequential code, so it doesn't check interleavings. It doesn't need to
+here: `@ActiveObject` runs one `@ActiveMethod` call at a time, so it is enough
+to prove that each call, run on its own, preserves the invariant. We keep just
+the bot's bookkeeping (the `println` and the reply to the greeter are outside
+the subset of Groovy that `groovy-verify` handles):
+
+[source,groovy]
+----
+@TypeChecked(extensions = 'verification.VerifyChecker')
+@ActiveObject
+@Invariant({ max >= 1 && 0 <= greetingCounter && greetingCounter <= max })
+class HelloWorldBot {
+    private final int max
+    private int greetingCounter
+
+    @Requires({ max >= 1 })
+    HelloWorldBot(int max) { this.max = max }
+
+    @ActiveMethod(blocking = false)
+    void greeted(String whom) {
+        greetingCounter++
+    }
+}
+----
+
+This doesn't compile:
+
+----
+[Static type checking] - Cannot prove class invariant of greeted holds at method exit
+    invariant: (((max >= 1) && (0 <= greetingCounter)) && (greetingCounter <= max))
+    counterexample: greetingCounter = 1, max = 1
+    fails on: greeted("")
+----
+
+The counterexample is a bot that has already had all the greetings it
+wanted (one, in this case) and then gets another. In our little system that
+never happens, because the bot stops replying once it reaches its maximum.
+But nothing in the bot itself guarantees that. A misbehaving or duplicated
+sender could push it past its limit. An actor can't refuse delivery, so the
+natural fix is to ignore late greetings:
+
+[source,groovy]
+----
+    @ActiveMethod(blocking = false)
+    void greeted(String whom) {
+        if (greetingCounter == max) return  // a late greeting: ignore it
+        greetingCounter++
+    }
+----
+
+Now the class compiles, and the invariant is proved for every possible call,
+not just the ones our tests happen to make.
+
+=== A mailbox deadlock
+
+By default, a `groovy.concurrent` actor's mailbox is unbounded, so sending a
+message never blocks. A bounded mailbox with the `BLOCK` overflow policy is
+different: once the mailbox is full, the sender waits until the actor takes
+another message. Combine that with a handler that is itself waiting for the
+sender and you have the classic actor deadlock. Here is the smallest version,
+from the `groovy-verify`
+https://github.com/paulk-asert/groovy-verify/blob/main/examples/concurrency.md[concurrency examples]:
+
+[source,groovy]
+----
+import groovy.concurrent.*
+import groovy.transform.TypeChecked
+
+@TypeChecked(extensions = 'verification.VerifyChecker')
+class Knot {
+    static int knot() {
+        AsyncChannel<Integer> gate = AsyncChannel.create(4)
+        Actor<Integer> worker = Actor.reactor({ Integer m -> gate.first() },
+            ActorOptions.DEFAULTS.withBoundedMailbox(1, ActorOptions.Overflow.BLOCK))
+        worker.send(1)
+        worker.send(2)
+        worker.send(3)
+        gate.send(0)
+        return 0
+    }
+}
+----
+
+The worker's handler waits on the `gate` channel. Its mailbox holds just one
+message. The first message is being handled (and waiting on `gate`), the
+second fills the mailbox, and the third send has to wait. But `gate` is only
+fed after that third send, so neither side can make progress. At runtime this
+just hangs. With `groovy-verify` it is a compile error that names both halves
+of the cycle:
+
+----
+[Static type checking] - Actor mailbox deadlock in 'knot': the send to 'worker' (line 12)
+is the 3rd to a mailbox bounded at 1 with Overflow.BLOCK — one message is being handled and
+1 waits behind it, so this send parks the sending thread until the handler takes another.
+The handler cannot: it is waiting for the receive on 'gate' (line 8), which this method
+sends only at line 13, after the send that blocks. ... Feed 'gate' before the burst, raise
+the bound above the burst, or choose a non-blocking overflow policy and handle the loss.
+----
+
+The same burst on an unbounded mailbox isn't reported, because there the
+sends are queued and nobody waits. The concurrency examples also cover messages
+an actor stashes but never replays, `become` phases checked against a
+protocol, and a `sendAndGet` that waits forever for a reply to a stashed
+message.
+
+Neither check makes `groovy-verify` a model checker. It doesn't explore
+thread schedules, and it relies on the actor runtime to deliver messages one
+at a time. What it does is catch the local mistakes, an invariant a handler
+breaks or a send that can never complete, while you compile.
+
 == Conclusion
 
 We have had a quick glimpse at using actors with Apache Pekko and with Groovy 6's
 built-in `groovy.concurrent` package -- both with explicit actors and with
 `@ActiveObject` classes (with GPars noted as the pre-Groovy-6 option).
+We also saw how the experimental `groovy-verify` project can check actor
+code at compile time.
 
 The sample code can be found here:
 
@@ -445,5 +577,6 @@ It contains `pekko`, `groovy6`, `activeobject`, and legacy `gpars` versions of t
 *25/Jun/2024*: Update to Pekko 1.0.3. +
 *28/Sep/2024*: Update to Pekko 1.1.1. +
 *12/Jul/2026*: Update to Pekko 1.6.0 and Groovy 6; replace the GPars example with the built-in `groovy.concurrent` actors (GPars retained as a legacy reference). +
-*22/Aug/2026*: Update to Pekko 1.7.0 and Groovy 6.0.0-beta-2; add an `@ActiveObject` version of the example.
+*22/Aug/2026*: Update to Pekko 1.7.0 and Groovy 6.0.0-beta-2; add an `@ActiveObject` version of the example. +
+*08/Nov/2026*: Update to Pekko 2.0.0 and Groovy 6.0.0; add a section on compile-time checking of actor code with `groovy-verify`.
 ****
