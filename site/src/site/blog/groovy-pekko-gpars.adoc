@@ -441,6 +441,8 @@ SMT solver, that turns Groovy 6's `groovy.contracts` annotations into proofs,
 or into compile errors with counterexamples. It is not part of Apache Groovy.
 The examples below were checked with Groovy 6.0.0, Pekko 2.0.0 and `groovy-verify` 0.1.0.
 
+image:img/groovy_verify_actors.png["The Pekko bot with its invariant proved, and three compile errors: a weaker invariant, a missing reply, and a mailbox deadlock",width=800]
+
 === The bot's invariant
 
 Our `@ActiveObject` bot keeps a counter which should never exceed its
@@ -690,7 +692,10 @@ None of these checks makes `groovy-verify` a model checker. It doesn't
 explore thread schedules, and it relies on the actor runtime to deliver
 messages one at a time. What it does is catch the local mistakes while you
 compile: an invariant a handler breaks, a reply that never comes, or a send
-that can never complete.
+that can never complete. It doesn't replace the other tools, either. Nothing
+here notices a handler that blocks and starves Pekko's dispatcher, or a
+mailbox that fills faster than it drains. Runtime monitoring and load tests
+still find those.
 
 == Conclusion
 
