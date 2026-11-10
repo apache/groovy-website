@@ -1,7 +1,7 @@
 = Running Groovy on the GPU with TornadoVM
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2026-10-28T08:00:00+00:00
-:keywords: groovy, tornadovm, gpu, metal, opencl, apple silicon, kernelcontext, ast transformation, mandelbrot
+:keywords: groovy, tornadovm, gpu, metal, opencl, cuda, apple silicon, intel arc, kernelcontext, ast transformation, mandelbrot
 :description: TornadoVM compiles Java bytecode to GPU kernels. We get Groovy code running on an Apple GPU with it today, and look at what upcoming Groovy fixes add.
 
 == Introduction
@@ -25,7 +25,7 @@ bytecode that is often very close to what javac produces. So, can we use it from
 In an link:matrix-calculations-with-groovy-apache.html[earlier post] we ran
 matrix multiplication with cuBLAS, which needs an NVIDIA GPU, on a
 Google Colab notebook. TornadoVM has a Metal backend, as well as OpenCL and CUDA,
-so this time we can use the GPU in a Mac directly, and then run the same code on an NVIDIA GPU on Colab.
+so this time we can use the GPU in a Mac directly, and then run the same code on an NVIDIA GPU on Colab and an Intel GPU on Windows.
 
 The example code is in the
 https://github.com/paulk-asert/groovy-tornadovm[groovy-tornadovm]
@@ -306,6 +306,59 @@ This time 0.28% of the pixels differed from the CPU result, and the total iterat
 slightly from the Apple GPU's. That fits the explanation above: each GPU compiler makes its own
 floating-point choices, and the chaotic boundary of the set magnifies them.
 
+=== On an Intel GPU
+
+We also tried a Windows 11 laptop with an Intel Core Ultra X7 358H, which has an integrated
+Intel Arc B390 GPU. TornadoVM's 8.0.0 release has OpenCL and CUDA SDKs for Windows, and the
+`jdk21` OpenCL one finds the GPU through Intel's OpenCL driver:
+
+----
+> tornado --devices
+Number of Tornado drivers: 1
+Driver: OpenCL
+  Total number of OpenCL devices  : 1
+  Tornado device=0:0  (DEFAULT)
+	OPENCL --  [Intel(R) OpenCL Graphics] -- Intel(R) Arc(TM) B390 GPU
+		Global Memory Size: 33.6 GB
+		Local Memory Size: 128.0 KB
+		Workgroup Dimensions: 3
+		Total Number of Block Threads: [1024]
+		Max WorkGroup Configuration: [1024, 1024, 1024]
+		Device OpenCL C version: OpenCL C 1.2
+----
+
+The only change needed was in the companion repo's build, which now runs the launcher as
+`tornado.exe` on Windows. The Groovy code ran unchanged. The vector add gave the same results as on the Mac,
+and the Mandelbrot timings were:
+
+[cols="3,2",options="header"]
+|===
+| Run | Time per image
+| GPU, OpenCL | 8.8–9.2 ms
+| CPU, parallel stream, 16 cores | 2.2–2.5 s
+| CPU, single thread | 29–34 s
+|===
+
+So this integrated GPU is a little faster than the M4 Pro's GPU on this kernel, and
+more than 200 times faster than all 16 CPU cores. As before, treat these numbers as indicative.
+The GPU image differs from the CPU one in 0.28% of its pixels, much as it did on the T4.
+
+There is one more difference from the Apple GPU. This GPU accepts double-precision kernels,
+so we could try the Mandelbrot kernel with `double` instead of `float`, and without `@GpuKernel`. TornadoVM
+generated OpenCL code that really is double precision:
+
+[source,c]
+----
+#pragma OPENCL EXTENSION cl_khr_fp64 : enable
+...
+  double cx, cy, x, y, xt;
+  cx = -2.0 + (double) px * 3.0 / 3840.0;
+----
+
+It ran, at about 85 ms per image, nearly ten times slower than the `float` version.
+So even where double precision is available, the float semantics `@GpuKernel` gives us
+are worth having.
+
 == Coming soon: `@Parallel` loops
 
 TornadoVM's other API is arguably the more natural one for Java and Groovy developers. You write
@@ -343,8 +396,8 @@ Groovy issues:
 
 All three are fixed for the upcoming Groovy 6.0.1 and 7.0.0-alpha-1 releases. The third makes Groovy's bytecode
 smaller and closer to javac's in general, not just for TornadoVM. With a Groovy build that includes
-them, the `@Parallel` versions of both examples run on Metal and OpenCL. They give the same results as
-the `KernelContext` versions, at 17–21 ms per Mandelbrot image. TornadoVM turns each `@Parallel`
+them, such as a 6.0.1-SNAPSHOT build, the `@Parallel` versions of both examples run on Metal and OpenCL. They give the same results as
+the `KernelContext` versions, at 17–21 ms per Mandelbrot image on the M4 Pro, and 14–17 ms on the Arc B390. TornadoVM turns each `@Parallel`
 loop into a grid-stride loop, where each GPU thread starts at its own index and steps by the number of threads.
 Here is the vector add:
 
@@ -367,7 +420,8 @@ Mandelbrot kernel no longer goes through an extra `0`/`1` flag variable in the g
 This was an experiment rather than a supported configuration, so:
 
 * We used macOS on an M4 Pro, with TornadoVM's Metal and OpenCL backends, and a single
-  Colab run of the CUDA backend on a T4, all with JDK 21. We haven't tried other platforms.
+  Colab run of the CUDA backend on a T4, and the OpenCL backend on Windows with an Intel Arc B390,
+  all with JDK 21. We haven't tried other platforms.
 * Kernels must be `@CompileStatic`, and should be written in the Java-like subset of Groovy that
   TornadoVM supports: primitives, TornadoVM's array types, simple loops and calls.
 * `@GpuKernel` is a demo. Its type inference only covers the kind of code shown here.
@@ -380,7 +434,7 @@ kernels in Groovy today. Use `@CompileStatic` and the `KernelContext` API, and t
 Groovy's habit of widening float arithmetic to double, and moving float literals into fields, is
 harmless on the JVM but not on a GPU without double precision. A small AST transformation
 takes care of both and keeps the kernel code readable. The result renders a 3840&#215;3200 Mandelbrot
-image in well under 20 ms on an Apple M4 Pro GPU, and the same code runs unchanged on an NVIDIA T4 through CUDA.
+image in well under 20 ms on an Apple M4 Pro GPU, and the same code runs unchanged on an NVIDIA T4 through CUDA and on an Intel Arc B390 through OpenCL on Windows.
 
 The more Java-like `@Parallel` loops need three Groovy fixes, coming in Groovy 6.0.1,
 and those fixes make Groovy's bytecode a little more javac-like along the way.
