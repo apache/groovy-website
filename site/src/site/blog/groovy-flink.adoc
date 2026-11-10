@@ -1,7 +1,7 @@
 = Whiskey Clustering with Groovy&reg; and Apache Flink&reg;
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2026-10-31T12:00:00+00:00
-:keywords: groovy, flink, flink ml, kmeans, clustering, whisky, whiskey, tornadovm, gpu
+:keywords: groovy, flink, flink ml, kmeans, clustering, whisky, whiskey, tornadovm, gpu, metal, opencl, intel arc
 :description: We cluster Scotch whiskies with Apache Flink and Groovy: with Flink ML, by hand on Flink 2.3, and with the hot loop on the GPU via TornadoVM.
 
 == Introduction
@@ -443,6 +443,37 @@ The float arithmetic stays float. TornadoVM has specialised the kernel for this 
 a `0`/`1` value; link:https://issues.apache.org/jira/browse/GROOVY-12542[GROOVY-12542], mentioned
 in the earlier post, makes this more javac-like in the upcoming Groovy 6.0.1.
 
+=== On an Intel GPU
+
+As in the link:groovy-tornadovm.html[earlier post], we also ran the job on a Windows 11 laptop
+with an Intel Arc B390 integrated GPU, using TornadoVM's OpenCL SDK for Windows.
+The Groovy code is unchanged:
+
+----
+> gradlew :flink:runWhiskeyKMeansGpu -PtornadoFlags=--threadInfo
+Task info: assign1.nearest
+	Backend           : OPENCL
+	Device            : Intel(R) Arc(TM) B390 GPU CL_DEVICE_TYPE_GPU (available)
+	Dims              : 1
+	Global work size  : [86, 1, 1]
+...
+Converged after 8 iterations
+Centroids:
+Cluster 0: 1.93, 2.33, 1.63, 0.41, 0.11, 1.78, 1.44, 1.11, 1.70, 1.96, 1.37, 1.56
+...
+----
+
+Again, the centroids and clusters are identical to the CPU run's.
+
+Unlike Apple GPUs, this one supports double precision, so do we still need `@GpuKernel`?
+Simply removing it doesn't work, whatever the GPU: Groovy moves the `0.0f` literals into a
+`$const$0` field, and TornadoVM rejects the kernel with `TC-E1003`. Declaring `bestDist`, `dist` and
+`diff` as `double` instead, with `0.0d` literals, does work without `@GpuKernel`. TornadoVM generates
+double-precision OpenCL code, and the clusters are again identical. But for a million points and
+_k_ = 100, TornadoVM's profiler puts the double kernel at about 22 ms, against 1.4 ms for the float one.
+That's around 16 times slower, though it hardly changes the iteration time, because, as we'll see next,
+the kernel is only a small part of each iteration.
+
 == Scaling up
 
 86 whiskies are about 3KB of data, which is far too little for the GPU to make a difference.
@@ -511,7 +542,7 @@ estimators or the DataStream API. Flink ML is a quick way to cluster our whiskie
 tied to Flink 1.x. Writing K-means by hand on Flink 2.3 takes a little more code, and a custom
 operator gives us batches to send to a GPU. With TornadoVM 8.0.0 and the `@GpuKernel`
 transformation, the assignment step runs as a Groovy kernel on an Apple GPU, unchanged on Metal and OpenCL,
-with results identical to the CPU version.
+and on an Intel GPU through OpenCL on Windows, with results identical to the CPU version.
 
 For our 86 whiskies, the GPU makes no difference. At four million, it is many times faster at the arithmetic, but
 end-to-end speed depends on everything else the job does. Caching the parsed data lets more of that
