@@ -6021,6 +6021,14 @@ same applies to `wrapAsync` and `wrapAsyncGenerator` closures (incubating),
 which are now named classes, so one serialized by 6.0.0 does not deserialize
 in 6.0.1
 (https://issues.apache.org/jira/browse/GROOVY-12679[GROOVY-12679]).
+* *A method call in a closure skips a null owner or delegate.* After
+`dehydrate()`, `rehydrate` with a null argument or `delegate = null`, an
+implicit-this method call threw `NullPointerException`; it now goes to the
+other of owner and delegate, or, with neither, runs a method of the closure
+itself (`toString()`, `with`, `tap`) on the closure and throws
+`MissingMethodException` for any other method. In 6.0.0, `toString()` and
+`with` ran against `null` there. Property access is unchanged
+(https://issues.apache.org/jira/browse/GROOVY-12667[GROOVY-12667]).
 * *`@IndexedProperty` adds no indexed setter to a record*, or to a property
 of a `@RecordType` or `@RecordBase` class, as records have no other setters.
 Code calling `setX(int, V)` on such a record no longer compiles under static
