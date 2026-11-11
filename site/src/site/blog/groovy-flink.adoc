@@ -523,8 +523,8 @@ Statically compiled Groovy worked well with both Flink and TornadoVM, but we did
 * *Cloning arrays.* Under `@CompileStatic`, `a[0].clone()` on a `float[][]`, or `it.clone()` in a closure
   over one, compiles to a call of `Object.clone()` on a reference the JVM verifier only knows is an
   `Object`, and fails with `VerifyError: Bad access to protected data`
-  (link:https://issues.apache.org/jira/browse/GROOVY-12595[GROOVY-12595]). Declaring the closure parameter's type,
-  `{ float[] c -> c.clone() }`, avoids it.
+  (link:https://issues.apache.org/jira/browse/GROOVY-12595[GROOVY-12595]). With 6.0.0, declaring the closure
+  parameter's type, `{ float[] c -> c.clone() }`, avoids it.
 * *Spread-dot over large lists.* We first wrote `batch*.f1` in `AssignOperator`. That took around
   400 ms per million points, more than the assignment itself. Groovy compiles the spread into a loop which keeps
   the result list on the JVM's operand stack, and HotSpot can't compile a loop like that while it is running
@@ -532,8 +532,11 @@ Statically compiled Groovy worked well with both Flink and TornadoVM, but we did
   the interpreter. A plain loop was around ten times faster
   (link:https://issues.apache.org/jira/browse/GROOVY-12642[GROOVY-12642]).
 
-Both are present in Groovy 6.0.0 and current snapshots. Like GROOVY-12542, the second is a case where
-bytecode closer to javac's would make a real difference.
+Both are present in Groovy 6.0.0 and fixed for the upcoming Groovy 6.0.1 and 7.0.0-alpha-1 releases.
+With a current 6.0.1-SNAPSHOT build, both `a[0].clone()` and `it.clone()` in a closure work, so the
+closure parameter no longer needs its type. The spread-dot loop no longer blocks on-stack compilation:
+in a standalone test spreading over four million elements, it took 76–127 ms, against 384–590 ms with 6.0.0.
+Like GROOVY-12542, the second is a case where bytecode closer to javac's makes a real difference.
 
 == Conclusion
 
