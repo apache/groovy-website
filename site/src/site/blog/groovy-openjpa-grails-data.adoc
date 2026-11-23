@@ -1,7 +1,6 @@
 = Groovy&reg; Persistence Two Ways: OpenJPA and Grails&reg; Data
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2026-11-23T08:00:00+00:00
-:draft: true
 :keywords: groovy, openjpa, grails data, gorm, jpa, jakarta persistence, hibernate, where queries, data services
 :description: One set of Groovy entity classes, two persistence stacks: standard JPA with Apache OpenJPA, and finders and data services with Grails Data, no Grails app.
 
