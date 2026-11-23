@@ -1,4 +1,4 @@
-= Groovy Persistence Two Ways: OpenJPA and Grails Data
+= Groovy&reg; Persistence Two Ways: OpenJPA and Grails&reg; Data
 Paul King <paulk-asert|PMC_Member>
 :revdate: 2026-11-23T08:00:00+00:00
 :draft: true
@@ -8,6 +8,8 @@ Paul King <paulk-asert|PMC_Member>
 == Introduction
 
 > [blue]#Apache OpenJPA gives Groovy standard Jakarta Persistence. Grails Data gives it finders, compile-time checked queries, validation and data services, and it doesn't need a Grails application. In this post we run the same Groovy entity classes on both, and look at when you might pick each.#
+
+image:img/groovy_openjpa_grails_data.png["One set of Groovy entity classes running on both Apache OpenJPA and Grails Data", width=800]
 
 Many Groovy users know persistence through Grails and GORM, which lives on today as
 https://grails.apache.org[Apache Grails] Data. Others use the
