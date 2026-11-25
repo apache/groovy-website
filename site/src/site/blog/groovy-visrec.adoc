@@ -16,7 +16,7 @@ reached Final Release in February 2022. It defines a small API for classifying i
 data) that different machine learning engines can implement.
 An earlier post, https://groovy.apache.org/blog/classifying-iris-flowers-with-deep[Classifying Iris Flowers with Deep Learning],
 used the https://www.deepnetts.com/[Deep Netts] implementation of JSR 381 on tabular data.
-Geertjan's recent foojay article
+Geertjan's recent Foojay.io article
 https://foojay.io/today/jsr-381-java-visual-recognition-api/[JSR 381: Java Visual Recognition API]
 looked at the image side of the API from Java. It trained the reference implementation and
 then wrote a second `ImageClassifier` of its own: images shrunk to 8x8 pixels, stored in
@@ -146,7 +146,7 @@ We'll see shortly how far that gets us.
 
 == Engine 2: nearest neighbours in DuckDB
 
-The second engine follows the foojay article. Each image is shrunk to 8x8 pixels, giving a vector of
+The second engine follows the Foojay.io article. Each image is shrunk to 8x8 pixels, giving a vector of
 192 RGB values (an _embedding_), which is another extension method:
 
 [source,groovy]
@@ -366,7 +366,7 @@ Here are the accuracy figures (%) from three setups: the two choices of unseen s
 |Hard augmentation, unseen style Noto 3D |87 |60 |84
 |===
 
-The foojay article says the 8x8 pixel embedding isn't suited to telling apart shapes, like cats and dogs.
+The Foojay.io article says the 8x8 pixel embedding isn't suited to telling apart shapes, like cats and dogs.
 With easy augmentation, though, it scores 96%: each emoji design is always drawn the same way, so the
 tiny thumbnails differ little between copies. With hard augmentation, the fruit move around, change
 size and turn sideways, and the pixel engine drops to 60%. The CNN holds up much better (90%), since
@@ -424,7 +424,7 @@ and a small CNN handles the harder cases best.
 == Further information
 
 * https://jcp.org/en/jsr/detail?id=381[JSR 381: Visual Recognition (VisRec) Specification]
-* https://foojay.io/today/jsr-381-java-visual-recognition-api/[JSR 381: Java Visual Recognition API] on foojay
+* https://foojay.io/today/jsr-381-java-visual-recognition-api/[JSR 381: Java Visual Recognition API] on Foojay.io
 * https://github.com/JavaVisRec[JavaVisRec] on GitHub: the API, reference implementation and examples
 * https://www.deepnetts.com/[Deep Netts]
 * https://duckdb.org/[DuckDB]
