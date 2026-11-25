@@ -1,0 +1,274 @@
+= GEP-34: Native Functional Values
+
+:icons: font
+
+.Metadata
+****
+[horizontal,options="compact"]
+*Number*:: GEP-34
+*Title*:: Native Functional Values
+*Version*:: 1
+*Type*:: Feature
+*Status*:: Draft
+*Target*:: Groovy 7.0
+*Comment*:: Builds on GEP-33. Under `@CompileStatic`, a lambda or method reference becomes the same native object wherever it is written, a call's target can come from its context as in Java, and closure literals at declared targets keep their identity. Contains the breaking changes GEP-33 avoids, with the benefits they buy and a way to find affected code.
+*Leader*:: Paul King
+*Created*:: 2026-11-25
+*Last modification*:: 2026-11-25
+****
+
+[width="80%",align="center"]
+|===
+a| NOTE: _WARNING:_
+Material on this page is still under development!
+This proposal is a draft for discussion. A prototype of most sections exists; its review findings are listed
+under <<risks>>. Performance claims are expectations until the benchmarks of the work items are run.
+|===
+
+== Abstract
+
+GEP-33 makes functional literals stored at type-parameter slots usable through their interface without
+taking anything away. It leaves Groovy with rules a Java developer would not predict: the same lambda is a
+native lambda at `list[0] = λ` and a closure at `list.add(λ)`; `Optional.of(String::trim)` needs explicit
+types; `Supplier<String> s = { 'x' }` creates a proxy that is not the closure.
+
+This GEP proposes, for statically compiled code:
+
+. every lambda and method reference with a functional-interface target is a native lambda, as in Java;
+. the target of a generic call can come from its context (assignment, return, argument of an enclosing call,
+  collection literal), as in JLS 18.5.2;
+. a closure literal with a declared target is an implementing closure rather than a coercion proxy, so it
+  keeps its identity and closure behaviour;
+. dynamic code can call a lambda or a Groovy coercion proxy with call syntax.
+
+The first item removes closure behaviour from values that dynamic code may read today. The rest of this GEP
+argues why that is worth it, lists every visible change, and gives users a way to find the code it affects.
+
+== The benefit, in full
+
+=== One representation, the one Java uses
+
+After GEP-33, the representation of a lambda depends on where it is written:
+
+[options="header",cols="3,2,2,2"]
+|===
+| `@CompileStatic` site | Groovy 6.0 | GEP-33 | GEP-34 (= javac)
+| `F f = λ`, `take(λ)` for an `F` parameter | native | native | native
+| `list[0] = λ`, `box.value = λ` | native | native | native
+| `list.add(λ)`, `map.put(k, λ)`, `list.set(0, λ)` | closure, read through F fails | implementing closure | native
+| `list << λ` | closure, read through F fails | implementing closure | native
+| `list << String::trim` | method closure, read through F fails | method closure, warning | native
+| `cond ? λ1 : λ2` as an argument | closure, read through F fails | implementing closure | native
+| `Optional.of(String::trim)`, `Arrays.asList(λ)`, `List.of(λ)` | compile error | compile error | native
+| `F f = id(id(λ))`, `pick(fv, String::strip)` | compile error | compile error | native
+| `List<F> l = [λ]`, `Map<String, F> m = [k: λ]` | compile error | compile error | native
+|===
+
+With this GEP, a statically compiled lambda is a native lambda. A reader of the code no longer needs to know
+which method a lambda is passed to, nor whether that method's parameter is declared with a type variable.
+
+=== Java code moves to Groovy unchanged
+
+The rows marked "compile error" above are ordinary Java. Java developers writing Groovy, and code ported
+from Java, currently hit them as type-checking errors with messages about type parameters that are not
+functional interfaces. Under this GEP they compile, with the same meaning as in Java.
+
+=== Cheaper functional values
+
+A native lambda is created by `LambdaMetafactory`: no generated closure class per literal, no `Closure`
+object with its owner, delegate and resolve strategy, and no reflective `doCall` lookup on call. A
+non-capturing lambda can be hoisted by GEP-27 to a shared instance with no allocation at all. An
+implementing closure, which GEP-33 uses, keeps all of those costs. Every site in the table that moves from
+closure to native gets the cheaper form.
+
+Native lambdas also need no proxy or reflection metadata in a GraalVM native image, where a coercion proxy
+must be registered for each interface.
+
+=== Identity at declared targets
+
+`Supplier<String> s = { 'x' }` today creates a `java.lang.reflect.Proxy` around the closure. The proxy is not
+the closure: dynamic `s()` fails, `delegate` cannot be set through it, and converting the same closure twice
+gives two unequal objects. Under this GEP the literal is compiled as an implementing closure, the same as at
+type-parameter slots after GEP-33: one object, both a `Closure` and a `Supplier`.
+
+=== Dynamic code can call functional values
+
+Dynamic code can already receive native lambdas today, for example from `F f = λ` or from Java libraries,
+and cannot call them with `f()`. Coercion proxies from `as F` cannot be called that way either. Section 4
+makes `f(x)` and `f.call(x)` work for both, whether or not the rest of this GEP is accepted.
+
+=== Type-checked and statically compiled code agree
+
+Under this GEP `@TypeChecked` and `@CompileStatic` accept the same programs at these sites, and a program
+`@TypeChecked` accepts does not fail at run time because a literal was not converted.
+
+== What it costs
+
+=== Breaking changes
+
+Compared with GEP-33, under `@CompileStatic`:
+
+[options="header",cols="3,3,3"]
+|===
+| Change | What stops working | What still works
+| A lambda at a type-parameter slot, operand or conditional argument is native instead of an implementing closure | from dynamic code: `delegate`, `curry`, `memoize`, `>>`, `isCase` (`switch`, `grep` treat it as a value), `Closure`-only DGM methods, serialization unless the target is `Serializable` | call syntax (section 4), the interface method, identity
+| `list << String::trim` stores a native lambda, not a method closure | the same, from dynamic code | call syntax, the interface method
+| A closure literal at a declared SAM target is an implementing closure, not a proxy | `instanceof Proxy`; code that relied on `s.is(t)` being false for two conversions | everything the proxy did, plus closure behaviour
+| Inference from context can choose a different overload of the enclosing call than Groovy 6 | rare; listed by the migration report | —
+| Call syntax on lambdas and coercion proxies (section 4) | code that caught MissingMethodException from `f()` | —
+|===
+
+Only *lambdas and method references* lose closure behaviour. A closure literal stays a closure everywhere.
+That gives users a simple rule for code that needs closure behaviour: write a closure literal.
+
+=== Finding affected code
+
+The compiler gets a report mode, `-Dgroovy.target.functional.report=true`, that changes nothing about the
+generated code. It lists every lambda or method reference whose representation differs from Groovy 6,
+with its location and the site kind, and every call whose overload choice or inferred type differs because
+of context inference. It is meant to be run once over a code base before upgrading, and by IDEs.
+
+The usual fix for a reported site is to write the literal as a closure (`{ s -> s.trim() }` instead of
+`s -> s.trim()`) where dynamic code needs closure behaviour, or to do nothing where it does not.
+
+== Proposal
+
+=== 1. Native lambdas and method references (proposed)
+
+Under `@CompileStatic`, every lambda or method reference with a functional-interface target is compiled as a
+native lambda, at every site of GEP-33 section 1, in collection literals with a declared element type, and
+wherever section 2 finds a target.
+
+* A target with a secondary bound (`<T extends Function<String, String> & Serializable>`) gives a lambda that
+  implements every bound, as javac does with `altMetafactory`. A secondary bound that is itself a functional
+  interface makes the target invalid, as in Java.
+* A target whose abstract method has its own type parameters accepts a method reference but not a lambda
+  (JLS 15.27.3).
+* A raw target (`List<Function>`) has `Object` parameters: a typed lambda is rejected, as in Java.
+* A targeted literal that cannot be compiled for its target is a compile error, not a silent closure.
+
+=== 2. Inference from context (proposed)
+
+The type arguments of a generic call are inferred from its arguments and its context together, following
+JLS 18.5.2:
+
+* the context is an assignment, a return, a cast, a conditional branch, an element of a collection literal,
+  or a parameter of an enclosing call;
+* while the enclosing call's overload is chosen, a functional literal whose target depends on that choice is
+  *not pertinent to applicability* (JLS 15.12.2.2), rather than standing in as `Closure`;
+* a value of type `Closure` is a witness like any other value, so `pick(function, closureValue)` infers the
+  common supertype as in Groovy 6 and is not silently treated as `F`;
+* where the rule finds no target, the literal is compiled as GEP-33 compiles it.
+
+Groovy 6 and GEP-33 do part of this, from the declaration a call is assigned to (GROOVY-12727). This section
+replaces that special case with one rule, including nested calls such as `take(id(id(λ)))`.
+
+The specification must state what type-checking extensions see. The prototype checks a pending inner call
+twice, so `beforeMethodCall` and `onMethodSelection` fire twice, the first time with placeholder types. The
+proposal is that the first check is internal and does not reach extensions.
+
+=== 3. Closure literals at declared targets (proposed)
+
+A closure literal with a declared functional-interface target (`Supplier<String> s = { 'x' }`,
+`take { .. }` for an `F` parameter) is compiled as an implementing closure, as GEP-33 does at type-parameter
+slots. The exclusions of GEP-33 section 4 still apply; such a literal keeps today's proxy.
+
+The incubating compile-time adapter of GROOVY-12492 (`groovy.target.closure.sam`) solves a related problem,
+avoiding the run-time proxy, with an object that is not a `Closure`. The two must be reconciled: either the
+adapter becomes the fallback for the exclusions, or this section replaces it.
+
+=== 4. Call syntax on functional values (proposed)
+
+In dynamic code, `f(args)` and `f.call(args)` on a value that has no `call` method invoke the abstract method
+of its functional interface when the value is:
+
+* a native lambda or method reference (a class created by `LambdaMetafactory`), or
+* a Groovy coercion proxy (a `java.lang.reflect.Proxy` whose handler is Groovy's closure or map conversion
+  handler, checked per instance, not per class).
+
+No other object gets call syntax. In particular a `List` (through `Iterable`), a `Thread` or a `Runnable`,
+an `InputStream` (through `AutoCloseable`), a `Comparable` and a user class implementing a functional
+interface keep throwing MissingMethodException, as today. A prototype of a wider rule, "any object
+implementing exactly one functional interface", made `[1, 2]()` return an iterator and `stream()` close the
+stream, and was rejected for that reason.
+
+The rule runs after everything the MOP already tries: categories, `methodMissing`, `invokeMethod`, a `call`
+property, and the outer class of an inner class. The message of a MissingMethodException is unchanged for all
+other objects.
+
+The call should be bound at the call site by the indy `Selector` with a class guard, so that a hot `f(x)` on a
+lambda does not take the missing-method path on every call.
+
+Whether section 4 depends on the caller's realm is decided with GEP-31.
+
+=== 5. Type-checked code (proposed)
+
+`@TypeChecked` code is compiled dynamically. Its closure literals and lambdas at targeted sites become
+implementing closures, which dynamic code handles like any closure. A method reference at a type-parameter
+slot stays a compile error under `@TypeChecked`, because it cannot become a native lambda there.
+
+[[risks]]
+== Implementation risks
+
+A prototype of sections 1, 2 and 4 (November 2026) passed the full core test suite, but an adversarial review
+found problems that the specification above already answers and the implementation must fix:
+
+* a deferred argument of a call that takes the map-constructor path was never type checked, giving a `BUG!`
+  in class generation for `new Foo(Map.of('name', { -> s.length() + 1 }))`;
+* `@TypeChecked` code accepted programs that then failed with MissingMethodException;
+* the overload of the enclosing call was chosen with `Closure` placeholders;
+* an error reported during the provisional check of an inner call could hide the real one;
+* node metadata from the first check (delegation metadata, the call target type) was not always cleared;
+* the wide call-syntax rule of section 4.
+
+Section 2 is the expensive part: it adds state to `StaticTypeCheckingVisitor` that is set and cleared across
+nested visits. It needs one documented protocol for deferred arguments and the probe matrix as a permanent
+test class.
+
+== Work items
+
+. Native lambdas and method references at every targeted site, with secondary bounds and the compile errors of
+  section 1.
+. Inference from context (section 2), with one protocol for deferred arguments and no extension callbacks for
+  the provisional check.
+. Implementing closures at declared targets (section 3), reconciled with GROOVY-12492.
+. Call syntax on lambdas and coercion proxies (section 4), with an indy fast path.
+. Implementing closures under `@TypeChecked` (section 5).
+. The report mode for finding affected code.
+. Benchmarks: closure, implementing closure, proxy and native lambda, for creation and call, on the JVM and
+  in a native image.
+. Documentation and a Groovy 7 compatibility entry.
+
+== Alternatives considered
+
+Stop at GEP-33:: Nothing breaks, but the two representations of a lambda, the coercion proxies and the gaps in
+  inference remain, and lambdas keep the cost of closures at type-parameter slots.
+Native lambdas without call syntax:: Smaller, but dynamic code loses `f()` on every lambda it receives from
+  statically compiled code.
+Call syntax on every functional-interface instance:: Simplest to state, but makes ordinary objects callable
+  (see section 4). Rejected.
+An option for the old behaviour:: The representation would depend on the build. The report mode finds
+  affected code instead.
+Compile lambdas as implementing closures everywhere:: Keeps closure behaviour for lambdas, but gives up the
+  native form and GEP-27 hoisting even where Groovy 6 already uses it. Rejected.
+
+== Open questions
+
+* Should section 4 be split off and land first? It is useful on its own, since dynamic code already receives
+  native lambdas.
+* Should section 3 also cover closures coerced with `as F`?
+* Do the GEP-34 changes need to land in the same release as GEP-33, so that no release ships lambdas as
+  implementing closures at sites that later become native?
+
+== References and useful links
+
+* https://groovy.apache.org/wiki/GEP-33.html[GEP-33: Functional Literals for Type-Parameter Slots]
+* https://groovy.apache.org/wiki/GEP-27.html[GEP-27: Compact Closure and Lambda Compilation]
+* https://groovy.apache.org/wiki/GEP-31.html[GEP-31: Realm based dynamic semantics]
+* https://issues.apache.org/jira/browse/GROOVY-12492[GROOVY-12492], https://issues.apache.org/jira/browse/GROOVY-12727[GROOVY-12727],
+  https://issues.apache.org/jira/browse/GROOVY-12823[GROOVY-12823]
+* Java Language Specification: 9.8, 9.9, 15.12.2.2, 15.13.2, 15.27.3, 18.5.2
+
+== Update history
+
+1 (2026-11-25):: Initial draft, from the parts of GEP-33 version 1 that change existing behaviour.
