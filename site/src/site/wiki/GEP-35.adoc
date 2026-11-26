@@ -1,0 +1,170 @@
+= GEP-35: Call Syntax on Functional Values
+
+:icons: font
+
+.Metadata
+****
+[horizontal,options="compact"]
+*Number*:: GEP-35
+*Title*:: Call Syntax on Functional Values
+*Version*:: 1
+*Type*:: Feature
+*Status*:: Draft
+*Target*:: Groovy 7.0
+*Comment*:: Dynamic code can call a native lambda, a method reference or a Groovy coercion proxy with call syntax, `f(x)` or `f.call(x)`, as it calls a closure. Split from GEP-34 version 1; independent of GEP-33, and needed by GEP-34.
+*Leader*:: Paul King
+*Created*:: 2026-11-26
+*Last modification*:: 2026-11-26
+****
+
+[width="80%",align="center"]
+|===
+a| NOTE: _WARNING:_
+Material on this page is still under development!
+This proposal is a draft for discussion. An implementation passes the core test suite; the behaviour table
+comes from running each example on Groovy 6.0.0 and on that implementation.
+|===
+
+== Abstract
+
+Dynamic Groovy calls a closure with `f(x)`. It cannot call a native lambda that way, although dynamic code
+receives native lambdas today: from `Function<String, String> f = s -> s.trim()` under `@CompileStatic`, from
+`String::trim`, and from Java libraries (`Function.identity()`, `Comparator.comparing(..)`). It cannot call a
+Groovy coercion proxy that way either, although `{ it } as Function` is made from a closure.
+
+This GEP lets dynamic code call such a value with `f(args)` or `f.call(args)`, invoking the abstract method of
+its functional interface. No other object becomes callable.
+
+== Motivation
+
+[options="header",cols="3,2,2"]
+|===
+| Dynamic code | Groovy 6.0.0 | This GEP
+| `def f = Function.identity(); f(' a ')` | MissingMethodException | `' a '`
+| `f.call(' a ')` on the same value | MissingMethodException | `' a '`
+| `def p = { it } as Function; p(' a ')` | MissingMethodException | `' a '`
+| a closure, `c(' a ')` | `' a '` | `' a '`
+|===
+
+The gap matters more with GEP-34, which makes statically compiled lambdas native at more sites: without this
+GEP, dynamic code would lose `f()` on every lambda it receives from statically compiled code. It also matters
+on its own, because the values above already exist in Groovy 6 programs, and a user who writes `f(x)` for a
+`Function` gets a message about a missing `call` method.
+
+== Proposal
+
+=== 1. Which values
+
+A *functional value* is:
+
+* a native lambda or method reference: an instance of a class created by `java.lang.invoke.LambdaMetafactory`;
+* a Groovy coercion proxy: a `java.lang.reflect.Proxy` whose invocation handler is Groovy's conversion handler,
+  as `closure as F` and `map as F` create. A proxy class is shared by every proxy for the same interfaces, so
+  this is checked per instance, not per class.
+
+The method called is the single abstract method of the functional interface the value implements, as Groovy's
+closure coercion defines it. Arguments are converted as for any dynamic call; if they do not fit, the call
+fails with MissingMethodException as before.
+
+No other object is a functional value. In particular a `List` (through `Iterable`), a `Thread` or a
+`Runnable`, an `InputStream` (through `AutoCloseable`), a `Comparable`, a `Comparator` that is not a lambda,
+such as `Comparator.naturalOrder()`, and a user class implementing a functional interface keep throwing
+MissingMethodException. A wider rule, "any object implementing exactly one functional interface", made
+`[1, 2]()` return an iterator and `stream()` close the stream, and was rejected for that reason.
+
+=== 2. When the rule applies
+
+The rule runs after everything the MOP already tries, as a last resort before MissingMethodException:
+categories, `methodMissing`, `invokeMethod`, a `call` property, and the outer class of an inner class. So a
+class whose `methodMissing` answers `f(x)` keeps answering it, and the message of a MissingMethodException is
+unchanged for every object that is not a functional value.
+
+The rule applies to call syntax on the value itself: a local variable or a parameter holding it, as `f(x)` and
+`f.call(x)`. It does not apply to `obj.f(x)` where `f` is a property of `obj`
+holding a lambda: that call is a method call on `obj`, and it fails as it does today, while a property holding
+a closure keeps working as it does today. Extending the rule to properties is an open question.
+
+Statically compiled and type-checked code already call a typed functional value through its interface, since
+GROOVY-8466 rewrites call syntax on a receiver whose static type is a functional interface. This GEP changes
+dynamic dispatch only.
+
+=== 3. Performance
+
+The call is bound at the call site by the invokedynamic `Selector`, with guards that keep the binding to the
+receivers it was made for, so a hot `f(x)` does not take the missing-method path on each call.
+
+.Measured with JMH (November 2026)
+[options="header",cols="3,1"]
+|===
+| Call | ns per call
+| dynamic `f(x)` on a native lambda, bound at the call site | 1.04
+| dynamic `f.apply(x)` on the same lambda | 0.90
+| dynamic `c(x)` on a closure | 0.98
+| dynamic `f(x)` on a coercion proxy | 10.8
+| the same call through the meta-class, without the call-site binding | 195
+|===
+
+=== 4. Realms
+
+Whether the rule depends on the caller's realm is decided with GEP-31. Until then it applies to every caller.
+
+== Compatibility
+
+[options="header",cols="3,3,2"]
+|===
+| Change | Who can notice | Kind
+| `f(x)` and `f.call(x)` on a native lambda, method reference or coercion proxy call it | code that tells callable values from others by catching MissingMethodException, as in `try { value(x); 'callable' } catch (MissingMethodException e) { 'not callable' }`, now finds these values callable | behaviour change
+| Nothing else becomes callable | none | —
+|===
+
+No public API is added. The support class is internal.
+
+== Relation to GEP-33 and GEP-34
+
+* GEP-33 does not need this GEP: its implementing closures are closures, and dynamic code calls them as it
+  calls any closure.
+* GEP-34 needs this GEP, so that dynamic code keeps `f()` on the lambdas GEP-34 makes native.
+* Version 1 of GEP-34 proposed closure literals at declared targets as implementing closures, partly so that
+  dynamic `s()` would work on `Supplier<String> s = { 'x' }`. This GEP makes that call work on the proxy instead,
+  without the overload, `grep` and `switch` changes, and GEP-34 version 2 defers that part.
+
+This GEP can land before either of them.
+
+== Work items
+
+. The rule of sections 1 and 2 in the meta-class, after the existing MOP fallbacks.
+. The call-site binding in `Selector`, with guards that are correct for a proxy class shared by proxies with
+  different handlers.
+. Tests: every value kind of section 1, the excluded objects, `methodMissing` and `invokeMethod` precedence,
+  properties, wrong arity, and the indy and non-indy paths.
+. The JMH benchmark in `subprojects/performance`.
+. Documentation: call syntax in the closures and the functional-interfaces chapters; a Groovy 7 compatibility
+  entry.
+
+== Alternatives considered
+
+Call syntax on every functional-interface instance:: Simplest to state, but makes ordinary objects callable
+  (section 1). Rejected.
+Call syntax on every lambda, including through properties:: Makes `obj.f(x)` call a lambda-valued property,
+  as it calls a closure-valued one, but changes which of a class's members answers a call. Left open.
+Convert the value to a closure first:: Allocates per call and loses identity. Rejected.
+
+== Open questions
+
+* Should `obj.f(x)` call a property `f` holding a functional value, as it does for a closure, when `obj` has no
+  method `f` and no `methodMissing`? The same rule decides a map entry: with
+  `Map<String, Function<String, String>> commands`, `commands.shout('hi')` is a MissingMethodException while
+  `commands.shout.call('hi')` works, and the map-of-commands idiom is common with closures.
+* Should this land in 6.x? It changes only calls that fail today, but code that relies on the failure exists.
+
+== References and useful links
+
+* https://groovy.apache.org/wiki/GEP-33.html[GEP-33: Functional Literals for Type-Parameter Slots]
+* https://groovy.apache.org/wiki/GEP-34.html[GEP-34: Native Functional Values]
+* https://groovy.apache.org/wiki/GEP-31.html[GEP-31: Realm based dynamic semantics]
+* https://issues.apache.org/jira/browse/GROOVY-8466[GROOVY-8466]
+
+== Update history
+
+1 (2026-11-26):: Split from section 4 of GEP-34 version 1, with the implementation's rules for properties and
+  the measured call costs.

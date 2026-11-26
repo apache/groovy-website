@@ -7,22 +7,22 @@
 [horizontal,options="compact"]
 *Number*:: GEP-33
 *Title*:: Functional Literals for Type-Parameter Slots
-*Version*:: 2
+*Version*:: 3
 *Type*:: Feature
 *Status*:: Draft
 *Target*:: Groovy 7.0
-*Comment*:: Makes a closure, lambda or method reference that statically compiled code stores in a slot declared with a type parameter, such as `E` of `List.add(E)`, usable through the functional interface the call binds, without removing anything such a value can do in Groovy 6. Settles GROOVY-10979 and GROOVY-12561. The changes that do remove capabilities, in exchange for Java-aligned native lambdas and inference, are in GEP-34.
+*Comment*:: Makes a closure, lambda or method reference that statically compiled code stores in a slot declared with a type parameter, such as `E` of `List.add(E)`, usable through the functional interface the call binds, while keeping what such a value can do in Groovy 6. Settles GROOVY-10979 and GROOVY-12561. Native lambdas and inference from context are in GEP-34; call syntax on lambdas and coercion proxies is in GEP-35.
 *Leader*:: Paul King
 *Created*:: 2026-11-25
-*Last modification*:: 2026-11-25
+*Last modification*:: 2026-11-26
 ****
 
 [width="80%",align="center"]
 |===
 a| NOTE: _WARNING:_
 Material on this page is still under development!
-This proposal is a draft for discussion. The behaviour tables come from probes of Groovy 5.1.3, 6.0.0, master
-and open pull requests in November 2026.
+This proposal is a draft for discussion. The behaviour tables come from running each example on Groovy 5.1.3,
+6.0.0, 6.0.1 (GROOVY_6_0_X with #3359) and a build of this GEP in November 2026.
 |===
 
 == Abstract
@@ -32,20 +32,23 @@ as a plain `Closure`. The type checker accepted the call, but the erasure of `E`
 converts the closure, and a statically compiled `list[0].get()` fails with ClassCastException. Typed lambdas
 passed the same way behave identically, and method references were rejected.
 
-This GEP fixes that by *adding* to what is stored, never by replacing it. A closure literal or lambda written
-for a type-parameter slot that the call binds to a functional interface is compiled as a closure class that
-also implements the interface. The value is still a `Closure`, with call syntax, `delegate`, `curry`, `isCase`,
+This GEP fixes that mainly by *adding* to what is stored. A closure literal or lambda written for a
+type-parameter slot that the call binds to a functional interface is compiled as a closure class that also
+implements the interface. The value is still a `Closure`, with call syntax, `delegate`, `curry`, `isCase`,
 identity and serialization unchanged, and it is now also an instance of the interface. A method reference for
-such a slot is compiled for the interface, as in Groovy 6.0.1. Untyped parameters take their types from the
-interface, so code that failed to compile now compiles.
+such a slot is compiled for the interface, including where only the call's assignment, return, cast or
+enclosing call gives its type. Untyped parameters take their types from the interface.
 
-Every change is one of three kinds: code that did not compile now compiles, a value that failed when read
-through the interface now works, or a new warning. Dynamic and `@TypeChecked` code are unchanged.
+Most changes are additions: code that did not compile now compiles, a value that failed when read through the
+interface now works, or there is a new warning. Two are not, and are listed under <<compatibility>>: an
+untyped parameter can select a different overload, and `@PackedClosures(mode = STRICT)` rejects closures it
+accepted. Dynamic code is compiled as before, but run-time behaviour changes in
+one respect: dynamic code can call the interface's methods on a closure that statically compiled code stored
+(section 2.2).
 
 GEP-34 builds on this to give Groovy Java's model, where a lambda is the same native object wherever it is
-written and the target of a call can come from its context. That brings real benefits and real breaking
-changes, and is proposed separately so each can be judged on its own terms. The section
-<<where-this-leads>> summarises what the two together give.
+written and the target of a call can come from its context. GEP-35 lets dynamic code call native lambdas and
+coercion proxies. The section <<where-this-leads>> summarises what the three together give.
 
 == Motivation
 
@@ -72,29 +75,31 @@ the program means.
 | `list.add(x)`, `list.set(0, x)`, `map.put('k', x)` | closure, *read through F fails* | closure, *read through F fails* | compile error
 | `list << x` | closure, *read through F fails* | closure, *read through F fails* | method closure, *read through F fails*
 | `cond ? x : y` as an argument | closure, *read through F fails* | closure, *read through F fails* | method closure, *read through F fails*
+| `Function f = id(String::trim)`, `take(id(String::trim))` | n/a | n/a | compile error
 | untyped (`it`, `s -> ..`) at the sites above | compile error when the body needs the type | compile error | n/a
 |===
 
 "Read through F fails" means a statically compiled read such as `list[0].get()` throws ClassCastException.
-Dynamic code reading the same value works, because it calls the closure.
+Dynamic code reading the same value with call syntax works, because it calls the closure. Groovy 5.1.3 behaves
+the same, and 6.0.1 differs only in the method reference arguments of #3359 and in `list += x`, below.
 
 === Work since 6.0.0
-
-Several pull requests have improved this area since 6.0.0. This GEP keeps most of them, reshapes some and
-defers one direction to GEP-34:
 
 [options="header",cols="2,3,3"]
 |===
 | Pull request | What it does | Under this GEP
-| #3089 (GROOVY-10979), merged on master and GROOVY_6_0_X | method references for type-parameter slots compiled for the interface; an incubating `groovy.target.lambda.typearg` option to do the same for lambdas; the same for operator operands | method reference arguments kept (shipped in 6.0.1 by #3359). The option is removed: lambdas take the representation of section 2 here, and native lambdas move to GEP-34. The operand path for method references moves to GEP-34
+| #3089 (GROOVY-10979), merged on master | method references for type-parameter slots compiled for the interface; an incubating `groovy.target.lambda.typearg` option to do the same for lambdas; the same for operator operands | method reference arguments kept. The option and the operand path are removed from master: lambdas take the representation of section 2, and native lambdas are GEP-34
 | #3359, GROOVY_6_0_X | 6.0.1 keeps only the method reference arguments of #3089 | kept; this GEP is a superset
-| #3090 (GROOVY-12561), open | closure literals for type-parameter slots implement the interface | the core of section 2; extended to lambdas
+| #3090 (GROOVY-12561), open | closure literals for type-parameter slots implement the interface; dynamic code can call the interface's methods on them | the core of section 2; extended to lambdas. Needs the wrapper rule of section 2.2, and the `@PackedClosures` decision of section 6
 | #3340 (GROOVY-12561), open | the same for operands and conditional arguments | kept
 | #3338 (GROOVY-12824), open | closure parameter types from the interface for operands, conditional and named arguments of SAM-typed parameters | kept
 | #3336 (GROOVY-12822), open | a conditional of lambdas or method references assigned to a functional interface no longer throws GroovyCastException | kept; an independent bug fix, also a 6.0.x candidate
 | #3265 (GROOVY-12727), merged on master | a type argument a lambda or closure needs is taken from the call's assignment, return or cast target | kept
-| #3337 (GROOVY-12823), open | the same for method references | kept
-| #3026 (GROOVY-12492), merged on master | incubating compile-time adapter instead of a runtime proxy for closures with a declared SAM target | unaffected; GEP-34 decides how it relates to closure literals at declared targets
+| #3337 (GROOVY-12823), open | the same for method references: `Function f = id(String::trim)` | kept (section 3); additive, a 6.0.x candidate
+| #3339 (GROOVY-12825), open, stacked on #3337 | a method reference in a generic call that is itself an argument takes its type from the enclosing call's parameter: `take(id(String::trim))` | kept (section 3); additive, a 6.0.x candidate. GEP-34 generalises it and must replace its mechanism rather than add a second one
+| #3246 (GROOVY-12714), merged on master and 6.0.1 | wildcard containment follows JLS 4.5.1 | unaffected. It rejects a closure added to a `List<? super F>`, which this GEP keeps (open question)
+| GROOVY-12748, merged on master and 6.0.1 | keeps the parameter count of an implicit-parameter closure when its call is checked again | makes `list += { .. }` on a `List<F>` a compile error in 6.0.1; this GEP keeps that
+| #3026 (GROOVY-12492), merged on master | incubating compile-time adapter instead of a runtime proxy for closures with a declared SAM target | unaffected
 |===
 
 == Terminology
@@ -109,14 +114,19 @@ Type-parameter slot:: A parameter, operand or property whose declared type is a 
   carries no functional interface.
 Implementing closure:: A closure class that also implements a functional interface, whose abstract method
   calls `doCall`. Written `C+I` in the tables.
+Wrapper closure:: A closure made from another by `andThen`, `>>`, `<<`, `curry`, `rcurry`, `ncurry`,
+  `memoize`, `trampoline` or `asWritable`.
 
 == Design principles
 
-. *Add, never remove.* A value stored at a site that compiled in Groovy 6 keeps every capability it had, and
-  gains the interface. Anything that would remove a capability belongs in GEP-34, where its benefit is argued.
+. *Add, do not remove.* A value stored at a site that compiled in Groovy 6 keeps every capability it had, and
+  gains the interface. The exceptions are listed under <<compatibility>>. Anything that removes a capability in
+  exchange for Java's model belongs in GEP-34, where its benefit is argued.
 . *Literals only.* Only functional literals change. A value that already exists, such as a variable of type
   `Closure`, keeps its identity; converting it needs `as F`.
-. *Static compilation only.* Dynamic and `@TypeChecked` code are compiled as in Groovy 6.
+. *Statically compiled sites only.* Only statically compiled code stores implementing closures. Dynamic and
+  `@TypeChecked` code compile literals as in Groovy 6; the one run-time change is how dynamic code treats an
+  implementing closure it receives (section 2.2).
 . *No options.* The representation does not depend on a system property or build setting.
 
 == Proposal
@@ -128,22 +138,34 @@ the type checker binds the slot's type variable to a functional interface `F`:
 
 * an argument for a type-parameter slot (`list.add(x)`, `list.set(0, x)`, `map.put(k, x)`, varargs, constructor
   arguments);
-* the operand of an operator method whose parameter is a type-parameter slot (`list << x`, `list += x`);
+* the operand of an operator method whose parameter is a type-parameter slot (`list << x`);
 * a subscript or property assignment whose setter or `putAt` parameter is a type-parameter slot
   (`list[0] = x`, `map['k'] = x`, `box.value = x`, `map?['k'] = x`), and a named constructor argument
   (`new Box<F>(value: x)`);
 * a branch of a conditional or elvis expression in any of these positions.
 
 The type variable is bound by the receiver's type arguments, explicit type arguments, the other arguments as
-in Groovy 6, and the call's assignment, return or cast target as GROOVY-12727 already does. This GEP adds no
-new inference.
+in Groovy 6, and the call's assignment, return or cast target as GROOVY-12727 already does. For method
+references only, section 3 adds the enclosing call's parameter.
+
+A slot is *not* targeted when the call leaves its type variable as a type variable of an enclosing method or
+class, as in `<T extends Function<String, String>> void fill(List<T> l) { l.add { .. } }`. The bound is not
+the type of the value: at run time `T` may be a subinterface of the bound, so implementing the bound would only
+move the failure to the readers of `List<Subinterface>`. Section 4 warns at such a slot.
+
+`list += x` is not a targeted site. Since Groovy 6.0.1 it is a compile error, because `plus` infers
+`List<Object>`, which is not a `List<F>`; GEP-34's inference makes it compile.
 
 === 2. Closure literals and lambdas
 
+==== 2.1 Representation
+
 A targeted closure literal or lambda is compiled as an implementing closure:
 
-* the closure class declares the interface's abstract method with its parameterised signature, calling
-  `doCall`; the verifier adds the erasure bridge;
+* the closure class declares the interface's abstract method, and its erasure bridge, with the body a coercion
+  proxy for the closure has: the closure is called with its arguments converted and its exceptions translated as
+  `closure as F` would call it, so a call through the interface behaves as one through the proxy, at about half
+  the proxy's cost per call. Where those methods cannot be declared, the method calls `doCall` directly;
 * the stored value is the closure, so call syntax, `delegate`, `owner`, `curry`, `memoize`, `isCase` (`switch`
   and `grep`), `equals`, identity in `contains` and `remove`, and serialization behave as in Groovy 6;
 * statically compiled reads through the interface (`list[0].get()`) work;
@@ -151,18 +173,53 @@ A targeted closure literal or lambda is compiled as an implementing closure:
   `list.add(s -> s.trim())` compile on a `List<Function<String, String>>`.
 
 A lambda at `list[0] = λ` or `box.value = λ` is already a native lambda in Groovy 6 and stays one: the rule
-applies only where Groovy 6 compiles the lambda as a closure. A lambda is therefore still a closure at some
-sites and a native lambda at others, as it has been since at least Groovy 5. GEP-34 removes that difference.
+applies only where Groovy 6 compiles the lambda as a closure. GEP-34 removes that difference.
 
-In dynamic code, a value passed both to `m(Closure)` and `m(F)` overloads still selects `m(Closure)`, and
-`collect`, `switch` and `grep` treat it as the closure it is. This was checked with #3090.
+==== 2.2 In dynamic code
+
+Dynamic code that receives an implementing closure can call the interface's methods on it, as statically
+compiled code does: its abstract method (`f.apply(x)`), and the default methods it inherits and does not
+override. A method of `Closure` with the same name wins, as it does for any closure: dynamic `f.andThen { .. }`
+selects `Closure#andThen(Closure)`, because the argument is a closure, and returns a composed closure.
+
+A wrapper closure keeps the closure it wraps as its owner, or holds it in a field. Without a rule, a call of
+`apply` on the wrapper would fall through to the wrapped closure and skip the wrapper's own behaviour:
+`f.andThen(up).apply(x)` would run only `f`, and `b.curry('x', 'y').apply(p, q)` would drop the curried
+arguments, with no error. So:
+
+* a wrapper closure answers the abstract method of the interface its wrapped closure implements by calling
+  itself: `f.andThen(up).apply(' a ')` is `up(f(' a '))`, and `b.curry('x').apply('y')` is `b('x', 'y')`;
+* the interface's default methods are not answered by a wrapper, so `g.twice(x)` on a composed closure is a
+  MissingMethodException, as in Groovy 6;
+* a chain of wrappers is followed to the closure that implements the interface.
+
+The wrapper is not an instance of the interface, so this applies to dynamic calls only; a statically compiled
+cast of the wrapper to the interface fails, as in Groovy 6.
+
+Dynamic code does not store implementing closures. The same source compiled dynamically stores a plain closure,
+so `f.apply(x)` works on a value statically compiled code built and is a MissingMethodException on the value
+dynamic code built, where Groovy 6 failed on both.
+
+In dynamic code, a value passed to overloads `m(Closure)` and `m(F)` still selects `m(Closure)`, and
+`collect`, `switch` and `grep` treat it as the closure it is.
 
 === 3. Method references
 
-A targeted method reference *argument* is compiled for the interface, as in Groovy 6.0.1, because Groovy 6.0.0
-rejected it. A method reference *operand* (`list << String::trim`) and a method reference branch of a
-conditional argument were method closures in Groovy 6.0.0; they stay method closures, with the warning of
-section 4. Making them native lambdas removes dynamic call syntax, so it is in GEP-34.
+A targeted method reference *argument* is compiled for the interface, as in Groovy 6.0.1. Its type parameter
+can also come from:
+
+* the assignment, return or cast target of the call it is passed to: `Function<String, String> f =
+  id(String::trim)` (GROOVY-12823, #3337);
+* the parameter of an enclosing call, when the call it is passed to is itself an argument:
+  `take(id(String::trim))`, and through further calls, `take(wrap(id(String::trim)))` (GROOVY-12825, #3339).
+
+Groovy 6.0.0 rejects all of these, so they are additions. This is the only inference this GEP adds, and it is
+limited to method references, which had no representation before; GEP-34 generalises it to every functional
+literal.
+
+A method reference *operand* (`list << String::trim`) and a method reference branch of a conditional argument
+were method closures in Groovy 6.0.0; they stay method closures, with the warning of section 4. Making them
+native lambdas removes the method closure's `Closure` behaviour, so it is in GEP-34.
 
 === 4. What is not converted, and the warnings
 
@@ -170,62 +227,85 @@ A targeted literal that cannot be compiled as an implementing closure is stored 
 checker reports a warning at the `LIKELY_ERRORS` level: "the closure is stored as a Closure, not as F: a
 statically compiled read through F will fail; write 'as F' to convert it". This happens when:
 
-* `Closure` already implements the interface (`Runnable`, `Callable`, `GroovyCallable`);
-* the abstract method's name is a `Closure` method (`call`, `run`, `doCall`, `isCase`, ...), or a default method
-  of the interface clashes with one (`getOwner`, ...);
+* the abstract method's name is a `Closure` method (`call`, `doCall`, `isCase`, `rehydrate`, `dehydrate`, ...),
+  including a generic interface whose erased bridge would override one (`interface Caller<T> { T call(T t) }`),
+  or a default method of the interface clashes with one (`getOwner`, ...);
 * the abstract method has its own type parameters;
 * the target is an abstract class, a trait, a sealed interface, or an interface the closure class cannot
   access;
 * the closure's parameters do not fit the abstract method.
 
+`Runnable`, `Callable` and `GroovyCallable` need no conversion and get no warning: `Closure` already implements
+them, so a read through them works.
+
+A slot whose type is a type variable of the enclosing method or class (section 1) is not targeted, and gets the
+same warning, worded for the type variable. Groovy 6 stores a plain closure there without a word; the value is
+neither the type variable nor its bound, and the failure appears in whichever method reads it.
+
 A value of type `Closure`, a method pointer or a call result in a type-parameter slot is stored as it is, with
 the same warning. Inference of the type variable treats such a value as Groovy 6 does, so
 `pick(function, closureValue)` still infers the common supertype and does not silently choose `F`.
 
-These cases fail today without a word. A warning is chosen over an error because programs that read such
-values only from dynamic code work today, and an error would break them.
+A warning is chosen over an error because programs that read such values only from dynamic code work today.
 
 === 5. Raw targets
 
 For a raw target (`List<Function>`), the interface's parameters are `Object`. A typed closure or lambda is
 compiled as an implementing closure of the raw interface with an unchecked conversion of its arguments, as a
-typed closure for a raw `Function` parameter is today.
+typed closure for a raw `Function` parameter is today. A raw receiver (`List`) binds nothing, so nothing is
+converted.
 
+=== 6. Packed closures
+
+An implementing closure has its own class, so GEP-27 cannot pack it. `@PackedClosures` in its default
+`LENIENT` mode and the `groovy.target.closure.pack` flag leave it unpacked without a word, and `WARN` mode and
+the pack report give the reason. `STRICT` mode reports every closure it cannot pack as a compile error, so code
+that compiled with 6.0 under `STRICT` stops compiling. `STRICT` is opt-in and incubating; this GEP proposes
+that it keeps its contract and that the error message names the interface and suggests `LENIENT`.
+
+[[compatibility]]
 == Compatibility
 
-All changes are under `@CompileStatic`, at the sites of section 1, compared with Groovy 6.0.x:
+All changes are under `@CompileStatic`, at the sites of sections 1 and 3, compared with Groovy 6.0.0. The
+dynamic version of every example behaves as in Groovy 6.0.0.
 
 [options="header",cols="3,3,2"]
 |===
 | Change | Who can notice | Kind
 | A closure literal or lambda stored at a targeted site is also an instance of the interface | `instanceof F` and reflection on the closure class | addition
 | A statically compiled read through the interface works instead of throwing ClassCastException | nobody relies on the exception | fix
-| Untyped closure and lambda parameters at targeted sites take the interface's types | a body that compiled with an `Object` parameter may now select a different overload, such as `foo(String)` over `foo(Object)` | compile-time typing
-| `list + {..}` and `list += λ` on a `List<F>` are reported as an ambiguous `plus` call instead of failing at run time with GroovyCastException | code that compiled but could never run | earlier error
-| A call through a raw view with the wrong argument type fails in the bridge with ClassCastException instead of in the closure | tests pinning exception types | rare
+| Dynamic code can call the interface's methods on such a value; a wrapper closure answers the abstract method by calling itself | code expecting MissingMethodException from `f.apply(x)` | addition
+| Untyped closure and lambda parameters at targeted sites take the interface's types | a body that compiled with an `Object` parameter selects a different overload, such as `describe(String)` over `describe(Object)`, with no message. Dynamic Groovy already selects that one | silent change
+| `@PackedClosures(mode = STRICT)` rejects an implementing closure it cannot pack | builds using `STRICT` on such code | compile error
+| Method references whose type comes from an assignment, return, cast or enclosing call compile | none | addition
 | New `LIKELY_ERRORS` warnings (section 4) | builds that treat warnings as errors | warning
 | Code that failed to compile now compiles (untyped literals, conditional and named arguments) | none | addition
 |===
 
-Dynamic and `@TypeChecked` code are unchanged. No public API is added. The incubating
+`@TypeChecked` code is compiled as before. No public API is added. The incubating
 `CompilerConfiguration.LAMBDA_TYPE_ARGUMENT` constant added on master by #3089 is removed; it was never
 released.
 
 === Groovy 6
 
-Groovy 6.0.1 ships method reference arguments only (#3359). The rest of this GEP is additive and could be
-considered for a later 6.0.x release once it has settled on master; that is left open.
+Groovy 6.0.1 ships method reference arguments only (#3359). The rest of this GEP is not purely additive (see
+above), so it targets 7.0. Three parts are additive bug fixes and are 6.0.x candidates on their own: #3336,
+and #3337 with #3339.
 
 == Work items
 
-. Rebase #3090, #3338 and #3340 on master and review them as the implementation of sections 1, 2 and 4.
+. Review #3090, #3338 and #3340 as the implementation of sections 1, 2 and 4, rebased on master.
+. Add the wrapper rule of section 2.2 to #3090. The implementing closure's interface methods otherwise make
+  `andThen`, `>>`, `<<`, `curry`, `asWritable`, `memoize` and `trampoline` silently skip the wrapper.
 . Extend the implementing-closure path to lambdas that Groovy 6 compiles as closures.
 . Remove the `groovy.target.lambda.typearg` option and the method reference operand path from master, matching
   6.0.1.
-. Add the warnings of section 4 and keep Groovy 6 inference for `Closure` values.
+. Land #3337 and #3339 (section 3), and consider them for 6.0.x.
+. The warnings of section 4, including type-variable slots; no warning for `Runnable` and `Callable`.
+. The `@PackedClosures(mode = STRICT)` message of section 6.
 . Land #3336 independently, and consider it for 6.0.x.
-. A test class over site × literal kind × mode with the expected representation and read behaviour, from the
-  probe matrix.
+. A test class over site × literal kind × static and dynamic compilation with the expected representation and
+  read behaviour, and the same cases checked against javac where Java has them.
 . Documentation: "Method references for a type parameter" in `core-semantics.adoc` becomes "Functional
   literals for a type parameter"; a Groovy 7 compatibility entry.
 
@@ -233,50 +313,63 @@ considered for a later 6.0.x release once it has settled on master; that is left
 == Where this leads
 
 After this GEP, statically compiled code can store closures, lambdas and method references at type-parameter
-slots and read them back through the interface, and nothing that worked in Groovy 6 stops working. Three
-things remain different from Java, and GEP-34 addresses them:
+slots and read them back through the interface, and almost nothing that worked in Groovy 6 stops working. What
+remains different from Java is addressed elsewhere:
 
 * *Two representations of a lambda.* `list[0] = λ` is a native lambda; `list.add(λ)` is an implementing
-  closure. GEP-34 makes every targeted lambda and method reference native, which removes dynamic call syntax
-  and other closure behaviour from those values, and restores call syntax with a narrow runtime rule.
-* *Inference from context.* `Optional.of(String::trim)`, `Arrays.asList(s -> ..)` and nested generic calls
-  still need explicit types where javac infers them.
-* *Coercion proxies at declared targets.* `Supplier<String> s = { 'x' }` still creates a proxy, which is not
-  the closure and is not callable from dynamic code.
-
-GEP-34 sets out the benefits of closing these gaps, the breaking changes they need, and how users can find
-affected code.
+  closure. GEP-34 makes every targeted lambda and method reference native.
+* *Inference from context.* Lambdas and closures still need explicit types where javac infers them, as in
+  `Arrays.asList(s -> ..)` and `List<F> l = [λ]`. GEP-34 generalises section 3 to every functional literal.
+* *Calling native lambdas and proxies from dynamic code.* `f(x)` fails on a native lambda, which dynamic code
+  already receives from `F f = λ` and from Java libraries, and on a coercion proxy. GEP-35 adds call syntax
+  for both, and is independent of this GEP and of GEP-34.
 
 == Alternatives considered
 
 Native lambdas now (version 1 of this GEP):: Gives Java's representation at once, but removes call syntax and
-  closure behaviour from values that dynamic code reads today, and needs a runtime rule to restore call syntax.
-  The adversarial review of version 1 found that rule hard to scope safely. Moved to GEP-34.
+  closure behaviour from values that dynamic code reads today. Moved to GEP-34, with call syntax in GEP-35.
 Keep the 6.0 option:: Lambdas native only under a JVM system property, so the representation depends on the
   build. Rejected.
 Convert values as well as literals:: A new proxy per conversion breaks `contains`, `remove` and `equals` on the
   stored value. Rejected.
-Coerce at the read site:: Statically compiled reads would coerce a closure taken from an erased slot. Covers
-  values, but allocates per read and changes every generic-return cast. Left open.
+Coerce at the read site:: A statically compiled read of an erased slot whose static type is a functional
+  interface would convert a `Closure` found there, leaving the stored value as in Groovy 6. Weaker than this GEP:
+  `instanceof F` stays false, Java readers still fail, and a read converts each time unless the conversion is
+  cached per closure. It is the agreed fallback if implementing closures are not accepted, and could sit behind an
+  incubating flag safely: only the reading code changes, so libraries compiled with and without it hand out the
+  same values.
+Call `doCall` directly from the interface method:: About twice as fast per call as the proxy-equivalent body,
+  but a wrong argument through a raw view then fails with ClassCastException in the bridge instead of Groovy 6's
+  MissingMethodException. Neither form honours a metaclass that intercepts the closure on that path. Rejected.
+Implement the bound at a type-variable slot:: Moves the failure from readers of the bound to readers of a
+  subinterface, with no gain. Rejected in favour of the warning.
+A wrapper answers nothing:: Restores Groovy 6's MissingMethodException for `apply` on a wrapper. Consistent,
+  but leaves `f.andThen(up).apply(x)` failing where statically compiled code composing through `Function`
+  works. Rejected in favour of section 2.2.
 A compile error instead of the section 4 warning:: Sound, but breaks programs that read such values only from
-  dynamic code. Could be added later under a strict mode.
+  dynamic code. Could be added later under a strict mode; GEP-34 makes it an error for lambdas, as javac does.
 
 == Open questions
 
-* Should `@TypeChecked` code also store implementing closures? It is compiled dynamically, so this needs the
-  dynamic closure writer to add the interface.
-* Should the rest of this GEP be offered in a 6.0.x release?
+* Should a closure literal added to a `List<? super F>` be accepted as an implementing closure of `F`? Since
+  GROOVY-12714 it is a compile error, because a `Closure` is not an `F`. An implementing closure is an `F`, so
+  accepting it is sound, as Java accepts an anonymous class there.
+* Should `@PackedClosures(mode = STRICT)` exempt closures that are unpacked only because they implement an
+  interface, so that section 6 is not a break?
 
 == References and useful links
 
 * https://issues.apache.org/jira/browse/GROOVY-10979[GROOVY-10979], https://issues.apache.org/jira/browse/GROOVY-12561[GROOVY-12561],
-  https://issues.apache.org/jira/browse/GROOVY-12727[GROOVY-12727], https://issues.apache.org/jira/browse/GROOVY-12822[GROOVY-12822],
-  https://issues.apache.org/jira/browse/GROOVY-12823[GROOVY-12823], https://issues.apache.org/jira/browse/GROOVY-12824[GROOVY-12824]
+  https://issues.apache.org/jira/browse/GROOVY-12714[GROOVY-12714], https://issues.apache.org/jira/browse/GROOVY-12727[GROOVY-12727],
+  https://issues.apache.org/jira/browse/GROOVY-12748[GROOVY-12748], https://issues.apache.org/jira/browse/GROOVY-12822[GROOVY-12822],
+  https://issues.apache.org/jira/browse/GROOVY-12823[GROOVY-12823], https://issues.apache.org/jira/browse/GROOVY-12824[GROOVY-12824],
+  https://issues.apache.org/jira/browse/GROOVY-12825[GROOVY-12825]
 * Pull requests https://github.com/apache/groovy/pull/3089[#3089], https://github.com/apache/groovy/pull/3090[#3090],
   https://github.com/apache/groovy/pull/3336[#3336], https://github.com/apache/groovy/pull/3337[#3337],
-  https://github.com/apache/groovy/pull/3338[#3338], https://github.com/apache/groovy/pull/3340[#3340],
-  https://github.com/apache/groovy/pull/3359[#3359]
+  https://github.com/apache/groovy/pull/3338[#3338], https://github.com/apache/groovy/pull/3339[#3339],
+  https://github.com/apache/groovy/pull/3340[#3340], https://github.com/apache/groovy/pull/3359[#3359]
 * https://groovy.apache.org/wiki/GEP-34.html[GEP-34: Native Functional Values]
+* https://groovy.apache.org/wiki/GEP-35.html[GEP-35: Call Syntax on Functional Values]
 * https://groovy.apache.org/wiki/GEP-27.html[GEP-27: Compact Closure and Lambda Compilation]
 
 == Update history
@@ -284,3 +377,10 @@ A compile error instead of the section 4 warning:: Sound, but breaks programs th
 1 (2026-11-25):: Initial draft, covering native lambdas, context inference and runtime call syntax.
 2 (2026-11-25):: Reduced to the additive core after an adversarial review; native lambdas, context inference
   and runtime call syntax moved to GEP-34.
+3 (2026-11-26):: Corrected from running every example on 5.1.3, 6.0.0, 6.0.1 and a build of this GEP: the three
+  changes that are not additions are listed; `list += x` is no longer a targeted site; the run-time behaviour
+  of implementing closures in dynamic code is specified, with the wrapper-closure rule; method references take
+  their type from an assignment, return, cast or enclosing call (#3337, #3339); type-variable slots are not
+  targeted and warn; `Runnable` and `Callable` do not warn; packed closures; call syntax for lambdas and proxies
+  moved to GEP-35. The interface method calls the closure as a coercion proxy would, so a wrong argument is a
+  MissingMethodException as in Groovy 6; read-site coercion is the fallback.
