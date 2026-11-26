@@ -7,14 +7,14 @@
 [horizontal,options="compact"]
 *Number*:: GEP-33
 *Title*:: Functional Literals for Type-Parameter Slots
-*Version*:: 3
+*Version*:: 4
 *Type*:: Feature
 *Status*:: Draft
 *Target*:: Groovy 7.0
 *Comment*:: Makes a closure, lambda or method reference that statically compiled code stores in a slot declared with a type parameter, such as `E` of `List.add(E)`, usable through the functional interface the call binds, while keeping what such a value can do in Groovy 6. Settles GROOVY-10979 and GROOVY-12561. Native lambdas and inference from context are in GEP-34; call syntax on lambdas and coercion proxies is in GEP-35.
 *Leader*:: Paul King
 *Created*:: 2026-11-25
-*Last modification*:: 2026-11-26
+*Last modification*:: 2026-11-27
 ****
 
 [width="80%",align="center"]
@@ -196,6 +196,19 @@ arguments, with no error. So:
 The wrapper is not an instance of the interface, so this applies to dynamic calls only; a statically compiled
 cast of the wrapper to the interface fails, as in Groovy 6.
 
+The interface's parameter types are checked where the value is used through the interface, and only there:
+
+* statically compiled and type-checked code see the slot's type, `F`, so a wrong argument to `l[0].call(x)` or
+  to the interface's method is a compile error, and `l[0]` cannot be returned or assigned as a `Closure`
+  without a cast;
+* a call through the interface's method, from any code, converts its arguments as a coercion proxy does, so a
+  wrong argument is a MissingMethodException. For a generic interface the check is against the erased
+  signature, as for a native lambda (GEP-35, section 1);
+* through the `Closure` view, which dynamic code has and statically compiled code has after a cast, the value
+  is a closure like any other: `call(Object...)` takes any arguments, and a wrong one fails in the closure body,
+  with ClassCastException where the parameter type came from the interface. `Closure<V>` types only the result,
+  as in Groovy 6.
+
 Dynamic code does not store implementing closures. The same source compiled dynamically stores a plain closure,
 so `f.apply(x)` works on a value statically compiled code built and is a MissingMethodException on the value
 dynamic code built, where Groovy 6 failed on both.
@@ -356,6 +369,11 @@ A compile error instead of the section 4 warning:: Sound, but breaks programs th
   accepting it is sound, as Java accepts an anonymous class there.
 * Should `@PackedClosures(mode = STRICT)` exempt closures that are unpacked only because they implement an
   interface, so that section 6 is not a break?
+* Should a wrong argument through the `Closure` view of an implementing closure be a MissingMethodException at
+  the call, as it is through the interface, rather than a ClassCastException in the body? That needs `doCall` to
+  declare the interface's parameter types, which changes how the closure takes arguments in dynamic code. The
+  ClassCastException matches what a native lambda for a generic interface does (GEP-35, section 1), so the
+  current proposal keeps it.
 
 == References and useful links
 
@@ -384,3 +402,5 @@ A compile error instead of the section 4 warning:: Sound, but breaks programs th
   targeted and warn; `Runnable` and `Callable` do not warn; packed closures; call syntax for lambdas and proxies
   moved to GEP-35. The interface method calls the closure as a coercion proxy would, so a wrong argument is a
   MissingMethodException as in Groovy 6; read-site coercion is the fallback.
+4 (2026-11-27):: Section 2.2 states where the interface's parameter types are checked: by the static type, by a
+  call through the interface, and not through the `Closure` view; an open question on the `Closure` view.

@@ -7,14 +7,14 @@
 [horizontal,options="compact"]
 *Number*:: GEP-35
 *Title*:: Call Syntax on Functional Values
-*Version*:: 1
+*Version*:: 2
 *Type*:: Feature
 *Status*:: Draft
 *Target*:: Groovy 7.0
 *Comment*:: Dynamic code can call a native lambda, a method reference or a Groovy coercion proxy with call syntax, `f(x)` or `f.call(x)`, as it calls a closure. Split from GEP-34 version 1; independent of GEP-33, and needed by GEP-34.
 *Leader*:: Paul King
 *Created*:: 2026-11-26
-*Last modification*:: 2026-11-26
+*Last modification*:: 2026-11-27
 ****
 
 [width="80%",align="center"]
@@ -46,6 +46,12 @@ its functional interface. No other object becomes callable.
 | a closure, `c(' a ')` | `' a '` | `' a '`
 |===
 
+Groovy 6.0.0 already calls the abstract method in one case: a local variable declared with the functional
+interface type, as in `StringTransform t = { .. }` for `interface StringTransform { String transform(String s) }`.
+There `t(x)` and `t.call(x)` call `transform`, converting the argument to the parameter type as a cast does, so
+`t.call(1)` passes `'1'`. That is unchanged by this GEP, and it is more lenient than the rule below, which
+rejects `1` for a `String` parameter. The table's values are held in untyped variables, where 6.0.0 fails.
+
 The gap matters more with GEP-34, which makes statically compiled lambdas native at more sites: without this
 GEP, dynamic code would lose `f()` on every lambda it receives from statically compiled code. It also matters
 on its own, because the values above already exist in Groovy 6 programs, and a user who writes `f(x)` for a
@@ -64,7 +70,16 @@ A *functional value* is:
 
 The method called is the single abstract method of the functional interface the value implements, as Groovy's
 closure coercion defines it. Arguments are converted as for any dynamic call; if they do not fit, the call
-fails with MissingMethodException as before.
+fails with MissingMethodException as before. So `f.call(x)` accepts exactly the arguments that a dynamic call of
+the abstract method itself accepts, and no others.
+
+The check is against the method's erased signature, since that is all the value carries at run time. For a
+non-generic interface such as `StringTransform`, `t.call(1)` is a MissingMethodException, as `t.transform(1)` is.
+For a generic one such as `Function<String, String>`, the method is `apply(Object)`, so `f.call(1)` reaches the
+lambda and fails there with ClassCastException, as `f.apply(1)` does in Groovy 6 and as a raw call does in Java.
+Only the static type can check the type arguments: statically compiled and type-checked code reject `f.call(1)`
+for a `Function<String, String>`, and a value whose static type is the interface cannot be returned or
+assigned as a `Closure` without a cast.
 
 No other object is a functional value. In particular a `List` (through `Iterable`), a `Thread` or a
 `Runnable`, an `InputStream` (through `AutoCloseable`), a `Comparable`, a `Comparator` that is not a lambda,
@@ -168,3 +183,6 @@ Convert the value to a closure first:: Allocates per call and loses identity. Re
 
 1 (2026-11-26):: Split from section 4 of GEP-34 version 1, with the implementation's rules for properties and
   the measured call costs.
+2 (2026-11-27):: Section 1 states which arguments `f.call(x)` accepts, and that a generic interface is checked
+  against its erased signature. Motivation notes the typed-local case where Groovy 6.0.0 already calls the
+  abstract method.
