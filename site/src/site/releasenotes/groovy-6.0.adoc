@@ -6084,9 +6084,6 @@ https://issues.apache.org/jira/browse/GROOVY-12470[GROOVY-12470]).
 * *A call from an inner class to an inherited outer method uses the nearest
 enclosing instance*
 (https://issues.apache.org/jira/browse/GROOVY-12574[GROOVY-12574]).
-* *A value written to a typed map is converted to the map's value type*:
-`m.k = "$name"` on a `Map<String,String>` stores a `String`
-(https://issues.apache.org/jira/browse/GROOVY-12535[GROOVY-12535]).
 * *`toString()`, `hashCode()`, `equals()` and `getClass()` in closures and
 lambdas use the enclosing object*, as dynamic Groovy does
 (https://issues.apache.org/jira/browse/GROOVY-12576[GROOVY-12576],
