@@ -5888,6 +5888,33 @@ class loader) a compile error instead of an `IllegalAccessError` at run time;
 `CompilerConfiguration.RUNTIME_PACKAGE_CHECK` -- see
 <<Groovy6.0.1-breaking,Breaking changes in 6.0.1>>).
 | https://issues.apache.org/jira/browse/GROOVY-12568[GROOVY-12568]
+
+| `groovy.frame.computation.max.bytes`
+| unlimited
+| _Since 6.0.1_: the most memory, in bytes, the compiler may allocate while
+computing the stack map frames of one method
+(`CompilerConfiguration.setFrameComputationMaxBytes`).
+| https://issues.apache.org/jira/browse/GROOVY-12465[GROOVY-12465]
+
+| `groovy.frame.computation.max.operations`
+| unlimited
+| _Since 6.0.1_: the most operations the compiler may spend computing the
+stack map frames of one method
+(`CompilerConfiguration.setFrameComputationMaxOperations`).
+| https://issues.apache.org/jira/browse/GROOVY-12465[GROOVY-12465]
+
+| `groovy.resolve.default.package.first`
+| `false`
+| _Since 6.0.1_: `true` looks up a compiled class of the default package
+before the default imports, so an incremental build resolves such a name as
+a full build does.
+| https://issues.apache.org/jira/browse/GROOVY-12555[GROOVY-12555]
+
+| `groovy.resolve.default.package.sources`
+| `false`
+| _Since 6.0.1_: with `groovy.resolve.default.package.first`, `true` also
+takes sources and already loaded classes into that lookup.
+| https://issues.apache.org/jira/browse/GROOVY-12555[GROOVY-12555]
 |===
 
 NOTE: The `SqlInjectionChecker` compile-time check
@@ -5923,122 +5950,279 @@ assignment: `def (result, nanos) = System.timed { ... }`
 (https://issues.apache.org/jira/browse/GROOVY-12450[GROOVY-12450]).
 * *Async channels can be closed with a failure (incubating).*
 `AsyncChannel.close(Throwable)` closes a channel so that `for await` throws
-that failure after the values already sent, rather than ending normally, and
-`receive` and `send` fail with a `ChannelClosedException` whose cause is that
-failure. `getCloseCause()` returns it, and `BroadcastChannel` supports the
-same. The new `AsyncChannel.produce` runs a producer body that closes the
-channel when it returns, or with the failure when it throws, so a failing
-producer no longer leaves the consumer waiting forever
+that failure after the values already sent, and `getCloseCause()` returns it;
+`BroadcastChannel` supports the same. The new `AsyncChannel.produce` closes
+the channel when its producer body returns, or with the failure when it
+throws
 (https://issues.apache.org/jira/browse/GROOVY-12459[GROOVY-12459]).
+* *`Awaitable.all`, `any`, `first` and `allSettled` accept one collection*
+of sources, such as the list `collect` returns, as well as separate arguments
+(https://issues.apache.org/jira/browse/GROOVY-12721[GROOVY-12721]).
+* *No-argument parallel forms (incubating).* `sumParallel()`,
+`minParallel()`, `maxParallel()`, `findAllParallel()`, `findParallel()`,
+`grepParallel()`, `anyParallel()`, `everyParallel()` and
+`collectManyParallel()` behave as their sequential namesakes
+(https://issues.apache.org/jira/browse/GROOVY-12722[GROOVY-12722]).
+* *`return`, `break` and `continue` in the arrow arms of a switch
+statement*, as in Java
+(https://issues.apache.org/jira/browse/GROOVY-12478[GROOVY-12478]), and a
+switch statement may end with an empty `case` or `default`
+(https://issues.apache.org/jira/browse/GROOVY-11617[GROOVY-11617]).
+* *A method reference passed for a type parameter is compiled statically.*
+Under `@CompileStatic`, a method reference given for a parameter declared
+with a type parameter, such as `E` of `List.add(E)`, is compiled for the
+functional interface the call binds it to, where 6.0.0 rejected it
+(https://issues.apache.org/jira/browse/GROOVY-10979[GROOVY-10979]).
+* *`groovy-http-builder` compression.* `compression true` in the builder
+sends `Accept-Encoding: gzip, deflate`, and a buffered response body sent
+with a `gzip` or `deflate` `Content-Encoding` is decoded
+(https://issues.apache.org/jira/browse/GROOVY-12582[GROOVY-12582]).
+* *Default Grape timeouts.* The default `grapeConfig.xml` sets a 30 second
+connection timeout and a 60 second read timeout, so a stalled download no
+longer hangs `@Grab` forever
+(https://issues.apache.org/jira/browse/GROOVY-12640[GROOVY-12640]).
+* *Optional ServiceLoader mediator in OSGi manifests.* Modules with
+`META-INF/services` entries now resolve without a mediator such as Aries SPI
+Fly
+(https://issues.apache.org/jira/browse/GROOVY-12690[GROOVY-12690]).
+* *Compiler configuration.* `CompilerConfiguration.JDK28` is a recognised
+target bytecode, ASM is 9.11.1, and the new frame computation limits
+(`groovy.frame.computation.max.bytes` and
+`groovy.frame.computation.max.operations`, unlimited by default) bound the
+memory and work spent computing a method's stack map frames
+(https://issues.apache.org/jira/browse/GROOVY-12465[GROOVY-12465]). The
+opt-in options `groovy.resolve.default.package.first` and
+`groovy.resolve.default.package.sources` look up a default-package class
+before the default imports, so an incremental build resolves such a name as
+a full build does
+(https://issues.apache.org/jira/browse/GROOVY-12555[GROOVY-12555]).
+* *`GroovyCodeSource.setNameGenerated` and `isNameGenerated`* tell a name
+Groovy chose for a script from one the caller supplied (part of
+https://issues.apache.org/jira/browse/GROOVY-8113[GROOVY-8113], see below).
 
 [[Groovy6.0.1-breaking]]
 === Breaking changes
 
-The following fixes change behaviour that existing code may depend on.
-Most of them correct results that were wrong before.
+Code that compiled and ran with 6.0.0 can fail to compile, throw, or give a
+different result with 6.0.1 in the cases below. Most of them correct results
+that were wrong before.
 https://github.com/apache/groovy/blob/GROOVY_6_0_X/COMPATIBILITY.md[COMPATIBILITY.md]
-has the detail for each.
+has an entry for each, in the same order, with what to change.
 
-* *`abs()` on a `Number` receiver keeps the number's precision.*
-`DefaultGroovyMethods.abs(Number)` returned `int`, truncating `Long`,
-`BigInteger`, `BigDecimal` and floating-point values, which `@CompileStatic`
-code with a `Number`-typed receiver always reached. It now returns `Number`,
-and new `abs(Integer)`, `abs(Short)` and `abs(Byte)` overloads keep `int`.
-`int x = n.abs()` with `n` a `Number` is now a type-checking error under
-`@CompileStatic`, and so is the same assignment from Java; use `.intValue()`
-where the narrowing is intended. Classes compiled against 6.0.0 still link
-(https://issues.apache.org/jira/browse/GROOVY-12471[GROOVY-12471]).
-* *Statically compiled variables declared wider than their initializer's
-generic type keep the value.* `CharSequence cs = list.get(0)` with `list` a
-`List<String>` converted the element to a `String` at the declaration. The
-variable now holds the value unchanged, as in dynamic Groovy and Java, so for
-a `GString` element `cs.equals('ab')` and `cs instanceof String` are false
-(`cs == 'ab'` is still true)
-(https://issues.apache.org/jira/browse/GROOVY-12469[GROOVY-12469]).
-* *Enum constants with literal arguments are created without the meta
-class*, as constants without arguments already were. A meta class or
-`ExpandoMetaClass` constructor registered for such an enum before it
-initializes no longer sees the constants being created
-(https://issues.apache.org/jira/browse/GROOVY-12490[GROOVY-12490]).
-* *`super.x = v` calls a setter of the superclass when it has several.* It
-called the class's own `setX`, so an overriding setter that delegated with
-`super.x = v` recursed until a `StackOverflowError`. Use `this.x = v` where
-the class's own setter is wanted
-(https://issues.apache.org/jira/browse/GROOVY-12521[GROOVY-12521]).
-* *A default `setProperty` or `getProperty` from another interface receives
-every access.* Property writes and computed-name reads used to bypass such a
-method and go to the metaclass. They now reach it, as for a method the class
-declares; for example, `other.secret = v` writing a private field of a
-superclass now fails as the read already did. Use `other.@secret = v` where
-direct field access is intended
-(https://issues.apache.org/jira/browse/GROOVY-12489[GROOVY-12489]).
-* *`>` and `>=` with a primitive NaN operand are false*, as in Java. They
-were `true` when both operands were primitive `double` or `float`. Use
-`Double.isNaN` where NaN needs handling of its own
-(https://issues.apache.org/jira/browse/GROOVY-12538[GROOVY-12538]).
-* *Statically compiled constructor references call the constructor
-directly.* `X::new` under `@CompileStatic` selected the constructor at run
-time through the meta-class. It is now selected at compile time from the
-functional interface's parameter types, as in Java, which can choose a
-different overload, and a constructor added through `ExpandoMetaClass` is no
-longer used
-(https://issues.apache.org/jira/browse/GROOVY-12488[GROOVY-12488]).
-* *Statically compiled code in a `GroovyShell` reports what the JVM refuses
-across class loaders.* A protected or package-private member of a class from
-an earlier `GroovyShell` parse, or a precompiled class used by a script, is in
-another run-time package even with the same package name. `@CompileStatic`
-code accessing one compiled and then failed with `IllegalAccessError`; it is
-now a compile error suggesting `@CompileDynamic`. Set
-`-Dgroovy.runtime.package.check=false`, or the new
-`CompilerConfiguration.RUNTIME_PACKAGE_CHECK` option, to keep the failure at
-run time
-(https://issues.apache.org/jira/browse/GROOVY-12568[GROOVY-12568]).
-* *Type checking rejects a call to a property accessor that is not
-generated*, such as `isName()` for a `String` property. It used to compile
-and then fail at run time, or reach `methodMissing` under `@TypeChecked`
+==== Parsing and statements
+
+* *`await(x).m()` applies `.m()` to the awaited value*, and `await` at the
+end of a line no longer takes the next line as its operand (incubating;
+https://issues.apache.org/jira/browse/GROOVY-12831[GROOVY-12831],
+https://issues.apache.org/jira/browse/GROOVY-12832[GROOVY-12832]). A cast in
+front of `await` or `async` now applies to the keyword
+(https://issues.apache.org/jira/browse/GROOVY-12715[GROOVY-12715]).
+* *An early `yield` leaves a statement-position arrow `switch`*, where the
+rest of the arm used to run
+(https://issues.apache.org/jira/browse/GROOVY-12478[GROOVY-12478]).
+* *Multiple assignments in a script with an instance `main` or `run` method
+are kept*: a rest binding gets the rest, and a non-literal right-hand side
+is no longer dropped with the declarations after it
+(https://issues.apache.org/jira/browse/GROOVY-12790[GROOVY-12790]).
+
+==== Static type checking rejects more code
+
+* *Wildcard containment follows JLS 4.5.1*, so code that could pollute a
+collection, or that `javac` rejects, no longer type checks
+(https://issues.apache.org/jira/browse/GROOVY-12714[GROOVY-12714]).
+* *A call to a property accessor that is not generated*, such as `isName()`
+for a `String` property, is a compile error
 (https://issues.apache.org/jira/browse/GROOVY-12525[GROOVY-12525]).
-* *The receiver of a compound-assigned or incremented property is evaluated
-once.* `obj().v += 2` and `obj().v++` evaluated `obj()` twice, so a receiver
-with side effects, or one returning a new object each time such as
-`iterator.next().v += 1`, now behaves differently
-(https://issues.apache.org/jira/browse/GROOVY-12619[GROOVY-12619]).
-* *`@CompileStatic` property and spread results on collections match dynamic
-Groovy.* A property that a `List`, `Set` or other `Iterable` type defines, or
-gets from an extension method, is read from the collection, and an explicit
-spread (`people*.name`) reads or writes it on each element. Code that relied
-on the previous, wrong, statically compiled results gets different results
-once recompiled
+* *Static method and constructor calls through an inaccessible type* are
+compile errors
+(https://issues.apache.org/jira/browse/GROOVY-12484[GROOVY-12484]).
+* *`instanceof` narrowing in a `switch` case no longer reaches later cases*
+(https://issues.apache.org/jira/browse/GROOVY-12428[GROOVY-12428]).
+* *A `Closure<R>` value used as a SAM type has its `R` checked*, so a
+`Closure<Integer>` passed for a `Supplier<String>` no longer compiles
+(https://issues.apache.org/jira/browse/GROOVY-12599[GROOVY-12599]).
+* *Statically compiled code in a `GroovyShell` reports what the JVM refuses
+across class loaders*: a protected or package-private member or class of an
+earlier parse is a compile error rather than an `IllegalAccessError`, even on
+a path that never runs. `-Dgroovy.runtime.package.check=false` keeps the run
+time failure
+(https://issues.apache.org/jira/browse/GROOVY-12568[GROOVY-12568],
+https://issues.apache.org/jira/browse/GROOVY-12569[GROOVY-12569]).
+* *`Iface.super.m()` and protected members of another package* that the JVM
+refuses are compile errors, which also catches such code on a path that never
+runs
+(https://issues.apache.org/jira/browse/GROOVY-12526[GROOVY-12526],
+https://issues.apache.org/jira/browse/GROOVY-12717[GROOVY-12717]).
+
+==== Static compilation gives different results
+
+* *A variable declared wider than its initializer's generic type keeps the
+value*, so a `GString` element is no longer converted to a `String`
+(https://issues.apache.org/jira/browse/GROOVY-12469[GROOVY-12469]).
+* *Instance initializer blocks are statically compiled* again, as in
+Groovy 4, so overloads are chosen from static types there
+(https://issues.apache.org/jira/browse/GROOVY-12761[GROOVY-12761]).
+* *Constructor references call the constructor directly*, chosen at compile
+time from the functional interface's parameter types
+(https://issues.apache.org/jira/browse/GROOVY-12488[GROOVY-12488]).
+* *Property and spread results on collections match dynamic Groovy*
 (https://issues.apache.org/jira/browse/GROOVY-12534[GROOVY-12534],
 https://issues.apache.org/jira/browse/GROOVY-12649[GROOVY-12649]).
-* *Closure wrappers report and take the delegation settings of the closure
-they wrap.* The closures returned by `memoize()`, `trampoline()`, `curry()`,
-composition and `asWritable()` now report the wrapped closure's
-`thisObject`, and a delegate or resolve strategy set on a memoized or
-trampolined closure now takes effect, on the wrapped closure too. Call
-`clone()` first for independent settings
-(https://issues.apache.org/jira/browse/GROOVY-12673[GROOVY-12673]). The
-same applies to `wrapAsync` and `wrapAsyncGenerator` closures (incubating),
-which are now named classes, so one serialized by 6.0.0 does not deserialize
-in 6.0.1
-(https://issues.apache.org/jira/browse/GROOVY-12679[GROOVY-12679]).
-* *A method call in a closure skips a null owner or delegate.* After
-`dehydrate()`, `rehydrate` with a null argument or `delegate = null`, an
-implicit-this method call threw `NullPointerException`; it now goes to the
-other of owner and delegate, or, with neither, runs a method of the closure
-itself (`toString()`, `with`, `tap`) on the closure and throws
-`MissingMethodException` for any other method. In 6.0.0, `toString()` and
-`with` ran against `null` there. Property access is unchanged
-(https://issues.apache.org/jira/browse/GROOVY-12667[GROOVY-12667]).
-* *`@IndexedProperty` adds no indexed setter to a record*, or to a property
-of a `@RecordType` or `@RecordBase` class, as records have no other setters.
-Code calling `setX(int, V)` on such a record no longer compiles under static
-compilation or Java, and fails with `MissingMethodException` in dynamic code
-(https://issues.apache.org/jira/browse/GROOVY-12730[GROOVY-12730]).
-* *A value written to a typed map is converted to the map's value type*
-under `@TypeChecked` and `@CompileStatic`: `m.k = "$name"` on a
-`Map<String,String>` stores a `String`, and `m['k'] = "$name"`, which was
-rejected, now compiles and does the same. An `Integer` written to a
-`Map<String,Long>` is stored as a `Long`. Code that read the value back as a
-`GString`, or relied on it keeping its own type, sees the declared type.
-`-Dgroovy.classtag.preemption.disable=true` keeps the previous behaviour
+* *`toString()` and `super.toString()` on a collection or map use the class's
+own `toString()`* where dynamic Groovy does, so a `CopyOnWriteArrayList`
+prints `[{k=1}]` rather than `[[k:1]]`
+(https://issues.apache.org/jira/browse/GROOVY-12476[GROOVY-12476],
+https://issues.apache.org/jira/browse/GROOVY-12470[GROOVY-12470]).
+* *A multiple assignment from a list literal has the list as its value*
+(https://issues.apache.org/jira/browse/GROOVY-12700[GROOVY-12700]).
+* *A static member reached through an expression evaluates it*, as in Java:
+`make().CONST` now calls `make()`
+(https://issues.apache.org/jira/browse/GROOVY-12479[GROOVY-12479]).
+* *`<=>` of operands of different types compares as dynamic Groovy does*:
+`0 <=> 4294967296L` is `-1`, not `0`
+(https://issues.apache.org/jira/browse/GROOVY-12560[GROOVY-12560]).
+* *A call from an inner class to an inherited outer method uses the nearest
+enclosing instance*
+(https://issues.apache.org/jira/browse/GROOVY-12574[GROOVY-12574]).
+* *A value written to a typed map is converted to the map's value type*:
+`m.k = "$name"` on a `Map<String,String>` stores a `String`
 (https://issues.apache.org/jira/browse/GROOVY-12535[GROOVY-12535]).
+* *`toString()`, `hashCode()`, `equals()` and `getClass()` in closures and
+lambdas use the enclosing object*, as dynamic Groovy does
+(https://issues.apache.org/jira/browse/GROOVY-12576[GROOVY-12576],
+https://issues.apache.org/jira/browse/GROOVY-12826[GROOVY-12826]).
+
+==== Dynamic dispatch and properties
+
+* *Overload selection prefers `double` over `float` for `BigDecimal` and
+`BigInteger` arguments*, fixing a silent narrowing since 4.0.4
+(https://issues.apache.org/jira/browse/GROOVY-12439[GROOVY-12439]).
+* *`super.x = v` calls a setter of the superclass when it has several*
+(https://issues.apache.org/jira/browse/GROOVY-12521[GROOVY-12521]), and
+*`super.x` reads through `isX()`* when the class overrides it
+(https://issues.apache.org/jira/browse/GROOVY-12520[GROOVY-12520]).
+* *`super.name()` in a closure, and `Outer.super.name()`, call the inherited
+method* rather than skipping a level
+(https://issues.apache.org/jira/browse/GROOVY-12592[GROOVY-12592]).
+* *A default `setProperty` or `getProperty` from another interface receives
+every access*
+(https://issues.apache.org/jira/browse/GROOVY-12489[GROOVY-12489]).
+* *`>` and `>=` with a primitive NaN operand are false*, as in Java
+(https://issues.apache.org/jira/browse/GROOVY-12538[GROOVY-12538]).
+* *The receiver, index and operand of a compound assignment or increment are
+evaluated once*
+(https://issues.apache.org/jira/browse/GROOVY-12619[GROOVY-12619],
+https://issues.apache.org/jira/browse/GROOVY-12622[GROOVY-12622],
+https://issues.apache.org/jira/browse/GROOVY-12613[GROOVY-12613]).
+* *A call site re-links when the metaclass a proxy shares with another class
+changes*, as in Groovy 5
+(https://issues.apache.org/jira/browse/GROOVY-12558[GROOVY-12558]).
+* *`ClassInfo.remove` keeps a class's Groovy methods and drops the
+metaclasses set for it*
+(https://issues.apache.org/jira/browse/GROOVY-12580[GROOVY-12580]).
+* *Enum constants with literal arguments are created without the meta class*
+(https://issues.apache.org/jira/browse/GROOVY-12490[GROOVY-12490]).
+
+==== Closures
+
+* *Closure wrappers report and take the delegation settings of the closure
+they wrap*, and a `wrapAsync` closure serialized by 6.0.0 does not
+deserialize in 6.0.1
+(https://issues.apache.org/jira/browse/GROOVY-12673[GROOVY-12673]).
+* *A method call skips a null owner or delegate*
+(https://issues.apache.org/jira/browse/GROOVY-12667[GROOVY-12667]), and a
+closure's own method used as the fallback runs once
+(https://issues.apache.org/jira/browse/GROOVY-12578[GROOVY-12578]).
+* *A closure passes a method of `Object` on for a closure nested in it*, so
+`toString()` in a nested closure reaches the enclosing object
+(https://issues.apache.org/jira/browse/GROOVY-12829[GROOVY-12829]).
+
+==== Traits
+
+* *Statically compiled trait code calls static accessors with the
+implementing class*, in lambdas, closures and property reads
+(https://issues.apache.org/jira/browse/GROOVY-12608[GROOVY-12608],
+https://issues.apache.org/jira/browse/GROOVY-12590[GROOVY-12590],
+https://issues.apache.org/jira/browse/GROOVY-12624[GROOVY-12624]).
+* *Trait static state used through the trait itself throws
+`MissingFieldException`*
+(https://issues.apache.org/jira/browse/GROOVY-12597[GROOVY-12597]).
+* *A private or static trait method called from a closure is resolved
+through the closure's delegate*
+(https://issues.apache.org/jira/browse/GROOVY-12611[GROOVY-12611],
+https://issues.apache.org/jira/browse/GROOVY-12618[GROOVY-12618]), and an
+explicit `this.m()` there calls the implementing object
+(https://issues.apache.org/jira/browse/GROOVY-12612[GROOVY-12612]).
+* *A trait's instance initializer blocks run once under joint compilation*
+(https://issues.apache.org/jira/browse/GROOVY-12575[GROOVY-12575]).
+
+==== Packed closures (incubating)
+
+* *Packed closures read owner properties through their accessors*, run
+against the new this object after `rehydrate`, and are not packed when they
+call a method of the closure itself
+(https://issues.apache.org/jira/browse/GROOVY-12658[GROOVY-12658],
+https://issues.apache.org/jira/browse/GROOVY-12666[GROOVY-12666],
+https://issues.apache.org/jira/browse/GROOVY-12670[GROOVY-12670],
+https://issues.apache.org/jira/browse/GROOVY-12660[GROOVY-12660],
+https://issues.apache.org/jira/browse/GROOVY-12663[GROOVY-12663]).
+
+==== Libraries and API
+
+* *`abs()` on a `Number` receiver keeps the number's precision* and returns
+`Number`, so `int x = n.abs()` needs `.intValue()`
+(https://issues.apache.org/jira/browse/GROOVY-12471[GROOVY-12471]).
+* *`@IndexedProperty` adds no indexed setter to a record*
+(https://issues.apache.org/jira/browse/GROOVY-12730[GROOVY-12730]).
+* *`@NamedVariant` keeps explicit falsy arguments* and generates
+default-argument variants, which can clash with a declared `m(Map)`
+(https://issues.apache.org/jira/browse/GROOVY-10498[GROOVY-10498],
+https://issues.apache.org/jira/browse/GROOVY-12762[GROOVY-12762]).
+* *A repeated `_` holds the last value*, as in Groovy 5, and
+`PlaceholderVisitor` is deprecated
+(https://issues.apache.org/jira/browse/GROOVY-11744[GROOVY-11744]).
+* *Anonymous scripts no longer go through the `GroovyShell` and
+`GroovyClassLoader` overloads that take a file name*, so subclasses
+overriding those overloads no longer see them
+(https://issues.apache.org/jira/browse/GROOVY-8113[GROOVY-8113]).
+* *`ListHashMap` views, as used for AST node metadata, are live and
+read-only*
+(https://issues.apache.org/jira/browse/GROOVY-12744[GROOVY-12744]).
+* *`@GrabConfig` system properties follow `Grape.enableGrapes`*
+(https://issues.apache.org/jira/browse/GROOVY-12461[GROOVY-12461]).
+* *Parallel collections run on the pool in scope (incubating)*, such as
+`Pool.virtual()`
+(https://issues.apache.org/jira/browse/GROOVY-12457[GROOVY-12457]).
+* *Async constructs rethrow a checked exception as itself* (incubating)
+(https://issues.apache.org/jira/browse/GROOVY-12763[GROOVY-12763]), and a
+late subscriber of `BroadcastChannel.asPublisher()` completes
+(https://issues.apache.org/jira/browse/GROOVY-12571[GROOVY-12571]).
+
+==== groovy-contracts and groovy-typecheckers
+
+* *Contracts are checked on more paths*: postconditions and class invariants
+on a trailing implicit return after an early return, and class invariants in
+trait methods
+(https://issues.apache.org/jira/browse/GROOVY-12463[GROOVY-12463],
+https://issues.apache.org/jira/browse/GROOVY-12742[GROOVY-12742]).
+* *Contract values that were silently ignored are compile errors*: a class
+literal as a contract, a non-closure `@Modifies`, and contracts on traits
+(https://issues.apache.org/jira/browse/GROOVY-12728[GROOVY-12728],
+https://issues.apache.org/jira/browse/GROOVY-12729[GROOVY-12729],
+https://issues.apache.org/jira/browse/GROOVY-12477[GROOVY-12477],
+https://issues.apache.org/jira/browse/GROOVY-12723[GROOVY-12723],
+https://issues.apache.org/jira/browse/GROOVY-12741[GROOVY-12741]).
+* *`PurityChecker` reports mutating operators* such as `s << v` and
+`a[i] = v` in `@Pure` methods
+(https://issues.apache.org/jira/browse/GROOVY-12464[GROOVY-12464]).
+
+=== Notable fixes
+
+* *Script engines no longer leak generated class names.* `GroovyShell`,
+`GroovyClassLoader` and the template engines retained the name of every
+generated script class in their parent class loaders
+(https://issues.apache.org/jira/browse/GROOVY-8113[GROOVY-8113]).
+* *Lower peak memory when compiling a large class.* Its syntax tree and the
+parser's prediction cache are released before class generation, where they
+could exhaust the default 512m heap of a forked compiler
+(https://issues.apache.org/jira/browse/GROOVY-12332[GROOVY-12332]).
